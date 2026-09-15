@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Getting started — Context Window Architecture</title>
+<meta name="description" content="From an existing prompt to a first conformant CWA payload in six steps. Includes the prompt-to-slots migrator and the scaffold downloads." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.60 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.58 0.17 38); --p-state: oklch(0.56 0.14 250); --p-evid: oklch(0.54 0.13 155); --p-inter: oklch(0.54 0.15 310); }
+  html[data-theme="dark"] { --bg: oklch(0.175 0.008 80); --surface: oklch(0.215 0.008 80); --fg: oklch(0.955 0.004 90); --muted: oklch(0.68 0.010 85); --line: oklch(0.305 0.008 80); --accent: oklch(0.74 0.17 45); --accent-soft: oklch(0.30 0.045 45); --p-gov: oklch(0.76 0.15 45); --p-state: oklch(0.76 0.12 250); --p-evid: oklch(0.76 0.13 155); --p-inter: oklch(0.76 0.13 310); }
+  html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--fg); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  textarea { font: inherit; }
+  @media (max-width: 1200px) { #sitenav { display: none !important; } }
+  @media (max-width: 860px) { #tool { grid-template-columns: minmax(0, 1fr) !important; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
+
+  <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
+          <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
+        </span>
+        <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
+      </a>
+      <nav id="sitenav" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+        <a href="./start.html" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">Start</a>
+        <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
+        <a href="./evidence.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Evidence</a>
+        <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
+        <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
+        <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+      </nav>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
+      <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
+    </div>
+  </header>
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Getting started · about fifteen minutes</div>
+      <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">From a prompt to a payload with owners.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">You already have a function that builds the model call. These six steps turn it into an assembly: the same content, expressed as typed items in named slots, with a trace. No library to install. Start with the migrator below or read the steps first.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
+        <a href="#migrate" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--fg);">Migrate a prompt</a>
+        <a href="#scaffold" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Download the scaffold</a>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Six steps</div>
+      <div style="display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--bg);">
+        <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
+          <div id="{{ s.anchor }}" style="display: grid; grid-template-columns: 48px minmax(0, 260px) minmax(0, 1fr); gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--line); align-items: start;">
+            <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); padding-top: 4px;">{{ s.n }}</span>
+            <div>
+              <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2;">{{ s.title }}</div>
+              <div style="font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 6px;">{{ s.rules }}</div>
+            </div>
+            <div style="min-width: 0;">
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--fg); text-wrap: pretty;">{{ s.text }}</p>
+              <div style="margin-top: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">{{ s.done }}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="migrate" style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Tool · steps 1 and 3</div>
+      <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Prompt → slots migrator</h2>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each chunk, assigns the slot's default authority, and reports what an assembler would still be missing. It is a heuristic, deliberately conservative: anything it cannot place is left unassigned rather than guessed. Nothing leaves your browser.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
+        <button onClick="{{ loadPrompt }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · system prompt</button>
+        <button onClick="{{ loadMessages }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · message array</button>
+      </div>
+      <div id="tool" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <div style="background: var(--bg); display: flex; flex-direction: column;">
+          <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">your prompt · text or JSON messages</div>
+          <textarea value="{{ src }}" onChange="{{ setSrc }}" spellcheck="false" style="flex: 1; min-height: 420px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
+        </div>
+        <div style="background: var(--surface); display: flex; flex-direction: column;">
+          <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);"><span>proposed items</span><span>{{ mig.summary }}</span></div>
+          <div style="display: flex; flex-direction: column;">
+            <sc-for list="{{ mig.items }}" as="it" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: start;">
+                <span style="width: 10px; height: 10px; margin-top: 5px; background: {{ it.color }};"></span>
+                <div style="min-width: 0;">
+                  <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 14px; font-family: var(--mono); font-size: 12px;"><span style="color: var(--fg);">{{ it.slot }}</span><span style="color: var(--muted);">{{ it.meta }}</span></div>
+                  <div style="font-size: 13.5px; line-height: 1.5; color: var(--muted); margin-top: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ it.preview }}</div>
+                  <div style="font-family: var(--mono); font-size: 11.5px; color: var(--accent); margin-top: 4px;">{{ it.flag }}</div>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="padding: 16px 18px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
+            <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1;">{{ mig.slotCount }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">slots named</div></div>
+            <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--accent);">{{ mig.gapPct }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">of tokens had no owner</div></div>
+            <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1;">{{ mig.missing }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">items still need source · as_of</div></div>
+          </div>
+          <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
+            <span>payload.cwa.yaml</span>
+            <button onClick="{{ downloadYaml }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Download</button>
+          </div>
+          <div style="padding: 16px 18px; max-height: 320px; overflow: auto; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre; color: var(--fg);">{{ mig.yaml }}</div>
+        </div>
+      </div>
+      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts tokens the migrator could not assign to a slot. Everything else still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span> and an <span style="font-family: var(--mono); font-size: 13px;">as_of</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>); that is step 3, and it is the part no tool can do for you.</p>
+    </div>
+  </section>
+
+  <section id="scaffold" style="border-bottom: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Take it with you · step 2</div>
+      <h2 style="margin: 0 0 16px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Copy the scaffold.</h2>
+      <p style="margin: 0 0 32px; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Five ways in: an assembly function for your prompt code, an empty payload, an item schema as YAML and as JSON Schema, and a spec file your coding agents can follow.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center;">
+        <sc-for list="{{ scaffoldTabs }}" as="s" hint-placeholder-count="5">
+          <button onClick="{{ s.select }}" style="{{ s.style }}">{{ s.label }}</button>
+        </sc-for>
+      </div>
+      <p style="margin: 0 0 18px; font-size: 16px; line-height: 1.55; color: var(--muted); max-width: 68ch; text-wrap: pretty;">{{ scaffoldBlurb }}</p>
+      <div style="border: 1px solid var(--line); background: var(--bg);">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
+          <span>{{ scaffoldName }}</span>
+          <button onClick="{{ downloadScaffold }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Download</button>
+        </div>
+        <div style="padding: 20px 18px; max-height: 460px; overflow: auto; font-family: var(--mono); font-size: 13px; line-height: 1.75;">
+          <sc-for list="{{ scaffoldLines }}" as="l" hint-placeholder-count="12">
+            <div style="white-space: pre; overflow-wrap: normal;">{{ l.text }}</div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 20px;">
+        <button onClick="{{ copyScaffold }}" style="{{ copyBtnStyle }}">{{ copyLabel }}</button>
+        <span style="font-family: var(--mono); font-size: 12px; color: var(--muted);">No install, no dependency, no licence.</span>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--fg); color: var(--bg);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <h2 style="margin: 0 0 20px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Next</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; max-width: 900px;">
+        <a href="./spec.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Spec</span><span style="font-size: 17px; line-height: 1.45;">The 23 requirements your assembler has to meet.</span></a>
+        <a href="./producers.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Producers</span><span style="font-size: 17px; line-height: 1.45;">What your retriever, memory store and MCP servers must emit. Lint an item.</span></a>
+        <a href="./evidence.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Evidence</span><span style="font-size: 17px; line-height: 1.45;">Pick a placement profile for your route, and see why it is a profile.</span></a>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SLOT_META = {
+  "governance.instructions": ["gov", "governing"], "governance.capabilities": ["gov", "capability"], "governance.output_contract": ["gov", "governing"],
+  "state.user": ["state", "state"], "state.task": ["state", "state"],
+  "evidence.knowledge": ["evid", "reference_only"], "evidence.tool_results": ["evid", "observation"],
+  "interaction.memory": ["inter", "generated"], "interaction.history": ["inter", "user"], "interaction.examples": ["inter", "steering"], "interaction.query": ["inter", "user"],
+  "unassigned": ["none", "?"]
+};
+const COLOR = { gov: "var(--p-gov)", state: "var(--p-state)", evid: "var(--p-evid)", inter: "var(--p-inter)", none: "var(--line)" };
+const SAMPLE_PROMPT = `You are Ada, a support agent for Northwind. Be warm but brief. Never quote prices you cannot verify with a tool. Do not discuss competitors.
+
+Respond in at most 3 sentences. No bullet lists. If you issue a refund, end with the refund id.
+
+You can call lookup_order(id) and issue_refund(id, amount). Only call issue_refund after lookup_order has confirmed eligibility.
+
+Customer profile: plan=pro, region=EU, preferred tone=concise.
+
+Refund policy (refunds-eu v17): Pro plans refund in full within 30 days of purchase. Refunds return to the original payment method.
+
+Earlier in this conversation the user mentioned they bought Pro in March and use EU billing.
+
+Example — user: "Can I get my money back?" assistant: "Yes. Orders under 30 days old refund in full to the original card. Want me to check yours?"
+
+Current task: refund_request; verify_eligibility=done; issue=pending.
+
+User: Can you just process it now?`;
+const SAMPLE_MESSAGES = JSON.stringify([
+  { role: "system", content: "You are a code reviewer for the payments service. Flag security issues first. Never approve a PR that touches auth without a test." },
+  { role: "system", content: "Output JSON: {\"verdict\": \"approve\"|\"request_changes\", \"findings\": [...]}" },
+  { role: "user", content: "Review PR #4412: adds retry to the charge endpoint." },
+  { role: "assistant", content: "Looking at the diff. Is idempotency handled on retry?" },
+  { role: "tool", name: "read_diff", content: "@@ -40,6 +40,12 @@ def charge(...): for attempt in range(3): ..." },
+  { role: "user", content: "Yes, the idempotency key is passed through. Verdict?" }
+], null, 2);
+
+class Component extends DCLogic {
+  state = { theme: "light", src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
+  componentDidMount() {
+    let t = "light";
+    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    this.applyTheme(t);
+    import("./scaffolds.js").then(m => this.setState({ scaffolds: m.SCAFFOLDS })).catch(() => {});
+  }
+  componentWillUnmount() { clearTimeout(this._c); }
+  applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cwa-theme", t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+  classify(text, role) {
+    const t = text.toLowerCase();
+    if (role === "tool" || role === "function") return "evidence.tool_results";
+    if (role === "assistant") return "interaction.history";
+    if (/^(example|e\.g\.)|—\s*user:|user:\s*".*assistant:/i.test(text)) return "interaction.examples";
+    if (/(respond|answer|reply|output|format|return) (in|as|with|json|at most|max)|json:|no bullet|schema|sentences?\b.*(max|at most)|max \d+ (sentences|words)/.test(t)) return "governance.output_contract";
+    if (/you (can|may) call|tools?:|functions?:|\w+\([\w, ]*\)/.test(t) && /call|tool|function/.test(t)) return "governance.capabilities";
+    if (/^(current )?task:|task state|workflow|status=|=pending|=done|approval/.test(t)) return "state.task";
+    if (/^(customer|user) profile|plan=|region=|locale|entitlement|tenant/.test(t)) return "state.user";
+    if (/earlier in this conversation|previously|prior (conversation|discussion)|the user (mentioned|said|prefers)|remember(ed)? that/.test(t)) return "interaction.memory";
+    if (/policy \(|\bv\d+\)|retrieved|according to|source:|passage|document|<doc|faq|knowledge base|refunds? (return|in full)/.test(t)) return "evidence.knowledge";
+    if (role === "user") return "interaction.query";
+    if (/^user:|^customer:|^q:/.test(t)) return "interaction.query";
+    if (/^you are|\byou are an?\b|never |always |do not |don't |must |be (warm|brief|concise|polite)|refuse/.test(t)) return "governance.instructions";
+    if (role === "system") return "governance.instructions";
+    return "unassigned";
+  }
+  migrate(src) {
+    let chunks = [];
+    let parsed = null;
+    try { parsed = JSON.parse(src); } catch (e) {}
+    if (Array.isArray(parsed)) {
+      const users = parsed.filter(m => m.role === "user").length;
+      let seenUsers = 0;
+      chunks = parsed.map(m => {
+        const text = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
+        let slot = this.classify(text, m.role);
+        if (m.role === "user") { seenUsers++; if (seenUsers < users) slot = "interaction.history"; }
+        return { text, slot, src: "message:" + m.role + (m.name ? ":" + m.name : "") };
+      });
+    } else {
+      chunks = src.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).map(text => ({ text, slot: this.classify(text, null), src: "prompt:literal" }));
+    }
+    const tok = s => Math.max(1, Math.round(s.length / 4));
+    const total = chunks.reduce((a, c) => a + tok(c.text), 0) || 1;
+    const gap = chunks.filter(c => c.slot === "unassigned").reduce((a, c) => a + tok(c.text), 0);
+    const slots = new Set(chunks.map(c => c.slot).filter(s => s !== "unassigned"));
+    const items = chunks.map((c, i) => {
+      const m = SLOT_META[c.slot];
+      return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + m[1] + " · ~" + tok(c.text) + " tok", preview: c.text.replace(/\s+/g, " "),
+        flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs source · as_of") };
+    });
+    const y = (s) => JSON.stringify(s);
+    const yaml = ["# proposed by the migrator · every item still needs a real source and as_of", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(chunks.map((c, i) => {
+      const m = SLOT_META[c.slot];
+      return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + m[1], "    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO as_of\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text.length > 140 ? c.text.slice(0, 137) + "…" : c.text)].join("\n");
+    })).join("\n");
+    return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: chunks.length + " chunk" + (chunks.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(chunks.filter(c => c.slot !== "unassigned").length), yaml };
+  }
+  download(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  copy(text) {
+    const done = () => { this.setState({ copied: true }); clearTimeout(this._c); this._c = setTimeout(() => this.setState({ copied: false }), 2200); };
+    const fb = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta); done(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb); else fb();
+  }
+  tab(active) {
+    return "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
+  }
+  renderVals() {
+    const mig = this.migrate(this.state.src);
+    const SC = this.state.scaffolds || [{ label: "Assembler", filename: "assemble.py", blurb: "Loading…", text: " " }];
+    const si = Math.min(this.state.scaffold, SC.length - 1);
+    const sc = SC[si];
+    return {
+      themeLabel: this.state.theme === "dark" ? "light" : "dark",
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      steps: [
+        { n: "01", anchor: "step-1", title: "Name the slots you already send", rules: "R-1", text: "Take the function that builds your model call and split its output into chunks. Give each chunk one of the eleven slot names. Anything that does not fit is a finding: either it belongs in two slots and should be two items, or it should not be in the window at all.", done: "Done when: every chunk has a slot, or is written down as unassigned." },
+        { n: "02", anchor: "step-2", title: "Wrap the payload in the scaffold", rules: "assemble.py · payload.txt", text: "Copy the assembly function below beside your prompt code. It takes items, a profile and a budget, and returns a payload and a trace. Replace your string concatenation with a call to it. Nothing about your content changes yet.", done: "Done when: the model receives the same bytes as before, produced by the scaffold." },
+        { n: "03", anchor: "step-3", title: "Give every item an authority and a source", rules: "R-2 · R-3", text: "Each item needs the eight minimum fields. Authority comes from the slot's ceiling. Source and source_version name where the content really came from: a policy file and its commit, a database row and its read time, a retriever and its index version. If you cannot name a source, you have found content with no owner.", done: "Done when: the item linter on /producers admits every item." },
+        { n: "04", anchor: "step-4", title: "Emit the trace and run the checks", rules: "R-21 · R-23", text: "The scaffold already writes the trace. Paste one into the trace validator and fix what it flags. Then run two of the conformance tests: assemble twice with identical inputs and compare the hash; drop one evidence item and confirm the trace names it.", done: "Done when: the validator reports conformant and both tests pass." },
+        { n: "05", anchor: "step-5", title: "Pick a placement profile", rules: "R-19 · R-20", text: "The scaffold ships with policy-first-chat/v1. Read the three profiles on the Evidence page and choose the one whose route matches yours. Record the choice in profile.yaml with the evaluation you ran, even if that evaluation is a single golden task for now.", done: "Done when: the trace names a profile id and version you chose deliberately." },
+        { n: "06", anchor: "step-6", title: "Move enforcement out of the prompt", rules: "R-5", text: "Search your governance items for invariants: never, always, must not. Each one stays in the prompt as guidance and gains a guard outside the model: a tool wrapper, a validator on the output, a permission check. The prompt instructs; the application enforces.", done: "Done when: every invariant has a named guard, and the prompt no longer carries the only copy of it." }
+      ],
+      src: this.state.src,
+      setSrc: e => this.setState({ src: e.target.value }),
+      loadPrompt: () => this.setState({ src: SAMPLE_PROMPT }),
+      loadMessages: () => this.setState({ src: SAMPLE_MESSAGES }),
+      mig,
+      downloadYaml: () => this.download("payload.cwa.yaml", mig.yaml),
+      scaffoldTabs: SC.map((s, i) => ({ label: s.label, style: this.tab(i === si), select: () => this.setState({ scaffold: i, copied: false }) })),
+      scaffoldName: sc.filename, scaffoldBlurb: sc.blurb,
+      scaffoldLines: sc.text.split("\n").map(t => ({ text: t === "" ? " " : t })),
+      downloadScaffold: () => this.download(sc.filename, sc.text),
+      copyScaffold: () => this.copy(sc.text),
+      copyLabel: this.state.copied ? "Copied" : "Copy " + sc.filename,
+      copyBtnStyle: "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; border-radius: var(--pill); padding: 11px 20px; cursor: pointer; background: " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; color: var(--bg);"
+    };
+  }
+}
+</script>
+</body>
+</html>

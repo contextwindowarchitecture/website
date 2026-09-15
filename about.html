@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>About, governance &amp; contributing — Context Window Architecture</title>
+<meta name="description" content="What CWA is and is not, who maintains it, how the specification is revised, the licence, and how to contribute." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.60 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.58 0.17 38); --p-state: oklch(0.56 0.14 250); --p-evid: oklch(0.54 0.13 155); --p-inter: oklch(0.54 0.15 310); }
+  html[data-theme="dark"] { --bg: oklch(0.175 0.008 80); --surface: oklch(0.215 0.008 80); --fg: oklch(0.955 0.004 90); --muted: oklch(0.68 0.010 85); --line: oklch(0.305 0.008 80); --accent: oklch(0.74 0.17 45); --accent-soft: oklch(0.30 0.045 45); --p-gov: oklch(0.76 0.15 45); --p-state: oklch(0.76 0.12 250); --p-evid: oklch(0.76 0.13 155); --p-inter: oklch(0.76 0.13 310); }
+  html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--fg); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  @media (max-width: 1200px) { #sitenav { display: none !important; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
+
+  <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
+          <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
+        </span>
+        <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
+      </a>
+      <nav id="sitenav" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+        <a href="./start.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Start</a>
+        <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
+        <a href="./evidence.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Evidence</a>
+        <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
+        <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
+        <a href="./about.html" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">About</a>
+      </nav>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
+      <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
+    </div>
+  </header>
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">About</div>
+      <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">A free specification, revised in the open.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Context Window Architecture is a specification for assembling every model call from typed slots. It is not a library, not a framework, and not a product. Anyone may implement it; nobody needs permission.</p>
+    </div>
+  </section>
+
+  <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">CWA is</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5;">
+            <span>A vocabulary: four planes, eleven slots, one item shape.</span>
+            <span>Twenty-three numbered requirements an assembler can be tested against.</span>
+            <span>A contract producers can build to without knowing the assembler.</span>
+            <span>A trace format that makes assembly decisions comparable across implementations.</span>
+          </div>
+        </div>
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">CWA is not</div>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5;">
+            <span>A prompt template or a recommended order. Placement is a profile you evaluate.</span>
+            <span>A replacement for your agent framework. It fills the blank the framework leaves.</span>
+            <span>A security boundary. Governance items instruct; the application enforces.</span>
+            <span>A claim about how models behave. The evidence page cites what is measured and stops there.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="governance" style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: start;">
+      <div>
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Maintainers &amp; revision process</div>
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">How the spec changes.</h2>
+        <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">The specification is maintained by its authors in the <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture</a> organisation on GitHub. The normative text on the <a href="./spec.html">Spec</a> page and <span style="font-family: var(--mono); font-size: 14px;">SPEC.md</span> in the repository are the same document; a change lands in both or in neither.</p>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Requirement numbers are permanent. A withdrawn rule keeps its number and is marked withdrawn. New rules take the next number, whatever section they land in.</p>
+      </div>
+      <div style="border: 1px solid var(--line);">
+        <sc-for list="{{ process }}" as="p" hint-placeholder-count="4">
+          <div style="display: grid; grid-template-columns: 32px 130px minmax(0, 1fr); gap: 14px; padding: 16px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ p.n }}</span>
+            <span style="font-size: 15px; font-weight: 600;">{{ p.name }}</span>
+            <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ p.text }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="contributing" style="border-bottom: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Contributing</div>
+      <h2 style="margin: 0 0 28px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Four ways in, in order of usefulness.</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <sc-for list="{{ ways }}" as="w" hint-placeholder-count="4">
+          <div style="background: var(--bg); padding: 22px 22px; display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: {{ w.color }};">{{ w.kicker }}</span>
+            <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2;">{{ w.title }}</span>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ w.text }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section id="licence" style="background: var(--fg); color: var(--bg);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; align-items: start;">
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px;">Licence</div>
+        <p style="margin: 0; font-size: 17px; line-height: 1.55; text-wrap: pretty;">The specification text, the scaffold files and the schemas are free to use, copy and implement without attribution. The reference assembler carries its own open-source licence in the repository.</p>
+      </div>
+      <div>
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px;">Contact</div>
+        <p style="margin: 0 0 20px; font-size: 17px; line-height: 1.55; text-wrap: pretty;">Issues and proposals on GitHub. For anything that should not be public, the repository README lists a maintainer address.</p>
+        <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="display: inline-block; font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">Open GitHub</a>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { theme: "light" };
+  componentDidMount() {
+    let t = "light";
+    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    this.applyTheme(t);
+  }
+  applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cwa-theme", t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+  renderVals() {
+    return {
+      themeLabel: this.state.theme === "dark" ? "light" : "dark",
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      process: [
+        { n: "01", name: "Proposal", text: "An issue titled with the rule it touches (R-n, or 'new rule'). States the problem seen in a real route, the proposed text, and which conformance test would change." },
+        { n: "02", name: "Draft", text: "A pull request against SPEC.md and the Spec page together. Draft rules are marked draft in the index until the revision ships." },
+        { n: "03", name: "Revision", text: "Accepted drafts are batched into a dated revision of the current version (v2 draft → v2 draft, later date). The changelog lists every rule touched." },
+        { n: "04", name: "Version", text: "A version bump (v2 → v3) happens when a MUST changes meaning or a rule is withdrawn. Profiles and traces name the version they conform to." }
+      ],
+      ways: [
+        { kicker: "Most useful", color: "var(--accent)", title: "Report a route the spec cannot express", text: "A real system where a rule blocks something legitimate, or where two rules conflict. Include the trace if you have one." },
+        { kicker: "Profiles", color: "var(--p-inter)", title: "Contribute an evaluated placement profile", text: "A profile.yaml with a filled evaluation block. Unevaluated profiles are accepted as hypotheses and labelled so." },
+        { kicker: "Producers", color: "var(--p-evid)", title: "Build a conforming producer", text: "A retriever, memory store or MCP adapter that passes the item linter. Listed on the Producers page once its items are admitted by the reference assembler." },
+        { kicker: "Assembler", color: "var(--p-state)", title: "Implement a requirement", text: "Pick a planned row in the conformance matrix, write the test first, then the code. One rule per pull request." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
