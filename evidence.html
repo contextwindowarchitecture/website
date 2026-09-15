@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Profiles &amp; placement evidence — Context Window Architecture</title>
+<meta name="description" content="Why CWA makes placement a versioned, per-route profile rather than a rule: the serial-position research, provider guidance by model generation, the profile format, and an explorer to diff profiles." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.60 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.58 0.17 38); --p-state: oklch(0.56 0.14 250); --p-evid: oklch(0.54 0.13 155); --p-inter: oklch(0.54 0.15 310); }
+  html[data-theme="dark"] { --bg: oklch(0.175 0.008 80); --surface: oklch(0.215 0.008 80); --fg: oklch(0.955 0.004 90); --muted: oklch(0.68 0.010 85); --line: oklch(0.305 0.008 80); --accent: oklch(0.74 0.17 45); --accent-soft: oklch(0.30 0.045 45); --p-gov: oklch(0.76 0.15 45); --p-state: oklch(0.76 0.12 250); --p-evid: oklch(0.76 0.13 155); --p-inter: oklch(0.76 0.13 310); }
+  html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--fg); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  @media (max-width: 1200px) { #sitenav { display: none !important; } }
+  @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
+  @media (max-width: 860px) { #diff { grid-template-columns: minmax(0, 1fr) !important; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
+
+  <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
+          <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
+        </span>
+        <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
+      </a>
+      <nav id="sitenav" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+        <a href="./start.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Start</a>
+        <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
+        <a href="./evidence.html" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">Evidence</a>
+        <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
+        <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
+        <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+      </nav>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
+      <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
+    </div>
+  </header>
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Profiles &amp; placement evidence</div>
+      <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Why placement is a profile, not a rule.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA fixes what the slots mean and refuses to fix where they go. This page is the justification: what the research measures, how provider guidance differs, what a profile has to carry, and how to evaluate one. Normative text is in <a href="./spec.html#s5">Spec §5</a>.</p>
+    </div>
+  </section>
+
+  <div id="layout" style="max-width: 1180px; margin: 0 auto; padding: 0 32px 96px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 56px; align-items: start;">
+
+    <nav id="toc" style="position: sticky; top: 92px; padding-top: 48px; display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.5;">
+      <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Contents</div>
+      <a href="#position" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">The position</a>
+      <a href="#research" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">What the research measures</a>
+      <a href="#providers" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Provider guidance</a>
+      <a href="#format" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile format</a>
+      <a href="#explorer" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile explorer</a>
+      <a href="#evaluate" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Evaluating a profile</a>
+      <a href="#refs" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">References</a>
+    </nav>
+
+    <article style="min-width: 0; padding-top: 48px; display: flex; flex-direction: column; gap: 72px;">
+
+      <section id="position">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">The position</h2>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">
+          <p style="margin: 0;">Where an item sits in the window changes whether the model uses it. That effect is real, measured, and different for every model family, task shape and context length. A specification that hard-coded an order would be right for one deployment and wrong for the next, and nobody would be able to tell which.</p>
+          <p style="margin: 0;">So CWA takes no position on where items go. It requires only that placement be a <strong>profile</strong>: versioned, per route, evaluated against that route's tasks, and recorded in every trace. Every placement hint on this site, including the <span style="font-family: var(--mono); font-size: 14px;">policy-first-chat</span> default, is a tested default for one route, not a claim about models in general.</p>
+        </div>
+      </section>
+
+      <section id="research">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">What the research measures</h2>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">
+          <p style="margin: 0;">Serial-position effects are measured, not folklore. Liu et al. tested models on multi-document question answering and key-value retrieval and found a U-shaped curve: accuracy is highest when the relevant passage sits at the beginning of the context (<strong>primacy</strong>) or at the end (<strong>recency</strong>), and drops when it sits in the middle. <a href="#cite-1">[1]</a></p>
+          <p style="margin: 0;">Later long-context work finds the effect persists and varies. RULER evaluated 17 models and found almost all lose accuracy as context length grows, despite near-perfect scores on simple needle retrieval. <a href="#cite-2">[2]</a> NoLiMa finds models do well at the edges of the window when the task is a literal match, but when the answer needs an associative hop, longer contexts pull performance down even at the edges. <a href="#cite-3">[3]</a></p>
+          <p style="margin: 0; color: var(--fg); font-weight: 500;">Position, length, model family and task interact. No single number describes it, and no single order is safe to bake into a spec.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Varies with</div><div style="font-size: 15px; line-height: 1.55;">Model family and version</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Varies with</div><div style="font-size: 15px; line-height: 1.55;">Total context length</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Varies with</div><div style="font-size: 15px; line-height: 1.55;">Task: literal match vs associative hop</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Varies with</div><div style="font-size: 15px; line-height: 1.55;">Number and similarity of distractors</div></div>
+        </div>
+      </section>
+
+      <section id="providers">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Provider guidance, by generation</h2>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Provider guidance differs and is written per model generation. Both recommendations below are right for their workloads; neither is right for the other's.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+          <div style="background: var(--bg); padding: 22px 24px;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Anthropic · long-context tips <a href="#cite-4">[4]</a></div>
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Documents near the top, the question after them.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Long inputs go early and clearly delimited; instructions and the query follow. The <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">document-analysis</span> profile is this shape.</p>
+          </div>
+          <div style="background: var(--bg); padding: 22px 24px;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">OpenAI · GPT-4.1 prompting guide <a href="#cite-5">[5]</a></div>
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Instructions at both ends of long context.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Repeat instructions before and after the long material; if stated once, above it. Notes that the family needed prompt migration. The <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">long-context-reinforced</span> profile is this shape.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="format">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile format</h2>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a small YAML file. It carries an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, and the evaluation that justified promoting it (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered.</p>
+        <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
+          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
+          <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
+        </div>
+      </section>
+
+      <section id="explorer">
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Tool</div>
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile explorer</h2>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Pick two profiles. Each is drawn as the window it produces, in order, coloured by plane. The diff lists what moved. Export either as YAML.</p>
+        <div id="diff" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+          <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile A</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ tabsA }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ a.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ a.id }}</span></div>
+              <div style="font-size: 13.5px; color: var(--muted);">route: {{ a.route }} · {{ a.uses }}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <sc-for list="{{ a.rows }}" as="r" hint-placeholder-count="11">
+                <div style="display: grid; grid-template-columns: 28px 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; background: {{ r.bg }};">
+                  <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ r.n }}</span>
+                  <span style="width: 8px; height: 18px; background: {{ r.color }};"></span>
+                  <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.slot }}</span>
+                  <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">{{ r.tag }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ a.principle }}</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ exportA }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Export A as YAML</button></div>
+          </div>
+          <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile B</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+              <sc-for list="{{ tabsB }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+            </div>
+            <div>
+              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ b.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ b.id }}</span></div>
+              <div style="font-size: 13.5px; color: var(--muted);">route: {{ b.route }} · {{ b.uses }}</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 3px;">
+              <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="11">
+                <div style="display: grid; grid-template-columns: 28px 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; background: {{ r.bg }};">
+                  <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ r.n }}</span>
+                  <span style="width: 8px; height: 18px; background: {{ r.color }};"></span>
+                  <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.slot }}</span>
+                  <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">{{ r.tag }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <p style="margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ b.principle }}</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ exportB }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Export B as YAML</button></div>
+          </div>
+        </div>
+        <div style="border: 1px solid var(--line); border-top: 0; background: var(--surface); padding: 18px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">A → B diff · {{ diffSummary }}</div>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <sc-for list="{{ diff }}" as="d" hint-placeholder-count="4">
+              <div style="display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.6;"><span style="color: {{ d.color }};">{{ d.kind }}</span><span style="color: var(--fg);">{{ d.text }}</span></div>
+            </sc-for>
+          </div>
+        </div>
+        <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Highlighted rows are slots whose position differs between A and B. <span style="color: var(--accent); font-family: var(--mono); font-size: 13px;">↺</span> marks a reinforcement: the slot has already appeared and is rendered again.</p>
+      </section>
+
+      <section id="evaluate">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Evaluating a profile</h2>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is promoted by evidence from its own route, not by argument. The protocol is short and the trace makes it cheap: because assembly is deterministic (<a href="./spec.html#R-23">R-23</a>), two profiles applied to the same items differ only in placement, so any change in outcome is attributable to placement alone.</p>
+        <div style="border: 1px solid var(--line);">
+          <sc-for list="{{ protocol }}" as="p" hint-placeholder-count="5">
+            <div style="display: grid; grid-template-columns: 32px 200px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+              <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ p.n }}</span>
+              <span style="font-size: 15px; font-weight: 600;">{{ p.name }}</span>
+              <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ p.text }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 18px 22px; margin-top: 24px; font-size: 15px; line-height: 1.55; max-width: 70ch; text-wrap: pretty;">A profile whose <span style="font-family: var(--mono); font-size: 13.5px;">evaluation</span> block is empty is a hypothesis. Ship it if you must, but version it, and treat the first golden-task run as the evaluation that fills the block.</div>
+      </section>
+
+      <section id="refs" style="border-top: 1px solid var(--line); padding-top: 28px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">References</div>
+        <ol style="margin: 0; padding: 0 0 0 22px; font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--muted); display: flex; flex-direction: column; gap: 10px;">
+          <li id="cite-1">Liu, Lin, Hewitt, Paranjape, Bevilacqua, Petroni, Liang. “Lost in the Middle: How Language Models Use Long Contexts.” arXiv 2307.03172 (2023); TACL 2024. <a href="https://arxiv.org/abs/2307.03172" target="_blank" rel="noopener">arxiv.org/abs/2307.03172</a></li>
+          <li id="cite-2">Hsieh et al. “RULER: What’s the Real Context Size of Your Long-Context Language Models?” arXiv 2404.06654 (2024). <a href="https://arxiv.org/abs/2404.06654" target="_blank" rel="noopener">arxiv.org/abs/2404.06654</a></li>
+          <li id="cite-3">Modarressi et al. “NoLiMa: Long-Context Evaluation Beyond Literal Matching.” arXiv 2502.05167 (2025). <a href="https://arxiv.org/abs/2502.05167" target="_blank" rel="noopener">arxiv.org/abs/2502.05167</a></li>
+          <li id="cite-4">Anthropic. “Long context prompting tips.” <a href="https://docs.anthropic.com/en/docs/long-context-window-tips" target="_blank" rel="noopener">docs.anthropic.com</a></li>
+          <li id="cite-5">OpenAI. “GPT-4.1 Prompting Guide.” <a href="https://developers.openai.com/cookbook/examples/gpt4-1_prompting_guide" target="_blank" rel="noopener">developers.openai.com</a></li>
+        </ol>
+      </section>
+
+    </article>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "interaction.examples", "governance.output_contract", "interaction.query"];
+const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
+const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("state") ? "var(--p-state)" : s.startsWith("evidence") ? "var(--p-evid)" : "var(--p-inter)";
+const PROFILES = [
+  { name: "Policy-first chat", id: "policy-first-chat/v1", short: "policy-first", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples.", evalNote: "golden-task suite support-chat/v4 · 2026-08-30 · groundedness 0.94, task success 0.91" },
+  { name: "Document analysis", id: "document-analysis/v1", short: "document", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples and the question after them, near the end.", evalNote: "document-qa/v2 · 2026-08-12 · citation accuracy 0.89" },
+  { name: "Long-context reinforced", id: "long-context-reinforced/v1", short: "reinforced", route: "long-context-qa", uses: "Very long inputs, multi-document synthesis", order: [0, 2, 7, 1, 3, 4, 5, 9, 0, 10], principle: "Instructions at both ends of a long window. Evidence and observations early and delimited; task state, memory and history after them; the output contract and the instructions restated beside the query.", evalNote: "not yet evaluated · hypothesis drawn from provider guidance [5]", isNew: true },
+  { name: "Tool-using agent", id: "tool-agent/v1", short: "tool-agent", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.", evalNote: "agent-loop/v3 · 2026-08-21 · tool-call correctness 0.96" },
+  { name: "Structured extraction", id: "extraction/v1", short: "extraction", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.", evalNote: "extract/v5 · 2026-07-30 · schema validity 0.99" }
+];
+class Component extends DCLogic {
+  state = { theme: "light", a: 0, b: 2 };
+  componentDidMount() {
+    let t = "light";
+    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    this.applyTheme(t);
+  }
+  applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cwa-theme", t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+  tab(active) {
+    return "font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 6px 11px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
+  }
+  yaml(p) {
+    const pad = s => (s + ",").padEnd(29);
+    const [id, v] = p.id.split("/");
+    return ["profile:", "  id:           " + id, "  version:      " + v.replace("v", ""), "  route:        " + p.route, "  model_family: \"<family and version this profile was evaluated on>\"", "  placement:"]
+      .concat(p.order.map(i => "    - { slot: " + pad(SLOTS[i]) + " wrap: " + WRAP[i] + " }"))
+      .concat(["  evaluation:", "    suite:  \"<route eval suite and version>\"", "    date:   \"<date>\"", "    result: \"" + p.evalNote + "\""]).join("\n");
+  }
+  view(p, other) {
+    const firstPos = (order, i) => order.indexOf(i);
+    const rows = p.order.map((i, k) => {
+      const reinforced = firstPos(p.order, i) < k;
+      const posOther = firstPos(other.order, i);
+      const moved = posOther === -1 || posOther !== firstPos(p.order, i);
+      return { n: String(k + 1).padStart(2, "0"), color: PLANE(SLOTS[i]), slot: SLOTS[i], tag: reinforced ? "↺" : "", bg: moved && !reinforced ? "var(--accent-soft)" : "transparent" };
+    });
+    return { name: p.name, id: p.id, route: p.route, uses: p.uses, principle: p.principle, rows, yaml: this.yaml(p) };
+  }
+  download(name, text) {
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
+    const a = document.createElement("a"); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  diff(A, B) {
+    const out = [];
+    const uniq = o => Array.from(new Set(o));
+    const ua = uniq(A.order), ub = uniq(B.order);
+    ua.forEach(i => { if (!ub.includes(i)) out.push({ kind: "removed", color: "var(--muted)", text: SLOTS[i] + " is not rendered in B" }); });
+    ub.forEach(i => { if (!ua.includes(i)) out.push({ kind: "added", color: "var(--p-evid)", text: SLOTS[i] + " is rendered in B only" }); });
+    ub.forEach(i => { if (ua.includes(i)) { const pa = ua.indexOf(i) + 1, pb = ub.indexOf(i) + 1; if (pa !== pb) out.push({ kind: "moved", color: "var(--accent)", text: SLOTS[i] + ": position " + pa + " → " + pb }); } });
+    const ra = A.order.length - ua.length, rb = B.order.length - ub.length;
+    if (ra !== rb) out.push({ kind: "reinforce", color: "var(--accent)", text: (rb > ra ? "B" : "A") + " repeats " + Math.abs(rb - ra) + " slot" + (Math.abs(rb - ra) === 1 ? "" : "s") + " (" + (rb > ra ? uniq(B.order.filter((x, k) => B.order.indexOf(x) < k)).map(i => SLOTS[i]).join(", ") : uniq(A.order.filter((x, k) => A.order.indexOf(x) < k)).map(i => SLOTS[i]).join(", ")) + ")" });
+    return out.length ? out : [{ kind: "identical", color: "var(--muted)", text: "Same placement." }];
+  }
+  renderVals() {
+    const A = PROFILES[this.state.a], B = PROFILES[this.state.b];
+    const d = this.diff(A, B);
+    return {
+      themeLabel: this.state.theme === "dark" ? "light" : "dark",
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      tabsA: PROFILES.map((p, i) => ({ label: p.short + (p.isNew ? " · new" : ""), style: this.tab(i === this.state.a), select: () => this.setState({ a: i }) })),
+      tabsB: PROFILES.map((p, i) => ({ label: p.short + (p.isNew ? " · new" : ""), style: this.tab(i === this.state.b), select: () => this.setState({ b: i }) })),
+      a: this.view(A, B), b: this.view(B, A),
+      exportA: () => this.download(A.id.replace("/", "-") + ".yaml", this.yaml(A)),
+      exportB: () => this.download(B.id.replace("/", "-") + ".yaml", this.yaml(B)),
+      diff: d, diffSummary: d.length + " change" + (d.length === 1 ? "" : "s"),
+      protocol: [
+        { n: "01", name: "Fix the item set", text: "Freeze a sample of real requests from the route with their admitted items and traces. The same items go through every profile under test." },
+        { n: "02", name: "Name the metric", text: "One outcome metric the route already tracks: groundedness, task success, tool-call correctness, schema validity. Placement is judged on that, not on preference." },
+        { n: "03", name: "Render with each profile", text: "Assemble every sample with the incumbent profile and the candidate. Traces confirm the only difference is placement." },
+        { n: "04", name: "Compare on the target model", text: "Run both payload sets against the model family the profile names. A profile evaluated on one family says nothing about another." },
+        { n: "05", name: "Record and version", text: "Write suite, date and result into the candidate's evaluation block. Promote by bumping the version; the trace of every later request names it." }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

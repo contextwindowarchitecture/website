@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Reference assembler — Context Window Architecture</title>
+<meta name="description" content="Status of the CWA reference assembler: in progress, no release. Conformance matrix by requirement and the intended API shape." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.60 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.58 0.17 38); --p-state: oklch(0.56 0.14 250); --p-evid: oklch(0.54 0.13 155); --p-inter: oklch(0.54 0.15 310); }
+  html[data-theme="dark"] { --bg: oklch(0.175 0.008 80); --surface: oklch(0.215 0.008 80); --fg: oklch(0.955 0.004 90); --muted: oklch(0.68 0.010 85); --line: oklch(0.305 0.008 80); --accent: oklch(0.74 0.17 45); --accent-soft: oklch(0.30 0.045 45); --p-gov: oklch(0.76 0.15 45); --p-state: oklch(0.76 0.12 250); --p-evid: oklch(0.76 0.13 155); --p-inter: oklch(0.76 0.13 310); }
+  html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--fg); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  @media (max-width: 1200px) { #sitenav { display: none !important; } }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
+
+  <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
+          <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
+        </span>
+        <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
+      </a>
+      <nav id="sitenav" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+        <a href="./start.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Start</a>
+        <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
+        <a href="./evidence.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Evidence</a>
+        <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
+        <a href="./assembler.html" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">Assembler</a>
+        <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+      </nav>
+      <div style="flex: 1;"></div>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
+      <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
+    </div>
+  </header>
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Reference assembler</div>
+      <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">In progress. No release yet.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification: admission, fitting, placement by profile, and the trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
+        <span>Status: <span style="color: var(--accent);">in progress</span></span>
+        <span>Spec target: <span style="color: var(--fg);">v2 draft</span></span>
+        <span>Language: <span style="color: var(--fg);">Python first</span>, others after conformance</span>
+        <span>Updated: 2026-09-15</span>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
+      <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. A row moves to <span style="color: var(--fg);">implemented</span> only when a test in the conformance suite exercises it and passes. Producer-side rules (R-13, R-14, R-15) are checked by the admission layer, so they appear here too.</p>
+      <div style="border: 1px solid var(--line); background: var(--bg);">
+        <div style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 120px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span>keyword</span><span>summary</span><span>status</span></div>
+        <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
+          <a href="{{ r.href }}" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 120px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); align-items: baseline; color: var(--fg);" style-hover="background: var(--surface);">
+            <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ r.id }}</span>
+            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted);">{{ r.kw }}</span>
+            <span style="font-size: 14px; line-height: 1.45; text-wrap: pretty;">{{ r.summary }}</span>
+            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: {{ r.color }};">{{ r.status }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: start;">
+      <div>
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Intended API · subject to change</div>
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">One call in, payload and trace out.</h2>
+        <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">The shape follows the scaffold's <span style="font-family: var(--mono); font-size: 14px;">assemble.py</span>. Producers are called before assembly; the assembler receives items, never producers. Nothing in <span style="font-family: var(--mono); font-size: 14px;">assemble()</span> calls a model (<a href="./spec.html#R-18">R-18</a>).</p>
+      </div>
+      <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
+        <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>cwa/assembler.py</span><span>draft</span></div>
+        <div style="padding: 18px; white-space: pre; overflow: auto;"><span style="color: var(--muted);">from</span> cwa <span style="color: var(--muted);">import</span> Item, Profile, Budget, assemble
+
+result = assemble(
+    items=items,                         <span style="color: var(--muted);"># list[Item], from your producers</span>
+    profile=Profile.load(<span style="color: var(--p-evid);">"policy-first-chat/v1"</span>),
+    budget=Budget(input=8192, reserved_output=1200),
+    route_policy=policy,                 <span style="color: var(--muted);"># matrix overrides, thresholds</span>
+)
+
+result.payload    <span style="color: var(--muted);"># rendered per profile wrap rules</span>
+result.trace      <span style="color: var(--muted);"># dict, R-21 fields; result.trace_json()</span>
+result.refused    <span style="color: var(--muted);"># bool · reason in trace.refused</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--fg); color: var(--bg);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <h2 style="margin: 0 0 20px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Tell us what it must do.</h2>
+      <p style="margin: 0 0 32px; font-size: 17px; line-height: 1.6; opacity: 0.72; max-width: 56ch; text-wrap: pretty;">The assembler is being built against real routes. If yours has a constraint the spec does not cover, open an issue before the API freezes.</p>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
+        <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">Repository</a>
+        <a href="./about.html#contributing" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">How to contribute</a>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const RULES = [
+  ["MUST", "One slot, one authority tier per item"], ["MUST", "Eight minimum fields; refuse at admission"], ["SHOULD", "Policy fields; defaults filled and traced"], ["MUST", "Slots that are never omitted"],
+  ["MUST NOT", "Rule zero: enforce outside the model"], ["MUST", "Resolve conflicts by tier first"], ["MUST NOT", "No slot overrides platform roles; no authority from wording"], ["MUST", "State is application-written and current"], ["MUST", "Memory carries TTL and source; expired is excluded"], ["MUST", "Untrusted content is marked, rendered as material, kept out of governance"], ["MUST", "Apply the resolution matrix; trace every resolution"],
+  ["MUST NOT", "Never answer from nothing"], ["MUST NOT", "Retrievers emit scored packets, not blobs"], ["MUST NOT", "Memory authority capped; expired never emitted"], ["MUST", "MCP output is untrusted evidence; capabilities only in governance"], ["MUST", "Budget pressure: drop, then compress, never touch protected"], ["MUST", "Refuse rather than silently fit"], ["MUST NOT", "Assembly never calls a model"],
+  ["MUST", "Profile shape"], ["MUST", "Profile recorded in every trace"],
+  ["MUST", "Trace as JSON with required fields"], ["SHOULD", "Recommended trace fields"], ["MUST", "Determinism"]
+];
+class Component extends DCLogic {
+  state = { theme: "light" };
+  componentDidMount() {
+    let t = "light";
+    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    this.applyTheme(t);
+  }
+  applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cwa-theme", t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+  renderVals() {
+    const matrix = RULES.map((r, i) => ({ id: "R-" + (i + 1), href: "./spec.html#R-" + (i + 1), kw: r[0], summary: r[1], status: "planned", color: "var(--muted)" }));
+    return {
+      themeLabel: this.state.theme === "dark" ? "light" : "dark",
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      matrix,
+      counts: "0 of " + matrix.length + " requirements implemented."
+    };
+  }
+}
+</script>
+</body>
+</html>
