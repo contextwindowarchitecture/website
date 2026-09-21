@@ -172,10 +172,10 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script>
 const SLOT_META = {
-  "governance.instructions": ["gov", "governing"], "governance.capabilities": ["gov", "capability"], "governance.output_contract": ["gov", "governing"],
+  "governance.instructions": ["gov", "governing"], "governance.capabilities": ["gov", "governing"], "governance.examples": ["gov", "governing"], "governance.output_contract": ["gov", "governing"],
   "state.user": ["state", "state"], "state.task": ["state", "state"],
   "evidence.knowledge": ["evid", "reference_only"], "evidence.tool_results": ["evid", "observation"],
-  "interaction.memory": ["inter", "generated"], "interaction.history": ["inter", "user"], "interaction.examples": ["inter", "steering"], "interaction.query": ["inter", "user"],
+  "interaction.memory": ["inter", "generated"], "interaction.history": ["inter", "user"], "interaction.query": ["inter", "user"],
   "unassigned": ["none", "?"]
 };
 const COLOR = { gov: "var(--p-gov)", state: "var(--p-state)", evid: "var(--p-evid)", inter: "var(--p-inter)", none: "var(--line)" };
@@ -223,7 +223,7 @@ class Component extends DCLogic {
     const t = text.toLowerCase();
     if (role === "tool" || role === "function") return "evidence.tool_results";
     if (role === "assistant") return "interaction.history";
-    if (/^(example|e\.g\.)|—\s*user:|user:\s*".*assistant:/i.test(text)) return "interaction.examples";
+    if (/^(example|e\.g\.)|—\s*user:|user:\s*".*assistant:/i.test(text)) return "governance.examples";
     if (/(respond|answer|reply|output|format|return) (in|as|with|json|at most|max)|json:|no bullet|schema|sentences?\b.*(max|at most)|max \d+ (sentences|words)/.test(t)) return "governance.output_contract";
     if (/you (can|may) call|tools?:|functions?:|\w+\([\w, ]*\)/.test(t) && /call|tool|function/.test(t)) return "governance.capabilities";
     if (/^(current )?task:|task state|workflow|status=|=pending|=done|approval/.test(t)) return "state.task";

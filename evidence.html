@@ -122,6 +122,7 @@
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
           <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
         </div>
+        <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> On 2026-09-20 the examples slot was renamed from <span style="font-family: var(--mono); font-size: 12.5px;">interaction.examples</span> to <span style="font-family: var(--mono); font-size: 12.5px;">governance.examples</span>. The profile keeps version 1: the rename changes no placement, wrapper or rendered byte, so the 2026-08-30 evaluation still describes this payload. This is a pre-release exception; once a profile is public, <a href="./spec.html#R-20">R-20</a> applies as written and a slot rename bumps the version.</p>
       </section>
 
       <section id="explorer">
@@ -216,7 +217,7 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
-const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "interaction.examples", "governance.output_contract", "interaction.query"];
+const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "governance.examples", "governance.output_contract", "interaction.query"];
 const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
 const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("state") ? "var(--p-state)" : s.startsWith("evidence") ? "var(--p-evid)" : "var(--p-inter)";
 const PROFILES = [
