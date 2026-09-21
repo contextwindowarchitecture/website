@@ -59,7 +59,7 @@
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
         <span>Spec target: <span style="color: var(--fg);">v2 draft</span></span>
         <span>Language: <span style="color: var(--fg);">Python first</span>, others after conformance</span>
-        <span>Updated: 2026-09-15</span>
+        <span>Updated: 2026-09-20</span>
       </div>
     </div>
   </section>
@@ -98,7 +98,7 @@ result = assemble(
     items=items,                         <span style="color: var(--muted);"># list[Item], from your producers</span>
     profile=Profile.load(<span style="color: var(--p-evid);">"policy-first-chat/v1"</span>),
     budget=Budget(input=8192, reserved_output=1200),
-    route_policy=policy,                 <span style="color: var(--muted);"># matrix overrides, thresholds</span>
+    route_policy=policy,                 <span style="color: var(--muted);"># matrix overrides, thresholds, capability allow-list</span>
 )
 
 result.payload    <span style="color: var(--muted);"># rendered per profile wrap rules</span>
@@ -123,8 +123,8 @@ result.refused    <span style="color: var(--muted);"># bool · reason in trace.r
 <script type="text/x-dc" data-dc-script>
 const RULES = [
   ["MUST", "One slot, one authority tier per item"], ["MUST", "Eight minimum fields; refuse at admission"], ["SHOULD", "Policy fields; defaults filled and traced"], ["MUST", "Slots that are never omitted"],
-  ["MUST NOT", "Rule zero: enforce outside the model"], ["MUST", "Resolve conflicts by tier first"], ["MUST NOT", "No slot overrides platform roles; no authority from wording"], ["MUST", "State is application-written and current"], ["MUST", "Memory carries TTL and source; expired is excluded"], ["MUST", "Untrusted content is marked, rendered as material, kept out of governance"], ["MUST", "Apply the resolution matrix; trace every resolution"],
-  ["MUST NOT", "Never answer from nothing"], ["MUST NOT", "Retrievers emit scored packets, not blobs"], ["MUST NOT", "Memory authority capped; expired never emitted"], ["MUST", "MCP output is untrusted evidence; capabilities only in governance"], ["MUST", "Budget pressure: drop, then compress, never touch protected"], ["MUST", "Refuse rather than silently fit"], ["MUST NOT", "Assembly never calls a model"],
+  ["MUST NOT", "Rule zero: enforce outside the model"], ["MUST", "Resolve conflicts by tier first"], ["MUST NOT", "No slot overrides platform roles; no authority from wording"], ["MUST", "State is application-written and current"], ["MUST", "Memory carries TTL and source; expired is excluded"], ["MUST", "Untrusted content is marked, rendered as material, kept out of governance"], ["MUST", "Apply the resolution order; trace every resolution and what decided it"],
+  ["MUST NOT", "Never answer from nothing"], ["MUST NOT", "Retrievers emit scored packets, not blobs"], ["MUST NOT", "Memory authority capped; expired never emitted"], ["MUST", "MCP output is untrusted evidence; capabilities enter only through the route's capability policy"], ["MUST", "Budget pressure: drop, then compress, never touch protected"], ["MUST", "Refuse rather than silently fit"], ["MUST NOT", "Assembly never calls a model"],
   ["MUST", "Profile shape"], ["MUST", "Profile recorded in every trace"],
   ["MUST", "Trace as JSON with required fields"], ["SHOULD", "Recommended trace fields"], ["MUST", "Determinism"]
 ];
