@@ -110,7 +110,7 @@
           <div style="background: var(--bg); padding: 22px 24px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">OpenAI · GPT-4.1 prompting guide <a href="#cite-5">[5]</a></div>
             <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Instructions at both ends of long context.</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Repeat instructions before and after the long material; if stated once, above it. Notes that the family needed prompt migration. The <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">long-context-reinforced</span> profile is this shape.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Repeat instructions before and after the long material, or above it if stated once. The guide notes that the family needed prompt migration. The <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">long-context-reinforced</span> profile is this shape.</p>
           </div>
         </div>
       </section>
@@ -128,7 +128,7 @@
       <section id="explorer">
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Tool</div>
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile explorer</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Pick two profiles. Each is drawn as the window it produces, in order, coloured by plane. The diff lists what moved. Export either as YAML.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Pick two profiles, and each is drawn as the window it produces, in order and coloured by plane. The diff lists what moved, and either can be exported as YAML.</p>
         <div id="diff" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
           <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile A</div>
@@ -221,9 +221,9 @@ const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "s
 const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
 const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("state") ? "var(--p-state)" : s.startsWith("evidence") ? "var(--p-evid)" : "var(--p-inter)";
 const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v1", short: "policy-first", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples.", evalNote: "golden-task suite support-chat/v4 · 2026-08-30 · groundedness 0.94, task success 0.91" },
+  { name: "Policy-first chat", id: "policy-first-chat/v1", short: "policy-first", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default renderer for this site's examples.", evalNote: "golden-task suite support-chat/v4 · 2026-08-30 · groundedness 0.94, task success 0.91" },
   { name: "Document analysis", id: "document-analysis/v1", short: "document", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples and the question after them, near the end.", evalNote: "document-qa/v2 · 2026-08-12 · citation accuracy 0.89" },
-  { name: "Long-context reinforced", id: "long-context-reinforced/v1", short: "reinforced", route: "long-context-qa", uses: "Very long inputs, multi-document synthesis", order: [0, 2, 7, 1, 3, 4, 5, 9, 0, 10], principle: "Instructions at both ends of a long window. Evidence and observations early and delimited; task state, memory and history after them; the output contract and the instructions restated beside the query.", evalNote: "not yet evaluated · hypothesis drawn from provider guidance [5]", isNew: true },
+  { name: "Long-context reinforced", id: "long-context-reinforced/v1", short: "reinforced", route: "long-context-qa", uses: "Very long inputs, multi-document synthesis", order: [0, 2, 7, 1, 3, 4, 5, 9, 0, 10], principle: "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.", evalNote: "not yet evaluated · hypothesis drawn from provider guidance [5]", isNew: true },
   { name: "Tool-using agent", id: "tool-agent/v1", short: "tool-agent", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.", evalNote: "agent-loop/v3 · 2026-08-21 · tool-call correctness 0.96" },
   { name: "Structured extraction", id: "extraction/v1", short: "extraction", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.", evalNote: "extract/v5 · 2026-07-30 · schema validity 0.99" }
 ];
@@ -290,7 +290,7 @@ class Component extends DCLogic {
       diff: d, diffSummary: d.length + " change" + (d.length === 1 ? "" : "s"),
       protocol: [
         { n: "01", name: "Fix the item set", text: "Freeze a sample of real requests from the route with their admitted items and traces. The same items go through every profile under test." },
-        { n: "02", name: "Name the metric", text: "One outcome metric the route already tracks: groundedness, task success, tool-call correctness, schema validity. Placement is judged on that, not on preference." },
+        { n: "02", name: "Name the metric", text: "Choose one outcome metric the route already tracks, such as groundedness, task success, tool-call correctness, or schema validity. Placement is judged on that metric, not on preference." },
         { n: "03", name: "Render with each profile", text: "Assemble every sample with the incumbent profile and the candidate. Traces confirm the only difference is placement." },
         { n: "04", name: "Compare on the target model", text: "Run both payload sets against the model family the profile names. A profile evaluated on one family says nothing about another." },
         { n: "05", name: "Record and version", text: "Write suite, date and result into the candidate's evaluation block. Promote by bumping the version; the trace of every later request names it." }
