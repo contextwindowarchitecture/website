@@ -56,7 +56,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · v2 draft · 2026-09-20</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page is the normative text. Anything on the landing page, in the producer guide, or in the evidence notes that disagrees with this page is wrong. Requirements are numbered R-1 to R-23; numbers are permanent and never reused.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page is the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered R-1 to R-23; numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span>Mirror: <span style="color: var(--fg);">SPEC.md</span> in the repository, same numbering.</span>
@@ -106,7 +106,7 @@
           <p style="margin: 0;">The key words <span style="color: var(--accent); font-weight: 600;">MUST</span>, <span style="color: var(--accent); font-weight: 600;">MUST NOT</span>, <span style="color: var(--accent); font-weight: 600;">SHOULD</span>, <span style="color: var(--accent); font-weight: 600;">SHOULD NOT</span> and <span style="color: var(--accent); font-weight: 600;">MAY</span> are used as in RFC 2119. MUST is required for conformance; SHOULD is expected unless a reason is recorded; MAY is optional.</p>
           <p style="margin: 0;">A <strong>conformant assembler</strong> satisfies every MUST in this document and can emit its trace as JSON with the fields required by <a href="#R-21">R-21</a>. A <strong>conformant producer</strong> satisfies every MUST in section 2 and the producer-specific rules in section 4 that apply to its kind.</p>
           <p style="margin: 0;">Requirements are numbered R-n in a single flat sequence. A number is assigned once and never reused. A withdrawn requirement keeps its number and is marked withdrawn in the index. Other pages on this site, and the reference implementation, cite requirements by number.</p>
-          <p style="margin: 0; color: var(--muted);">The wire syntax of payloads and traces is not specified. Fields and behaviour are.</p>
+          <p style="margin: 0; color: var(--muted);">This document specifies fields and behaviour, not the wire syntax of payloads and traces.</p>
         </div>
       </section>
 
@@ -181,7 +181,7 @@
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Governance</h2>
         <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 22px 26px; margin-bottom: 24px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px;">Rule zero</div>
-          <div style="font-size: clamp(18px, 2.2vw, 24px); line-height: 1.35; letter-spacing: -0.015em; max-width: 46ch; text-wrap: pretty;">Language guidance goes in context. Enforceable invariants go outside the model. "Never quote an unverified price" is stated in governance and enforced by a tool guard: the model is instructed; the application still enforces.</div>
+          <div style="font-size: clamp(18px, 2.2vw, 24px); line-height: 1.35; letter-spacing: -0.015em; max-width: 46ch; text-wrap: pretty;">Language guidance goes in context, and enforceable invariants go outside the model. "Never quote an unverified price" is stated in governance and enforced by a tool guard: the model is instructed, but the application still enforces the rule.</div>
         </div>
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">3.1 Authority hierarchy · high → low</div>
         <div style="border: 1px solid var(--line); margin-bottom: 14px;">
@@ -199,11 +199,11 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-bottom: 24px;">
           <div style="background: var(--bg); padding: 18px 20px;">
             <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--p-state);">state.*</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Canonical, structured, typed, current, application-owned. Workflow stage, approval status, selected entity IDs, pending action, retry count. The database is the source of truth, never the model.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">State is canonical, structured, typed, current, and owned by the application. It holds workflow stage, approval status, selected entity IDs, pending action, and retry count. The database is the source of truth, never the model.</p>
           </div>
           <div style="background: var(--bg); padding: 18px 20px;">
             <div style="font-size: 17px; font-weight: 600; margin-bottom: 8px; color: var(--p-inter);">interaction.memory</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Fallible, compressible, source-linked, revocable. Preferences, prior-discussion summaries, inferred long-term facts. Every entry carries a TTL and the turn it was derived from.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Memory is fallible, compressible, linked to its source, and revocable. It holds preferences, prior-discussion summaries, and inferred long-term facts. Every entry carries a TTL and the turn it was derived from.</p>
           </div>
         </div>
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">3.3 Conflict resolution · default policy, overridable per route</div>
@@ -241,7 +241,7 @@
       <section id="s4">
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">4</div>
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Admission &amp; fitting</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Between a producer and the payload sit eight decisions. Each is a deterministic rule the trace can point at. A producer owns the first three stages for evidence it emits; the assembler owns the other five.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Between a producer and the payload sit eight decisions, each a deterministic rule the trace can point at. A producer owns the first three stages for evidence it emits; the assembler owns the other five.</p>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ stages }}" as="s" hint-placeholder-count="8">
             <div style="display: grid; grid-template-columns: 32px 140px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
@@ -380,26 +380,26 @@ const PLANES = [
   { name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked" }
 ];
 const SLOTS = [
-  ["governance.instructions", 0, "Identity, goals, refusals, safety boundaries. The system's constitution.", "Never omitted. Only governing-authority items. Untrusted content is refused here."],
-  ["state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Scoped to the current tenant and user. Claims the user made about themselves are marked as such, not as verified state."],
-  ["evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Passes the admission pipeline: reranked, deduplicated, above threshold, inside freshness limits. An empty result is a recorded outcome."],
-  ["state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Written by the application's state machine, never inferred from conversation."],
-  ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Carries a TTL and a source. Expired or user-contradicted entries are excluded and logged."],
-  ["interaction.history", 3, "Verbatim transcript of the most recent turns, bounded.", "Bounded by turn count and tokens. Overflow is summarised into memory, never truncated mid-thought."],
-  ["governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user, admitted against a versioned allow-list. Permission is decided outside the model."],
-  ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. Evidence, not permission to act."],
-  ["governance.examples", 0, "Input/output pairs that steer reasoning, tone or format, ranked by task similarity. Developer-owned steering material.", "Admitted only when the route needs steering. Defers to instructions and the output contract. First to be dropped under budget pressure."],
-  ["governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "Never omitted when a downstream parser exists. Safety disclosures outrank format constraints."],
-  ["interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "Never omitted. The trigger; placed wherever the route's profile has tested it belongs."]
+  ["governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Untrusted content is refused here."],
+  ["state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state."],
+  ["evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the admission pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error."],
+  ["state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation."],
+  ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged."],
+  ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought."],
+  ["governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Permission is decided outside the model."],
+  ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. An observation is evidence, not permission to act."],
+  ["governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure."],
+  ["governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. Safety disclosures outrank format constraints."],
+  ["interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile has tested that it belongs."]
 ];
 const AUTHORITY = [
   ["Governing instruction", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
-  ["User intent / preference", "What the user asks for and how they want it. Cannot lift a constraint above it."],
-  ["Canonical state", "Application-owned facts about the task and session. Beats any recollection."],
-  ["Reference evidence", "Retrieved passages. Informs the answer; never directs behaviour."],
-  ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
-  ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
-  ["Untrusted content", "Anything user-controlled or fetched. Rendered as material, never as instruction."]
+  ["User intent / preference", "What the user asks for and how they want it. It cannot lift a constraint set above it."],
+  ["Canonical state", "Application-owned facts about the task and session. It beats any recollection."],
+  ["Reference evidence", "Retrieved passages, which inform the answer but never direct behaviour."],
+  ["Tool observation", "What a tool returned: evidence about the world, not permission to act on it."],
+  ["Generated memory", "Summaries and inferences the system wrote. They are fallible, they expire, and they can be revoked."],
+  ["Untrusted content", "Anything user-controlled or fetched, rendered as material and never as instruction."]
 ];
 const CONFLICTS = [
   ["System or developer policy vs user request", "Higher-authority policy governs."],
@@ -413,17 +413,17 @@ const CONFLICTS = [
 const STAGES = [
   ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "Pull a candidate set, passage-level, from sources with a declared authority tier."],
-  ["Rerank", "Score candidates against the query. Below threshold is out, and the threshold is versioned."],
+  ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
   ["Deduplicate", "Collapse near-identical passages; apply a diversity constraint across sources."],
-  ["Filter", "Freshness limits, jurisdiction, tenant scope, trust tier. Deterministic rules the trace can cite."],
+  ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "Select by relevance × trust × freshness × diversity until the slot's allocation is spent."],
   ["Attribute", "Carry citation requirements into the output contract so the answer can point back to the packet."]
 ];
 const ITEM_FIELDS = [
   ["provenance", "source and source_version: which document, turn, tool call, database field or memory write it came from, and which version."],
-  ["authority", "Governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content. Exactly one of the seven tiers in section 3.1; no other value is valid."],
-  ["freshness", "as_of: when it was true and when it must be revalidated. Expired items are excluded, not aged silently."],
+  ["authority", "Exactly one of the seven tiers in section 3.1: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content. No other value is valid."],
+  ["freshness", "as_of: when the item was true and when it must be revalidated. Expired items are excluded rather than aged silently."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
   ["eligibility", "The deterministic rule that admitted it into this request, stated so a test can replay it."],
   ["budget", "token_budget and tier: how much it may consume, which tier it sits in, and what shortens first under pressure."],
