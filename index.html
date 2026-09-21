@@ -103,7 +103,7 @@
     <div style="display: grid; grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr); gap: 56px; align-items: start;">
       <div>
         <h1 style="margin: 0; font-size: clamp(42px, 5.6vw, 82px); line-height: 0.94; letter-spacing: -0.045em; font-weight: 700; max-width: 13ch; text-wrap: balance;">Context isn't a prompt. It's an assembled request.</h1>
-        <p style="margin: 32px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 48ch; text-wrap: pretty;">CWA is a free specification for assembling everything a model call needs — instructions, state, evidence, history, the live turn — into one payload where every item has an owner, an authority, a lifecycle, a budget, and a place. Deterministic assembly. Inspectable behaviour.</p>
+        <p style="margin: 32px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 48ch; text-wrap: pretty;">CWA is a free specification for assembling everything a model call needs — instructions, state, evidence, history, the live turn — into one payload where every item has an owner, an authority, a lifecycle, a budget, and a place. The assembly is deterministic, and every step of it can be inspected.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
           <a href="#assemble" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--fg);">Watch it assemble</a>
           <button onClick="{{ startTour }}" style="font-size: 16px; font-weight: 600; font-family: inherit; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px; cursor: pointer;" style-hover="border-color: var(--fg);">Take the guided tour</button>
@@ -165,11 +165,11 @@
     <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Not a library</div>
-        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Nothing to install. A specification you apply to the payload you already send — and an assembler you can build against it.</div>
+        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">There is nothing to install. CWA is a specification you apply to the payload you already send, and an assembler can be built against it.</div>
       </div>
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Deterministic assembly</div>
-        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Same inputs, same source versions, same policy, same payload. The model's output stays probabilistic; the request never is.</div>
+        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Given the same inputs, source versions, and policy, the assembler produces the same payload every time. The model's answer may still vary, but the request it receives does not.</div>
       </div>
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Traceable</div>
@@ -177,8 +177,8 @@
       </div>
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
-      <span>Evaluating? Read to <a href="#why">Why it works</a>.</span>
-      <span>Building? Start at the <a href="./spec.html">Spec</a>.</span>
+      <span>If you are evaluating CWA, read on to <a href="#why">Why it works</a>.</span>
+      <span>If you are building, start at the <a href="./spec.html">Spec</a>.</span>
     </div>
   </section>
 
@@ -186,7 +186,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The problem</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">What goes wrong when nobody owns the payload.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Every model call is assembled by a function. In most systems it has no name. It grew arguments for a year, it concatenates whatever the route happens to hold, and it knows nothing about who is allowed to direct the model, how old each piece is, what to shorten when the window is full, or what it sent last time. The failures this produces are not random. They repeat, they have shapes, and they can be named.</p>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Every model call is assembled by a function, and in most systems that function has no name. It has grown arguments for a year, it concatenates whatever the route happens to hold, and it knows nothing about who is allowed to direct the model, how old each piece is, what to shorten when the window is full, or what it sent last time. The failures this produces are not random: they repeat, they have recognisable shapes, and they can be named.</p>
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <a href="#assemble/clinical-triage/blob" onClick="{{ fmOpen2 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">01</span>
@@ -245,11 +245,11 @@
           </span>
         </a>
         <div style="background: var(--fg); color: var(--bg); padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
-          <div style="font-size: clamp(20px, 2.2vw, 26px); line-height: 1.25; letter-spacing: -0.02em; font-weight: 600; text-wrap: pretty;">These are assembly errors. Today they have no assembler.</div>
+          <div style="font-size: clamp(20px, 2.2vw, 26px); line-height: 1.25; letter-spacing: -0.02em; font-weight: 600; text-wrap: pretty;">These are assembly errors, and in most systems today nothing owns the assembly step that would catch them.</div>
           <div style="font-size: 14.5px; line-height: 1.5; opacity: 0.72; text-wrap: pretty;">Each card opens the demo on the system that reproduces it, shown as the unassembled blob.</div>
         </div>
       </div>
-      <p style="margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Where an item sits in the window matters too. That question has evidence of its own: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</p>
+      <p style="margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Where an item sits in the window matters too, and that question has evidence of its own: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</p>
     </div>
   </section>
 
@@ -266,12 +266,12 @@
         <div>
           <div style="font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px;">02</div>
           <h3 style="margin: 0 0 12px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Deterministic assembly</h3>
-          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Same request state, same source versions, same selection rules, same budget: the assembler emits the same payload in the same order. That is a testable claim. "The model will answer the same way" is not, and CWA never makes it.</p>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Given the same request state, source versions, selection rules, and budget, the assembler emits the same payload in the same order. That is a claim a test can check. "The model will answer the same way" is not, and CWA never makes it.</p>
         </div>
         <div>
           <div style="font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px;">03</div>
           <h3 style="margin: 0 0 12px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">A budget with a policy</h3>
-          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Tokens are finite. When every item is measured and tiered, the assembler knows what to protect, what to compress, what to drop, and when to stop and say the evidence didn't fit.</p>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Tokens are finite, so when every item is measured and tiered the assembler knows what to protect, what to compress, what to drop, and when to stop and report that the evidence did not fit.</p>
         </div>
       </div>
     </div>
@@ -282,7 +282,7 @@
       <div data-tour="intro">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
-      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots. No request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a tested order. Watch seven very different systems assemble — then pull a slot out, or squeeze the budget, and see what degrades first.</p>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a tested order. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
 
       <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
@@ -490,7 +490,7 @@
       <div>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The unit</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">A slot holds items, not a paragraph.</h2>
-        <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved passages, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata. Without that metadata a clean slot order still produces unpredictable payloads.</p>
+        <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved passages, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
         <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line);">
           <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="9">
             <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line);">
@@ -530,24 +530,24 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Go deeper</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Order alone is not an architecture.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A fixed order reproduces a payload. It says nothing about who is allowed to direct the model, what wins when sources disagree, whether this order is right for this model, or how anyone would know. The normative rules, the producer contract and the placement evidence each have a page of their own.</p>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A fixed order reproduces a payload, but it says nothing about who is allowed to direct the model, what wins when sources disagree, whether this order is right for this model, or how anyone would know. The normative rules, the producer contract, and the placement evidence each have a page of their own.</p>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <a href="./spec.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Specification · v2 draft</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">23 numbered requirements.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Conformance language, the authority hierarchy and resolution matrix, budget tiers, the profile shape, required trace fields. Pure text, permalinked per rule, mirrored to the repo.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">They cover conformance language, the authority hierarchy and resolution matrix, budget tiers, the profile shape, and the required trace fields. Pure text, permalinked per rule and mirrored to the repo.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the spec →</span>
         </a>
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Producer contract</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">What your tool has to emit.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Eight minimum fields, slot defaults, the rules for retrievers, memory stores, state services, MCP servers and the capability policy. Paste an item into the linter and see whether an assembler would admit it.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to see whether an assembler would admit it.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the contract →</span>
         </a>
         <a href="./evidence.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-inter);">Placement evidence</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Why placement is a profile, not a rule.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Serial-position research, provider guidance by model generation, the profile format and how to evaluate one. Five profiles to diff, one new.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">The evidence covers serial-position research, provider guidance by model generation, the profile format, and how to evaluate one. Five profiles to diff, including one new.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the evidence →</span>
         </a>
       </div>
@@ -557,8 +557,8 @@
   <section id="evidence" data-tour="evidence" style="border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Evidence selection</div>
-      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">RAG lands in Evidence. Admission is a pipeline.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable and too coarse. Between the vector store and the payload sit eight decisions. Each one is a deterministic rule the trace can point at. For high-stakes answers the slot holds evidence packets — source, passage, version, relevance, authority, binding or informative — not "knowledge."</p>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Retrieval feeds Evidence through an admission pipeline.</h2>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload sit eight decisions, and each one is a deterministic rule the trace can point at. For high-stakes answers the slot holds evidence packets, each carrying source, passage, version, relevance, authority, and whether it is binding or informative, rather than undifferentiated "knowledge."</p>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <sc-for list="{{ evidenceStages }}" as="s" hint-placeholder-count="8">
           <div style="background: var(--bg); padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 10px;">
@@ -576,7 +576,7 @@
         </div>
         <div style="background: var(--bg); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Fresh beats retrieved</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A tool observation from 0.4 seconds ago and a passage indexed in August are both evidence. For current facts, the observation governs; the passage cites.</div>
+          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A tool observation from 0.4 seconds ago and a passage indexed in August are both evidence, but for current facts the observation governs and the passage only cites.</div>
         </div>
       </div>
     </div>
@@ -587,7 +587,7 @@
       <div style="position: sticky; top: 100px;">
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">In practice</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">What an assembled request looks like on the wire.</h2>
-        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA doesn't dictate syntax. Tag slots however your stack prefers — XML-ish blocks, message roles, delimited sections. What matters: every item names its slot and authority, evidence arrives as packets with provenance, and the profile that ordered them is recorded.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA does not dictate syntax, so tag slots however your stack prefers: XML-style blocks, message roles, or delimited sections. What matters is that every item names its slot and authority, evidence arrives as packets with provenance, and the profile that ordered them is recorded.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
         <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v1</span></div>
@@ -635,8 +635,8 @@
   <section id="fit" style="border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Where it fits</div>
-      <h2 style="margin: 0 0 16px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 22ch;">It replaces nothing you already use.</h2>
-      <p style="margin: 0 0 48px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your tools supply the materials. CWA is the assembly step between them and the model.</p>
+      <h2 style="margin: 0 0 16px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 22ch;">It augments what you already use.</h2>
+      <p style="margin: 0 0 48px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your existing tools supply the materials, and CWA is the assembly step between them and the model.</p>
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <a href="https://contextwindowarchitecture.io/stack/rag" target="_blank" rel="noopener" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
           <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">RAG</div>
@@ -655,7 +655,7 @@
         </a>
         <a href="https://contextwindowarchitecture.io/stack/prompt-engineering" target="_blank" rel="noopener" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
           <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">Prompt engineering</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Prompting is craft at the sentence level. CWA is structure at the payload level. You need both.</p>
+          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Prompting is craft at the sentence level and CWA is structure at the payload level, so you need both.</p>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
         </a>
       </div>
@@ -666,7 +666,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Harness engineering</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1.0; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Already using a framework? The assembler goes inside it.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your framework is the harness: it runs the loop, calls the tools, keeps the state, retries the failures. It is deliberately unopinionated about the one thing that decides answer quality — what actually lands in the window on each pass. That hole is where CWA lives. Pick your stack:</p>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your framework is the harness: it runs the loop, calls the tools, keeps the state, and retries the failures. It is deliberately unopinionated about the one thing that decides answer quality, which is what actually lands in the window on each pass. CWA fills that gap. Pick your stack:</p>
 
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;">
         <sc-for list="{{ fwTabs }}" as="t" hint-placeholder-count="5">
@@ -762,7 +762,7 @@
       <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <div style="background: var(--surface); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
-          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">One fixed prompt, no retrieval, no history. An assembler for a single slot is bureaucracy.</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">You send one fixed prompt with no retrieval and no history. An assembler for a single slot is bureaucracy.</div>
         </div>
         <div style="background: var(--surface); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
@@ -780,8 +780,8 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px 40px; align-items: center;">
       <div>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Take it with you</div>
-        <h2 style="margin: 0 0 12px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Copy the scaffold. Start today.</h2>
-        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Six steps from your current prompt to a payload with owners, a migrator that proposes slots for it, and five files to copy: an assembly function, an empty payload, the item schema as YAML and JSON Schema, and a cwa.md for coding agents.</p>
+        <h2 style="margin: 0 0 12px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Copy the scaffold and start today.</h2>
+        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">The getting-started guide takes you in six steps from your current prompt to a payload with owners. It includes a migrator that proposes slots for your prompt and five files to copy: an assembly function, an empty payload, the item schema as YAML and JSON Schema, and a cwa.md for coding agents.</p>
       </div>
       <a href="./start.html" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px; white-space: nowrap;" style-hover="background: var(--fg);">Getting started →</a>
     </div>
@@ -790,7 +790,7 @@
   <section id="adopt" data-tour="adopt" style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
       <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Adopt the spec. The assembler comes next.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. A reference assembler that implements this spec — admission, fitting, profiles, traces — is in progress. Tell us what it must do. A future revision will describe request intent as a typed tree that items bind to.</p>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. A reference assembler that implements this spec, covering admission, fitting, profiles, and traces, is in progress, and we want to hear what it must do. A future revision will describe request intent as a typed tree that items bind to.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 12px;">
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">View on GitHub</a>
         <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">Read the docs</a>
@@ -829,7 +829,7 @@
 
   <footer style="border-top: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-      <span>Context Window Architecture — a context assembler specification, not a library.</span>
+      <span>Context Window Architecture is a context assembler specification, not a library.</span>
       <div style="display: flex; gap: 20px;">
         <a href="./spec.html">Docs</a>
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener">GitHub</a>
@@ -841,25 +841,25 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;oklch(0.60 0.20 38)&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;oklch(0.60 0.20 38)&quot;, &quot;oklch(0.55 0.17 250)&quot;, &quot;oklch(0.55 0.14 155)&quot;, &quot;oklch(0.50 0.20 310)&quot;], &quot;section&quot;: &quot;Theme&quot;}}">
 const PLANES = [
-  { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Authority, policy, permissions, steering examples, and the output contract. Stable across a route, versioned like code, never overridden by anything below it." },
-  { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "Canonical facts about the user, session, and task. Structured, typed, application-owned. The model reads state; it never becomes the source of truth for it." },
-  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Retrieved passages, tool observations, artifacts, citations. Arrives as packets with provenance, freshness, and trust. Reference material, not instruction." },
-  { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Compressed memory, recent verbatim turns, and the live query that triggers generation." }
+  { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
+  { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
+  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved passages, tool observations, artifacts, and citations. Each arrives as a packet with provenance, freshness, and trust, and is treated as reference material, not instruction." },
+  { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
 ];
 
 /* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
 const SLOTS = [
-  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, safety boundaries. The system's constitution.", "Never omitted. Only governing-authority items. Untrusted content is refused here by the assembler.", "authority governing\ntier protected\nlineage verbatim"],
-  ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Scoped to the current tenant and user. Claims the user made about themselves are marked as such, not as verified state.", "authority state\ntier droppable\nscope user · session"],
-  ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Passes the evidence pipeline: reranked, deduplicated, above threshold, inside freshness limits. Empty result is a recorded outcome.", "authority reference\ntier compressible\nrisk untrusted_content"],
-  ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Written by the application's state machine, never inferred from conversation. Canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
-  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Carries a TTL and a source. Expired or user-contradicted entries are excluded and logged.", "authority generated\ntier compressible\nlifecycle ttl · revocable"],
-  ["Recent history", "interaction.history", 3, "Verbatim transcript of the most recent turns, bounded.", "Bounded by turn count and tokens. Overflow is summarised into memory, never truncated mid-thought.", "authority user\ntier compressible\nbound turns · tokens"],
-  ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user, admitted against a versioned allow-list. Adapters propose; the policy admits and assigns authority. Permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
-  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. Evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
-  ["Examples", "governance.examples", 0, "Input/output pairs that steer reasoning, tone, or format, ranked by task similarity. Developer-owned steering material.", "Admitted only when the route needs steering. Defers to instructions and the output contract. First to be dropped under budget pressure.", "authority governing\ntier droppable\nrank task similarity"],
-  ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "Never omitted when a downstream parser exists. Safety disclosures outrank format constraints.", "authority governing\ntier protected\nreinforced near the query"],
-  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "Never omitted. The trigger; placed wherever the route's profile has tested it belongs.", "authority user\ntier protected\nrole trigger"]
+  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler refuses untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
+  ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
+  ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference\ntier compressible\nrisk untrusted_content"],
+  ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
+  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged.", "authority generated\ntier compressible\nlifecycle ttl · revocable"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought.", "authority user\ntier compressible\nbound turns · tokens"],
+  ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority, and permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
+  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
+  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure.", "authority governing\ntier droppable\nrank task similarity"],
+  ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. Safety disclosures outrank format constraints.", "authority governing\ntier protected\nreinforced near the query"],
+  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile has tested that it belongs.", "authority user\ntier protected\nrole trigger"]
 ];
 
 const UCS = [
@@ -889,8 +889,8 @@ const UCS = [
       [9, "Max 3 sentences. No bullet lists."],
       [10, "Can you just process it now?"]
     ],
-    note: "No memory and no examples — the conversation is four turns old and the format is trivial. Empty slots cost tokens and add noise, so they stay empty. The refund passage is a packet with a version and a trust tier, not a paste.",
-    questions: ["The price rule is stated in governance.instructions. Is it also enforced by a tool guard? Language guidance in context; invariants in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
+    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund passage arrives as a packet with a version and a trust tier, rather than as pasted text.",
+    questions: ["The price rule is stated in governance.instructions, but is it also enforced by a tool guard? Language guidance belongs in context; invariants belong in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
   },
   {
     label: "Code review bot",
@@ -1093,9 +1093,9 @@ const TESTS = [
 const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "Pull a candidate set, passage-level, from sources with a declared authority tier."],
-  ["Rerank", "Score candidates against the query. Below threshold is out, and the threshold is versioned."],
+  ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
   ["Deduplicate", "Collapse near-identical passages; apply a diversity constraint across sources."],
-  ["Filter", "Freshness limits, jurisdiction, tenant scope, trust tier. Deterministic rules the trace can cite."],
+  ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "Select by relevance × trust × freshness × diversity until the slot's allocation is spent."],
   ["Attribute", "Carry citation requirements into the output contract so the answer can point back to the packet."]
@@ -1103,8 +1103,8 @@ const EVIDENCE_STAGES = [
 
 const ITEM_FIELDS = [
   ["provenance", "Which document, turn, tool call, database field, or memory write it came from, and which version."],
-  ["authority", "Governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content. Exactly one of these seven."],
-  ["freshness", "When it was true and when it must be revalidated. Expired items are excluded, not aged silently."],
+  ["authority", "Exactly one of seven values: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content."],
+  ["freshness", "When the item was true and when it must be revalidated. Expired items are excluded rather than aged silently."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
   ["eligibility", "The deterministic rule that admitted it into this request, stated so a test can replay it."],
   ["budget", "How much it may consume, which tier it sits in, and what shortens first under pressure."],
@@ -1575,7 +1575,7 @@ class Component extends DCLogic {
         owns: ["The agent loop, tool calls and retries", "Handoffs between agents", "Sessions, tracing and guardrails", "Structured output parsing"],
         blank: ["What the instructions callable returns", "The input list you pass to Runner.run()", "What your context object carries", "What tool results look like coming back"],
         cost: ["Instructions grow into one 900-line string nobody edits", "Session history replays raw and crowds out evidence", "A bad handoff is unattributable — you can't tell which item caused it"],
-        verdict: "Yes. The dynamic instructions callable is already a context assembler — it just has no spec. CWA gives it typed slots, a fitting policy, and a trace, and costs you a refactor of one function."
+        verdict: "Yes. The dynamic instructions callable is already a context assembler without a spec. CWA gives it typed slots, a fitting policy, and a trace, at the cost of refactoring one function."
       },
       {
         label: "LangChain / LangGraph", name: "LangGraph", stage: "Build state[\"messages\"]",
@@ -1904,7 +1904,7 @@ class Component extends DCLogic {
       evictionStyle = evBase + "var(--accent);";
     } else if (evictedNames.length || compressedNames.length) {
       evictionLabel = (evictedNames.length ? "Dropped: " + evictedNames.join(", ") + ". " : "") + (compressedNames.length ? "Compressed with source links: " + compressedNames.join(", ") + ". " : "") + "Protected slots untouched.";
-    } else evictionLabel = "Everything fits. Nothing had to be dropped or compressed.";
+    } else evictionLabel = "Everything fits, so nothing had to be dropped or compressed.";
 
     const out = {
       layers, slots, payload,
