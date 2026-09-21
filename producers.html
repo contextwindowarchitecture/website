@@ -57,7 +57,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The producer contract</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Building a tool an assembler can consume.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A producer is anything that emits candidate items into a slot: a retriever, a memory store, an MCP server, a state service, a policy loader, a capability policy. The assembler does not know how a producer works. It knows what the producer hands over. That handover is the contract. This page is a guide; the rules it cites are normative in the <a href="./spec.html">Spec</a>.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A producer is anything that emits candidate items into a slot: a retriever, a memory store, an MCP server, a state service, a policy loader, a capability policy. The assembler does not know how a producer works. It knows only what the producer hands over, and that handover is the contract. This page is a guide; the rules it cites are normative in the <a href="./spec.html">Spec</a>.</p>
     </div>
   </section>
 
@@ -82,7 +82,7 @@
 
       <section id="minimum">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">The minimum item</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Eight fields. Without them the assembler cannot place, rank, expire or trace the item, so it is refused at admission (<a href="./spec.html#R-2">R-2</a>). Emit them on every item, every time, even when the value seems obvious.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Every item must carry eight fields. Without them the assembler cannot place, rank, expire or trace the item, so it refuses the item at admission (<a href="./spec.html#R-2">R-2</a>). Emit them on every item, every time, even when the value seems obvious.</p>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ minimum }}" as="f" hint-placeholder-count="8">
             <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
@@ -134,32 +134,32 @@
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Retrieval → evidence.knowledge</div>
-            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Packets with a score, never a blob.</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">One item per passage, each with its rerank score and source version. The retriever owns rewrite, retrieve, rerank; the assembler owns deduplicate, filter, packetize, budget, attribute. An empty result set is a valid, recorded outcome; do not pad it.</p>
+            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">One scored packet per passage, never a blob.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Emit one item per passage, each with its rerank score and source version. The retriever owns rewrite, retrieve and rerank; the assembler owns deduplicate, filter, packetize, budget and attribute. An empty result set is a valid, recorded outcome, so do not pad it.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Ceiling <span style="color: var(--muted);">authority: reference_only</span> · <a href="./spec.html#R-13">R-13</a> · <a href="./spec.html#R-12">R-12</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-inter);">Memory → interaction.memory</div>
-            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">State-vs-memory, as fields.</div>
+            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">The state-versus-memory distinction, expressed as fields.</div>
             <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Every entry carries <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">expires</span> (the TTL), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source</span> (the turn it was derived from), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">lineage: summarised | generated</span>, a revocation reference when the user has contradicted it, and <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">trust: unverified</span>. Expired or revoked entries are not emitted at all; the store filters, not the assembler.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Ceiling <span style="color: var(--muted);">authority: generated</span> · <a href="./spec.html#R-14">R-14</a> · <a href="./spec.html#R-9">R-9</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-state);">State → state.user · state.task</div>
-            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Application-owned. Current or absent.</div>
+            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Owned by the application, and either current or absent.</div>
             <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">A state producer reads the database or the workflow engine and emits one item per fact, typed, with <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">as_of</span> set to the read time. It never derives a value from conversation. Claims the user made about themselves go to memory, not state.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Ceiling <span style="color: var(--muted);">authority: state</span> · <a href="./spec.html#R-8">R-8</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-gov);">MCP → tool_results · knowledge</div>
-            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Results to Evidence. Specs are proposed, not placed.</div>
+            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Results go to Evidence; specifications are proposed, never placed.</div>
             <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Tool results and resources become <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">evidence.tool_results</span> or <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">evidence.knowledge</span> with <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">authority: observation</span> or <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">reference_only</span>, an <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">as_of</span>, and untrusted by default. A resource that contains imperatives is still evidence. Tool specifications are <em>proposed</em> to the route's capability policy; the adapter never writes to <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">governance.capabilities</span> itself, and an item it emits there is refused with <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">capability_not_allowed</span>.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Ceiling <span style="color: var(--muted);">authority: observation</span> · <a href="./spec.html#R-15">R-15</a> · <a href="./spec.html#R-10">R-10</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-gov);">Capability policy → governance.capabilities</div>
-            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Application-owned. The only producer for this slot.</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Holds the versioned allow-list of tools per route and user. Takes proposed specifications from MCP adapters and local tool registries, admits the ones this user may use, and emits one item per tool with <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">authority: governing</span>, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source</span> = the allow-list, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source_version</span> = allow-list version + specification content hash, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">trust: verified</span>. Rejected proposals are reported to the assembler so they appear in the trace as <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">excluded[]</span> with reason <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">capability_not_allowed</span>. Permission is decided here, outside the model; the model is told what it may call, and the tool guard still enforces it.</p>
+            <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">Owned by the application, and the only producer for this slot.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">The capability policy holds the versioned allow-list of tools per route and user. It takes proposed specifications from MCP adapters and local tool registries, admits the ones this user may use, and emits one item per tool with <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">authority: governing</span>, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source</span> = the allow-list, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source_version</span> = allow-list version + specification content hash, <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">trust: verified</span>. Rejected proposals are reported to the assembler so they appear in the trace as <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">excluded[]</span> with reason <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">capability_not_allowed</span>. Permission is decided here, outside the model; the model is told what it may call, and the tool guard still enforces it.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Ceiling <span style="color: var(--muted);">authority: governing</span> · <a href="./spec.html#R-15">R-15</a> · <a href="./spec.html#R-5">R-5</a></div>
           </div>
         </div>
@@ -298,9 +298,9 @@ const SHOULD = ["token_budget", "lineage", "conflict_policy", "eligibility", "in
 const STAGES = [
   ["Rewrite", "producer", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "producer", "Pull a candidate set, passage-level, from sources with a declared authority tier."],
-  ["Rerank", "producer", "Score candidates against the query. Below threshold is out, and the threshold is versioned."],
+  ["Rerank", "producer", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
   ["Deduplicate", "assembler", "Collapse near-identical passages; apply a diversity constraint across sources."],
-  ["Filter", "assembler", "Freshness limits, jurisdiction, tenant scope, trust tier. Deterministic rules the trace can cite."],
+  ["Filter", "assembler", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "assembler", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "assembler", "Select by relevance × trust × freshness × diversity until the slot's allocation is spent."],
   ["Attribute", "assembler", "Carry citation requirements into the output contract so the answer can point back to the packet."]
@@ -309,11 +309,11 @@ const FAILURES = [
   ["missing_field:<name>", "One of the eight minimum fields is absent. Fix the producer; the assembler will not guess.", 2],
   ["unknown_slot", "The slot name is not one of the eleven. Check spelling and plane prefix.", 1],
   ["unknown_authority", "The authority value is not one of the seven tiers. capability and steering are not tiers; use governing with a conflict_policy.", 1],
-  ["authority_above_ceiling", "The item claims more authority than its slot or producer kind allows. Memory above generated, retrieval above reference_only, MCP results above observation.", 14],
+  ["authority_above_ceiling", "The item claims more authority than its slot or producer kind allows, such as memory above generated, retrieval above reference_only, or MCP results above observation.", 14],
   ["capability_not_allowed", "A governance.capabilities item whose source is not the route's capability policy, or a proposed tool that is not on the allow-list. Only the capability policy writes to this slot.", 15],
   ["untrusted_in_governance", "An item marked untrusted_content was aimed at a governance slot.", 10],
   ["expired", "freshness or expires is in the past. The producer should have filtered it.", 9],
-  ["below_threshold", "Rerank score under the route's versioned threshold.", 13],
+  ["below_threshold", "The rerank score is under the route's versioned threshold.", 13],
   ["out_of_scope", "Tenant, user or session scope does not match the request.", 2]
 ];
 const SAMPLES = [
@@ -428,7 +428,7 @@ class Component extends DCLogic {
     return {
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
-      minimum: [["id", "Stable within the producer; the trace and the payload both cite it."], ["slot", "One of the eleven slot names, plane-prefixed."], ["source", "Which document, turn, tool call, database field, allow-list or memory write it came from."], ["source_version", "The version of that source at read time, so a replay can fetch the same bytes."], ["authority", "Exactly one of the seven tiers in Spec §3.1: governing, user, state, reference_only, observation, generated, untrusted. Never above the slot's ceiling. Any other value is refused."], ["freshness · as_of", "When the content was true. Expired items are excluded, not aged silently."], ["trust", "verified, unverified or untrusted."], ["body", "The content itself, verbatim unless lineage says otherwise."]].map(f => ({ key: f[0], text: f[1] })),
+      minimum: [["id", "Stable within the producer; the trace and the payload both cite it."], ["slot", "One of the eleven slot names, plane-prefixed."], ["source", "Which document, turn, tool call, database field, allow-list or memory write it came from."], ["source_version", "The version of that source at read time, so a replay can fetch the same bytes."], ["authority", "Exactly one of the seven tiers in Spec §3.1: governing, user, state, reference_only, observation, generated, untrusted. It may never exceed the slot's ceiling, and any other value is refused."], ["freshness · as_of", "When the content was true. Expired items are excluded rather than aged silently."], ["trust", "verified, unverified or untrusted."], ["body", "The content itself, verbatim unless lineage says otherwise."]].map(f => ({ key: f[0], text: f[1] })),
       defaults: Object.keys(SLOT_DEFAULTS).map(k => { const d = SLOT_DEFAULTS[k]; return { slot: k, color: PLANE_COLOR[d.plane], authority: d.authority, tier: d.tier, lineage: d.lineage, rest: d.injection_risk + " · " + d.conflict_policy }; }),
       stages: STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s[0], owner: s[1], ownerColor: s[1] === "producer" ? "var(--accent)" : "var(--muted)", text: s[2] })),
       failures: FAILURES.map(f => ({ reason: f[0], text: f[1], rule: "R-" + f[2], href: "./spec.html#R-" + f[2] })),
