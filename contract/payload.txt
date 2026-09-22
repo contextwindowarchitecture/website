@@ -1,0 +1,36 @@
+<!-- profile: policy-first-chat/v2 -->
+
+<!-- governance.instructions · authority=governing · protected -->
+<instructions version=""></instructions>
+
+<!-- state.user · authority=state · scope=user,session -->
+<user_facts></user_facts>
+
+<!-- evidence.knowledge · authority=reference_only · one <evidence> per packet -->
+<evidence id="" source="" version="" trust="" freshness=""></evidence>
+
+<!-- state.task · authority=state · app-owned, canonical -->
+<task></task>
+
+<!-- interaction.memory · authority=generated · lineage=summary · ttl -->
+<memory></memory>
+
+<!-- interaction.history · authority=user · verbatim, bounded -->
+<history></history>
+
+<!-- governance.capabilities · authority=governing · source=capability-policy -->
+<tools></tools>
+
+<!-- evidence.tool_results · authority=observation · one <observation> per call -->
+<observation call="" age=""></observation>
+
+<!-- governance.examples · authority=governing · droppable -->
+<examples></examples>
+
+<!-- governance.output_contract · authority=governing · protected -->
+<format></format>
+
+<!-- interaction.query · authority=user · protected -->
+<query></query>
+
+<!-- trace: <id> · included/compressed/excluded counts · conflicts -->

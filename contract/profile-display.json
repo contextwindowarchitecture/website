@@ -1,0 +1,105 @@
+[
+  {
+    "name": "Policy-first chat",
+    "id": "policy-first-chat/v2",
+    "short": "policy-first",
+    "route": "support-chat",
+    "uses": "Support, assistants, workflows",
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "principle": "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default renderer for this site's examples.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Document analysis",
+    "id": "document-analysis/v2",
+    "short": "document",
+    "route": "document-qa",
+    "uses": "Long reports, contracts, corpora",
+    "order": [
+      2,
+      0,
+      1,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10
+    ],
+    "principle": "Documents early and clearly delimited; instructions, examples and the question after them, near the end.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Long-context reinforced",
+    "id": "long-context-reinforced/v2",
+    "short": "reinforced",
+    "route": "long-context-qa",
+    "uses": "Very long inputs, multi-document synthesis",
+    "order": [
+      0,
+      2,
+      7,
+      1,
+      3,
+      4,
+      5,
+      9,
+      0,
+      10
+    ],
+    "principle": "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published",
+    "isNew": true
+  },
+  {
+    "name": "Tool-using agent",
+    "id": "tool-agent/v2",
+    "short": "tool-agent",
+    "route": "agent-loop",
+    "uses": "Multi-step work",
+    "order": [
+      0,
+      6,
+      1,
+      2,
+      4,
+      5,
+      3,
+      7,
+      9,
+      10
+    ],
+    "principle": "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Structured extraction",
+    "id": "extraction/v2",
+    "short": "extraction",
+    "route": "extract",
+    "uses": "Parsing and classification",
+    "order": [
+      0,
+      9,
+      1,
+      2,
+      8,
+      9,
+      10
+    ],
+    "principle": "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  }
+]
