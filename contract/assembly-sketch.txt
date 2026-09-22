@@ -1,0 +1,29 @@
+# CWA integration sketch — not runnable or a reference implementation.
+# Implement these application-owned helpers; producers run before assembly.
+def prepare_request(req):
+    batches = collect_producers(req)  # Includes candidate items and producer exclusions.
+    snapshot = freeze_snapshot(
+        items=flatten_items(batches),
+        excluded=flatten_exclusions(batches),
+        producer_context=authenticated_producers(req),
+        conflicts=declared_conflict_groups(req),
+        scope=request_scope(req),
+        assembly_time=req.assembly_time,
+        route_policy=load_versioned_policy(req.route),
+        profile=load_profile('policy-first-chat/v2'),
+        tokenizer=req.tokenizer,
+        renderer=req.renderer,
+        budget=req.budget,  # input is already net of reserved_output.
+    )
+    return assemble_snapshot(snapshot)
+
+
+def assemble_snapshot(snapshot):
+    # No model calls, external reads, or ambient clock reads from this point.
+    admitted = admit(snapshot)
+    resolved = resolve_declared_conflicts(admitted, snapshot)
+    fitted = fit_with_rendered_token_counts(resolved, snapshot)
+    if fitted.refused:
+        return refused_result(fitted.reason, snapshot)  # No payload; trace.result = null.
+    payload = render_profile(fitted, snapshot)
+    return result_with_trace_and_sha256(payload, fitted, snapshot)
