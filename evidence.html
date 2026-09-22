@@ -79,7 +79,7 @@
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">The position</h2>
         <div style="display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">
           <p style="margin: 0;">Where an item sits in the window changes whether the model uses it. That effect is real, measured, and different for every model family, task shape and context length. A specification that hard-coded an order would be right for one deployment and wrong for the next, and nobody would be able to tell which.</p>
-          <p style="margin: 0;">So CWA takes no position on where items go. It requires only that placement be a <strong>profile</strong>: versioned, per route, evaluated against that route's tasks, and recorded in every trace. Every placement hint on this site, including the <span style="font-family: var(--mono); font-size: 14px;">policy-first-chat</span> default, is a tested default for one route, not a claim about models in general.</p>
+          <p style="margin: 0;">So CWA takes no position on where items go. It requires only that placement be a <strong>profile</strong>: versioned, per route, evaluated against that route's tasks, and recorded in every trace. Every profile on this site is an unevaluated example. No reproducible profile evaluation is published here; evaluate the target route before promotion.</p>
         </div>
       </section>
 
@@ -117,12 +117,12 @@
 
       <section id="format">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile format</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a small YAML file. It carries an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, and the evaluation that justified promoting it (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The exports below use JSON syntax, which is valid YAML. It carries an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
           <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
         </div>
-        <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> On 2026-09-20 the examples slot was renamed from <span style="font-family: var(--mono); font-size: 12.5px;">interaction.examples</span> to <span style="font-family: var(--mono); font-size: 12.5px;">governance.examples</span>. The profile keeps version 1: the rename changes no placement, wrapper or rendered byte, so the 2026-08-30 evaluation still describes this payload. This is a pre-release exception; once a profile is public, <a href="./spec.html#R-20">R-20</a> applies as written and a slot rename bumps the version.</p>
+        <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are v2 drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. The former v1 evaluation summaries are withdrawn because supporting runs are unavailable.</p>
       </section>
 
       <section id="explorer">
@@ -188,7 +188,7 @@
 
       <section id="evaluate">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Evaluating a profile</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is promoted by evidence from its own route, not by argument. The protocol is short and the trace makes it cheap: because assembly is deterministic (<a href="./spec.html#R-23">R-23</a>), two profiles applied to the same items differ only in placement, so any change in outcome is attributable to placement alone.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is promoted by evidence from its own route, not by argument. The protocol is short and the trace makes it cheap: freeze the assembly snapshot, model configuration, and scoring protocol. Inspect changes in inclusion, repetition, wrappers and token counts as well as order. Deterministic requests do not make model responses deterministic or isolate placement as the sole cause of an outcome difference.</p>
         <div style="border: 1px solid var(--line);">
           <sc-for list="{{ protocol }}" as="p" hint-placeholder-count="5">
             <div style="display: grid; grid-template-columns: 32px 200px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
@@ -198,7 +198,7 @@
             </div>
           </sc-for>
         </div>
-        <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 18px 22px; margin-top: 24px; font-size: 15px; line-height: 1.55; max-width: 70ch; text-wrap: pretty;">A profile whose <span style="font-family: var(--mono); font-size: 13.5px;">evaluation</span> block is empty is a hypothesis. Ship it if you must, but version it, and treat the first golden-task run as the evaluation that fills the block.</div>
+        <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 18px 22px; margin-top: 24px; font-size: 15px; line-height: 1.55; max-width: 70ch; text-wrap: pretty;">An unevaluated profile is a hypothesis. Keep evaluation.status as unevaluated until a reproducible route evaluation justifies promotion; a schema-valid profile is not evidence of model quality.</div>
       </section>
 
       <section id="refs" style="border-top: 1px solid var(--line); padding-top: 28px;">
@@ -220,12 +220,380 @@
 const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "governance.examples", "governance.output_contract", "interaction.query"];
 const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
 const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("state") ? "var(--p-state)" : s.startsWith("evidence") ? "var(--p-evid)" : "var(--p-inter)";
+const PROFILE_CONTRACTS = [
+  {
+    "id": "policy-first-chat",
+    "version": 2,
+    "route": "support-chat",
+    "model_family": null,
+    "route_policy_version": "illustrative/v2",
+    "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "state.task",
+        "wrap": "xml:task"
+      },
+      {
+        "slot": "interaction.memory",
+        "wrap": "xml:memory"
+      },
+      {
+        "slot": "interaction.history",
+        "wrap": "xml:history"
+      },
+      {
+        "slot": "governance.capabilities",
+        "wrap": "tools"
+      },
+      {
+        "slot": "evidence.tool_results",
+        "wrap": "xml:observation"
+      },
+      {
+        "slot": "governance.examples",
+        "wrap": "xml:examples"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
+  },
+  {
+    "id": "document-analysis",
+    "version": 2,
+    "route": "document-qa",
+    "model_family": null,
+    "route_policy_version": "illustrative/v2",
+    "placement": [
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "state.task",
+        "wrap": "xml:task"
+      },
+      {
+        "slot": "interaction.memory",
+        "wrap": "xml:memory"
+      },
+      {
+        "slot": "interaction.history",
+        "wrap": "xml:history"
+      },
+      {
+        "slot": "governance.examples",
+        "wrap": "xml:examples"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
+  },
+  {
+    "id": "long-context-reinforced",
+    "version": 2,
+    "route": "long-context-qa",
+    "model_family": null,
+    "route_policy_version": "illustrative/v2",
+    "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "evidence.tool_results",
+        "wrap": "xml:observation"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "state.task",
+        "wrap": "xml:task"
+      },
+      {
+        "slot": "interaction.memory",
+        "wrap": "xml:memory"
+      },
+      {
+        "slot": "interaction.history",
+        "wrap": "xml:history"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
+  },
+  {
+    "id": "tool-agent",
+    "version": 2,
+    "route": "agent-loop",
+    "model_family": null,
+    "route_policy_version": "illustrative/v2",
+    "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "governance.capabilities",
+        "wrap": "tools"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "interaction.memory",
+        "wrap": "xml:memory"
+      },
+      {
+        "slot": "interaction.history",
+        "wrap": "xml:history"
+      },
+      {
+        "slot": "state.task",
+        "wrap": "xml:task"
+      },
+      {
+        "slot": "evidence.tool_results",
+        "wrap": "xml:observation"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
+  },
+  {
+    "id": "extraction",
+    "version": 2,
+    "route": "extract",
+    "model_family": null,
+    "route_policy_version": "illustrative/v2",
+    "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "governance.examples",
+        "wrap": "xml:examples"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
+  }
+];
 const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v1", short: "policy-first", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default renderer for this site's examples.", evalNote: "golden-task suite support-chat/v4 · 2026-08-30 · groundedness 0.94, task success 0.91" },
-  { name: "Document analysis", id: "document-analysis/v1", short: "document", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples and the question after them, near the end.", evalNote: "document-qa/v2 · 2026-08-12 · citation accuracy 0.89" },
-  { name: "Long-context reinforced", id: "long-context-reinforced/v1", short: "reinforced", route: "long-context-qa", uses: "Very long inputs, multi-document synthesis", order: [0, 2, 7, 1, 3, 4, 5, 9, 0, 10], principle: "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.", evalNote: "not yet evaluated · hypothesis drawn from provider guidance [5]", isNew: true },
-  { name: "Tool-using agent", id: "tool-agent/v1", short: "tool-agent", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.", evalNote: "agent-loop/v3 · 2026-08-21 · tool-call correctness 0.96" },
-  { name: "Structured extraction", id: "extraction/v1", short: "extraction", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.", evalNote: "extract/v5 · 2026-07-30 · schema validity 0.99" }
+  {
+    "name": "Policy-first chat",
+    "id": "policy-first-chat/v2",
+    "short": "policy-first",
+    "route": "support-chat",
+    "uses": "Support, assistants, workflows",
+    "order": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "principle": "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default renderer for this site's examples.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Document analysis",
+    "id": "document-analysis/v2",
+    "short": "document",
+    "route": "document-qa",
+    "uses": "Long reports, contracts, corpora",
+    "order": [
+      2,
+      0,
+      1,
+      3,
+      4,
+      5,
+      8,
+      9,
+      10
+    ],
+    "principle": "Documents early and clearly delimited; instructions, examples and the question after them, near the end.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Long-context reinforced",
+    "id": "long-context-reinforced/v2",
+    "short": "reinforced",
+    "route": "long-context-qa",
+    "uses": "Very long inputs, multi-document synthesis",
+    "order": [
+      0,
+      2,
+      7,
+      1,
+      3,
+      4,
+      5,
+      9,
+      0,
+      10
+    ],
+    "principle": "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published",
+    "isNew": true
+  },
+  {
+    "name": "Tool-using agent",
+    "id": "tool-agent/v2",
+    "short": "tool-agent",
+    "route": "agent-loop",
+    "uses": "Multi-step work",
+    "order": [
+      0,
+      6,
+      1,
+      2,
+      4,
+      5,
+      3,
+      7,
+      9,
+      10
+    ],
+    "principle": "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Structured extraction",
+    "id": "extraction/v2",
+    "short": "extraction",
+    "route": "extract",
+    "uses": "Parsing and classification",
+    "order": [
+      0,
+      9,
+      1,
+      2,
+      8,
+      9,
+      10
+    ],
+    "principle": "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  }
 ];
 class Component extends DCLogic {
   state = { theme: "light", a: 0, b: 2 };
@@ -243,11 +611,7 @@ class Component extends DCLogic {
     return "font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 6px 11px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
   }
   yaml(p) {
-    const pad = s => (s + ",").padEnd(29);
-    const [id, v] = p.id.split("/");
-    return ["profile:", "  id:           " + id, "  version:      " + v.replace("v", ""), "  route:        " + p.route, "  model_family: \"<family and version this profile was evaluated on>\"", "  placement:"]
-      .concat(p.order.map(i => "    - { slot: " + pad(SLOTS[i]) + " wrap: " + WRAP[i] + " }"))
-      .concat(["  evaluation:", "    suite:  \"<route eval suite and version>\"", "    date:   \"<date>\"", "    result: \"" + p.evalNote + "\""]).join("\n");
+    return JSON.stringify(PROFILE_CONTRACTS.find(profile => profile.id + "/v" + profile.version === p.id), null, 2);
   }
   view(p, other) {
     const firstPos = (order, i) => order.indexOf(i);
@@ -291,9 +655,9 @@ class Component extends DCLogic {
       protocol: [
         { n: "01", name: "Fix the item set", text: "Freeze a sample of real requests from the route with their admitted items and traces. The same items go through every profile under test." },
         { n: "02", name: "Name the metric", text: "Choose one outcome metric the route already tracks, such as groundedness, task success, tool-call correctness, or schema validity. Placement is judged on that metric, not on preference." },
-        { n: "03", name: "Render with each profile", text: "Assemble every sample with the incumbent profile and the candidate. Traces confirm the only difference is placement." },
+        { n: "03", name: "Render with each profile", text: "Assemble every sample with the incumbent profile and the candidate. Use traces to inspect changes in order, inclusion, repetition, wrappers and token counts." },
         { n: "04", name: "Compare on the target model", text: "Run both payload sets against the model family the profile names. A profile evaluated on one family says nothing about another." },
-        { n: "05", name: "Record and version", text: "Write suite, date and result into the candidate's evaluation block. Promote by bumping the version; the trace of every later request names it." }
+        { n: "05", name: "Record and version", text: "Publish suite, model version, date, results and a reproducible artifact in the evaluation block. Version any payload configuration change; the trace of every later request names it." }
       ]
     };
   }
