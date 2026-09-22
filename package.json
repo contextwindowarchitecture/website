@@ -1,0 +1,15 @@
+{
+  "name": "cwa-website-contract",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:contract": "node scripts/build-contract.mjs",
+    "check:generated": "node scripts/build-contract.mjs --check",
+    "test": "npm run check:generated && node --test tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "esbuild": "0.28.2"
+  }
+}

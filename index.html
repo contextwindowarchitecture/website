@@ -130,7 +130,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px;">
             <span>{{ mTokens }}</span>
-            <span>profile · policy-first-chat/v1</span>
+            <span>profile · policy-first-chat/v2</span>
           </div>
         </div>
       </div>
@@ -282,7 +282,7 @@
       <div data-tour="intro">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
-      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a tested order. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; removing protected slots deliberately shows a nonconformant case. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
 
       <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
@@ -315,7 +315,7 @@
         </div>
         <div style="{{ evictionStyle }}">{{ evictionLabel }}</div>
         <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--muted);">
-          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Protected</span> · instructions, task state, output contract, query</span>
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Protected</span> · instructions, capabilities, task state, output contract, query</span>
           <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Compressible</span> · memory, history, knowledge, tool results</span>
           <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Droppable</span> · examples, user facts</span>
         </div>
@@ -505,23 +505,32 @@
           <span>context_item.yaml</span>
           <span style="color: var(--p-evid);">evidence.knowledge · 1 of 3</span>
         </div>
-        <div style="padding: 20px 18px; white-space: pre; overflow: auto;"><span style="color: var(--muted);">id:</span>              "retrieval:refunds-eu:v17#p4"
-<span style="color: var(--muted);">slot:</span>            evidence.knowledge
-<span style="color: var(--muted);">type:</span>            evidence
-<span style="color: var(--muted);">source:</span>          policy-corpus
-<span style="color: var(--muted);">source_version:</span>  "2026-09-10"
-<span style="color: var(--muted);">authority:</span>       reference_only
-<span style="color: var(--muted);">trust:</span>           verified
-<span style="color: var(--muted);">freshness:</span>       "2026-09-12T15:30:00Z"
-<span style="color: var(--muted);">scope:</span>           refund_request
-<span style="color: var(--muted);">eligibility:</span>     "similarity &gt;= 0.82 AND jurisdiction == EU"
-<span style="color: var(--muted);">token_budget:</span>    420
-<span style="color: var(--muted);">compression:</span>     extractive_quote
-<span style="color: var(--muted);">conflict_policy:</span> defer_to_current_tool_result
-<span style="color: var(--muted);">injection_risk:</span>  untrusted_content
-<span style="color: var(--muted);">lineage:</span>         verbatim
-<span style="color: var(--muted);">placement:</span>       evidence_near_query</div>
-        <div style="padding: 12px 18px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.55; color: var(--muted); white-space: normal;"><span style="color: var(--fg);">placement</span> is a hint the route’s profile consumes, not a position. Where items go is a profile decision with evidence behind it: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</div>
+        <!-- CONTRACT_ITEM_START -->
+<pre style="padding: 20px 18px; overflow: auto; margin: 0;">{
+  "id": "refunds-eu:v17#p4",
+  "slot": "evidence.knowledge",
+  "source": "policy-corpus",
+  "source_version": "2026-09-10",
+  "authority": "reference_only",
+  "trust": "verified",
+  "freshness": "2026-09-12T15:30:00Z",
+  "expires": "2026-12-12T15:30:00Z",
+  "scope": {
+    "tenant": "acme",
+    "task": "refund_request"
+  },
+  "relevance": 0.91,
+  "token_budget": 420,
+  "tier": "compressible",
+  "variants": [],
+  "conflict_policy": "defers",
+  "injection_risk": "untrusted_content",
+  "lineage": "verbatim",
+  "eligibility": "support-chat/v2: tenant acme; rerank at least 0.82",
+  "body": "Pro plans refund in full within 30 days of purchase."
+}</pre>
+<!-- CONTRACT_ITEM_END -->
+        <div style="padding: 12px 18px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.55; color: var(--muted); white-space: normal;">The item schema defines metadata; the route profile defines placement. Where items go is a profile decision with evidence behind it: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</div>
       </div>
     </div>
   </section>
@@ -535,13 +544,13 @@
         <a href="./spec.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Specification · v2 draft</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">23 numbered requirements.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">They cover conformance language, the authority hierarchy and resolution matrix, budget tiers, the profile shape, and the required trace fields. Pure text, permalinked per rule and mirrored to the repo.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">They cover conformance language, instruction authority and route-specific factual precedence, budget tiers, the profile shape, and the required trace fields. Pure text, permalinked per rule and mirrored to the repo.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the spec →</span>
         </a>
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Producer contract</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">What your tool has to emit.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to see whether an assembler would admit it.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to check its structure and local invariants; the application owns admission.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the contract →</span>
         </a>
         <a href="./evidence.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
@@ -571,12 +580,12 @@
       <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0;">
         <div style="background: var(--bg); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">When nothing valid is retrieved</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">The assembler does not answer from nothing. It retrieves narrower, summarises with traceability, or routes the request for more context — and the trace records which.</div>
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">When admission yields no valid evidence, an assembler <span style="color: var(--accent); font-weight: 600;">MUST NOT</span> answer from nothing. It <span style="color: var(--accent); font-weight: 600;">MUST</span> retrieve narrower, summarise with traceability, or route for more context, and the trace <span style="color: var(--accent); font-weight: 600;">MUST</span> record which.</div>
+          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">The assembler refuses with evidence_required and a recovery action. The application retrieves narrower, precomputes a summary, or requests context before constructing a new snapshot.</div>
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">When admission yields no valid evidence, an assembler <span style="color: var(--accent); font-weight: 600;">MUST NOT</span> answer from nothing. It <span style="color: var(--accent); font-weight: 600;">MUST</span> refuse and record a recovery action for the application, and the trace <span style="color: var(--accent); font-weight: 600;">MUST</span> record which.</div>
         </div>
         <div style="background: var(--bg); padding: 24px 22px;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Fresh beats retrieved</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A tool observation from 0.4 seconds ago and a passage indexed in August are both evidence, but for current facts the observation governs and the passage only cites.</div>
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Factual precedence is route policy</div>
+          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A recent observation and an older passage are both evidence. A route may prefer a verified observation for the same current fact; neither age nor source kind establishes a universal truth ranking.</div>
         </div>
       </div>
     </div>
@@ -590,7 +599,7 @@
         <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA does not dictate syntax, so tag slots however your stack prefers: XML-style blocks, message roles, or delimited sections. What matters is that every item names its slot and authority, evidence arrives as packets with provenance, and the profile that ordered them is recorded.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
-        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v1</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v2</span></div>
         <div style="padding: 20px 18px; display: flex; flex-direction: column;">
           <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-gov);">&lt;!-- governance.instructions · authority=governing · v12 --&gt;</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;system&gt;</span>You are Ada, a support agent for Northwind.</div>
@@ -600,10 +609,10 @@
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;user_profile&gt;</span>plan=pro; region=EU; tone=concise<span style="color: var(--accent);">&lt;/user_profile&gt;</span></div>
           <div style="height: 1.85em;"></div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-evid);">&lt;!-- evidence.knowledge · authority=reference_only · 2 of 12 candidates --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="refunds-eu:v17#p4" trust="verified" as_of="2026-09-10"&gt;</span></div>
+          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="refunds-eu:v17#p4" trust="verified" freshness="2026-09-10"&gt;</span></div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;">  Pro plans refund in full within 30 days of purchase.</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;/evidence&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="billing-faq:v3#p1" trust="verified" as_of="2026-08-02"&gt;</span></div>
+          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="billing-faq:v3#p1" trust="verified" freshness="2026-08-02"&gt;</span></div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;">  Refunds return to the original payment method.</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;/evidence&gt;</span></div>
           <div style="height: 1.85em;"></div>
@@ -626,7 +635,7 @@
           <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-inter);">&lt;!-- interaction.query · authority=user · the trigger --&gt;</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;query&gt;</span>Can you just process it now?<span style="color: var(--accent);">&lt;/query&gt;</span></div>
           <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);">&lt;!-- trace ctx_01J9K · 3 items excluded · 0 conflicts · policy-first-chat/v1 --&gt;</div>
+          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);">&lt;!-- trace ctx_01J9K · 3 items excluded · 0 conflicts · policy-first-chat/v2 --&gt;</div>
         </div>
       </div>
     </div>
@@ -781,7 +790,7 @@
       <div>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Take it with you</div>
         <h2 style="margin: 0 0 12px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Copy the scaffold and start today.</h2>
-        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">The getting-started guide takes you in six steps from your current prompt to a payload with owners. It includes a migrator that proposes slots for your prompt and five files to copy: an assembly function, an empty payload, the item schema as YAML and JSON Schema, and a cwa.md for coding agents.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">The getting-started guide takes you in six steps from your current prompt to a payload with owners. It includes a migrator that proposes slots for your prompt and five files to copy: an integration sketch, a rendering template, a complete item example and JSON Schema, and a cwa.md for coding agents.</p>
       </div>
       <a href="./start.html" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px; white-space: nowrap;" style-hover="background: var(--fg);">Getting started →</a>
     </div>
@@ -851,7 +860,7 @@ const PLANES = [
 const SLOTS = [
   ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler refuses untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
   ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
-  ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference\ntier compressible\nrisk untrusted_content"],
+  ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
   ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged.", "authority generated\ntier compressible\nlifecycle ttl · revocable"],
   ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought.", "authority user\ntier compressible\nbound turns · tokens"],
@@ -907,7 +916,7 @@ const UCS = [
     name: "Pull request #482 · CI job",
     picks: [
       [0, "You review diffs. Comment only on lines that changed."],
-      [2, "repo conventions · eslint config · CODEOWNERS · authority=reference"],
+      [2, "repo conventions · eslint config · CODEOWNERS · authority=reference_only"],
       [6, "fetch_diff(pr) · post_comment(file, line, body)"],
       [7, "fetch_diff(482) → 3 files, 214 lines changed"],
       [8, "Two approved review comments from last week."],
@@ -956,7 +965,7 @@ const UCS = [
     name: "Monday sales brief · scheduled batch",
     picks: [
       [0, "Analyst voice. Every number cites the source row."],
-      [2, "pipeline snapshot · 41 open deals · 6 closed lost · as_of Mon 06:00"],
+      [2, "pipeline snapshot · 41 open deals · 6 closed lost · freshness Mon 06:00"],
       [3, "brief week 30 → section 2 of 5 drafted"],
       [8, "Last week's approved brief, as a style reference."],
       [9, "800 words. Four headings. No preamble."],
@@ -1053,16 +1062,16 @@ const COMPRESS = 0.4;
 const BUDGETS = [8192, 4096, 2048, 1024];
 
 const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v1", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
-  { name: "Document analysis", id: "document-analysis/v1", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples, and the question after them, near the end." },
-  { name: "Tool-using agent", id: "tool-agent/v1", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
-  { name: "Structured extraction", id: "extraction/v1", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
+  { name: "Policy-first chat", id: "policy-first-chat/v2", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
+  { name: "Document analysis", id: "document-analysis/v2", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples, and the question after them, near the end." },
+  { name: "Tool-using agent", id: "tool-agent/v2", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
+  { name: "Structured extraction", id: "extraction/v2", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
 ];
 
 const AUTHORITY = [
   ["Governing instruction", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
   ["User intent / preference", "What the user asks for and how they want it. Cannot lift a constraint above it."],
-  ["Canonical state", "Application-owned facts about the task and session. Beats any recollection."],
+  ["Canonical state", "Application-owned facts about the task and session. Precedence is defined by the route for the facts it owns."],
   ["Reference evidence", "Retrieved passages. Informs the answer; never directs behaviour."],
   ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
   ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
@@ -1071,363 +1080,48 @@ const AUTHORITY = [
 
 const CONFLICTS = [
   ["System or developer policy vs user request", "Higher-authority policy governs."],
-  ["Fresh verified tool output vs retrieved document", "The tool output governs for current facts; the document may still be cited."],
-  ["Canonical task state vs conversational recollection", "Canonical state governs. The model is not the source of truth."],
-  ["User correction vs inferred memory", "The correction updates or suppresses the inference, and the trace records the revocation."],
+  ["Fresh verified tool output vs retrieved document", "Route policy may prefer a verified observation for the same current fact; unresolved conflicts escalate."],
+  ["Canonical task state vs conversational recollection", "Route policy identifies canonical application state for its owned facts; the model does not write that state."],
+  ["User correction vs inferred memory", "The application explicitly revokes affected memory and reports the exclusion."],
   ["Conflicting retrieved sources", "Surface the conflict, retrieve more, or abstain and escalate. Never silently pick one."],
   ["Format constraint vs required safety disclosure", "Safety and correctness govern; the contract bends."],
   ["Steering example vs instruction or output contract", "The instruction or contract governs. Examples defer within the governing tier."]
 ];
 
 const TESTS = [
-  ["Assembly snapshot", "Identical inputs produce a byte-equivalent payload, or a normalised structural equivalent."],
+  ["Assembly snapshot", "Identical immutable snapshots produce identical rendered bytes and hashes."],
   ["Golden task", "The correct evidence packet appears in the final context for a known request."],
   ["Counterfactual ablation", "Remove evidence, task state, or tool results and confirm what fails, and that the trace explains it."],
   ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions."],
   ["Budget pressure", "At half the window, protected slots survive intact and compression happens in tier order."],
-  ["Freshness", "An expired memory loses to a current tool observation for the same fact."],
+  ["Freshness", "Expired memory is excluded using assembly_time and its producer rejection is traced."],
   ["Refusal", "When essential evidence cannot fit, the assembler refuses to render rather than silently answering."],
   ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is refused with capability_not_allowed."]
 ];
 
 const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
-  ["Retrieve", "Pull a candidate set, passage-level, from sources with a declared authority tier."],
+  ["Retrieve", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
   ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
   ["Deduplicate", "Collapse near-identical passages; apply a diversity constraint across sources."],
   ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
-  ["Budget", "Select by relevance × trust × freshness × diversity until the slot's allocation is spent."],
+  ["Budget", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],
   ["Attribute", "Carry citation requirements into the output contract so the answer can point back to the packet."]
 ];
 
 const ITEM_FIELDS = [
   ["provenance", "Which document, turn, tool call, database field, or memory write it came from, and which version."],
   ["authority", "Exactly one of seven values: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content."],
-  ["freshness", "When the item was true and when it must be revalidated. Expired items are excluded rather than aged silently."],
+  ["freshness", "freshness records observation time; expires is the separate expiration deadline. Expired items are excluded rather than aged silently."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
   ["eligibility", "The deterministic rule that admitted it into this request, stated so a test can replay it."],
   ["budget", "How much it may consume, which tier it sits in, and what shortens first under pressure."],
-  ["conflict_policy", "What wins if another item of the same tier disagrees: this one defers, governs, or forces escalation."],
+  ["conflict_policy", "For permitted instruction peers: this one defers, governs, or forces escalation."],
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
   ["trust", "Verified, unverified, or untrusted. Untrusted content can never issue instructions."]
 ];
 
-const SCAFFOLDS = [
-  {
-    label: "Assembler", filename: "assemble.py",
-    blurb: "Drop this beside your prompt code. Slots are typed collections; a versioned profile decides the order; the fitting step protects, compresses, drops, or refuses.",
-    text: [
-      "# Context Window Architecture — assembly scaffold",
-      "# Slots hold items. A profile renders them. Empty slots are omitted, never emitted.",
-      "",
-      "PROFILE = load_profile('policy-first-chat/v1')   # per route, versioned, evaluated",
-      "",
-      "def assemble_context(req, profile=PROFILE):",
-      "    items = [",
-      "        *slot('governance.instructions',    [policy(req.route)],            authority='governing'),",
-      "        *slot('governance.capabilities',    capability_policy(req),         authority='governing'),   # the policy admits; adapters only propose",
-      "        *slot('governance.output_contract', [OUTPUT_CONTRACT],              authority='governing'),",
-      "        *slot('state.user',                 user_facts(req.user),           authority='state'),",
-      "        *slot('state.task',                 [req.task.snapshot()],          authority='state'),",
-      "        *slot('evidence.knowledge',         retrieve(req.query, k=12),      authority='reference'),",
-      "        *slot('evidence.tool_results',      req.observations,               authority='observation'),",
-      "        *slot('interaction.memory',         memory.summaries(req.session),  authority='generated'),",
-      "        *slot('interaction.history',        req.session.recent(turns=6),    authority='user'),",
-      "        *slot('governance.examples',        examples_for(req.route),        authority='governing'),   # defers to instructions within the tier",
-      "        *slot('interaction.query',          [req.message],                  authority='user'),",
-      "    ]",
-      "    admitted  = admit(items, req)                    # scope, eligibility, freshness, trust",
-      "    resolved  = resolve_conflicts(admitted)          # tier, then conflict_policy, then freshness, else escalate",
-      "    fitted    = fit(resolved, budget=req.budget)     # reserve output; protect; compress; drop; or refuse",
-      "    payload   = profile.render(fitted)               # placement belongs to the profile, not the slot",
-      "    trace     = Trace(profile, items, admitted, fitted)",
-      "    return payload, trace",
-      "",
-      "def slot(name, bodies, authority):",
-      "    return [Item(slot=name, body=b, authority=authority, **provenance(b)) for b in bodies if b]",
-      "",
-      "PROTECTED    = {'governance.instructions', 'state.task', 'governance.output_contract', 'interaction.query'}",
-      "COMPRESSIBLE = ['interaction.memory', 'interaction.history', 'evidence.knowledge', 'evidence.tool_results']",
-      "DROPPABLE    = ['governance.examples', 'state.user']",
-      "",
-      "def fit(items, budget):",
-      "    budget -= RESERVED_OUTPUT",
-      "    for name in DROPPABLE:                            # 1. drop redundant steering and low-value facts",
-      "        if total(items) <= budget: break",
-      "        items = [i for i in items if i.slot != name]",
-      "    for name in COMPRESSIBLE:                         # 2. compress with source links, never blind truncation",
-      "        if total(items) <= budget: break",
-      "        items = [i.compress() if i.slot == name else i for i in items]",
-      "    if total(items) > budget:                         # 3. essential evidence does not fit",
-      "        raise ContextRefused('retrieve narrower, summarise with traceability, or route for more context')",
-      "    return items"
-    ].join("\n")
-  },
-  {
-    label: "Payload", filename: "payload.txt",
-    blurb: "The wire format, empty, in the default profile's order. Tag however your stack prefers — what matters is that every item names its slot and authority.",
-    text: [
-      "<!-- profile: policy-first-chat/v1 -->",
-      "",
-      "<!-- governance.instructions · authority=governing · protected -->",
-      "<instructions version=\"\"></instructions>",
-      "",
-      "<!-- state.user · authority=state · scope=user,session -->",
-      "<user_facts></user_facts>",
-      "",
-      "<!-- evidence.knowledge · authority=reference · one <evidence> per packet -->",
-      "<evidence id=\"\" source=\"\" version=\"\" trust=\"\" as_of=\"\"></evidence>",
-      "",
-      "<!-- state.task · authority=state · app-owned, canonical -->",
-      "<task></task>",
-      "",
-      "<!-- interaction.memory · authority=generated · lineage=summary · ttl -->",
-      "<memory></memory>",
-      "",
-      "<!-- interaction.history · authority=user · verbatim, bounded -->",
-      "<history></history>",
-      "",
-      "<!-- governance.capabilities · authority=governing · source=capability-policy -->",
-      "<tools></tools>",
-      "",
-      "<!-- evidence.tool_results · authority=observation · one <observation> per call -->",
-      "<observation call=\"\" age=\"\"></observation>",
-      "",
-      "<!-- governance.examples · authority=governing · droppable -->",
-      "<examples></examples>",
-      "",
-      "<!-- governance.output_contract · authority=governing · protected -->",
-      "<format></format>",
-      "",
-      "<!-- interaction.query · authority=user · protected -->",
-      "<query></query>",
-      "",
-      "<!-- trace: <id> · included/compressed/excluded counts · conflicts -->"
-    ].join("\n")
-  },
-  {
-    label: "Item schema", filename: "context_item.yaml",
-    blurb: "What every item carries beyond its slot. Without these fields a fixed order still produces unpredictable payloads.",
-    text: [
-      "context_item:",
-      "  id: \"retrieval:refunds-eu:v17#p4\"",
-      "  slot: evidence.knowledge",
-      "  type: evidence                       # governing | state | evidence | observation | memory | steering | trigger",
-      "  source: policy-corpus",
-      "  source_version: \"2026-09-10\"",
-      "  authority: reference_only            # governing | user | state | reference_only | observation | generated | untrusted",
-      "  trust: verified                      # verified | unverified | untrusted",
-      "  freshness: \"2026-09-12T15:30:00Z\"",
-      "  expires: \"2026-12-12T15:30:00Z\"",
-      "  scope: refund_request                # tenant / user / session / task / locale / step",
-      "  eligibility: \"similarity >= 0.82 AND jurisdiction == EU\"",
-      "  token_budget: 420",
-      "  tier: compressible                   # protected | compressible | droppable",
-      "  compression: extractive_quote",
-      "  conflict_policy: defer_to_current_tool_result",
-      "  injection_risk: untrusted_content",
-      "  lineage: verbatim                    # verbatim | summarised | redacted | translated | extracted | generated",
-      "  placement: evidence_near_query       # hint consumed by the profile, not a fixed position"
-    ].join("\n")
-  },
-  {
-    label: "JSON Schema", filename: "context_item.schema.json",
-    blurb: "The item schema as data: the same fields and enums as context_item.yaml, plus body. Validate what your producers emit before the assembler sees it.",
-    text: [
-     
-      "{",
-      "  \"$schema\": \"https://json-schema.org/draft/2020-12/schema\",",
-      "  \"$id\": \"https://contextwindowarchitecture.io/schema/context_item.schema.json\",",
-      "  \"title\": \"CWA context item\",",
-      "  \"description\": \"One governed object in a slot. Fields match context_item.yaml. Wire syntax is not specified; fields are.\",",
-      "  \"type\": \"object\",",
-      "  \"additionalProperties\": false,",
-      "  \"required\": [",
-      "    \"id\",",
-      "    \"slot\",",
-      "    \"source\",",
-      "    \"source_version\",",
-      "    \"authority\",",
-      "    \"trust\",",
-      "    \"freshness\",",
-      "    \"body\"",
-      "  ],",
-      "  \"properties\": {",
-      "    \"id\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"Stable, provenance-bearing id, e.g. retrieval:refunds-eu:v17#p4\"",
-      "    },",
-      "    \"slot\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"governance.instructions\",",
-      "        \"governance.capabilities\",",
-      "        \"governance.examples\",",
-      "        \"governance.output_contract\",",
-      "        \"state.user\",",
-      "        \"state.task\",",
-      "        \"evidence.knowledge\",",
-      "        \"evidence.tool_results\",",
-      "        \"interaction.memory\",",
-      "        \"interaction.history\",",
-      "        \"interaction.query\"",
-      "      ]",
-      "    },",
-      "    \"type\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"governing\",",
-      "        \"state\",",
-      "        \"evidence\",",
-      "        \"observation\",",
-      "        \"memory\",",
-      "        \"steering\",",
-      "        \"trigger\"",
-      "      ]",
-      "    },",
-      "    \"source\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"Document, turn, tool call, database field, allow-list, or memory write it came from\"",
-      "    },",
-      "    \"source_version\": {",
-      "      \"type\": \"string\"",
-      "    },",
-      "    \"authority\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"governing\",",
-      "        \"user\",",
-      "        \"state\",",
-      "        \"reference_only\",",
-      "        \"observation\",",
-      "        \"generated\",",
-      "        \"untrusted\"",
-      "      ]",
-      "    },",
-      "    \"trust\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"verified\",",
-      "        \"unverified\",",
-      "        \"untrusted\"",
-      "      ]",
-      "    },",
-      "    \"freshness\": {",
-      "      \"type\": \"string\",",
-      "      \"format\": \"date-time\",",
-      "      \"description\": \"When it was true (as_of)\"",
-      "    },",
-      "    \"expires\": {",
-      "      \"type\": \"string\",",
-      "      \"format\": \"date-time\",",
-      "      \"description\": \"When it must be revalidated; expired items are excluded, not aged silently\"",
-      "    },",
-      "    \"scope\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"tenant / user / session / task / locale / step\"",
-      "    },",
-      "    \"eligibility\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"The deterministic rule that admitted it, stated so a test can replay it\"",
-      "    },",
-      "    \"token_budget\": {",
-      "      \"type\": \"integer\",",
-      "      \"minimum\": 0",
-      "    },",
-      "    \"tier\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"protected\",",
-      "        \"compressible\",",
-      "        \"droppable\"",
-      "      ]",
-      "    },",
-      "    \"compression\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"Precomputed variant to use under budget pressure, e.g. extractive_quote\"",
-      "    },",
-      "    \"conflict_policy\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"What wins if another item of the same tier disagrees, e.g. defer_to_current_tool_result\"",
-      "    },",
-      "    \"injection_risk\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"none\",",
-      "        \"untrusted_content\"",
-      "      ]",
-      "    },",
-      "    \"lineage\": {",
-      "      \"type\": \"string\",",
-      "      \"enum\": [",
-      "        \"verbatim\",",
-      "        \"summarised\",",
-      "        \"redacted\",",
-      "        \"translated\",",
-      "        \"extracted\",",
-      "        \"generated\"",
-      "      ]",
-      "    },",
-      "    \"placement\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"Hint consumed by the profile, not a fixed position, e.g. evidence_near_query\"",
-      "    },",
-      "    \"body\": {",
-      "      \"type\": \"string\",",
-      "      \"description\": \"The content rendered into the payload\"",
-      "    }",
-      "  }",
-      "}"
-
-    ].join("\n")
-  },
-  {
-    label: "For agents", filename: "cwa.md",
-    blurb: "Put this in your repo so coding agents assemble context the same way your team does.",
-    text: [
-      "# Context Window Architecture (CWA)",
-      "",
-      "Assemble every LLM payload from typed slots grouped in four planes.",
-      "Each slot holds zero or more items. Omit empty slots. A versioned profile",
-      "decides serialization order per route. Every assembly run emits a trace.",
-      "",
-      "## Planes and slots",
-      "",
-      "| Plane       | Slot                       | Holds                                   | Authority     | Tier         |",
-      "| ----------- | -------------------------- | --------------------------------------- | ------------- | ------------ |",
-      "| Governance  | governance.instructions    | Identity, rules, refusals, safety       | governing     | protected    |",
-      "| Governance  | governance.capabilities    | Permitted tools and their contracts     | governing     | protected    |",
-      "| Governance  | governance.examples        | Steering pairs, ranked by similarity    | governing     | droppable    |",
-      "| Governance  | governance.output_contract | Required structure, style, schema       | governing     | protected    |",
-      "| State       | state.user                 | Profile, entitlements, locale, prefs    | state         | droppable    |",
-      "| State       | state.task                 | Canonical workflow state, app-owned     | state         | protected    |",
-      "| Evidence    | evidence.knowledge         | Retrieved packets with provenance       | reference     | compressible |",
-      "| Evidence    | evidence.tool_results      | Tool observations, with age             | observation   | compressible |",
-      "| Interaction | interaction.memory         | Summaries and inferences, with TTL      | generated     | compressible |",
-      "| Interaction | interaction.history        | Verbatim recent turns, bounded          | user          | compressible |",
-      "| Interaction | interaction.query          | The unprocessed live request            | user          | protected    |",
-      "",
-      "## Rules",
-      "",
-      "1. Language guidance goes in context. Enforceable invariants go in code, tool guards, or a policy engine.",
-      "2. Slots never override platform roles or application controls. Untrusted content never enters a governance slot.",
-      "3. State is canonical and application-owned. Memory is fallible, source-linked, expiring, revocable.",
-      "4. Evidence is admitted through a pipeline (rewrite, retrieve, rerank, dedupe, filter, packetize, budget, attribute). An empty result is a recorded outcome, not a silent answer.",
-      "5. Conflicts resolve by authority tier, then conflict_policy within a tier, then freshness, else escalate: policy > user > state > observation > reference > memory. Conflicting sources are surfaced or escalated, never silently picked.",
-      "6. Fitting: reserve output tokens; keep protected slots intact; drop droppable; compress compressible with source links; if essential evidence still does not fit, refuse and route.",
-      "7. Placement is a profile, versioned per route and evaluated. Never assume one order is optimal for every model.",
-      "8. Every assembly run emits a trace: profile, budget, included, compressed, excluded (with reasons), conflicts (with what decided each).",
-      "",
-      "## Determinism claim",
-      "",
-      "Given the same request state, source versions, selection rules, and budget, the assembler emits the same",
-      "payload in the same order. CWA makes no claim about the determinism of the model's output.",
-      "",
-      "Reference: https://contextwindowarchitecture.io"
-    ].join("\n")
-  }
-];
 
 class Component extends DCLogic {
   state = { mode: "planes", spec: 0, open: { 0: true }, theme: "light", uc: 0, step: 0, hold: 0, playing: true };
@@ -1448,35 +1142,6 @@ class Component extends DCLogic {
       else if ((this.state.mHold || 0) < 4) this.setState(s => ({ mHold: (s.mHold || 0) + 1 }));
       else this.setState(s => ({ mUc: ((s.mUc || 0) + 1) % UCS.length, mStep: 0, mHold: 0 }));
     }, 520);
-  }
-
-  copyScaffold() {
-    const sc = SCAFFOLDS[this.state.scaffold || 0];
-    const done = () => {
-      this.setState({ copied: true });
-      clearTimeout(this._c);
-      this._c = setTimeout(() => this.setState({ copied: false }), 2200);
-    };
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(sc.text).then(done, () => this.fallbackCopy(sc.text, done));
-    } else this.fallbackCopy(sc.text, done);
-  }
-
-  fallbackCopy(text, done) {
-    const ta = document.createElement("textarea");
-    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
-    document.body.appendChild(ta); ta.select();
-    try { document.execCommand("copy"); } catch (e) {}
-    document.body.removeChild(ta); done();
-  }
-
-  downloadScaffold() {
-    const sc = SCAFFOLDS[this.state.scaffold || 0];
-    const url = URL.createObjectURL(new Blob([sc.text], { type: "text/plain" }));
-    const a = document.createElement("a");
-    a.href = url; a.download = sc.filename;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
   offMap(uc) { return (this.state.off || {})[uc] || {}; }
@@ -1797,23 +1462,6 @@ class Component extends DCLogic {
     out.authority = AUTHORITY.map((a, k) => ({ n: String(k + 1).padStart(2, "0"), name: a[0], text: a[1] }));
     out.conflicts = CONFLICTS.map(c => ({ when: c[0], then: c[1] }));
     out.tests = TESTS.map(t => ({ name: t[0], text: t[1] }));
-    const TIERS = ["governing", "user", "state", "reference", "observation", "generated", "untrusted"];
-    const cellBase = "background: var(--bg); padding: 8px 10px; font-family: var(--mono); font-size: 10.5px; line-height: 1.4; overflow-wrap: anywhere; color: ";
-    const cell = (r, c) => {
-      let t, col = "var(--muted)";
-      if (r === c) { t = r === 3 ? "escalate" : "policy, then fresher"; col = "var(--fg)"; }
-      else if (r === 6) t = "defers";
-      else if (c === 6) { t = "wins"; col = "var(--fg)"; }
-      else if (r === 3 && c === 4) t = "defers · current facts";
-      else if (r === 4 && c === 3) { t = "wins · current facts"; col = "var(--fg)"; }
-      else if (r === 1 && c === 5) { t = "wins · revokes"; col = "var(--fg)"; }
-      else if (r === 5 && c === 1) t = "defers · revoked";
-      else if (r < c) { t = "wins"; col = "var(--fg)"; }
-      else t = "defers";
-      return { text: t, style: cellBase + col + ";" };
-    };
-    out.matrixHead = TIERS.map(n => ({ name: n }));
-    out.matrixRows = TIERS.map((n, r) => ({ name: n, cells: TIERS.map((_, c) => cell(r, c)) }));
     out.profiles = PROFILES.map(p => ({
       name: p.name, id: p.id, uses: p.uses, principle: p.principle,
       meta: "route: " + p.route + " · model_family: per deployment · evaluation: required before promotion",
@@ -1917,7 +1565,7 @@ class Component extends DCLogic {
       segments,
       tokenLabel: "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
       evictionLabel, evictionStyle,
-      profileName: "policy-first-chat/v1",
+      profileName: "policy-first-chat/v2",
       traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
       budgets: BUDGETS.map((b, i) => ({ label: b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k", style: this.ucTabStyle(i === (this.state.budget || 0)), select: () => this.setState({ budget: i }) })),
       playLabel: this.state.playing ? "Pause" : "Play",
@@ -1950,23 +1598,13 @@ class Component extends DCLogic {
     out.mTokens = "~" + fmt(mTok) + " tokens";
     out.mFill = "height: 100%; width: " + Math.min(100, (mTok / 4096) * 100) + "%; background: var(--accent); transition: width 400ms ease;";
 
-    const si = this.state.scaffold || 0;
-    const sc = SCAFFOLDS[si];
-    out.scaffoldTabs = SCAFFOLDS.map((s, i) => ({ label: s.label, style: this.ucTabStyle(i === si), select: () => this.setState({ scaffold: i, copied: false }) }));
-    out.scaffoldName = sc.filename; out.scaffoldBlurb = sc.blurb;
-    out.scaffoldLines = sc.text.split("\n").map(t => ({ text: t === "" ? " " : t }));
-    out.copyLabel = this.state.copied ? "Copied" : "Copy " + sc.filename;
-    out.copyScaffold = () => this.copyScaffold();
-    out.downloadScaffold = () => this.downloadScaffold();
-    out.copyBtnStyle = "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; border-radius: var(--pill); padding: 12px 22px; cursor: pointer; background: " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; color: var(--bg);";
-
     out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
     out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
     out.badBtnStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.bad ? "var(--fg)" : "var(--line)") + "; background: " + (this.state.bad ? "var(--fg)" : "transparent") + "; color: " + (this.state.bad ? "var(--bg)" : "var(--muted)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer;";
     out.toggleBad = () => this.setState(s => ({ bad: !s.bad, playing: false, step: 99 }));
     out.ucSymptom = uc.symptom;
     out.badNotes = [
-      { text: "Instructions and retrieved text carry the same authority, so any document in the window can overrule the system prompt." },
+      { text: "An undelimited blob obscures provenance and instruction boundaries, increasing the risk that the model follows instruction-shaped evidence. Platform role precedence still applies." },
       { text: "History is unbounded and untiered: as the session grows, the oldest turns push the newest constraints out of the window." },
       { text: "Nothing has provenance or freshness, so when the answer is wrong there is no trace to say which item did it." }
     ];

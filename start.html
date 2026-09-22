@@ -116,7 +116,7 @@
           <div style="padding: 16px 18px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;">
             <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1;">{{ mig.slotCount }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">slots named</div></div>
             <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--accent);">{{ mig.gapPct }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">of tokens had no owner</div></div>
-            <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1;">{{ mig.missing }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">items still need source · as_of</div></div>
+            <div><div style="font-size: 26px; font-weight: 700; letter-spacing: -0.03em; line-height: 1;">{{ mig.missing }}</div><div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-top: 6px;">items still need source · freshness</div></div>
           </div>
           <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
             <span>payload.cwa.yaml</span>
@@ -125,7 +125,7 @@
           <div style="padding: 16px 18px; max-height: 320px; overflow: auto; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre; color: var(--fg);">{{ mig.yaml }}</div>
         </div>
       </div>
-      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts tokens the migrator could not assign to a slot. Everything else still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span> and an <span style="font-family: var(--mono); font-size: 13px;">as_of</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>); that is step 3, and it is the part no tool can do for you.</p>
+      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts tokens the migrator could not assign to a slot. Everything else still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span> and a <span style="font-family: var(--mono); font-size: 13px;">freshness</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>); that is step 3, and it is the part no tool can do for you.</p>
     </div>
   </section>
 
@@ -133,7 +133,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Take it with you · step 2</div>
       <h2 style="margin: 0 0 16px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Copy the scaffold.</h2>
-      <p style="margin: 0 0 32px; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Five ways in: an assembly function for your prompt code, an empty payload, an item schema as YAML and as JSON Schema, and a spec file your coding agents can follow.</p>
+      <p style="margin: 0 0 32px; font-size: 17px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Five downloads: an integration sketch, a rendering template, a complete item example, its JSON Schema, and implementation guidance for coding agents.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; align-items: center;">
         <sc-for list="{{ scaffoldTabs }}" as="s" hint-placeholder-count="5">
           <button onClick="{{ s.select }}" style="{{ s.style }}">{{ s.label }}</button>
@@ -211,7 +211,7 @@ class Component extends DCLogic {
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
     this.applyTheme(t);
-    import("./scaffolds.js").then(m => this.setState({ scaffolds: m.SCAFFOLDS })).catch(() => {});
+    import("./scaffolds.js").then(m => this.setState({ scaffolds: m.SCAFFOLDS })).catch(() => this.setState({ scaffoldError: "Downloads could not load. Reload the page to retry." }));
   }
   componentWillUnmount() { clearTimeout(this._c); }
   applyTheme(t) {
@@ -241,9 +241,10 @@ class Component extends DCLogic {
     let parsed = null;
     try { parsed = JSON.parse(src); } catch (e) {}
     if (Array.isArray(parsed)) {
-      const users = parsed.filter(m => m.role === "user").length;
+      const users = parsed.filter(m => m && m.role === "user").length;
       let seenUsers = 0;
       chunks = parsed.map(m => {
+        if (!m || typeof m !== "object" || Array.isArray(m) || m.content === undefined) return { text: JSON.stringify(m), slot: "unassigned", src: "message:invalid" };
         const text = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
         let slot = this.classify(text, m.role);
         if (m.role === "user") { seenUsers++; if (seenUsers < users) slot = "interaction.history"; }
@@ -259,12 +260,12 @@ class Component extends DCLogic {
     const items = chunks.map((c, i) => {
       const m = SLOT_META[c.slot];
       return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + m[1] + " · ~" + tok(c.text) + " tok", preview: c.text.replace(/\s+/g, " "),
-        flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs source · as_of") };
+        flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs source · freshness") };
     });
     const y = (s) => JSON.stringify(s);
-    const yaml = ["# proposed by the migrator · every item still needs a real source and as_of", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(chunks.map((c, i) => {
+    const yaml = ["# proposed by the migrator · every item still needs a real source and freshness", "profile: policy-first-chat/v2   # pick one on /evidence", "items:"].concat(chunks.map((c, i) => {
       const m = SLOT_META[c.slot];
-      return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + m[1], "    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO as_of\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text.length > 140 ? c.text.slice(0, 137) + "…" : c.text)].join("\n");
+      return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + m[1], "    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO timestamp\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text)].join("\n");
     })).join("\n");
     return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: chunks.length + " chunk" + (chunks.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(chunks.filter(c => c.slot !== "unassigned").length), yaml };
   }
@@ -284,7 +285,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     const mig = this.migrate(this.state.src);
-    const SC = this.state.scaffolds || [{ label: "Assembler", filename: "assemble.py", blurb: "Loading…", text: " " }];
+    const SC = this.state.scaffolds || [{ label: "Assembler", filename: "assemble.py", blurb: this.state.scaffoldError || "Loading downloads…", text: "" }];
     const si = Math.min(this.state.scaffold, SC.length - 1);
     const sc = SC[si];
     return {
@@ -292,10 +293,10 @@ class Component extends DCLogic {
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       steps: [
         { n: "01", anchor: "step-1", title: "Name the slots you already send", rules: "R-1", text: "Take the function that builds your model call and split its output into chunks. Give each chunk one of the eleven slot names. Anything that does not fit is a finding: either it belongs in two slots and should be two items, or it should not be in the window at all.", done: "Done when: every chunk has a slot, or is written down as unassigned." },
-        { n: "02", anchor: "step-2", title: "Wrap the payload in the scaffold", rules: "assemble.py · payload.txt", text: "Copy the assembly function below beside your prompt code. It takes items, a profile and a budget, and returns a payload and a trace. Replace your string concatenation with a call to it. Nothing about your content changes yet.", done: "Done when: the model receives the same bytes as before, produced by the scaffold." },
+        { n: "02", anchor: "step-2", title: "Wrap the payload in the scaffold", rules: "assemble.py · payload.txt", text: "Use the integration sketch below to identify the application helpers you must implement. It is not runnable as downloaded. Build an assembly function that returns a payload and trace, then compare its rendering with your existing request builder.", done: "Done when: the model receives the same bytes as before, produced by your implementation." },
         { n: "03", anchor: "step-3", title: "Give every item an authority and a source", rules: "R-2 · R-3", text: "Each item needs the eight minimum fields. Authority comes from the slot's ceiling. Source and source_version name where the content really came from: a policy file and its commit, a database row and its read time, a retriever and its index version. If you cannot name a source, you have found content with no owner.", done: "Done when: the item linter on /producers admits every item." },
-        { n: "04", anchor: "step-4", title: "Emit the trace and run the checks", rules: "R-21 · R-23", text: "The scaffold already writes the trace. Paste one into the trace validator and fix what it flags. Then run two of the conformance tests: assemble twice with identical inputs and compare the hash; drop one evidence item and confirm the trace names it.", done: "Done when: the validator reports conformant and both tests pass." },
-        { n: "05", anchor: "step-5", title: "Pick a placement profile", rules: "R-19 · R-20", text: "The scaffold ships with policy-first-chat/v1. Read the three profiles on the Evidence page and choose the one whose route matches yours. Record the choice in profile.yaml with the evaluation you ran, even if that evaluation is a single golden task for now.", done: "Done when: the trace names a profile id and version you chose deliberately." },
+        { n: "04", anchor: "step-4", title: "Emit the trace and run the checks", rules: "R-21 · R-23", text: "Your implementation must emit the required trace fields. Paste one into the trace validator and fix what it flags. Then run two of the conformance tests: assemble twice with identical inputs and compare the hash; drop one evidence item and confirm the trace names it.", done: "Done when: the trace passes structural validation and both implementation tests pass." },
+        { n: "05", anchor: "step-5", title: "Pick a placement profile", rules: "R-19 · R-20", text: "The integration sketch names the unevaluated policy-first-chat/v2 example. Read the five profiles on the Evidence page and choose the one whose route matches yours. Keep evaluation.status as unevaluated until you have a reproducible route evaluation with a model version, suite, date, results and artifact.", done: "Done when: the trace names a profile id and version you chose deliberately." },
         { n: "06", anchor: "step-6", title: "Move enforcement out of the prompt", rules: "R-5", text: "Search your governance items for invariants: never, always, must not. Each one stays in the prompt as guidance and gains a guard outside the model: a tool wrapper, a validator on the output, a permission check. The prompt instructs; the application enforces.", done: "Done when: every invariant has a named guard, and the prompt no longer carries the only copy of it." }
       ],
       src: this.state.src,
@@ -307,8 +308,8 @@ class Component extends DCLogic {
       scaffoldTabs: SC.map((s, i) => ({ label: s.label, style: this.tab(i === si), select: () => this.setState({ scaffold: i, copied: false }) })),
       scaffoldName: sc.filename, scaffoldBlurb: sc.blurb,
       scaffoldLines: sc.text.split("\n").map(t => ({ text: t === "" ? " " : t })),
-      downloadScaffold: () => this.download(sc.filename, sc.text),
-      copyScaffold: () => this.copy(sc.text),
+      downloadScaffold: () => this.state.scaffolds && this.download(sc.filename, sc.text),
+      copyScaffold: () => this.state.scaffolds && this.copy(sc.text),
       copyLabel: this.state.copied ? "Copied" : "Copy " + sc.filename,
       copyBtnStyle: "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; border-radius: var(--pill); padding: 11px 20px; cursor: pointer; background: " + (this.state.copied ? "var(--fg)" : "var(--accent)") + "; color: var(--bg);"
     };
