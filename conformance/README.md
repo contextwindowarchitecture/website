@@ -30,7 +30,7 @@ When an item fails several admission checks, the trace records the earliest appl
 
 ## Refusals
 
-A refused trace has `result: null`, `included: []` and `compressed: []` (R-17). It keeps the producer and admission rows in `excluded[]`, and `defaults_filled[]`. Assembly checks the refusal conditions in `contract/reasons.json` order and records the first that holds (R-21):
+A refused trace has `result: null`, `included: []` and `compressed: []` (R-17). It keeps the producer and admission rows in `excluded[]`, and `defaults_filled[]`. An `evidence_required` refusal comes after fitting, so it also keeps the fitting rows. Assembly checks the refusal conditions in `contract/reasons.json` order and records the first that holds (R-21):
 
 1. `required_slot_missing`: no admitted item in `governance.instructions` or `interaction.query`, or, on a route with `parser: true`, in `governance.output_contract` (R-4).
 2. `conflict_unresolved`: specified with conflict resolution.
