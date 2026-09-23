@@ -71,11 +71,13 @@ export const ITEM_SCHEMA = {
     "freshness": {
       "type": "string",
       "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])(?![\\s\\S])",
       "description": "When it was true (as_of)"
     },
     "expires": {
       "type": "string",
       "format": "date-time",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])(?![\\s\\S])",
       "description": "When it must be revalidated; expired items are excluded, not aged silently"
     },
     "scope": {
@@ -234,6 +236,7 @@ export const ITEM_SCHEMA = {
           "expires": {
             "type": "string",
             "format": "date-time",
+            "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])(?![\\s\\S])",
             "description": "When it must be revalidated; expired items are excluded, not aged silently"
           }
         }
@@ -320,7 +323,9 @@ export const TRACE_SCHEMA = {
             },
             "hash": {
               "type": "string",
-              "pattern": "^[a-f0-9]{64}$"
+              "pattern": "^[a-f0-9]{64}$",
+              "minLength": 64,
+              "maxLength": 64
             }
           },
           "required": [
@@ -668,7 +673,8 @@ export const TRACE_SCHEMA = {
       "properties": {
         "assembly_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9](\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])(?![\\s\\S])"
         },
         "route_policy_version": {
           "type": "string",
@@ -687,7 +693,9 @@ export const TRACE_SCHEMA = {
         },
         "snapshot_digest": {
           "type": "string",
-          "pattern": "^[a-f0-9]{64}$"
+          "pattern": "^[a-f0-9]{64}$",
+          "minLength": 64,
+          "maxLength": 64
         }
       },
       "required": [
