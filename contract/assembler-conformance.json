@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "136133c62e024e1826754dd57b0bafed953b237e",
+    "commit": "7817552742c49455e7d5d3e2f9c9b78cc447d968",
     "dirty": false
   },
   "implementation": {
@@ -10,7 +10,7 @@
     "language": "python"
   },
   "contract": {
-    "website_commit": "d70e14be0351b07929ebaf12c1222b90d0ddcf20",
+    "website_commit": "05266860655ea82ce3b552edae93db6a5fff3d8e",
     "dirty": false
   },
   "cases": [
@@ -68,6 +68,26 @@
         "R-16",
         "R-18",
         "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "budget-slot-cap-before-pressure",
+      "rules": [
+        "R-16",
+        "R-18",
+        "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "budget-slot-caps",
+      "rules": [
+        "R-3",
+        "R-16",
+        "R-18",
+        "R-21",
+        "R-22"
       ],
       "outcome": "passed"
     },
@@ -253,6 +273,15 @@
     },
     {
       "id": "protected-over-cap",
+      "rules": [
+        "R-16",
+        "R-17",
+        "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "protected-over-slot-cap",
       "rules": [
         "R-16",
         "R-17",
