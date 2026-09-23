@@ -191,7 +191,7 @@ const RULES = [
     "Resolves declared groups; evidence, state and memory never render as instructions.",
     "implemented",
     3,
-    3
+    4
   ],
   [
     "MUST NOT",
@@ -236,7 +236,7 @@ const RULES = [
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
     6,
-    6
+    7
   ],
   [
     "MUST NOT",
@@ -245,7 +245,7 @@ const RULES = [
     "Refuses with evidence_required and a recovery action.",
     "implemented",
     5,
-    5
+    6
   ],
   [
     "MUST NOT",
@@ -281,7 +281,7 @@ const RULES = [
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
     17,
-    17
+    18
   ],
   [
     "MUST",
@@ -290,7 +290,7 @@ const RULES = [
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
     9,
-    9
+    10
   ],
   [
     "MUST NOT",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     28,
-    28
+    31
   ],
   [
     "SHOULD",
@@ -335,7 +335,7 @@ const RULES = [
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
     13,
-    13
+    14
   ],
   [
     "MUST",
@@ -353,10 +353,10 @@ const RULES = [
     "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "planned",
     0,
-    0
+    3
   ]
 ];
-const CONFORMANCE = {"passed":28,"total":28,"commit":"7817552"};
+const CONFORMANCE = {"passed":28,"total":31,"commit":"7817552"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
