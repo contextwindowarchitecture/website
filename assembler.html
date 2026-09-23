@@ -58,7 +58,7 @@
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification: admission, conflict resolution, fitting, placement by profile, and the trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
-        <span>Milestone: <span style="color: var(--fg);">M3 conflict resolution</span></span>
+        <span>Milestone: <span style="color: var(--fg);">M4 placement, profiles and registry</span></span>
         <span>Spec target: <span style="color: var(--fg);">v2 draft</span></span>
         <span>Language: <span style="color: var(--fg);">Python first</span>, others after conformance</span>
         <span>Updated: 2026-09-22</span>
@@ -184,7 +184,7 @@ const RULES = [
     "No slot overrides platform roles; no authority from wording",
     "assembler",
     "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers.",
-    "in progress"
+    "implemented"
   ],
   [
     "MUST",
@@ -205,7 +205,7 @@ const RULES = [
     "Untrusted content is marked, rendered as material, kept out of governance",
     "assembler",
     "Checks untrusted marking, refuses it in governance, and renders it as material.",
-    "in progress"
+    "implemented"
   ],
   [
     "MUST",
@@ -268,14 +268,14 @@ const RULES = [
     "Draft profiles versus evaluated profiles",
     "boundary",
     "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly.",
-    "planned"
+    "boundary-checked"
   ],
   [
     "MUST",
     "Profile version and mandatory-slot validation",
     "assembler",
     "Pins profile content by hash and refuses unplaced protected content.",
-    "planned"
+    "implemented"
   ],
   [
     "MUST",
