@@ -80,3 +80,17 @@ test('specification, generated requirement reference, and status matrix share al
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (let i = 1; i <= 23; i++) assert.ok(markdown.includes(`## R-${i}:`));
 });
+
+test('the status matrix counts the published cases the imported conformance report passes', async () => {
+  const statuses = await component('assembler.html', 'RULES');
+  const { cases: outcomes } = JSON.parse(await fs.readFile(new URL('../contract/assembler-conformance.json', import.meta.url), 'utf8'));
+  const passed = new Set(outcomes.filter(c => c.outcome === 'passed').map(c => c.id));
+  const root = new URL('../conformance/cases/', import.meta.url);
+  const published = await Promise.all((await fs.readdir(root)).map(async name => JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8'))));
+  statuses.forEach((row, i) => {
+    const tagged = published.filter(c => c.rules.includes(`R-${i + 1}`));
+    assert.deepEqual([row[5], row[6]], [tagged.filter(c => passed.has(c.id)).length, tagged.length], `R-${i + 1}`);
+  });
+  const { caseLine } = (await component('assembler.html')).renderVals();
+  assert.ok(caseLine.startsWith(`${published.filter(c => passed.has(c.id)).length} of ${published.length} published conformance cases pass`), caseLine);
+});

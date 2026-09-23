@@ -58,7 +58,7 @@
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification: admission, conflict resolution, fitting, placement by profile, and the trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
-        <span>Milestone: <span style="color: var(--fg);">M4 placement, profiles and registry</span></span>
+        <span>Milestone: <span style="color: var(--fg);">M5 hardening</span></span>
         <span>Spec target: <span style="color: var(--fg);">v2 draft</span></span>
         <span>Language: <span style="color: var(--fg);">Python first</span>, others after conformance</span>
         <span>Updated: 2026-09-22</span>
@@ -69,9 +69,10 @@
   <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
-      <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
+      <h2 style="margin: 0 0 12px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
+      <p style="margin: 0 0 18px; font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; color: var(--p-evid);">{{ caseLine }}</p>
       <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
-      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the reference assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the reference assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it, and its <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span>, which records the outcome of every published conformance case. A row shows how many of the cases exercising it pass. The assembler's own tests reject a claim while any of them fails; a case published after its last run counts as not passing until it runs again.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
         <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
@@ -79,7 +80,7 @@
             <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ r.id }}</span>
             <span class="mx-kw" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: var(--muted);">{{ r.kw }}</span>
             <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0;"><span style="font-size: 14px; line-height: 1.45; text-wrap: pretty;">{{ r.summary }}</span><span style="font-size: 12.5px; line-height: 1.45; color: var(--muted); text-wrap: pretty;">{{ r.note }}</span></span>
-            <span class="mx-ss" style="display: flex; flex-direction: column; gap: 3px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;"><span style="color: {{ r.scopeColor }};">{{ r.scope }}</span><span style="color: {{ r.color }};">{{ r.status }}</span></span>
+            <span class="mx-ss" style="display: flex; flex-direction: column; gap: 3px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em;"><span style="color: {{ r.scopeColor }};">{{ r.scope }}</span><span style="color: {{ r.color }};">{{ r.status }}</span><span style="color: var(--muted);">{{ r.cases }}</span></span>
           </a>
         </sc-for>
       </div>
@@ -89,36 +90,37 @@
   <section style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 48px; align-items: start;">
       <div>
-        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Intended API · subject to change</div>
+        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">API · unreleased, subject to change</div>
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">One call in, payload and trace out.</h2>
         <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Producers run before assembly. The application authenticates each one, reads the clock once, and freezes everything that can affect the payload into a snapshot. <span style="font-family: var(--mono); font-size: 14px;">assemble()</span> receives only that snapshot, never producers, clocks or network access, so a stored snapshot replays to the same bytes (<a href="./spec.html#R-23">R-23</a>). Nothing in it calls a model (<a href="./spec.html#R-18">R-18</a>).</p>
         <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Each producer batch stays bound to the identity your application authenticated, which is what lets capability and state admission work (<a href="./spec.html#R-15">R-15</a>, <a href="./spec.html#R-8">R-8</a>). The Start page's <span style="font-family: var(--mono); font-size: 14px;">assemble.py</span> sketch shows the application side.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
-        <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>cwa/assembler.py</span><span>draft</span></div>
-        <div style="padding: 18px; white-space: pre; overflow: auto;"><span style="color: var(--muted);">from</span> cwa <span style="color: var(--muted);">import</span> assemble, Snapshot, Budget
+        <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>example.py</span><span>v0.0.1 · unreleased</span></div>
+        <div style="padding: 18px; white-space: pre; overflow: auto;"><span style="color: var(--muted);">from</span> cwa <span style="color: var(--muted);">import</span> assemble, Snapshot
 <span style="color: var(--muted);">from</span> cwa.registry <span style="color: var(--muted);">import</span> Registry
 
-reg = Registry.from_lockfile(<span style="color: var(--p-evid);">"cwa.lock.json"</span>)  <span style="color: var(--muted);"># profiles + route policies, pinned by hash</span>
+reg = Registry.from_json(lock, profiles, policies)  <span style="color: var(--muted);"># pinned by digest; an edit under the same version fails</span>
 
-snapshot = Snapshot.freeze(
-    batches=batches,            <span style="color: var(--muted);"># items + exclusions, one authenticated producer each</span>
-    capabilities=grant,         <span style="color: var(--muted);"># allow-list result for this route and user</span>
-    conflicts=groups,           <span style="color: var(--muted);"># conflict_group.schema.json</span>
-    scope=scope,                <span style="color: var(--muted);"># tenant, user, session, task</span>
-    assembly_time=now,          <span style="color: var(--muted);"># read once, before freezing</span>
-    route_policy=reg.policy(<span style="color: var(--p-evid);">"support-chat"</span>, <span style="color: var(--p-evid);">"v2"</span>),
-    profile=reg.profile(<span style="color: var(--p-evid);">"policy-first-chat"</span>, 2),
-    tokenizer=tokenizer,        <span style="color: var(--muted);"># declared; estimators carry a margin</span>
-    renderer=renderer,          <span style="color: var(--muted);"># canonical render IR</span>
-    budget=Budget(input=8192, reserved_output=1200),
+snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shaped, as snapshot.schema.json</span>
+    batches=batches,              <span style="color: var(--muted);"># items + exclusions, one authenticated producer each</span>
+    capabilities=grant,           <span style="color: var(--muted);"># allow-list result for this route and user</span>
+    conflicts=groups,             <span style="color: var(--muted);"># conflict_group.schema.json</span>
+    scope=scope,                  <span style="color: var(--muted);"># tenant, user, session, task</span>
+    assembly_time=now,            <span style="color: var(--muted);"># read once, before freezing</span>
+    route_policy=reg.route_policy(<span style="color: var(--p-evid);">"support-chat"</span>, <span style="color: var(--p-evid);">"v2"</span>),
+    profile=reg.profile(<span style="color: var(--p-evid);">"policy-first-chat"</span>, 2, deployment=True),  <span style="color: var(--muted);"># evaluated only</span>
+    tokenizer=<span style="color: var(--p-evid);">"fixture-whitespace/v1"</span>,
+    renderer=<span style="color: var(--p-evid);">"cwa-messages/v1"</span>,  <span style="color: var(--muted);"># render IR for a provider adapter</span>
+    budget={<span style="color: var(--p-evid);">"input"</span>: 8192, <span style="color: var(--p-evid);">"reserved_output"</span>: 1200},
 )
 
-result = assemble(snapshot)     <span style="color: var(--muted);"># pure: no I/O, clock or model</span>
+result = assemble(snapshot)       <span style="color: var(--muted);"># pure: no I/O, clock or model</span>
 
 result.payload    <span style="color: var(--muted);"># bytes, or None when refused</span>
 result.trace      <span style="color: var(--muted);"># dict matching trace.schema.json</span>
-result.refused    <span style="color: var(--muted);"># bool · reason in trace.refused</span></div>
+result.refused    <span style="color: var(--muted);"># bool · reason in trace.refused</span>
+snapshot.digest() <span style="color: var(--muted);"># context.snapshot_digest, the replay key</span></div>
       </div>
     </div>
   </section>
@@ -142,163 +144,210 @@ const RULES = [
     "One slot and one authority role per item",
     "assembler",
     "Admission checks each item's slot and authority.",
-    "implemented"
+    "implemented",
+    1,
+    1
   ],
   [
     "MUST",
     "Required fields and canonical JSON shape",
     "assembler",
     "Schema validation with format checking; timestamps compared at full precision.",
-    "implemented"
+    "implemented",
+    2,
+    2
   ],
   [
     "SHOULD",
     "Declared policy defaults, filled and traced",
     "assembler",
     "Fills slot defaults and versioned route overrides, and records defaults_filled.",
-    "implemented"
+    "implemented",
+    4,
+    4
   ],
   [
     "MUST",
     "Slots that are never omitted",
     "assembler",
     "Refuses with required_slot_missing.",
-    "implemented"
+    "implemented",
+    4,
+    4
   ],
   [
     "MUST NOT",
     "Rule zero: enforce outside the model",
     "application",
     "Application guards enforce invariants. Nothing observable in assembly can prove it.",
-    "documented"
+    "documented",
+    0,
+    0
   ],
   [
     "MUST",
     "Separate instruction authority from factual precedence",
     "assembler",
     "Resolves declared groups; evidence, state and memory never render as instructions.",
-    "implemented"
+    "implemented",
+    3,
+    3
   ],
   [
     "MUST NOT",
     "No slot overrides platform roles; no authority from wording",
     "assembler",
     "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers.",
-    "implemented"
+    "implemented",
+    3,
+    3
   ],
   [
     "MUST",
     "State is application-written and current",
     "boundary",
     "Checks producer kind and state age. Writing state stays with the application.",
-    "boundary-checked"
+    "boundary-checked",
+    1,
+    1
   ],
   [
     "MUST",
     "Memory lifetime and rejection reporting",
     "boundary",
     "Excludes expired and revoked memory and merges producer exclusions. Reporting them is the producer's duty.",
-    "boundary-checked"
+    "boundary-checked",
+    2,
+    2
   ],
   [
     "MUST",
     "Untrusted content is marked, rendered as material, kept out of governance",
     "assembler",
     "Checks untrusted marking, refuses it in governance, and renders it as material.",
-    "implemented"
+    "implemented",
+    2,
+    2
   ],
   [
     "MUST",
     "Explicit conflict groups and traceable resolution",
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
-    "boundary-checked"
+    "boundary-checked",
+    6,
+    6
   ],
   [
     "MUST NOT",
     "Never answer from nothing",
     "assembler",
     "Refuses with evidence_required and a recovery action.",
-    "implemented"
+    "implemented",
+    5,
+    5
   ],
   [
     "MUST NOT",
     "Retrievers emit scored packets, not blobs",
     "boundary",
     "Requires relevance and reference_only. It cannot tell whether a producer merged passages.",
-    "boundary-checked"
+    "boundary-checked",
+    1,
+    1
   ],
   [
     "MUST NOT",
     "Memory producers suppress and report expired or revoked items",
     "boundary",
     "Re-excludes expired or revoked memory as a backstop. Suppressing and reporting them is the producer's duty.",
-    "boundary-checked"
+    "boundary-checked",
+    1,
+    1
   ],
   [
     "MUST",
     "Authenticated capability admission; MCP output is evidence",
     "boundary",
     "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
-    "boundary-checked"
+    "boundary-checked",
+    2,
+    2
   ],
   [
     "MUST",
     "Account for rendered tokens; shed in tier order",
     "assembler",
     "Counts rendered tokens and sheds in tier order.",
-    "implemented"
+    "implemented",
+    14,
+    14
   ],
   [
     "MUST",
     "Refused assembly has no rendered payload",
     "assembler",
     "Refusal traces carry no payload, no result and no included items.",
-    "implemented"
+    "implemented",
+    8,
+    8
   ],
   [
     "MUST NOT",
     "Precomputed variants; no model calls during assembly",
     "boundary",
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
-    "boundary-checked"
+    "boundary-checked",
+    5,
+    5
   ],
   [
     "MUST",
     "Draft profiles versus evaluated profiles",
     "boundary",
     "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly.",
-    "boundary-checked"
+    "boundary-checked",
+    0,
+    0
   ],
   [
     "MUST",
     "Profile version and mandatory-slot validation",
     "assembler",
     "Pins profile content by hash and refuses unplaced protected content.",
-    "implemented"
+    "implemented",
+    3,
+    3
   ],
   [
     "MUST",
     "Trace JSON matches the published schema",
     "assembler",
-    "Every emitted trace is validated against the published schema in tests.",
-    "in progress"
+    "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
+    "implemented",
+    25,
+    25
   ],
   [
     "SHOULD",
     "Recommended trace fields",
     "assembler",
-    "Emits the recommended trace fields.",
-    "in progress"
+    "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
+    "implemented",
+    12,
+    12
   ],
   [
     "MUST",
     "Determinism includes the clock and policy snapshot",
     "assembler",
-    "Snapshot replay across processes, hash seeds and time zones.",
-    "in progress"
+    "Snapshot replay across processes, hash seeds, time zones and locales, with ordering, blank strings, timestamps and the digest pinned for every language.",
+    "implemented",
+    2,
+    2
   ]
 ];
+const CONFORMANCE = {"passed":25,"total":25,"commit":"8783f6b"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
@@ -317,7 +366,8 @@ class Component extends DCLogic {
     const matrix = RULES.map((r, i) => ({
       id: "R-" + (i + 1), href: "./spec.html#R-" + (i + 1), kw: r[0], summary: r[1], note: r[3],
       scope: SCOPE[r[2]][0], scopeColor: SCOPE[r[2]][1],
-      status: r[4], color: STATUS_COLOR[r[4]]
+      status: r[4], color: STATUS_COLOR[r[4]],
+      cases: r[6] ? r[5] + "/" + r[6] + " cases" : ""
     }));
     const checkable = matrix.filter(r => r.scope !== "application");
     const met = checkable.filter(r => r.status === "implemented" || r.status === "boundary-checked");
@@ -325,7 +375,8 @@ class Component extends DCLogic {
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       matrix,
-      counts: met.length + " of " + checkable.length + " checkable requirements implemented."
+      counts: met.length + " of " + checkable.length + " checkable requirements implemented.",
+      caseLine: CONFORMANCE.passed + " of " + CONFORMANCE.total + " published conformance cases pass · assembler " + CONFORMANCE.commit
     };
   }
 }

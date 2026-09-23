@@ -87,10 +87,21 @@ statuses.forEach((row, i) => {
   if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`contract/assembler-status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
 });
 if (statuses.length !== 23) throw new Error('contract/assembler-status.json needs R-1 through R-23.');
+// The reference assembler's conformance run, checked against this repo's own cases: a published case the
+// report lacks, or reports as anything but passed, does not count (conformance/README.md, Reporting results).
+const { source: runSource, ...report } = await read('contract/assembler-conformance.json');
+const validateReport = ajv.getSchema(conformanceReportSchema.$id);
+if (!validateReport(report)) throw new Error('contract/assembler-conformance.json: ' + JSON.stringify(validateReport.errors));
+const outcomes = new Map(report.cases.map(c => [c.id, c.outcome]));
+const published = await Promise.all((await fs.readdir('conformance/cases')).sort().map(name => read(`conformance/cases/${name}/case.json`)));
+const casesFor = id => published.filter(c => c.rules.includes(id));
+const conformance = { passed: published.filter(c => outcomes.get(c.id) === 'passed').length, total: published.length, commit: runSource.commit.slice(0, 7) };
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
-  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status]);
+  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status,
+    casesFor(`R-${i + 1}`).filter(c => outcomes.get(c.id) === 'passed').length, casesFor(`R-${i + 1}`).length]);
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
+  if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = \{[\s\S]*?\};/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
   if (page === 'spec.html') {
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     updated = updated.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
