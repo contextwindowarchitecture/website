@@ -12,7 +12,7 @@ npm run build:contract
 npm test
 ```
 
-`npm test` fails if generated artifacts are stale, then runs the contract fixtures and embedded website-component checks. Commit generated files with their sources so static hosting serves the tested validators.
+`npm test` fails if generated artifacts are stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Commit generated files with their sources so static hosting serves the tested validators.
 
 ## Sources of truth
 
