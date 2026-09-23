@@ -745,6 +745,10 @@ export const TRACE_SCHEMA = {
     "context": {
       "type": "object",
       "properties": {
+        "spec": {
+          "const": "cwa/draft",
+          "description": "The specification the assembly followed, which is the profile's spec (R-21)."
+        },
         "assembly_time": {
           "type": "string",
           "format": "date-time",
@@ -773,6 +777,7 @@ export const TRACE_SCHEMA = {
         }
       },
       "required": [
+        "spec",
         "assembly_time",
         "route_policy_version",
         "tokenizer",
@@ -1359,16 +1364,18 @@ export const TRACE_EXAMPLE = {
     "reason": null
   },
   "context": {
+    "spec": "cwa/draft",
     "assembly_time": "2026-09-22T12:00:00Z",
     "route_policy_version": "fixture/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "23942d766ef7da272699d35969562c4669ec71fb52f2b761f1a921f9509a40d5"
+    "snapshot_digest": "cae64f87d7560b2e19b6e64cd2b36cdfd29761eef38cb98164e1679726b17414"
   },
   "defaults_filled": []
 };
 export const PROFILES = [
   {
+    "spec": "cwa/draft",
     "id": "policy-first-chat",
     "version": 1,
     "route": "support-chat",
@@ -1429,6 +1436,7 @@ export const PROFILES = [
     }
   },
   {
+    "spec": "cwa/draft",
     "id": "document-analysis",
     "version": 1,
     "route": "document-qa",
@@ -1485,6 +1493,7 @@ export const PROFILES = [
     }
   },
   {
+    "spec": "cwa/draft",
     "id": "long-context-reinforced",
     "version": 1,
     "route": "long-context-qa",
@@ -1541,6 +1550,7 @@ export const PROFILES = [
     }
   },
   {
+    "spec": "cwa/draft",
     "id": "tool-agent",
     "version": 1,
     "route": "agent-loop",
@@ -1597,6 +1607,7 @@ export const PROFILES = [
     }
   },
   {
+    "spec": "cwa/draft",
     "id": "extraction",
     "version": 1,
     "route": "extract",

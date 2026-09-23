@@ -205,6 +205,25 @@ test('published trace hash and fixture token counts match the concrete sample pa
   assert.equal(trace.result.input_tokens, payload.toString('utf8').match(/\S+/gu).length);
 });
 
+test('profiles and traces name the specification they follow (R-19, R-21)', async () => {
+  const fixture = await read('examples/fixture-profile.json');
+  for (const profile of [...profiles, fixture]) assert.equal(profile.spec, 'cwa/draft', profile.id);
+  assert.equal(trace.context.spec, fixture.spec);
+  for (const spec of [undefined, 'cwa/1', 'cwa/v2', 'draft']) {
+    const profile = copy(fixture);
+    const candidate = copy(trace);
+    if (spec === undefined) {
+      delete profile.spec;
+      delete candidate.context.spec;
+    } else {
+      profile.spec = spec;
+      candidate.context.spec = spec;
+    }
+    assert.equal(checkProfile(profile).valid, false, `profile spec ${spec}`);
+    assert.equal(checkTrace(candidate).valid, false, `trace spec ${spec}`);
+  }
+});
+
 test('budget omissions of compressible items and structured defaults are valid trace records', () => {
   const candidate = copy(trace);
   candidate.excluded.push({ item_id: 'history:turn-3', reason: 'over_budget', stage: 'assembler', slot: 'interaction.history' });
@@ -403,6 +422,7 @@ test('conformance cases are complete, schema-valid, and agree with the published
     assert.equal(payload === null, expected.refused.bool);
     if (payload) assert.equal(expected.result.hash, createHash('sha256').update(payload).digest('hex'));
     assert.equal(expected.context.snapshot_digest, snapshotDigest(snapshot), `${name}: snapshot_digest`);
+    assert.equal(expected.context.spec, snapshot.profile.spec, `${name}: context.spec`);
   }
   const fixture = new URL('fixture-three-slot/', root);
   assert.deepEqual(JSON.parse(await fs.readFile(new URL('expected.trace.json', fixture), 'utf8')), trace);
