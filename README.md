@@ -44,3 +44,7 @@ The suite checks field types and enums, timestamps, required fields, defaults, p
 The concrete trace uses `examples/fixture-profile.json`, separate from the five illustrative route profiles, and its hash matches `examples/payload.txt`. Its `fixture-whitespace/v1` tokenizer counts non-whitespace runs only and is a test fixture, not a model tokenizer. Real assembly must use the target model's accounting, including wrappers and repeated content. Hash the exact rendered UTF-8 bytes; preserve the immutable snapshot separately for replay.
 
 The suite does **not** implement or certify an assembler, detect semantic contradictions in prose, establish factual truth, authenticate remote sources, prove compression fidelity, or benchmark model outcomes. All five example profiles are unevaluated. A production conformance suite must exercise the actual implementation's admission, conflict resolution, fitting, rendering and replay behavior.
+
+## License
+
+Apache License 2.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). This covers the specification, schemas, conformance cases and site. The generated validator bundles MIT-licensed code listed in `THIRD_PARTY_NOTICES.md`.
