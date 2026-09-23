@@ -62,6 +62,7 @@ These follow the reference assembler's M2 kickoff (`cwa-assembler/docs/DESIGN.md
 | Two implementations could shed differently and both claim R-16 | `conformance/README.md` fixes one procedure: one item at a time, whole-payload recount, longest variant that fits or else the shortest |
 | R-12 named three recovery actions without saying when each applies | `request_context` when budget omitted no evidence, `precompute_summary` when omitted evidence had no variants, `retrieve_narrower` otherwise |
 | Several refusals could apply at once | R-21: the earliest refusal code in `contract/reasons.json` order, which is now the order assembly checks them. `conflict_unresolved` moved ahead of the budget refusals |
+| `token_budget` was called a cap, but nothing said what happens to an item over it, and "null means the route allocation" named a field that does not exist | Caps are enforced before shedding, whether or not the payload fits: a compressible item takes its longest variant within the cap or is omitted, a droppable item is omitted, and a protected item over its cap refuses with `protected_content_over_budget` (R-16). R-3 now says null sets no per-item cap and `budget.input` still bounds the item; per-slot allocations are deferred |
 | An invalid snapshot had no refusal code | None needed: a snapshot that fails its schema is rejected before assembly and has no trace |
 
 ## Review and migration implications

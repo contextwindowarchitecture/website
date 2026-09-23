@@ -125,7 +125,7 @@ export const ITEM_SCHEMA = {
         "null"
       ],
       "minimum": 0,
-      "description": "Optional cap. Null means use the route allocation, never an unbounded request."
+      "description": "Cap on the tokens of the item's rendered body in each occurrence (R-3, R-16). An item over its cap is reduced before shedding: a compressible item to a supplied variant within the cap, otherwise it is omitted, and a protected item over its cap refuses the assembly. Null sets no per-item cap; budget.input still bounds the item."
     },
     "tier": {
       "type": "string",
@@ -1019,7 +1019,7 @@ export const REASONS = [
     "code": "over_budget",
     "kind": "exclusion",
     "rule": "R-16",
-    "text": "The item was omitted to fit the rendered budget, in tier order and by the route's fitting policy."
+    "text": "The item was omitted to fit the rendered budget or its own token_budget, in tier order and by the route's fitting policy."
   },
   {
     "code": "assembly_time_required",
@@ -1043,7 +1043,7 @@ export const REASONS = [
     "code": "protected_content_over_budget",
     "kind": "refusal",
     "rule": "R-17",
-    "text": "Protected content alone exceeds budget.input. The assembler refuses rather than truncating."
+    "text": "Protected content alone exceeds budget.input, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating."
   },
   {
     "code": "evidence_required",
