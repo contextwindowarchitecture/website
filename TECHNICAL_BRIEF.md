@@ -89,7 +89,7 @@ The producer guide supplies these default budget tiers:
 | Compressible | Knowledge, tool results, memory, history | After droppable items are gone: use precomputed shorter variants or omit, in route fitting-policy order (variants first by default) |
 | Droppable | Examples, user state | Omit before compressing other items |
 
-If protected items cannot fit, refuse to render and record the reason (R-16–R-17). When a route requires evidence and none is valid, record a recovery decision such as narrower retrieval or routing for more context; do not assemble as though evidence existed (R-12). Implementations must account for the reserved output budget.
+Only the route's versioned policy can raise a slot's tier; an item that claims a higher tier is excluded with `tier_upgrade_not_allowed`. If protected items cannot fit, refuse to render and record the reason (R-16–R-17). When a route requires evidence and none is valid, record a recovery decision such as narrower retrieval or routing for more context; do not assemble as though evidence existed (R-12). Implementations must account for the reserved output budget.
 
 ## Placement profiles and evaluation
 

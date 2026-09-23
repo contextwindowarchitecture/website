@@ -219,3 +219,15 @@ test('prior model turns in history carry untrusted authority; user turns keep us
   assert.equal(checkItem(reply, context).findings[0].reason, 'authority_not_allowed');
   assert.equal(checkItem({ ...reply, authority: 'untrusted' }, context).valid, true);
 });
+
+test('only route policy can raise a tier; items may lower non-protected tiers', () => {
+  const reason = (candidate, ctx = context) => checkItem(candidate, ctx).findings.map(f => f.reason);
+  assert.deepEqual(reason({ ...item, tier: 'protected' }), ['tier_upgrade_not_allowed']);
+  assert.equal(checkItem({ ...item, tier: 'protected' }, { ...context, tierUpgrades: { 'evidence.knowledge': 'protected' } }).valid, true);
+  assert.equal(checkItem({ ...item, tier: 'droppable' }, context).valid, true);
+  const userFact = { ...item, id: 'user:plan', slot: 'state.user', authority: 'state', injection_risk: 'none', tier: 'compressible' };
+  delete userFact.relevance;
+  assert.deepEqual(reason(userFact), ['tier_upgrade_not_allowed']);
+  assert.equal(checkItem(userFact, { ...context, tierUpgrades: { 'state.user': 'protected' } }).valid, true);
+  assert.equal(checkItem(userFact, { ...context, tierUpgrades: { 'state.user': 'droppable' } }).valid, false);
+});

@@ -950,6 +950,12 @@ export const REASONS = [
     "text": "The item tries to downgrade a protected slot."
   },
   {
+    "code": "tier_upgrade_not_allowed",
+    "kind": "exclusion",
+    "rule": "R-16",
+    "text": "The item claims a tier above its slot's effective tier. Only the route's versioned policy can raise a tier; a producer cannot protect its own items."
+  },
+  {
     "code": "duplicate_item_id",
     "kind": "exclusion",
     "rule": "R-2",

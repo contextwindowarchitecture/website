@@ -45,6 +45,7 @@ These follow the reference-assembler design review (`cwa-assembler/docs/DESIGN.m
 | `defaults_filled` strings were ambiguous for IDs containing `#` or `:` | `{item_id, field}` records |
 | Millisecond truncation made JavaScript and Python disagree on expiry | Timestamps compare at full stated precision; `compareInstants()` in `contract.js` |
 | A trace could not point to its replay input; validators could not see an omitted item's slot | Optional `context.snapshot_digest`, `excluded[].slot`, `conflicts[].group_id` |
+| A producer could mark its own items protected, forcing refusals or displacing other content (DA-12) | R-16: only the route's versioned policy raises a tier; an item claiming a higher tier is excluded with `tier_upgrade_not_allowed`; lowering a non-protected tier stays allowed |
 | Prior assistant turns in history carried user authority and could render as native assistant messages (DA-22) | R-1: model turns, marked `lineage: generated`, carry `untrusted`; R-7: prior turns render inside the history transcript, never as platform messages. The Start-page migrator follows this |
 
 Breaking for stored traces: `decided_by: "tier"` and string `defaults_filled` entries no longer validate. Migrate `tier` to `authority` and split strings into `{item_id, field}` records.

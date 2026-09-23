@@ -113,6 +113,7 @@
       <section id="defaults">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Policy fields and slot defaults</h2>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Six more fields describe how an item may be handled. A producer that knows better than the slot default should set them. When it does not, the assembler fills them from the slot's defaults and the trace says so (<a href="./spec.html#R-3">R-3</a>). These are the published slot defaults; the reference assembler is unreleased.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">The <span style="font-family: var(--mono); font-size: 13.5px; color: var(--fg);">tier</span> column is a floor your items cannot raise. You may mark an item droppable to have it shed earlier, but only the route's versioned policy can make a slot compressible or protected. An item that claims a higher tier is excluded with <span style="font-family: var(--mono); font-size: 13.5px; color: var(--fg);">tier_upgrade_not_allowed</span> (<a href="./spec.html#R-16">R-16</a>).</p>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;"><span style="font-family: var(--mono); font-size: 13.5px; color: var(--fg);">conflict_policy</span> is applied only between permitted instruction peers. It is how two governing-tier items — an instruction and a steering example, say — resolve without inventing a tier for each.</p>
         <div style="overflow: auto;">
           <div style="min-width: 760px; border: 1px solid var(--line);">
@@ -467,6 +468,11 @@ const FAILURES = [
   [
     "protected_tier_changed",
     "The item tries to downgrade a protected slot.",
+    16
+  ],
+  [
+    "tier_upgrade_not_allowed",
+    "The item claims a tier above its slot's effective tier. Only the route's versioned policy can raise a tier; a producer cannot protect its own items.",
     16
   ],
   [

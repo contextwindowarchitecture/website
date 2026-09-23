@@ -4,6 +4,7 @@ import { validateItemSchema, validateTraceSchema, validateProfileSchema, validat
 export { SLOT_DEFAULTS, REASONS, ITEM_EXAMPLE, TRACE_EXAMPLE } from './generated/contract-data.js';
 
 const policyFields = ['token_budget', 'variants', 'conflict_policy', 'lineage', 'eligibility', 'injection_risk'];
+const TIER_RANK = { droppable: 0, compressible: 1, protected: 2 };
 const failure = (reason, text, rule) => ({ reason, text, rule, level: 'error' });
 const schemaErrors = (validator, rule) => (validator.errors || []).map(error =>
   failure('invalid_structure', `${error.instancePath || '/'} ${error.message}`, rule));
@@ -100,6 +101,12 @@ export function checkItem(candidate, context = {}) {
   }
   if (SLOT_DEFAULTS[item.slot].tier === 'protected' && item.tier && item.tier !== 'protected') {
     findings.push(failure('protected_tier_changed', 'An item cannot downgrade its protected slot.', 16));
+  }
+  // Only trusted route policy (context.tierUpgrades) may raise a slot's tier; an item may lower a non-protected one.
+  const effectiveTier = [SLOT_DEFAULTS[item.slot].tier, context.tierUpgrades?.[item.slot]]
+    .filter(tier => tier in TIER_RANK).reduce((a, b) => TIER_RANK[b] > TIER_RANK[a] ? b : a);
+  if (item.tier && TIER_RANK[item.tier] > TIER_RANK[effectiveTier]) {
+    findings.push(failure('tier_upgrade_not_allowed', `This item claims ${item.tier}, above its slot's ${effectiveTier} tier; only route policy can raise it.`, 16));
   }
   return { valid: findings.length === 0, findings, filled, item };
 }
