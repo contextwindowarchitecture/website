@@ -163,7 +163,7 @@ const RULES = [
     "Slots that are never omitted",
     "assembler",
     "Refuses with required_slot_missing.",
-    "planned"
+    "implemented"
   ],
   [
     "MUST NOT",
@@ -219,7 +219,7 @@ const RULES = [
     "Never answer from nothing",
     "assembler",
     "Refuses with evidence_required and a recovery action.",
-    "planned"
+    "implemented"
   ],
   [
     "MUST NOT",
@@ -247,21 +247,21 @@ const RULES = [
     "Account for rendered tokens; shed in tier order",
     "assembler",
     "Counts rendered tokens and sheds in tier order.",
-    "in progress"
+    "implemented"
   ],
   [
     "MUST",
     "Refused assembly has no rendered payload",
     "assembler",
     "Refusal traces carry no payload, no result and no included items.",
-    "planned"
+    "implemented"
   ],
   [
     "MUST NOT",
     "Precomputed variants; no model calls during assembly",
     "boundary",
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
-    "in progress"
+    "boundary-checked"
   ],
   [
     "MUST",
