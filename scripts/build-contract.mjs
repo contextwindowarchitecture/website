@@ -93,14 +93,16 @@ if (statuses.length !== requirements.length) throw new Error(`contract/assembler
 const { source: runSource, ...report } = await read('contract/assembler-conformance.json');
 const validateReport = ajv.getSchema(conformanceReportSchema.$id);
 if (!validateReport(report)) throw new Error('contract/assembler-conformance.json: ' + JSON.stringify(validateReport.errors));
-const outcomes = new Map(report.cases.map(c => [c.id, c.outcome]));
-const published = await Promise.all((await fs.readdir('conformance/cases')).sort().map(name => read(`conformance/cases/${name}/case.json`)));
+// A case counts when it passed; a rejection case when the snapshot was rejected (R-17).
+const counts = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
+const caseFiles = async dir => (await fs.readdir(dir).catch(() => [])).sort().map(name => `${dir}/${name}/case.json`);
+const published = await Promise.all([...await caseFiles('conformance/cases'), ...await caseFiles('conformance/rejections')].map(read));
 const casesFor = id => published.filter(c => c.rules.includes(id));
-const conformance = { passed: published.filter(c => outcomes.get(c.id) === 'passed').length, total: published.length, commit: runSource.commit.slice(0, 7) };
+const conformance = { passed: published.filter(c => counts.get(c.id)).length, total: published.length, commit: runSource.commit.slice(0, 7) };
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
   const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status,
-    casesFor(`R-${i + 1}`).filter(c => outcomes.get(c.id) === 'passed').length, casesFor(`R-${i + 1}`).length]);
+    casesFor(`R-${i + 1}`).filter(c => counts.get(c.id)).length, casesFor(`R-${i + 1}`).length]);
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
   if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = \{[\s\S]*?\};/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
   if (page === 'spec.html') {

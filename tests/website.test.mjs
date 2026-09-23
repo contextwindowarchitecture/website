@@ -85,10 +85,15 @@ test('specification, generated requirement reference, and status matrix share ev
 
 test('the status matrix counts the published cases the imported conformance report passes', async () => {
   const statuses = await component('assembler.html', 'RULES');
-  const { cases: outcomes } = JSON.parse(await fs.readFile(new URL('../contract/assembler-conformance.json', import.meta.url), 'utf8'));
-  const passed = new Set(outcomes.filter(c => c.outcome === 'passed').map(c => c.id));
-  const root = new URL('../conformance/cases/', import.meta.url);
-  const published = await Promise.all((await fs.readdir(root)).map(async name => JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8'))));
+  const { cases: outcomes, rejections = [] } = JSON.parse(await fs.readFile(new URL('../contract/assembler-conformance.json', import.meta.url), 'utf8'));
+  const passed = new Set([...outcomes.filter(c => c.outcome === 'passed'), ...rejections.filter(c => c.outcome === 'rejected')].map(c => c.id));
+  const published = [];
+  for (const dir of ['cases', 'rejections']) {
+    const root = new URL(`../conformance/${dir}/`, import.meta.url);
+    const names = await fs.readdir(root).catch(() => []);
+    published.push(...await Promise.all(names.map(async name => JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8')))));
+  }
+  assert.equal(new Set(published.map(c => c.id)).size, published.length, 'case and rejection ids are distinct');
   statuses.forEach((row, i) => {
     const tagged = published.filter(c => c.rules.includes(`R-${i + 1}`));
     assert.deepEqual([row[5], row[6]], [tagged.filter(c => passed.has(c.id)).length, tagged.length], `R-${i + 1}`);

@@ -9,6 +9,8 @@ Language-neutral test cases for assemblers. Each directory under `cases/` holds:
 | `expected.trace.json` | The trace a conformant assembler emits, valid against `schema/trace.schema.json` |
 | `expected.payload.txt` | The exact rendered payload bytes; absent when the case expects a refusal |
 
+Each directory under `rejections/` holds a `case.json` and a `snapshot.json` that breaks exactly one of the Snapshot checks or its schemas. A conformant assembler rejects it before assembly, so there is no expected trace or payload (R-17).
+
 Some cases have a generator in `generators/`. It holds a table of each candidate's intended outcome, and it derives the expected trace and payload from that table rather than from any assembler's logic. Regenerate a case with `python3 conformance/generators/<case>.py`, and review the diff.
 
 ## Running a case
@@ -200,6 +202,12 @@ An implementation reports a run as `conformance-report.json`, valid against `sch
 - `failed`: anything else, including an exception or a trace the schema rejects. `detail` says what differed;
 - `skipped`: the implementation does not provide the case's tokenizer or renderer. `detail` names it.
 
-Only `passed` counts. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page imports the reference assembler's report beside its `status.json`.
+It also holds one entry per directory under `rejections/`, ordered by id, in `rejections`, with the case's `rules` and one outcome:
+
+- `rejected`: the implementation rejected the snapshot before assembly, with no payload and no trace;
+- `accepted`: it assembled or refused instead. `detail` says what it did;
+- `skipped`: it does not provide the case's tokenizer or renderer. `detail` names it.
+
+Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page imports the reference assembler's report beside its `status.json`.
 
 Implementations vendor these cases pinned by hash, so a case changes only through a reviewed edit here.
