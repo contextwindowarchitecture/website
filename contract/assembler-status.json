@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "639ddc018af7d4701421a27a40e549845d35a406",
+    "commit": "f87b6fee2dc5c58e4f0756195485e9c4801ef582",
     "dirty": false
   },
   "requirements": [
@@ -83,12 +83,12 @@
     {
       "id": "R-16",
       "status": "implemented",
-      "tests": 35
+      "tests": 44
     },
     {
       "id": "R-17",
       "status": "implemented",
-      "tests": 12
+      "tests": 14
     },
     {
       "id": "R-18",

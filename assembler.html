@@ -280,7 +280,7 @@ const RULES = [
     "assembler",
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
-    20,
+    23,
     23
   ],
   [
@@ -289,7 +289,7 @@ const RULES = [
     "assembler",
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
-    12,
+    13,
     13
   ],
   [
@@ -298,7 +298,7 @@ const RULES = [
     "boundary",
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
     "boundary-checked",
-    7,
+    9,
     9
   ],
   [
@@ -325,7 +325,7 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    37,
+    40,
     40
   ],
   [
@@ -374,7 +374,7 @@ const RULES = [
     3
   ]
 ];
-const CONFORMANCE = {"passed":37,"total":40,"commit":"639ddc0"};
+const CONFORMANCE = {"passed":40,"total":40,"commit":"f87b6fe"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
