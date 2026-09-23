@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, REASONS } from '../contract.js';
-import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema } from '../generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema, validateRegistryLockSchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
 const read = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
@@ -383,3 +383,4 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
 });
+
