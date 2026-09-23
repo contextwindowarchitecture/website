@@ -3,6 +3,7 @@ import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
+import { IMPLEMENTATIONS, caseDigestsNow, tally } from './conformance-reports.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -88,23 +89,31 @@ statuses.forEach((row, i) => {
   if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`contract/assembler-status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
 });
 if (statuses.length !== requirements.length) throw new Error(`contract/assembler-status.json needs R-1 through R-${requirements.length}.`);
-// The reference assembler's conformance run, checked against this repo's own cases: a published case the
-// report lacks, or reports as anything but passed, does not count (conformance/README.md, Reporting results).
-const { source: runSource, ...report } = await read('contract/assembler-conformance.json');
-const validateReport = ajv.getSchema(conformanceReportSchema.$id);
-if (!validateReport(report)) throw new Error('contract/assembler-conformance.json: ' + JSON.stringify(validateReport.errors));
-// A case counts when it passed; a rejection case when the snapshot was rejected (R-17).
-const counts = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
+// Each implementation's conformance run, checked against this repo's own cases: a published case the report
+// lacks, reports as anything but passed (rejected, for a rejection case), or ran before its files last changed
+// does not count (conformance/README.md, Reporting results).
 const caseFiles = async dir => (await fs.readdir(dir).catch(() => [])).sort().map(name => `${dir}/${name}/case.json`);
-const published = await Promise.all([...await caseFiles('conformance/cases'), ...await caseFiles('conformance/rejections')].map(read));
+const digests = await caseDigestsNow();
+const published = (await Promise.all([...await caseFiles('conformance/cases'), ...await caseFiles('conformance/rejections')].map(read)))
+  .map(c => ({ ...c, digest: digests[c.id] }));
 const casesFor = id => published.filter(c => c.rules.includes(id));
-const conformance = { passed: published.filter(c => counts.get(c.id)).length, total: published.length, commit: runSource.commit.slice(0, 7) };
+const validateReport = ajv.getSchema(conformanceReportSchema.$id);
+const runs = await Promise.all(IMPLEMENTATIONS.map(async ({ label, file }) => {
+  const { source, cases_at_run: atRun, ...report } = await read(file);
+  if (!validateReport(report)) throw new Error(`${file}: ` + JSON.stringify(validateReport.errors));
+  if (atRun === undefined) throw new Error(`${file} has no cases_at_run; import it with scripts/import-conformance-report.mjs`);
+  return { label, source, report, outcomes: tally(report, atRun, published) };
+}));
+const conformance = runs.map(({ label, source, report, outcomes }) => ({
+  label, commit: source.commit.slice(0, 7), website: report.contract.website_commit.slice(0, 7), total: published.length,
+  passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
+}));
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
   const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status,
-    casesFor(`R-${i + 1}`).filter(c => counts.get(c.id)).length, casesFor(`R-${i + 1}`).length]);
+    casesFor(`R-${i + 1}`).length, runs.map(run => casesFor(`R-${i + 1}`).filter(c => run.outcomes.get(c.id) === 'passed').length)]);
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
-  if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = \{[\s\S]*?\};/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
+  if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
   if (page === 'spec.html') {
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     updated = updated.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,

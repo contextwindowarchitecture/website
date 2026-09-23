@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
+import { createHash } from 'node:crypto';
 import * as contract from '../contract.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
@@ -83,21 +84,52 @@ test('specification, generated requirement reference, and status matrix share ev
   for (const { id } of requirements) assert.ok(markdown.includes(`## ${id}:`));
 });
 
-test('the status matrix counts the published cases the imported conformance report passes', async () => {
+const IMPORTED = [['Python', 'contract/assembler-conformance.json'], ['TypeScript', 'contract/assembler-ts-conformance.json']];
+const readJson = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
+// A case's digest, computed here independently of scripts/conformance-reports.mjs: SHA-256 over its files' paths and SHA-256s.
+async function caseDigest(dir) {
+  const root = new URL(`../conformance/${dir}/`, import.meta.url);
+  const names = (await fs.readdir(root)).sort();
+  const files = await Promise.all(names.map(async name => [name, createHash('sha256').update(await fs.readFile(new URL(name, root))).digest('hex')]));
+  return createHash('sha256').update(JSON.stringify(files)).digest('hex');
+}
+
+test('the status matrix counts, per implementation, the published cases each imported report passes and has run as they are now', async () => {
   const statuses = await component('assembler.html', 'RULES');
-  const { cases: outcomes, rejections = [] } = JSON.parse(await fs.readFile(new URL('../contract/assembler-conformance.json', import.meta.url), 'utf8'));
-  const passed = new Set([...outcomes.filter(c => c.outcome === 'passed'), ...rejections.filter(c => c.outcome === 'rejected')].map(c => c.id));
   const published = [];
   for (const dir of ['cases', 'rejections']) {
     const root = new URL(`../conformance/${dir}/`, import.meta.url);
-    const names = await fs.readdir(root).catch(() => []);
-    published.push(...await Promise.all(names.map(async name => JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8')))));
+    for (const name of await fs.readdir(root)) published.push({ ...await readJson(`conformance/${dir}/${name}/case.json`), digest: await caseDigest(`${dir}/${name}`) });
   }
   assert.equal(new Set(published.map(c => c.id)).size, published.length, 'case and rejection ids are distinct');
-  statuses.forEach((row, i) => {
-    const tagged = published.filter(c => c.rules.includes(`R-${i + 1}`));
-    assert.deepEqual([row[5], row[6]], [tagged.filter(c => passed.has(c.id)).length, tagged.length], `R-${i + 1}`);
-  });
-  const { caseLine } = (await component('assembler.html')).renderVals();
-  assert.ok(caseLine.startsWith(`${published.filter(c => passed.has(c.id)).length} of ${published.length} published conformance cases pass`), caseLine);
+  const { caseLines } = (await component('assembler.html')).renderVals();
+  assert.equal(caseLines.length, IMPORTED.length);
+  for (const [n, [label, file]] of IMPORTED.entries()) {
+    const { source, cases_at_run: atRun, ...report } = await readJson(file);
+    assert.match(source.commit, /^[0-9a-f]{40}$/, file);
+    const outcomes = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
+    const passing = new Set(published.filter(c => outcomes.get(c.id) && atRun?.[c.id] === c.digest).map(c => c.id));
+    const stale = published.filter(c => outcomes.has(c.id) && atRun?.[c.id] !== c.digest).length;
+    statuses.forEach((row, i) => {
+      const tagged = published.filter(c => c.rules.includes(`R-${i + 1}`));
+      assert.equal(row[5], tagged.length, `R-${i + 1} total`);
+      assert.equal(row[6][n], tagged.filter(c => passing.has(c.id)).length, `${label} R-${i + 1}`);
+    });
+    const line = caseLines[n].text;
+    assert.ok(line.startsWith(`${label} · ${passing.size} of ${published.length} published conformance cases pass`), line);
+    assert.ok(line.includes(`assembler ${source.commit.slice(0, 7)}`), line);
+    assert.ok(line.includes(`cases at ${report.contract.website_commit.slice(0, 7)}`), line);
+    assert.equal(line.includes('changed since its run'), stale > 0, line);
+  }
+});
+
+test('a case changed or published after a report\'s run does not count as passing', async () => {
+  const { tally } = await import('../scripts/conformance-reports.mjs');
+  const published = [{ id: 'a', digest: 'd1' }, { id: 'b', digest: 'd2' }, { id: 'c', digest: 'd3' }, { id: 'd', digest: 'd4' }];
+  const report = { cases: [{ id: 'a', outcome: 'passed' }, { id: 'b', outcome: 'passed' }, { id: 'c', outcome: 'failed' }], rejections: [] };
+  const outcomes = tally(report, { a: 'd1', b: 'old', c: 'd3' }, published);
+  assert.deepEqual(Object.fromEntries(outcomes), { a: 'passed', b: 'stale', c: 'failed', d: 'not run' });
+  assert.deepEqual(Object.fromEntries(tally(report, null, published)), { a: 'stale', b: 'stale', c: 'stale', d: 'not run' });
+  const rejection = tally({ cases: [], rejections: [{ id: 'a', outcome: 'rejected' }] }, { a: 'd1' }, published.slice(0, 1));
+  assert.deepEqual(Object.fromEntries(rejection), { a: 'passed' });
 });

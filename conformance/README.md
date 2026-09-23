@@ -218,6 +218,6 @@ It also holds one entry per directory under `rejections/`, ordered by id, in `re
 - `failed`: anything else: it assembled a payload, refused, or raised something other than a rejection. `detail` says what happened;
 - `skipped`: it does not provide the case's tokenizer or renderer. `detail` names it.
 
-Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page imports the reference assembler's report beside its `status.json`.
+Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of both implementations, the Python reference assembler (beside its `status.json`) and the TypeScript one. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.website_commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
 
 Implementations vendor these cases pinned by hash, so a case changes only through a reviewed edit here.

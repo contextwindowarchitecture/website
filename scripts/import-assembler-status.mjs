@@ -2,12 +2,13 @@
 // its conformance run (conformance-report.json) into contract/assembler-conformance.json.
 //   node scripts/import-assembler-status.mjs ../cwa-assembler
 // Each claim there cites tests and is checked against its scope; the report records every case's
-// outcome. These files record the result and the assembler commit it came from. The build validates
+// outcome, and the import records each case's digest at the website commit the run used (scripts/conformance-reports.mjs). These files record the result and the assembler commit it came from. The build validates
 // them again and renders the Assembler matrix.
 import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
+import { imported } from './conformance-reports.mjs';
 
 const assembler = process.argv[2];
 if (!assembler) throw new Error('usage: node scripts/import-assembler-status.mjs <path to cwa-assembler>');
@@ -21,7 +22,7 @@ await fs.writeFile('contract/assembler-status.json', JSON.stringify({
 }, null, 2) + '\n');
 const report = await read('conformance-report.json');
 if (!validateConformanceReportSchema(report)) throw new Error('conformance-report.json: ' + JSON.stringify(validateConformanceReportSchema.errors));
-await fs.writeFile('contract/assembler-conformance.json', JSON.stringify({ source, ...report }, null, 2) + '\n');
+await fs.writeFile('contract/assembler-conformance.json', JSON.stringify(imported(source, report), null, 2) + '\n');
 const passed = report.cases.filter(c => c.outcome === 'passed').length;
 const rejections = report.rejections ?? [];
 const rejected = rejections.filter(c => c.outcome === 'rejected').length;

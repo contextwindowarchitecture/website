@@ -1,7 +1,7 @@
 {
   "source": {
-    "repository": "contextwindowarchitecture/assembler",
-    "commit": "d0129dbf7f8d50302bba4c26d6e27eb210724652",
+    "repository": null,
+    "commit": "57fd943227f98821b542ef5e882093a5c613e2f9",
     "dirty": false
   },
   "cases_at_run": {
@@ -67,9 +67,9 @@
     "unpaired-surrogate": "e4894e8bcb3f630468c015a7a0e243a967ca773823de69b8dd24f6902456fa22"
   },
   "implementation": {
-    "name": "cwa-assembler",
+    "name": "@contextwindowarchitecture/assembler",
     "version": "0.0.1",
-    "language": "python"
+    "language": "TypeScript"
   },
   "contract": {
     "website_commit": "387a3e96248e0d5d496e4fa82497cdef755b4b39",
