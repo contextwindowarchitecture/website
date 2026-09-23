@@ -11303,8 +11303,569 @@ function validate28(data, { instancePath = "", parentData, parentDataProperty, r
   return errors === 0;
 }
 validate28.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
+var validateConformanceReportSchema = validate29;
+var schema62 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/conformance_report.schema.json", "title": "CWA conformance report", "description": "One implementation's run of the conformance cases (conformance/README.md, Reporting results). A case passes only when its payload bytes and trace match; validating traces against the schema alone is not conformance (R-21).", "type": "object", "properties": { "implementation": { "type": "object", "properties": { "name": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "language": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "required": ["name", "version"], "additionalProperties": false }, "contract": { "type": "object", "description": "The website commit the cases were taken from, and whether that working tree had uncommitted changes.", "properties": { "website_commit": { "type": "string", "pattern": "^[0-9a-f]{40}$", "minLength": 40, "maxLength": 40 }, "dirty": { "type": "boolean" } }, "required": ["website_commit", "dirty"], "additionalProperties": false }, "cases": { "type": "array", "description": "One entry per case directory, ordered by id.", "items": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "rules": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "pattern": "^R-([1-9]|1[0-9]|2[0-3])(?![\\s\\S])" } }, "outcome": { "enum": ["passed", "failed", "skipped"] }, "detail": { "type": "string" } }, "required": ["id", "rules", "outcome"], "additionalProperties": false, "if": { "properties": { "outcome": { "enum": ["failed", "skipped"] } } }, "then": { "properties": { "detail": { "type": "string", "minLength": 1 } }, "required": ["detail"] } } } }, "required": ["implementation", "contract", "cases"], "additionalProperties": false };
+var pattern129 = new RegExp("^[0-9a-f]{40}$", "u");
+var pattern131 = new RegExp("^R-([1-9]|1[0-9]|2[0-3])(?![\\s\\S])", "u");
+function validate29(data, { instancePath = "", parentData, parentDataProperty, rootData = data, dynamicAnchors = {} } = {}) {
+  ;
+  let vErrors = null;
+  let errors = 0;
+  const evaluated0 = validate29.evaluated;
+  if (evaluated0.dynamicProps) {
+    evaluated0.props = void 0;
+  }
+  if (evaluated0.dynamicItems) {
+    evaluated0.items = void 0;
+  }
+  if (data && typeof data == "object" && !Array.isArray(data)) {
+    if (data.implementation === void 0) {
+      const err0 = { instancePath, schemaPath: "#/required", keyword: "required", params: { missingProperty: "implementation" }, message: "must have required property 'implementation'" };
+      if (vErrors === null) {
+        vErrors = [err0];
+      } else {
+        vErrors.push(err0);
+      }
+      errors++;
+    }
+    if (data.contract === void 0) {
+      const err1 = { instancePath, schemaPath: "#/required", keyword: "required", params: { missingProperty: "contract" }, message: "must have required property 'contract'" };
+      if (vErrors === null) {
+        vErrors = [err1];
+      } else {
+        vErrors.push(err1);
+      }
+      errors++;
+    }
+    if (data.cases === void 0) {
+      const err2 = { instancePath, schemaPath: "#/required", keyword: "required", params: { missingProperty: "cases" }, message: "must have required property 'cases'" };
+      if (vErrors === null) {
+        vErrors = [err2];
+      } else {
+        vErrors.push(err2);
+      }
+      errors++;
+    }
+    for (const key0 in data) {
+      if (!(key0 === "implementation" || key0 === "contract" || key0 === "cases")) {
+        const err3 = { instancePath, schemaPath: "#/additionalProperties", keyword: "additionalProperties", params: { additionalProperty: key0 }, message: "must NOT have additional properties" };
+        if (vErrors === null) {
+          vErrors = [err3];
+        } else {
+          vErrors.push(err3);
+        }
+        errors++;
+      }
+    }
+    if (data.implementation !== void 0) {
+      let data0 = data.implementation;
+      if (data0 && typeof data0 == "object" && !Array.isArray(data0)) {
+        if (data0.name === void 0) {
+          const err4 = { instancePath: instancePath + "/implementation", schemaPath: "#/properties/implementation/required", keyword: "required", params: { missingProperty: "name" }, message: "must have required property 'name'" };
+          if (vErrors === null) {
+            vErrors = [err4];
+          } else {
+            vErrors.push(err4);
+          }
+          errors++;
+        }
+        if (data0.version === void 0) {
+          const err5 = { instancePath: instancePath + "/implementation", schemaPath: "#/properties/implementation/required", keyword: "required", params: { missingProperty: "version" }, message: "must have required property 'version'" };
+          if (vErrors === null) {
+            vErrors = [err5];
+          } else {
+            vErrors.push(err5);
+          }
+          errors++;
+        }
+        for (const key1 in data0) {
+          if (!(key1 === "name" || key1 === "version" || key1 === "language")) {
+            const err6 = { instancePath: instancePath + "/implementation", schemaPath: "#/properties/implementation/additionalProperties", keyword: "additionalProperties", params: { additionalProperty: key1 }, message: "must NOT have additional properties" };
+            if (vErrors === null) {
+              vErrors = [err6];
+            } else {
+              vErrors.push(err6);
+            }
+            errors++;
+          }
+        }
+        if (data0.name !== void 0) {
+          let data1 = data0.name;
+          if (typeof data1 === "string") {
+            if (func2(data1) < 1) {
+              const err7 = { instancePath: instancePath + "/implementation/name", schemaPath: "#/properties/implementation/properties/name/minLength", keyword: "minLength", params: { limit: 1 }, message: "must NOT have fewer than 1 characters" };
+              if (vErrors === null) {
+                vErrors = [err7];
+              } else {
+                vErrors.push(err7);
+              }
+              errors++;
+            }
+            if (!pattern5.test(data1)) {
+              const err8 = { instancePath: instancePath + "/implementation/name", schemaPath: "#/properties/implementation/properties/name/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
+              if (vErrors === null) {
+                vErrors = [err8];
+              } else {
+                vErrors.push(err8);
+              }
+              errors++;
+            }
+          } else {
+            const err9 = { instancePath: instancePath + "/implementation/name", schemaPath: "#/properties/implementation/properties/name/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+            if (vErrors === null) {
+              vErrors = [err9];
+            } else {
+              vErrors.push(err9);
+            }
+            errors++;
+          }
+        }
+        if (data0.version !== void 0) {
+          let data2 = data0.version;
+          if (typeof data2 === "string") {
+            if (func2(data2) < 1) {
+              const err10 = { instancePath: instancePath + "/implementation/version", schemaPath: "#/properties/implementation/properties/version/minLength", keyword: "minLength", params: { limit: 1 }, message: "must NOT have fewer than 1 characters" };
+              if (vErrors === null) {
+                vErrors = [err10];
+              } else {
+                vErrors.push(err10);
+              }
+              errors++;
+            }
+            if (!pattern5.test(data2)) {
+              const err11 = { instancePath: instancePath + "/implementation/version", schemaPath: "#/properties/implementation/properties/version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
+              if (vErrors === null) {
+                vErrors = [err11];
+              } else {
+                vErrors.push(err11);
+              }
+              errors++;
+            }
+          } else {
+            const err12 = { instancePath: instancePath + "/implementation/version", schemaPath: "#/properties/implementation/properties/version/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+            if (vErrors === null) {
+              vErrors = [err12];
+            } else {
+              vErrors.push(err12);
+            }
+            errors++;
+          }
+        }
+        if (data0.language !== void 0) {
+          let data3 = data0.language;
+          if (typeof data3 === "string") {
+            if (func2(data3) < 1) {
+              const err13 = { instancePath: instancePath + "/implementation/language", schemaPath: "#/properties/implementation/properties/language/minLength", keyword: "minLength", params: { limit: 1 }, message: "must NOT have fewer than 1 characters" };
+              if (vErrors === null) {
+                vErrors = [err13];
+              } else {
+                vErrors.push(err13);
+              }
+              errors++;
+            }
+            if (!pattern5.test(data3)) {
+              const err14 = { instancePath: instancePath + "/implementation/language", schemaPath: "#/properties/implementation/properties/language/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
+              if (vErrors === null) {
+                vErrors = [err14];
+              } else {
+                vErrors.push(err14);
+              }
+              errors++;
+            }
+          } else {
+            const err15 = { instancePath: instancePath + "/implementation/language", schemaPath: "#/properties/implementation/properties/language/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+            if (vErrors === null) {
+              vErrors = [err15];
+            } else {
+              vErrors.push(err15);
+            }
+            errors++;
+          }
+        }
+      } else {
+        const err16 = { instancePath: instancePath + "/implementation", schemaPath: "#/properties/implementation/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+        if (vErrors === null) {
+          vErrors = [err16];
+        } else {
+          vErrors.push(err16);
+        }
+        errors++;
+      }
+    }
+    if (data.contract !== void 0) {
+      let data4 = data.contract;
+      if (data4 && typeof data4 == "object" && !Array.isArray(data4)) {
+        if (data4.website_commit === void 0) {
+          const err17 = { instancePath: instancePath + "/contract", schemaPath: "#/properties/contract/required", keyword: "required", params: { missingProperty: "website_commit" }, message: "must have required property 'website_commit'" };
+          if (vErrors === null) {
+            vErrors = [err17];
+          } else {
+            vErrors.push(err17);
+          }
+          errors++;
+        }
+        if (data4.dirty === void 0) {
+          const err18 = { instancePath: instancePath + "/contract", schemaPath: "#/properties/contract/required", keyword: "required", params: { missingProperty: "dirty" }, message: "must have required property 'dirty'" };
+          if (vErrors === null) {
+            vErrors = [err18];
+          } else {
+            vErrors.push(err18);
+          }
+          errors++;
+        }
+        for (const key2 in data4) {
+          if (!(key2 === "website_commit" || key2 === "dirty")) {
+            const err19 = { instancePath: instancePath + "/contract", schemaPath: "#/properties/contract/additionalProperties", keyword: "additionalProperties", params: { additionalProperty: key2 }, message: "must NOT have additional properties" };
+            if (vErrors === null) {
+              vErrors = [err19];
+            } else {
+              vErrors.push(err19);
+            }
+            errors++;
+          }
+        }
+        if (data4.website_commit !== void 0) {
+          let data5 = data4.website_commit;
+          if (typeof data5 === "string") {
+            if (func2(data5) > 40) {
+              const err20 = { instancePath: instancePath + "/contract/website_commit", schemaPath: "#/properties/contract/properties/website_commit/maxLength", keyword: "maxLength", params: { limit: 40 }, message: "must NOT have more than 40 characters" };
+              if (vErrors === null) {
+                vErrors = [err20];
+              } else {
+                vErrors.push(err20);
+              }
+              errors++;
+            }
+            if (func2(data5) < 40) {
+              const err21 = { instancePath: instancePath + "/contract/website_commit", schemaPath: "#/properties/contract/properties/website_commit/minLength", keyword: "minLength", params: { limit: 40 }, message: "must NOT have fewer than 40 characters" };
+              if (vErrors === null) {
+                vErrors = [err21];
+              } else {
+                vErrors.push(err21);
+              }
+              errors++;
+            }
+            if (!pattern129.test(data5)) {
+              const err22 = { instancePath: instancePath + "/contract/website_commit", schemaPath: "#/properties/contract/properties/website_commit/pattern", keyword: "pattern", params: { pattern: "^[0-9a-f]{40}$" }, message: 'must match pattern "^[0-9a-f]{40}$"' };
+              if (vErrors === null) {
+                vErrors = [err22];
+              } else {
+                vErrors.push(err22);
+              }
+              errors++;
+            }
+          } else {
+            const err23 = { instancePath: instancePath + "/contract/website_commit", schemaPath: "#/properties/contract/properties/website_commit/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+            if (vErrors === null) {
+              vErrors = [err23];
+            } else {
+              vErrors.push(err23);
+            }
+            errors++;
+          }
+        }
+        if (data4.dirty !== void 0) {
+          if (typeof data4.dirty !== "boolean") {
+            const err24 = { instancePath: instancePath + "/contract/dirty", schemaPath: "#/properties/contract/properties/dirty/type", keyword: "type", params: { type: "boolean" }, message: "must be boolean" };
+            if (vErrors === null) {
+              vErrors = [err24];
+            } else {
+              vErrors.push(err24);
+            }
+            errors++;
+          }
+        }
+      } else {
+        const err25 = { instancePath: instancePath + "/contract", schemaPath: "#/properties/contract/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+        if (vErrors === null) {
+          vErrors = [err25];
+        } else {
+          vErrors.push(err25);
+        }
+        errors++;
+      }
+    }
+    if (data.cases !== void 0) {
+      let data7 = data.cases;
+      if (Array.isArray(data7)) {
+        const len0 = data7.length;
+        for (let i0 = 0; i0 < len0; i0++) {
+          let data8 = data7[i0];
+          const _errs22 = errors;
+          let valid5 = true;
+          const _errs23 = errors;
+          if (data8 && typeof data8 == "object" && !Array.isArray(data8)) {
+            if (data8.outcome !== void 0) {
+              let data9 = data8.outcome;
+              if (!(data9 === "failed" || data9 === "skipped")) {
+                const err26 = {};
+                if (vErrors === null) {
+                  vErrors = [err26];
+                } else {
+                  vErrors.push(err26);
+                }
+                errors++;
+              }
+            }
+          }
+          var _valid0 = _errs23 === errors;
+          errors = _errs22;
+          if (vErrors !== null) {
+            if (_errs22) {
+              vErrors.length = _errs22;
+            } else {
+              vErrors = null;
+            }
+          }
+          if (_valid0) {
+            const _errs25 = errors;
+            if (data8 && typeof data8 == "object" && !Array.isArray(data8)) {
+              if (data8.detail === void 0) {
+                const err27 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/then/required", keyword: "required", params: { missingProperty: "detail" }, message: "must have required property 'detail'" };
+                if (vErrors === null) {
+                  vErrors = [err27];
+                } else {
+                  vErrors.push(err27);
+                }
+                errors++;
+              }
+              if (data8.detail !== void 0) {
+                let data10 = data8.detail;
+                if (typeof data10 === "string") {
+                  if (func2(data10) < 1) {
+                    const err28 = { instancePath: instancePath + "/cases/" + i0 + "/detail", schemaPath: "#/properties/cases/items/then/properties/detail/minLength", keyword: "minLength", params: { limit: 1 }, message: "must NOT have fewer than 1 characters" };
+                    if (vErrors === null) {
+                      vErrors = [err28];
+                    } else {
+                      vErrors.push(err28);
+                    }
+                    errors++;
+                  }
+                } else {
+                  const err29 = { instancePath: instancePath + "/cases/" + i0 + "/detail", schemaPath: "#/properties/cases/items/then/properties/detail/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                  if (vErrors === null) {
+                    vErrors = [err29];
+                  } else {
+                    vErrors.push(err29);
+                  }
+                  errors++;
+                }
+              }
+            }
+            var _valid0 = _errs25 === errors;
+            valid5 = _valid0;
+            if (valid5) {
+              var props0 = {};
+              props0.detail = true;
+              props0.outcome = true;
+            }
+          }
+          if (!valid5) {
+            const err30 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/if", keyword: "if", params: { failingKeyword: "then" }, message: 'must match "then" schema' };
+            if (vErrors === null) {
+              vErrors = [err30];
+            } else {
+              vErrors.push(err30);
+            }
+            errors++;
+          }
+          if (data8 && typeof data8 == "object" && !Array.isArray(data8)) {
+            if (data8.id === void 0) {
+              const err31 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/required", keyword: "required", params: { missingProperty: "id" }, message: "must have required property 'id'" };
+              if (vErrors === null) {
+                vErrors = [err31];
+              } else {
+                vErrors.push(err31);
+              }
+              errors++;
+            }
+            if (data8.rules === void 0) {
+              const err32 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/required", keyword: "required", params: { missingProperty: "rules" }, message: "must have required property 'rules'" };
+              if (vErrors === null) {
+                vErrors = [err32];
+              } else {
+                vErrors.push(err32);
+              }
+              errors++;
+            }
+            if (data8.outcome === void 0) {
+              const err33 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/required", keyword: "required", params: { missingProperty: "outcome" }, message: "must have required property 'outcome'" };
+              if (vErrors === null) {
+                vErrors = [err33];
+              } else {
+                vErrors.push(err33);
+              }
+              errors++;
+            }
+            for (const key3 in data8) {
+              if (!(key3 === "id" || key3 === "rules" || key3 === "outcome" || key3 === "detail")) {
+                const err34 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/additionalProperties", keyword: "additionalProperties", params: { additionalProperty: key3 }, message: "must NOT have additional properties" };
+                if (vErrors === null) {
+                  vErrors = [err34];
+                } else {
+                  vErrors.push(err34);
+                }
+                errors++;
+              }
+            }
+            if (data8.id !== void 0) {
+              let data11 = data8.id;
+              if (typeof data11 === "string") {
+                if (func2(data11) < 1) {
+                  const err35 = { instancePath: instancePath + "/cases/" + i0 + "/id", schemaPath: "#/properties/cases/items/properties/id/minLength", keyword: "minLength", params: { limit: 1 }, message: "must NOT have fewer than 1 characters" };
+                  if (vErrors === null) {
+                    vErrors = [err35];
+                  } else {
+                    vErrors.push(err35);
+                  }
+                  errors++;
+                }
+                if (!pattern5.test(data11)) {
+                  const err36 = { instancePath: instancePath + "/cases/" + i0 + "/id", schemaPath: "#/properties/cases/items/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
+                  if (vErrors === null) {
+                    vErrors = [err36];
+                  } else {
+                    vErrors.push(err36);
+                  }
+                  errors++;
+                }
+              } else {
+                const err37 = { instancePath: instancePath + "/cases/" + i0 + "/id", schemaPath: "#/properties/cases/items/properties/id/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err37];
+                } else {
+                  vErrors.push(err37);
+                }
+                errors++;
+              }
+            }
+            if (data8.rules !== void 0) {
+              let data12 = data8.rules;
+              if (Array.isArray(data12)) {
+                if (data12.length < 1) {
+                  const err38 = { instancePath: instancePath + "/cases/" + i0 + "/rules", schemaPath: "#/properties/cases/items/properties/rules/minItems", keyword: "minItems", params: { limit: 1 }, message: "must NOT have fewer than 1 items" };
+                  if (vErrors === null) {
+                    vErrors = [err38];
+                  } else {
+                    vErrors.push(err38);
+                  }
+                  errors++;
+                }
+                const len1 = data12.length;
+                for (let i1 = 0; i1 < len1; i1++) {
+                  let data13 = data12[i1];
+                  if (typeof data13 === "string") {
+                    if (!pattern131.test(data13)) {
+                      const err39 = { instancePath: instancePath + "/cases/" + i0 + "/rules/" + i1, schemaPath: "#/properties/cases/items/properties/rules/items/pattern", keyword: "pattern", params: { pattern: "^R-([1-9]|1[0-9]|2[0-3])(?![\\s\\S])" }, message: 'must match pattern "^R-([1-9]|1[0-9]|2[0-3])(?![\\s\\S])"' };
+                      if (vErrors === null) {
+                        vErrors = [err39];
+                      } else {
+                        vErrors.push(err39);
+                      }
+                      errors++;
+                    }
+                  } else {
+                    const err40 = { instancePath: instancePath + "/cases/" + i0 + "/rules/" + i1, schemaPath: "#/properties/cases/items/properties/rules/items/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                    if (vErrors === null) {
+                      vErrors = [err40];
+                    } else {
+                      vErrors.push(err40);
+                    }
+                    errors++;
+                  }
+                }
+                let i2 = data12.length;
+                let j0;
+                if (i2 > 1) {
+                  const indices0 = {};
+                  for (; i2--; ) {
+                    let item0 = data12[i2];
+                    if (typeof item0 !== "string") {
+                      continue;
+                    }
+                    if (typeof indices0[item0] == "number") {
+                      j0 = indices0[item0];
+                      const err41 = { instancePath: instancePath + "/cases/" + i0 + "/rules", schemaPath: "#/properties/cases/items/properties/rules/uniqueItems", keyword: "uniqueItems", params: { i: i2, j: j0 }, message: "must NOT have duplicate items (items ## " + j0 + " and " + i2 + " are identical)" };
+                      if (vErrors === null) {
+                        vErrors = [err41];
+                      } else {
+                        vErrors.push(err41);
+                      }
+                      errors++;
+                      break;
+                    }
+                    indices0[item0] = i2;
+                  }
+                }
+              } else {
+                const err42 = { instancePath: instancePath + "/cases/" + i0 + "/rules", schemaPath: "#/properties/cases/items/properties/rules/type", keyword: "type", params: { type: "array" }, message: "must be array" };
+                if (vErrors === null) {
+                  vErrors = [err42];
+                } else {
+                  vErrors.push(err42);
+                }
+                errors++;
+              }
+            }
+            if (data8.outcome !== void 0) {
+              let data14 = data8.outcome;
+              if (!(data14 === "passed" || data14 === "failed" || data14 === "skipped")) {
+                const err43 = { instancePath: instancePath + "/cases/" + i0 + "/outcome", schemaPath: "#/properties/cases/items/properties/outcome/enum", keyword: "enum", params: { allowedValues: schema62.properties.cases.items.properties.outcome.enum }, message: "must be equal to one of the allowed values" };
+                if (vErrors === null) {
+                  vErrors = [err43];
+                } else {
+                  vErrors.push(err43);
+                }
+                errors++;
+              }
+            }
+            if (data8.detail !== void 0) {
+              if (typeof data8.detail !== "string") {
+                const err44 = { instancePath: instancePath + "/cases/" + i0 + "/detail", schemaPath: "#/properties/cases/items/properties/detail/type", keyword: "type", params: { type: "string" }, message: "must be string" };
+                if (vErrors === null) {
+                  vErrors = [err44];
+                } else {
+                  vErrors.push(err44);
+                }
+                errors++;
+              }
+            }
+          } else {
+            const err45 = { instancePath: instancePath + "/cases/" + i0, schemaPath: "#/properties/cases/items/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+            if (vErrors === null) {
+              vErrors = [err45];
+            } else {
+              vErrors.push(err45);
+            }
+            errors++;
+          }
+        }
+      } else {
+        const err46 = { instancePath: instancePath + "/cases", schemaPath: "#/properties/cases/type", keyword: "type", params: { type: "array" }, message: "must be array" };
+        if (vErrors === null) {
+          vErrors = [err46];
+        } else {
+          vErrors.push(err46);
+        }
+        errors++;
+      }
+    }
+  } else {
+    const err47 = { instancePath, schemaPath: "#/type", keyword: "type", params: { type: "object" }, message: "must be object" };
+    if (vErrors === null) {
+      vErrors = [err47];
+    } else {
+      vErrors.push(err47);
+    }
+    errors++;
+  }
+  validate29.errors = vErrors;
+  return errors === 0;
+}
+validate29.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
 export {
   validateConflictGroupSchema,
+  validateConformanceReportSchema,
   validateItemSchema,
   validateProducerBatchSchema,
   validateProfileSchema,

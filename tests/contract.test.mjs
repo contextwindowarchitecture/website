@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, REASONS } from '../contract.js';
-import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema, validateRegistryLockSchema } from '../generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema, validateRegistryLockSchema, validateConformanceReportSchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
 const read = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
@@ -425,5 +425,17 @@ test('the registry lock pins the published profiles and conformance route polici
   for (const mutate of [l => l.profiles[0].sha256 = 'ABC', l => l.profiles[0].extra = 1, l => delete l.route_policies, l => l.route_policies[0].version = 3]) {
     const candidate = copy(lock); mutate(candidate);
     assert.equal(validateRegistryLockSchema(candidate), false, mutate.toString());
+  }
+});
+
+test('a conformance report records one outcome per case, and why any case did not pass (R-21)', () => {
+  const report = { implementation: { name: 'cwa-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
+    cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'skipped', detail: 'no cwa-messages/v1 renderer' }] };
+  assert.equal(validateConformanceReportSchema(report), true, JSON.stringify(validateConformanceReportSchema.errors));
+  for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = ['R-24'],
+    r => r.cases[0].rules = ['R-1\n'], r => r.cases[0].rules = [], r => r.contract.website_commit = 'abc1234', r => r.contract.website_commit += '\n',
+    r => delete r.implementation.version, r => r.implementation.name = '\ufeff', r => r.cases[0].passed = true, r => delete r.contract.dirty]) {
+    const candidate = copy(report); mutate(candidate);
+    assert.equal(validateConformanceReportSchema(candidate), false, mutate.toString());
   }
 });

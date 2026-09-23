@@ -15,6 +15,7 @@ const conflictGroupSchema = await read('schema/conflict_group.schema.json');
 const routePolicySchema = await read('schema/route_policy.schema.json');
 const snapshotSchema = await read('schema/snapshot.schema.json');
 const registryLockSchema = await read('schema/registry_lock.schema.json');
+const conformanceReportSchema = await read('schema/conformance_report.schema.json');
 const data = {
   ITEM_SCHEMA: itemSchema,
   TRACE_SCHEMA: traceSchema,
@@ -50,11 +51,13 @@ ajv.addSchema(conflictGroupSchema);
 ajv.addSchema(routePolicySchema);
 ajv.addSchema(snapshotSchema);
 ajv.addSchema(registryLockSchema);
+ajv.addSchema(conformanceReportSchema);
 const source = standalone(ajv, {
   validateItemSchema: itemSchema.$id, validateTraceSchema: traceSchema.$id,
   validateProfileSchema: profileSchema.$id, validateProducerBatchSchema: batchSchema.$id,
   validateConflictGroupSchema: conflictGroupSchema.$id, validateSnapshotSchema: snapshotSchema.$id,
-  validateRoutePolicySchema: routePolicySchema.$id, validateRegistryLockSchema: registryLockSchema.$id
+  validateRoutePolicySchema: routePolicySchema.$id, validateRegistryLockSchema: registryLockSchema.$id,
+  validateConformanceReportSchema: conformanceReportSchema.$id
 });
 const bundle = await build({
   stdin: { contents: source, resolveDir: process.cwd(), sourcefile: 'compiled-schemas.js' },
