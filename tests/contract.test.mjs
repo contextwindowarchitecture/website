@@ -329,6 +329,7 @@ test('conformance cases are complete, schema-valid, and agree with the published
     const payload = await fs.readFile(file('expected.payload.txt')).catch(() => null);
     assert.equal(payload === null, expected.refused.bool);
     if (payload) assert.equal(expected.result.hash, createHash('sha256').update(payload).digest('hex'));
+    assert.equal(expected.context.snapshot_digest, snapshotDigest(snapshot), `${name}: snapshot_digest`);
   }
   const fixture = new URL('fixture-three-slot/', root);
   assert.deepEqual(JSON.parse(await fs.readFile(new URL('expected.trace.json', fixture), 'utf8')), trace);
@@ -389,6 +390,23 @@ const canonical = value => Array.isArray(value) ? `[${value.map(canonical).join(
   : value !== null && typeof value === 'object' ? `{${Object.keys(value).sort().map(k => `${JSON.stringify(k)}:${canonical(value[k])}`).join(',')}}`
   : JSON.stringify(value);
 const sha256 = value => createHash('sha256').update(canonical(value), 'utf8').digest('hex');
+
+// conformance/README.md, Snapshot digest: an independent implementation of what generators/digest.py computes.
+const NONBLANK = /[^\t\n\v\f\r \u00a0\u1680\u2000-\u200a\u2028\u2029\u202f\u205f\u3000\ufeff]/u;
+const usable = item => item !== null && typeof item === 'object' && typeof item.id === 'string' && NONBLANK.test(item.id);
+const units = (a, b) => (a < b ? -1 : a > b ? 1 : 0); // JavaScript compares strings by UTF-16 code units
+const serialized = (a, b) => Buffer.compare(Buffer.from(canonical(a), 'utf8'), Buffer.from(canonical(b), 'utf8'));
+const snapshotDigest = snapshot => {
+  const s = copy(snapshot);
+  for (const batch of s.batches) {
+    batch.items = [...batch.items.filter(usable).sort((a, b) => units(a.id, b.id) || serialized(a, b)), ...batch.items.filter(i => !usable(i))];
+    batch.excluded.sort((a, b) => units(a.item_id, b.item_id) || serialized(a, b));
+  }
+  s.batches.sort((a, b) => units(a.producer.id, b.producer.id));
+  s.conflicts.sort((a, b) => units(a.id, b.id));
+  for (const group of s.conflicts) group.items.sort(units);
+  return sha256(s);
+};
 
 test('the registry lock pins the published profiles and conformance route policies by digest (R-20)', async () => {
   const lock = await read('conformance/registry/lock.json');
