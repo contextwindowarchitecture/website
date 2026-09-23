@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, compareInstants, REASONS } from '../contract.js';
-import { validateItemSchema, validateTraceSchema, validateSnapshotSchema } from '../generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
 const read = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
@@ -254,10 +254,26 @@ test('conformance cases are complete, schema-valid, and agree with the published
   assert.deepEqual(await fs.readFile(new URL('expected.payload.txt', fixture)), await fs.readFile(new URL('../examples/payload.txt', import.meta.url)));
 });
 
-test('snapshots bind identity per batch and reject undeclared fields', async () => {
+test('snapshots bind identity per batch and reject undeclared fields, but carry raw items for admission', async () => {
   const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
-  for (const mutate of [s => delete s.assembly_time, s => s.batches[0].producer.kind = 'self-declared', s => s.batches[0].items[0].surprise = 1, s => s.clock = 'now', s => delete s.batches[1].producer]) {
+  for (const mutate of [s => delete s.assembly_time, s => s.batches[0].producer.kind = 'self-declared', s => s.clock = 'now', s => delete s.batches[1].producer, s => s.batches[0].producer.verified_server = true, s => s.batches[0].items.push('not an object')]) {
     const candidate = copy(snapshot); mutate(candidate);
     assert.equal(validateSnapshotSchema(candidate), false);
+  }
+  const raw = copy(snapshot); raw.batches[0].items[0].surprise = 1; delete raw.batches[1].items[0].body;
+  assert.equal(validateSnapshotSchema(raw), true, 'invalid items are refused per item at admission (R-2), not by the snapshot');
+});
+
+test('route policies declare producers, slot rules, overrides and upgrades in closed vocabularies', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const full = { ...copy(policy), clock_skew_seconds: 5,
+    slots: { 'evidence.knowledge': { min_relevance: 0.82, max_age_seconds: 7776000, required_scope: ['tenant'] }, 'interaction.memory': { source_prefix: 'turn:' } },
+    default_overrides: { 'evidence.knowledge': { token_budget: 420 } }, tier_upgrades: { 'state.user': 'protected' } };
+  assert.equal(validateRoutePolicySchema(full), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => delete p.producers, p => p.producers.x = { kind: 'oracle', slots: ['state.task'] }, p => p.producers.x = { kind: 'mcp', slots: [] },
+    p => p.slots['evidence.web'] = {}, p => p.slots['evidence.knowledge'].max_age = 'P90D', p => p.slots['evidence.knowledge'].required_scope = ['org'],
+    p => p.tier_upgrades['state.user'] = 'droppable', p => p.default_overrides['evidence.knowledge'] = { tier: 'protected' }, p => p.default_overrides['state.task'] = {}]) {
+    const candidate = copy(full); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
   }
 });

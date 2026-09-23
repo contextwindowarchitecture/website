@@ -20,7 +20,7 @@ npm test
 | --- | --- |
 | `contract/requirements.json` | Permanent R-1 through R-23 IDs and requirement text |
 | `spec.html` | Normative definitions and explanatory context outside the generated requirements |
-| `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group and snapshot JSON structures |
+| `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
 | `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |

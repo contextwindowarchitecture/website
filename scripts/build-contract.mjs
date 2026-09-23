@@ -12,6 +12,7 @@ const traceSchema = await read('schema/trace.schema.json');
 const profileSchema = await read('schema/profile.schema.json');
 const batchSchema = await read('schema/producer_batch.schema.json');
 const conflictGroupSchema = await read('schema/conflict_group.schema.json');
+const routePolicySchema = await read('schema/route_policy.schema.json');
 const snapshotSchema = await read('schema/snapshot.schema.json');
 const data = {
   ITEM_SCHEMA: itemSchema,
@@ -45,11 +46,13 @@ ajv.addSchema(traceSchema);
 ajv.addSchema(profileSchema);
 ajv.addSchema(batchSchema);
 ajv.addSchema(conflictGroupSchema);
+ajv.addSchema(routePolicySchema);
 ajv.addSchema(snapshotSchema);
 const source = standalone(ajv, {
   validateItemSchema: itemSchema.$id, validateTraceSchema: traceSchema.$id,
   validateProfileSchema: profileSchema.$id, validateProducerBatchSchema: batchSchema.$id,
-  validateConflictGroupSchema: conflictGroupSchema.$id, validateSnapshotSchema: snapshotSchema.$id
+  validateConflictGroupSchema: conflictGroupSchema.$id, validateSnapshotSchema: snapshotSchema.$id,
+  validateRoutePolicySchema: routePolicySchema.$id
 });
 const bundle = await build({
   stdin: { contents: source, resolveDir: process.cwd(), sourcefile: 'compiled-schemas.js' },
