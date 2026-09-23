@@ -13,7 +13,7 @@ Some cases have a generator in `generators/`. It holds a table of each candidate
 
 ## Running a case
 
-1. Validate `snapshot.json` against the snapshot schema and load it. Resolve `tokenizer` and `renderer` by ID; an implementation that does not provide one skips the case and reports it as skipped, not passed. A snapshot that fails the schema is rejected before assembly and has no trace; the refusal codes describe assemblies of valid snapshots. Conflict groups are part of that check: group ids must be unique, every item id a group names must be the id of a candidate or a producer exclusion in the snapshot, no item may belong to two groups, and a fact group's `fact` must be a key of the route's `facts`. A producer exclusion's `duplicate_of` must be the id of a candidate in the same batch (R-13). The profile is part of it too (R-19, R-20): its `spec` must be `cwa/draft`, which the profile schema fixes and the trace repeats as `context.spec` (R-21); its `route` and `route_policy_version` must equal the route policy's `route` and `version`, it must place `governance.instructions` and `interaction.query`, and it must place `governance.output_contract` when the route sets `parser: true`.
+1. Validate `snapshot.json` and load it. A snapshot that fails its schemas or any check in Snapshot checks is rejected before assembly and has no trace (R-17). Resolve `tokenizer` and `renderer` by ID; an implementation that does not provide one skips the case and reports it as skipped, not passed.
 2. Assemble.
 3. Compare the payload byte for byte with `expected.payload.txt`, or confirm no payload when that file is absent.
 4. Compare the trace with `expected.trace.json` after removing `trace_id` and `timings`, which may differ (R-23). `context.snapshot_digest` is compared like every other field; Snapshot digest defines it.
@@ -154,6 +154,18 @@ A slot's *size* is the sum of `included[].tokens` over the slot's rows: the toke
 *Shedding order* takes slots by ascending `priority` (default 0), then by slot name, and within each slot takes items from the lowest rank up. Rank sorts by the slot's `order_by` keys, then by `id`, with the first item ranked highest. The default keys are `["-relevance", "-freshness"]`: higher scores rank first and unscored items last, then newer items first.
 
 Fitting decides per item. A slot the profile places twice sheds or compresses both occurrences together. When those placements render a body differently, as `system` and an `xml:` wrap do in `cwa-messages/v1`, the size of the item's body or of a variant, wherever this section compares one with a cap or with another, is the largest of its occurrences' renderings: a cap bounds the body however it is rendered. Each omitted item adds one `excluded[]` row with reason `over_budget`, stage `assembler` and its slot. Each included occurrence of a compressed item adds one `compressed[]` row: `from` counts the original body and `to` and `included[].tokens` the variant, each as that occurrence renders it, and `method` and `variant_id` name the variant (R-18).
+
+## Snapshot checks
+
+A snapshot is *valid* when it satisfies `snapshot.schema.json`, and the schemas it references, and passes every check below. An invalid snapshot is rejected before assembly, with no payload and no trace, because its profile, budget or context may be missing or contradictory (R-17). Rejection reports the application's error in building the snapshot. An implementation lists the problems in its own words, since no reason code names them; the codes in `contract/reasons.json` describe assemblies of valid snapshots, refusals included.
+
+- **Well-formed Unicode.** No string holds an unpaired surrogate (Snapshot digest).
+- **One batch per producer.** No producer id heads more than one batch. A batch is one authenticated producer's output for the call (R-15), and rows, ranks, supersession and source diversity all key on that producer.
+- **Conflict groups (R-11).** Group ids are unique, every item id a group names is the id of a candidate or a producer exclusion in the snapshot, no item belongs to two groups, and a fact group's `fact` is a key of the route's `facts`.
+- **Producer exclusions (R-13).** An exclusion's `duplicate_of` is the id of a candidate in the same batch.
+- **Profile (R-19, R-20).** Its `spec` is `cwa/draft`, which the profile schema fixes and the trace repeats as `context.spec` (R-21). Its `route` and `route_policy_version` equal the route policy's `route` and `version`. It places `governance.instructions` and `interaction.query`, and `governance.output_contract` when the route sets `parser: true`. The snapshot's renderer can realize it (Tokenizers and renderers).
+
+A tokenizer or renderer the implementation does not provide is not a problem with the snapshot: the case is skipped (Reporting results).
 
 ## Tokenizers and renderers
 

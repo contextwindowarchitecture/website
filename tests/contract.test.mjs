@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, REASONS } from '../contract.js';
+import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, checkSnapshot, REASONS } from '../contract.js';
 import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema, validateRegistryLockSchema, validateConformanceReportSchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
@@ -450,6 +450,41 @@ test('a budget may reserve an integer margin percent of at most 100, and the tra
     const traced = copy(trace);
     traced.budget.margin_percent = margin;
     assert.equal(validateTraceSchema(traced), valid, `trace margin ${margin}`);
+  }
+});
+
+// One break per variant of fixture-three-slot: each snapshot check rejects on its own (conformance/README.md, Snapshot checks).
+const group = (id, items, extra = {}) => ({ id, kind: 'instruction', items, ...extra });
+const REJECTS = [
+  ['invalid_structure', s => { delete s.budget; }],
+  ['invalid_structure', s => { s.profile.spec = 'cwa/1'; }],
+  ['unpaired_surrogate', s => { s.batches[0].items[0].body += '\uD800'; }],
+  ['duplicate_producer', s => { s.batches[3].producer = { ...s.batches[0].producer }; }],
+  ['unknown_conflict_item', s => { s.conflicts = [group('g1', ['policy:v12', 'nope'])]; }],
+  ['duplicate_conflict_group', s => { s.conflicts = [group('g1', ['policy:v12', 'turn:18']), group('g1', ['refunds-eu:v17#p4', 'memory:expired'])]; }],
+  ['overlapping_conflict_groups', s => { s.conflicts = [group('g1', ['policy:v12', 'turn:18']), group('g2', ['turn:18', 'refunds-eu:v17#p4'])]; }],
+  ['unknown_fact', s => { s.conflicts = [group('g1', ['policy:v12', 'refunds-eu:v17#p4'], { kind: 'fact', fact: 'refund_window' })]; }],
+  ['unknown_duplicate_of', s => { s.batches[2].excluded.push({ item_id: 'memory:dup', reason: 'duplicate_content', stage: 'producer', duplicate_of: 'memory:gone' }); }],
+  ['profile_route_mismatch', s => { s.profile.route = 'another-route'; }],
+  ['profile_route_policy_mismatch', s => { s.profile.route_policy_version = 'fixture/v2'; }],
+  ['protected_slot_omitted', s => { s.profile.placement = s.profile.placement.filter(p => p.slot !== 'interaction.query'); }],
+  ['protected_slot_omitted', s => { s.route_policy.parser = true; }],
+  ['unrealizable_profile', s => { s.profile.placement[1].wrap = 'system'; }],
+];
+
+test('every published case is a valid snapshot, and each snapshot check rejects on its own (R-17)', async () => {
+  const root = new URL('../conformance/cases/', import.meta.url);
+  for (const name of await fs.readdir(root)) {
+    const snapshot = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
+    assert.deepEqual(checkSnapshot(snapshot).findings, [], name);
+  }
+  const base = JSON.parse(await fs.readFile(new URL('fixture-three-slot/snapshot.json', root), 'utf8'));
+  for (const [reason, mutate] of REJECTS) {
+    const snapshot = copy(base);
+    mutate(snapshot);
+    const result = checkSnapshot(snapshot);
+    assert.equal(result.valid, false, `${reason}: ${mutate}`);
+    assert.deepEqual(result.findings.map(f => f.reason), [reason], `${mutate}`);
   }
 });
 

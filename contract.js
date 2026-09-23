@@ -1,5 +1,5 @@
 import { ITEM_SCHEMA, SLOT_DEFAULTS } from './generated/contract-data.js';
-import { validateItemSchema, validateTraceSchema, validateProfileSchema, validateProducerBatchSchema, validateConflictGroupSchema } from './generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateProfileSchema, validateProducerBatchSchema, validateConflictGroupSchema, validateSnapshotSchema } from './generated/schema-validators.js';
 
 export { SLOT_DEFAULTS, REASONS, ITEM_EXAMPLE, TRACE_EXAMPLE } from './generated/contract-data.js';
 
@@ -211,6 +211,59 @@ export function checkConflictGroups(groups, options = {}) {
   for (const group of groups) for (const id of group.items ?? []) {
     if (seen.has(id)) findings.push(failure('overlapping_conflict_groups', `${id} belongs to both ${seen.get(id)} and ${group.id}; an item belongs to at most one group.`, 11));
     else seen.set(id, group.id);
+  }
+  return { valid: findings.length === 0, findings };
+}
+
+// Placements a renderer can realize (conformance/README.md, Tokenizers and renderers). An unknown renderer is
+// skipped by the caller, not judged here.
+const XML_WRAP = /^xml:[A-Za-z_][A-Za-z0-9_.-]*$/;
+const REALIZE = {
+  'fixture-xml/v1': placement => placement.flatMap(({ wrap }, i) => XML_WRAP.test(wrap) ? [] : [`placement[${i}] wrap ${wrap} is not an xml:<name> wrap`]),
+  'cwa-messages/v1': placement => {
+    let seenXml = false;
+    return placement.flatMap(({ slot, wrap }, i) => {
+      const problems = [];
+      if (wrap !== 'system' && wrap !== 'tools' && !XML_WRAP.test(wrap)) problems.push(`placement[${i}] wrap ${wrap} is not system, tools or xml:<name>`);
+      else if (wrap === 'system' && !slot.startsWith('governance.')) problems.push(`placement[${i}] puts ${slot} in system`);
+      else if (wrap === 'tools' && slot !== 'governance.capabilities') problems.push(`placement[${i}] puts ${slot} in tools`);
+      else if (wrap === 'system' && seenXml) problems.push(`placement[${i}] puts system after an xml: placement`);
+      seenXml ||= wrap.startsWith('xml:');
+      return problems;
+    });
+  },
+};
+
+const wellFormed = value => typeof value === 'string' ? value.isWellFormed()
+  : Array.isArray(value) ? value.every(wellFormed)
+  : value !== null && typeof value === 'object' ? Object.entries(value).every(([k, v]) => k.isWellFormed() && wellFormed(v)) : true;
+
+// A snapshot is valid when it passes its schemas and every snapshot check; an invalid one is rejected before
+// assembly, with no payload and no trace (R-17; conformance/README.md, Snapshot checks).
+export function checkSnapshot(snapshot) {
+  if (!validateSnapshotSchema(snapshot)) return { valid: false, findings: schemaErrors(validateSnapshotSchema, 17) };
+  const findings = [];
+  if (!wellFormed(snapshot)) findings.push(failure('unpaired_surrogate', 'Every string must be well-formed Unicode, with no unpaired surrogate.', 23));
+  const producers = snapshot.batches.map(batch => batch.producer.id);
+  for (const id of new Set(producers.filter((id, i) => producers.indexOf(id) !== i))) {
+    findings.push(failure('duplicate_producer', `Producer ${id} heads more than one batch.`, 15));
+  }
+  const itemIds = snapshot.batches.flatMap(batch => [...batch.items.map(item => item?.id), ...batch.excluded.map(row => row.item_id)]);
+  findings.push(...checkConflictGroups(snapshot.conflicts, { itemIds, facts: snapshot.route_policy.facts ?? {} }).findings);
+  for (const batch of snapshot.batches) {
+    const candidates = new Set(batch.items.map(item => item?.id));
+    for (const row of batch.excluded) if (row.duplicate_of !== undefined && !candidates.has(row.duplicate_of)) {
+      findings.push(failure('unknown_duplicate_of', `${row.item_id} names ${row.duplicate_of} as kept, which is not a candidate in ${batch.producer.id}'s batch.`, 13));
+    }
+  }
+  const { profile, route_policy: policy } = snapshot;
+  if (profile.route !== policy.route) findings.push(failure('profile_route_mismatch', `The profile is for route ${profile.route}, the route policy for ${policy.route}.`, 20));
+  if (profile.route_policy_version !== policy.version) {
+    findings.push(failure('profile_route_policy_mismatch', `The profile expects route policy ${profile.route_policy_version}, the snapshot has ${policy.version}.`, 20));
+  }
+  findings.push(...checkProfile(profile, { parser: policy.parser === true }).findings);
+  for (const problem of REALIZE[snapshot.renderer]?.(profile.placement) ?? []) {
+    findings.push(failure('unrealizable_profile', `${snapshot.renderer} cannot realize this profile: ${problem}.`, 7));
   }
   return { valid: findings.length === 0, findings };
 }
