@@ -12,7 +12,7 @@ npm run build:contract
 npm test
 ```
 
-`npm test` fails if generated artifacts are stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Commit generated files with their sources so static hosting serves the tested validators.
+`npm test` fails if generated artifacts are stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. `CHANGELOG.md` is generated from the commit history with git-cliff (`cliff.toml`): regenerate it at a release with `uvx git-cliff --tag vX.Y.Z -o CHANGELOG.md` and never edit it by hand. The spec's own revision history is the Changelog on the Spec page. Commit generated files with their sources so static hosting serves the tested validators.
 
 ## Sources of truth
 
