@@ -488,6 +488,21 @@ test('every published case is a valid snapshot, and each snapshot check rejects 
   }
 });
 
+test('each published rejection case breaks exactly one snapshot check (R-17)', async () => {
+  const root = new URL('../conformance/rejections/', import.meta.url);
+  const names = await fs.readdir(root);
+  assert.ok(names.length > 0);
+  for (const name of names) {
+    const meta = JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8'));
+    assert.equal(meta.id, name);
+    assert.ok(meta.rules.includes('R-17'), name);
+    for (const rule of meta.rules) assert.match(rule, PERMANENT_ID);
+    assert.deepEqual((await fs.readdir(new URL(`${name}/`, root))).sort(), ['case.json', 'snapshot.json'], name);
+    const { findings } = checkSnapshot(JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8')));
+    assert.equal(findings.length, 1, `${name}: ${JSON.stringify(findings)}`);
+  }
+});
+
 test('a conformance report lists rejection cases as rejected, accepted or skipped (R-17)', async () => {
   const { source, ...report } = await read('contract/assembler-conformance.json');
   for (const [row, valid] of [
