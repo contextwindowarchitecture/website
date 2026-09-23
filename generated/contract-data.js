@@ -469,6 +469,12 @@ export const TRACE_SCHEMA = {
             "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
             "description": "For duplicate_content only: the id of the item kept in its place (R-24)."
           },
+          "superseded_by": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
+            "description": "For superseded only: the id of the latest item kept for the same producer and source (R-25)."
+          },
           "slot": {
             "type": "string",
             "enum": [
@@ -492,34 +498,68 @@ export const TRACE_SCHEMA = {
           "stage"
         ],
         "additionalProperties": false,
-        "if": {
-          "properties": {
-            "reason": {
-              "const": "duplicate_content"
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "duplicate_content"
+                }
+              },
+              "required": [
+                "reason"
+              ]
+            },
+            "then": {
+              "required": [
+                "duplicate_of"
+              ],
+              "properties": {
+                "duplicate_of": true
+              }
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "duplicate_of"
+                ],
+                "properties": {
+                  "duplicate_of": true
+                }
+              }
             }
           },
-          "required": [
-            "reason"
-          ]
-        },
-        "then": {
-          "required": [
-            "duplicate_of"
-          ],
-          "properties": {
-            "duplicate_of": true
-          }
-        },
-        "else": {
-          "not": {
-            "required": [
-              "duplicate_of"
-            ],
-            "properties": {
-              "duplicate_of": true
+          {
+            "if": {
+              "properties": {
+                "reason": {
+                  "const": "superseded"
+                }
+              },
+              "required": [
+                "reason"
+              ]
+            },
+            "then": {
+              "required": [
+                "superseded_by"
+              ],
+              "properties": {
+                "superseded_by": true
+              }
+            },
+            "else": {
+              "not": {
+                "required": [
+                  "superseded_by"
+                ],
+                "properties": {
+                  "superseded_by": true
+                }
+              }
             }
           }
-        }
+        ]
       }
     },
     "conflicts": {
@@ -1177,6 +1217,12 @@ export const REASONS = [
     "kind": "exclusion",
     "rule": "R-6",
     "text": "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates."
+  },
+  {
+    "code": "superseded",
+    "kind": "exclusion",
+    "rule": "R-25",
+    "text": "The route asked this slot to supersede by source, and the same producer sent a later observation with the same source. superseded_by names the item kept."
   },
   {
     "code": "duplicate_content",

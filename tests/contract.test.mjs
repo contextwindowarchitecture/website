@@ -242,9 +242,9 @@ test('a snapshot\'s groups name known items and facts, with no item in two group
   assert.deepEqual(checkConflictGroups([groups[0], { ...groups[1], id: groups[0].id }], options).findings.map(f => f.reason), ['duplicate_conflict_group']);
 });
 
-test('exclusions after admission follow the pipeline in the reason registry: conflicts, deduplication, fitting', () => {
+test('exclusions after admission follow the pipeline in the reason registry: conflicts, supersession, deduplication, fitting', () => {
   const exclusions = REASONS.filter(r => r.kind === 'exclusion').map(r => r.code);
-  assert.deepEqual(exclusions.slice(-4), ['conflict_deferred', 'conflict_lost', 'duplicate_content', 'over_budget']);
+  assert.deepEqual(exclusions.slice(-5), ['conflict_deferred', 'conflict_lost', 'superseded', 'duplicate_content', 'over_budget']);
 });
 
 test('route policies declare fact precedence and unresolved-conflict actions (R-6, R-11)', async () => {
@@ -290,6 +290,26 @@ test('reason registry is unique and cites permanent requirement IDs', () => {
   assert.equal(new Set(codes).size, codes.length);
   for (const reason of REASONS) assert.match(reason.rule, PERMANENT_ID);
   for (const code of ['over_budget', 'evidence_required', 'protected_content_over_budget']) assert.ok(codes.includes(code));
+});
+
+test('superseded is an R-25 exclusion', () => {
+  assert.deepEqual(REASONS.find(r => r.code === 'superseded')?.rule, 'R-25');
+  assert.equal(REASONS.find(r => r.code === 'superseded').kind, 'exclusion');
+});
+
+test('a superseded row names the newest item in superseded_by, and only that reason carries it', () => {
+  const row = { item_id: 'obs:old', reason: 'superseded', stage: 'assembler', slot: 'evidence.tool_results', superseded_by: 'obs:new' };
+  assert.equal(checkTrace({ ...trace, excluded: [...trace.excluded, row] }).valid, true, JSON.stringify(validateTraceSchema.errors));
+  const { superseded_by, ...unnamed } = row;
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, unnamed] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, reason: 'duplicate_content', duplicate_of: 'obs:new' }] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, duplicate_of: 'obs:new' }] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, superseded_by: ' ' }] }), false);
+});
+
+test('supersession never excludes a protected item', () => {
+  const task = { item_id: 'task:1', reason: 'superseded', stage: 'assembler', slot: 'state.task', superseded_by: 'task:2' };
+  assert.deepEqual(checkTrace({ ...trace, excluded: [...trace.excluded, task] }).findings.map(f => f.reason), ['protected_superseded_excluded']);
 });
 
 test('duplicate_content is an R-24 exclusion', () => {
@@ -407,6 +427,17 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(toolMinimum), true, 'both evidence slots accept a minimum');
   const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
+});
+
+test('route policies may ask any slot to supersede observations by source', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const superseding = { ...copy(policy), slots: { 'evidence.tool_results': { supersede: 'source', dedupe: 'exact' }, 'evidence.knowledge': { supersede: 'source' } } };
+  assert.equal(validateRoutePolicySchema(superseding), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.slots['evidence.knowledge'].supersede = true, p => p.slots['evidence.knowledge'].supersede = 'call_key',
+    p => p.slots['evidence.knowledge'].supersede = null, p => p.slots['evidence.tool_results'].supersede = ['source']]) {
+    const candidate = copy(superseding); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
 });
 
 test('route policies may ask any slot for exact deduplication', async () => {

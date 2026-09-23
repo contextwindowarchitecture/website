@@ -131,6 +131,9 @@ function checkRenderedBudget(trace, tierUpgrades) {
     if (['conflict_deferred', 'conflict_lost'].includes(item.reason) && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_conflict_excluded', `Conflict resolution cannot exclude a protected ${item.slot} item; its group escalates.`, 11));
     }
+    if (item.reason === 'superseded' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+      findings.push(failure('protected_superseded_excluded', `Supersession cannot exclude a protected ${item.slot} item; it is kept.`, 25));
+    }
     if (item.reason === 'duplicate_content' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_duplicate_excluded', `Deduplication cannot exclude a protected ${item.slot} item; it is kept.`, 24));
     }
