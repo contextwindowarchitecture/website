@@ -18,7 +18,7 @@ npm test
 
 | Source | Responsibility |
 | --- | --- |
-| `contract/requirements.json` | Permanent R-1 through R-23 IDs and requirement text |
+| `contract/requirements.json` | Permanent requirement IDs (R-1 through R-24; new ones append) and requirement text |
 | `spec.html` | Normative definitions and explanatory context outside the generated requirements |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |

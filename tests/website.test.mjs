@@ -65,10 +65,12 @@ test('exported profiles pass the same contract as published profile examples', a
   }
 });
 
-test('specification, generated requirement reference, and status matrix share all 23 permanent IDs', async () => {
+test('specification, generated requirement reference, and status matrix share every permanent ID', async () => {
   const rules = await component('spec.html', 'RULES');
   const statuses = await component('assembler.html', 'RULES');
-  assert.equal(rules.length, 23);
+  const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));
+  assert.equal(rules.length, requirements.length);
+  assert.ok(requirements.some(r => r.id === 'R-24'), 'R-24 is published');
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r.slice(0, 2)))), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
   const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => [r[2], r[3]]))), scopes.map(s => [s.scope, s.note]));
@@ -76,9 +78,9 @@ test('specification, generated requirement reference, and status matrix share al
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r[4]))), imported.requirements.map(r => r.status));
   const view = await component('assembler.html');
   const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
-  assert.equal(view.renderVals().counts, `${met} of 22 checkable requirements implemented.`);
+  assert.equal(view.renderVals().counts, `${met} of ${scopes.filter(s => s.scope !== 'application').length} checkable requirements implemented.`);
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
-  for (let i = 1; i <= 23; i++) assert.ok(markdown.includes(`## R-${i}:`));
+  for (const { id } of requirements) assert.ok(markdown.includes(`## ${id}:`));
 });
 
 test('the status matrix counts the published cases the imported conformance report passes', async () => {

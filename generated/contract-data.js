@@ -463,6 +463,12 @@ export const TRACE_SCHEMA = {
               "assembler"
             ]
           },
+          "duplicate_of": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
+            "description": "For duplicate_content only: the id of the item kept in its place (R-24)."
+          },
           "slot": {
             "type": "string",
             "enum": [
@@ -485,7 +491,35 @@ export const TRACE_SCHEMA = {
           "reason",
           "stage"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "if": {
+          "properties": {
+            "reason": {
+              "const": "duplicate_content"
+            }
+          },
+          "required": [
+            "reason"
+          ]
+        },
+        "then": {
+          "required": [
+            "duplicate_of"
+          ],
+          "properties": {
+            "duplicate_of": true
+          }
+        },
+        "else": {
+          "not": {
+            "required": [
+              "duplicate_of"
+            ],
+            "properties": {
+              "duplicate_of": true
+            }
+          }
+        }
       }
     },
     "conflicts": {
@@ -1143,6 +1177,12 @@ export const REASONS = [
     "kind": "exclusion",
     "rule": "R-6",
     "text": "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates."
+  },
+  {
+    "code": "duplicate_content",
+    "kind": "exclusion",
+    "rule": "R-24",
+    "text": "The route asked this slot for deduplication, and the item's body equals a kept item's body once whitespace is collapsed. duplicate_of names the item kept."
   },
   {
     "code": "over_budget",

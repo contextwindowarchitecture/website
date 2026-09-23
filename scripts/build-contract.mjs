@@ -73,12 +73,13 @@ outputs.set('evidence.html', evidence.replace(/const PROFILES = \[[\s\S]*?\n\];/
 
 // The requirement text is authored once and embedded for static hosting.
 const requirements = (await read('contract/requirements.json')).sort((a, b) => Number(a.id.slice(2)) - Number(b.id.slice(2)));
-if (requirements.length !== 23 || requirements.some((rule, index) => rule.id !== `R-${index + 1}`)) throw new Error('Expected permanent requirement IDs R-1 through R-23.');
+// IDs are permanent: new requirements append, and none is renumbered or reused.
+if (requirements.some((rule, index) => rule.id !== `R-${index + 1}`)) throw new Error(`Expected permanent requirement IDs R-1 through R-${requirements.length}.`);
 const rules = requirements.map(rule => [rule.section, rule.keyword, rule.summary, rule.text]);
 // What a reference assembler can verify for each requirement; drives the Assembler page matrix.
 const scopes = await read('contract/assembler-scope.json');
-if (scopes.length !== 23 || scopes.some((row, index) => row.id !== `R-${index + 1}` || !['assembler', 'boundary', 'application'].includes(row.scope) || !row.note)) {
-  throw new Error('contract/assembler-scope.json needs R-1 through R-23 in order, each with a scope and a note.');
+if (scopes.length !== requirements.length || scopes.some((row, index) => row.id !== `R-${index + 1}` || !['assembler', 'boundary', 'application'].includes(row.scope) || !row.note)) {
+  throw new Error(`contract/assembler-scope.json needs R-1 through R-${requirements.length} in order, each with a scope and a note.`);
 }
 // Claims imported from the reference assembler (scripts/import-assembler-status.mjs).
 const { requirements: statuses } = await read('contract/assembler-status.json');
@@ -86,7 +87,7 @@ const allowed = { assembler: ['planned', 'in progress', 'implemented'], boundary
 statuses.forEach((row, i) => {
   if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`contract/assembler-status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
 });
-if (statuses.length !== 23) throw new Error('contract/assembler-status.json needs R-1 through R-23.');
+if (statuses.length !== requirements.length) throw new Error(`contract/assembler-status.json needs R-1 through R-${requirements.length}.`);
 // The reference assembler's conformance run, checked against this repo's own cases: a published case the
 // report lacks, or reports as anything but passed, does not count (conformance/README.md, Reporting results).
 const { source: runSource, ...report } = await read('contract/assembler-conformance.json');

@@ -13,6 +13,8 @@ const profiles = await read('examples/profiles.json');
 const batch = await read('examples/producer-batch.json');
 const context = { assemblyTime: '2026-09-22T12:00:00Z' };
 const copy = value => structuredClone(value);
+const requirementIds = (await read('contract/requirements.json')).map(r => r.id);
+const PERMANENT_ID = new RegExp(`^(${requirementIds.join('|')})$`);
 
 test('downloaded item and schema are the canonical published data', async () => {
   const example = JSON.parse(SCAFFOLDS.find(s => s.filename === 'context_item.yaml').text);
@@ -240,9 +242,9 @@ test('a snapshot\'s groups name known items and facts, with no item in two group
   assert.deepEqual(checkConflictGroups([groups[0], { ...groups[1], id: groups[0].id }], options).findings.map(f => f.reason), ['duplicate_conflict_group']);
 });
 
-test('conflict exclusions sit between admission and fitting in the reason registry', () => {
+test('exclusions after admission follow the pipeline in the reason registry: conflicts, deduplication, fitting', () => {
   const exclusions = REASONS.filter(r => r.kind === 'exclusion').map(r => r.code);
-  assert.deepEqual(exclusions.slice(-3), ['conflict_deferred', 'conflict_lost', 'over_budget']);
+  assert.deepEqual(exclusions.slice(-4), ['conflict_deferred', 'conflict_lost', 'duplicate_content', 'over_budget']);
 });
 
 test('route policies declare fact precedence and unresolved-conflict actions (R-6, R-11)', async () => {
@@ -286,8 +288,30 @@ test('item findings use registered reason codes, with specific schema codes', ()
 test('reason registry is unique and cites permanent requirement IDs', () => {
   const codes = REASONS.map(r => r.code);
   assert.equal(new Set(codes).size, codes.length);
-  for (const reason of REASONS) assert.match(reason.rule, /^R-([1-9]|1\d|2[0-3])$/);
+  for (const reason of REASONS) assert.match(reason.rule, PERMANENT_ID);
   for (const code of ['over_budget', 'evidence_required', 'protected_content_over_budget']) assert.ok(codes.includes(code));
+});
+
+test('duplicate_content is an R-24 exclusion', () => {
+  assert.deepEqual(REASONS.find(r => r.code === 'duplicate_content')?.rule, 'R-24');
+  assert.equal(REASONS.find(r => r.code === 'duplicate_content').kind, 'exclusion');
+});
+
+test('a duplicate_content row names the item kept in duplicate_of, and only that reason carries it', () => {
+  const row = { item_id: 'kb:b', reason: 'duplicate_content', stage: 'assembler', slot: 'evidence.knowledge', duplicate_of: 'kb:a' };
+  assert.equal(checkTrace({ ...trace, excluded: [...trace.excluded, row] }).valid, true, JSON.stringify(validateTraceSchema.errors));
+  const { duplicate_of, ...unnamed } = row;
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, unnamed] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, reason: 'over_budget' }] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, duplicate_of: ' ' }] }), false);
+});
+
+test('deduplication never excludes a protected item', () => {
+  const task = { item_id: 'task:2', reason: 'duplicate_content', stage: 'assembler', slot: 'state.task', duplicate_of: 'task:1' };
+  assert.deepEqual(checkTrace({ ...trace, excluded: [...trace.excluded, task] }).findings.map(f => f.reason), ['protected_duplicate_excluded']);
+  const kb = { ...task, slot: 'evidence.knowledge' };
+  assert.deepEqual(checkTrace({ ...trace, excluded: [...trace.excluded, kb] }, { tierUpgrades: { 'evidence.knowledge': 'protected' } }).findings.map(f => f.reason),
+    ['protected_duplicate_excluded']);
 });
 
 test('prior model turns in history carry untrusted authority; user turns keep user', () => {
@@ -319,7 +343,7 @@ test('conformance cases are complete, schema-valid, and agree with the published
     const file = f => new URL(`${name}/${f}`, root);
     const meta = JSON.parse(await fs.readFile(file('case.json'), 'utf8'));
     assert.equal(meta.id, name);
-    for (const rule of meta.rules) assert.match(rule, /^R-([1-9]|1\d|2[0-3])$/);
+    for (const rule of meta.rules) assert.match(rule, PERMANENT_ID);
     const snapshot = JSON.parse(await fs.readFile(file('snapshot.json'), 'utf8'));
     assert.equal(validateSnapshotSchema(snapshot), true, JSON.stringify(validateSnapshotSchema.errors));
     const itemIds = snapshot.batches.flatMap(b => [...b.items.map(i => i.id), ...b.excluded.map(e => e.item_id)]);
@@ -383,6 +407,17 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(toolMinimum), true, 'both evidence slots accept a minimum');
   const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
+});
+
+test('route policies may ask any slot for exact deduplication', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const deduped = { ...copy(policy), slots: { 'evidence.knowledge': { dedupe: 'exact' }, 'interaction.memory': { dedupe: 'exact', max_tokens: 40 } } };
+  assert.equal(validateRoutePolicySchema(deduped), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.slots['evidence.knowledge'].dedupe = true, p => p.slots['evidence.knowledge'].dedupe = 'near',
+    p => p.slots['evidence.knowledge'].dedupe = null, p => p.slots['interaction.memory'].dedupe = ['exact']]) {
+    const candidate = copy(deduped); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
 });
 
 test('route policies may cap any slot with max_tokens, a whole number of tokens', async () => {

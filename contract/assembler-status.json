@@ -119,6 +119,11 @@
       "id": "R-23",
       "status": "implemented",
       "tests": 14
+    },
+    {
+      "id": "R-24",
+      "status": "planned",
+      "tests": 0
     }
   ]
 }
