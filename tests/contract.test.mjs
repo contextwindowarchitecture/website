@@ -420,7 +420,9 @@ test('route policies declare producers, slot rules, overrides and upgrades in cl
 
 test('refusal codes are listed in the order assembly checks them', () => {
   assert.deepEqual(REASONS.filter(r => r.kind === 'refusal').map(r => r.code),
-    ['assembly_time_required', 'required_slot_missing', 'protected_slot_unplaced', 'conflict_unresolved', 'protected_content_over_budget', 'evidence_required']);
+    ['assembly_time_required', 'required_slot_missing', 'protected_slot_unplaced', 'conflict_unresolved', 'protected_content_over_budget',
+      'slot_floor_over_budget', 'evidence_required']);
+  assert.equal(REASONS.find(r => r.code === 'slot_floor_over_budget').rule, 'R-17');
 });
 
 test('route policies declare required slots, evidence minimums and a fitting order', async () => {
@@ -441,6 +443,17 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(toolMinimum), true, 'both evidence slots accept a minimum');
   const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
+});
+
+test('route policies may hold any slot at a floor of at least one token, beside a cap', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const floored = { ...copy(policy), slots: { 'interaction.history': { min_tokens: 200, max_tokens: 100 }, 'governance.examples': { min_tokens: 1 } } };
+  assert.equal(validateRoutePolicySchema(floored), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.slots['interaction.history'].min_tokens = 0, p => p.slots['interaction.history'].min_tokens = 2.5,
+    p => p.slots['interaction.history'].min_tokens = null, p => p.slots['governance.examples'].min_tokens = '1']) {
+    const candidate = copy(floored); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
 });
 
 test('route policies may cap any slot at a whole number of items per source, at least one', async () => {
