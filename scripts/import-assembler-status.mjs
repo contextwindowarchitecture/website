@@ -8,13 +8,13 @@ import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { imported } from './conformance-reports.mjs';
+import { imported, remoteOf } from './conformance-reports.mjs';
 
 const assembler = process.argv[2];
 if (!assembler) throw new Error('usage: node scripts/import-assembler-status.mjs <path to cwa-assembler>');
 const git = (...args) => execFileSync('git', ['-C', assembler, ...args], { encoding: 'utf8' }).trim();
 const read = async name => JSON.parse(await fs.readFile(path.join(assembler, name), 'utf8'));
-const source = { repository: 'contextwindowarchitecture/assembler', commit: git('rev-parse', 'HEAD'),
+const source = { repository: remoteOf(assembler), commit: git('rev-parse', 'HEAD'),
   dirty: git('status', '--porcelain', '--', 'status.json', 'conformance-report.json', 'src', 'tests') !== '' };
 const { requirements } = await read('status.json');
 await fs.writeFile('contract/assembler-status.json', JSON.stringify({

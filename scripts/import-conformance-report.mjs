@@ -6,14 +6,12 @@ import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { imported } from './conformance-reports.mjs';
+import { imported, remoteOf } from './conformance-reports.mjs';
 
 const [checkout, out] = process.argv.slice(2);
 if (!checkout || !out) throw new Error('usage: node scripts/import-conformance-report.mjs <implementation checkout> <output file>');
 const git = (...args) => execFileSync('git', ['-C', checkout, ...args], { encoding: 'utf8' }).trim();
-let repository = null;
-try { repository = execFileSync('git', ['-C', checkout, 'remote', 'get-url', 'origin'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch {}
-const source = { repository, commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain') !== '' };
+const source = { repository: remoteOf(checkout), commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain') !== '' };
 const report = JSON.parse(await fs.readFile(path.join(checkout, 'conformance-report.json'), 'utf8'));
 if (!validateConformanceReportSchema(report)) throw new Error('conformance-report.json: ' + JSON.stringify(validateConformanceReportSchema.errors));
 await fs.writeFile(out, JSON.stringify(imported(source, report), null, 2) + '\n');

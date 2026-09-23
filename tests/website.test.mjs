@@ -133,3 +133,17 @@ test('a case changed or published after a report\'s run does not count as passin
   const rejection = tally({ cases: [], rejections: [{ id: 'a', outcome: 'rejected' }] }, { a: 'd1' }, published.slice(0, 1));
   assert.deepEqual(Object.fromEntries(rejection), { a: 'passed' });
 });
+
+test('an imported report names its GitHub repository as owner/repo, from the checkout\'s remote', async () => {
+  const { repositoryOf } = await import('../scripts/conformance-reports.mjs');
+  for (const url of ['https://github.com/contextwindowarchitecture/assembler-python', 'https://github.com/contextwindowarchitecture/assembler-python.git',
+    'git@github.com:contextwindowarchitecture/assembler-python.git', 'ssh://git@github.com/contextwindowarchitecture/assembler-python']) {
+    assert.equal(repositoryOf(url), 'contextwindowarchitecture/assembler-python', url);
+  }
+  assert.equal(repositoryOf('https://gitlab.example.org/team/assembler.git'), 'https://gitlab.example.org/team/assembler.git');
+  assert.equal(repositoryOf(null), null);
+  for (const [, file] of IMPORTED) {
+    const { source } = await readJson(file);
+    assert.match(source.repository ?? '', /^[\w.-]+\/[\w.-]+$/, file);
+  }
+});

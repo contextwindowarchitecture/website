@@ -49,6 +49,22 @@ export function tally(report, atRun, published) {
     !outcomes.has(c.id) ? 'not run' : atRun?.[c.id] !== c.digest ? 'stale' : outcomes.get(c.id) ? 'passed' : 'failed']));
 }
 
+/** A remote URL as owner/repo when it is on GitHub, over HTTPS or SSH; any other URL as given; null for none. */
+export function repositoryOf(url) {
+  if (!url) return null;
+  const github = /^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/.exec(url);
+  return github ? `${github[1]}/${github[2]}` : url;
+}
+
+/** A checkout's origin remote as repositoryOf names it, or null when it has none. */
+export function remoteOf(checkout) {
+  try {
+    return repositoryOf(execFileSync('git', ['-C', checkout, 'remote', 'get-url', 'origin'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
+  } catch {
+    return null;
+  }
+}
+
 /** A report as the website stores it: its source, the digests of the cases it ran, and the report itself. */
 export function imported(source, report, root = '.') {
   const atRun = report.contract.dirty ? null : caseDigestsAt(report.contract.website_commit, root);
