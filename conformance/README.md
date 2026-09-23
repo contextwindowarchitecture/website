@@ -16,7 +16,13 @@ Language-neutral test cases for assemblers. Each directory under `cases/` holds:
 3. Compare the payload byte for byte with `expected.payload.txt`, or confirm no payload when that file is absent.
 4. Compare the trace with `expected.trace.json` after removing `trace_id`, `timings` and `context.snapshot_digest`. Trace IDs and timings may differ (R-23). Snapshot digests depend on an implementation's canonical serialization, which the spec does not yet fix.
 
-Array order in the trace is part of the expectation.
+Array order in the trace is part of the expectation:
+
+- `included[]` follows payload order.
+- `excluded[]` lists producer-stage rows first, ordered by producer id and then `item_id`. Assembler rows follow in pipeline order. Admission rows are ordered by producer id and then recorded `item_id`. Later stages define their order when they are specified.
+- `defaults_filled[]` is ordered by `item_id`, then by field in R-3 order: `token_budget`, `variants`, `conflict_policy`, `lineage`, `eligibility`, `injection_risk`. It covers every schema-valid item from a producer the route admits, including items later excluded, because later admission checks read the filled values.
+
+When an item fails several admission checks, the trace records the earliest applicable code in `contract/reasons.json` order (R-21).
 
 ## Fixture tokenizer and renderer
 

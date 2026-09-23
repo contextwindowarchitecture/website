@@ -416,6 +416,11 @@ const STAGES = [
 ];
 const FAILURES = [
   [
+    "producer_not_authenticated",
+    "The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields.",
+    15
+  ],
+  [
     "missing_field:<name>",
     "A required field is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for retrieval. Fix the producer; the assembler will not guess.",
     2
@@ -436,19 +441,19 @@ const FAILURES = [
     2
   ],
   [
-    "authority_not_allowed",
-    "The authority value is not allowed for this slot or authenticated producer. These roles are not a factual ranking.",
-    1
-  ],
-  [
-    "producer_not_authenticated",
-    "The application did not authenticate the emitting producer. Identity comes from trusted context, never from item fields.",
-    15
+    "duplicate_item_id",
+    "Another candidate or producer exclusion in the same assembly uses this ID.",
+    2
   ],
   [
     "producer_slot_not_allowed",
     "The authenticated producer is not permitted to emit into this slot.",
     15
+  ],
+  [
+    "authority_not_allowed",
+    "The authority value is not allowed for this slot or authenticated producer. These roles are not a factual ranking.",
+    1
   ],
   [
     "capability_not_allowed",
@@ -476,11 +481,6 @@ const FAILURES = [
     16
   ],
   [
-    "duplicate_item_id",
-    "Another candidate or producer exclusion in the same assembly uses this ID.",
-    2
-  ],
-  [
     "duplicate_variant_id",
     "Variant IDs repeat, or a variant reuses its parent item's ID.",
     18
@@ -501,14 +501,29 @@ const FAILURES = [
     2
   ],
   [
-    "below_threshold",
-    "The rerank score is under the route's versioned threshold.",
-    13
+    "stale_state",
+    "A state item was observed longer ago than its slot's max_age_seconds. State must be current at assembly time.",
+    8
+  ],
+  [
+    "source_invalid",
+    "The item's source does not start with its slot's source_prefix. For memory, this is how the source turn is identified.",
+    9
   ],
   [
     "out_of_scope",
     "Tenant, user or session scope does not match the request.",
     2
+  ],
+  [
+    "below_threshold",
+    "The rerank score is under the route's versioned threshold.",
+    13
+  ],
+  [
+    "not_eligible",
+    "The route's eligibility predicate rejected the item, for example because it was observed longer ago than its slot's max_age_seconds.",
+    3
   ],
   [
     "over_budget",
