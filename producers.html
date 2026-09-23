@@ -588,7 +588,7 @@ class Component extends DCLogic {
     return {
       ...base, verdict: result.valid ? "structure and local invariants valid" : "checks failed", verdictColor: result.valid ? ok : bad,
       required: result.valid ? [{ name: "Published trace schema and local invariants", mark: "✓", color: ok }] : result.findings.map(f => ({ name: f.text, mark: "✕", color: bad })),
-      evidenced: [{ rule: "R-21", href: "./spec.html#R-21", text: "This checks reported structure, not the truth of the trace, its hash, or assembler conformance." }]
+      evidenced: [{ rule: "R-21", href: "./spec.html#R-21", text: "This checks reported structure, not the truth of the trace, its hash, or assembler conformance. Without the route policy it judges each slot at its default tier, so a trace from a route that raises tiers may be flagged." }]
     };
   }
   renderVals() {

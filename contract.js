@@ -5,6 +5,9 @@ export { SLOT_DEFAULTS, REASONS, ITEM_EXAMPLE, TRACE_EXAMPLE } from './generated
 
 const policyFields = ['token_budget', 'variants', 'conflict_policy', 'lineage', 'eligibility', 'injection_risk'];
 const TIER_RANK = { droppable: 0, compressible: 1, protected: 2 };
+// A slot's default tier, raised by trusted route policy (tierUpgrades); never lowered (R-16).
+const effectiveTier = (slot, tierUpgrades) => [SLOT_DEFAULTS[slot].tier, tierUpgrades?.[slot]]
+  .filter(tier => tier in TIER_RANK).reduce((a, b) => TIER_RANK[b] > TIER_RANK[a] ? b : a);
 const failure = (reason, text, rule) => ({ reason, text, rule, level: 'error' });
 const schemaErrors = (validator, rule) => (validator.errors || []).map(error =>
   failure('invalid_structure', `${error.instancePath || '/'} ${error.message}`, rule));
@@ -103,15 +106,14 @@ export function checkItem(candidate, context = {}) {
     findings.push(failure('protected_tier_changed', 'An item cannot downgrade its protected slot.', 16));
   }
   // Only trusted route policy (context.tierUpgrades) may raise a slot's tier; an item may lower a non-protected one.
-  const effectiveTier = [SLOT_DEFAULTS[item.slot].tier, context.tierUpgrades?.[item.slot]]
-    .filter(tier => tier in TIER_RANK).reduce((a, b) => TIER_RANK[b] > TIER_RANK[a] ? b : a);
-  if (item.tier && TIER_RANK[item.tier] > TIER_RANK[effectiveTier]) {
-    findings.push(failure('tier_upgrade_not_allowed', `This item claims ${item.tier}, above its slot's ${effectiveTier} tier; only route policy can raise it.`, 16));
+  const slotTier = effectiveTier(item.slot, context.tierUpgrades);
+  if (item.tier && TIER_RANK[item.tier] > TIER_RANK[slotTier]) {
+    findings.push(failure('tier_upgrade_not_allowed', `This item claims ${item.tier}, above its slot's ${slotTier} tier; only route policy can raise it.`, 16));
   }
   return { valid: findings.length === 0, findings, filled, item };
 }
 
-function checkRenderedBudget(trace) {
+function checkRenderedBudget(trace, tierUpgrades) {
   const findings = [];
   if (!trace.refused.bool) {
     for (const slot of ['governance.instructions', 'interaction.query']) {
@@ -123,18 +125,19 @@ function checkRenderedBudget(trace) {
     }
   } else if (trace.included.length) findings.push(failure('refused_payload_included', 'A refused assembly has no rendered included items.', 17));
   for (const item of trace.excluded) {
-    if (item.reason === 'over_budget' && item.slot && SLOT_DEFAULTS[item.slot].tier === 'protected') {
+    if (item.reason === 'over_budget' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_omitted', `A protected ${item.slot} item cannot be omitted for budget.`, 16));
     }
   }
   return findings;
 }
 
-export function checkTrace(trace) {
+// context.tierUpgrades is the route policy's tier_upgrades; without it, slots keep their default tiers.
+export function checkTrace(trace, context = {}) {
   if (!validateTraceSchema(trace)) return { valid: false, findings: schemaErrors(validateTraceSchema, 21) };
-  const findings = checkRenderedBudget(trace);
+  const findings = checkRenderedBudget(trace, context.tierUpgrades);
   for (const item of trace.compressed) {
-    if (item.to > item.from || SLOT_DEFAULTS[item.slot].tier !== 'compressible') {
+    if (item.to >= item.from || effectiveTier(item.slot, context.tierUpgrades) !== 'compressible') {
       findings.push(failure('invalid_compression', 'Compression must shorten a compressible item.', 16));
     }
   }

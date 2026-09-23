@@ -121,6 +121,20 @@ test('success and refusal shapes are mutually consistent', () => {
   assert.equal(checkTrace({ ...refused, included: trace.included }).valid, false);
 });
 
+test('trace checks use the route-raised tier when the route policy is supplied', () => {
+  const compressedUser = { ...trace, compressed: [{ slot: 'state.user', item_id: 'user:plan', from: 9, to: 3, method: 'extract', variant_id: 'user:plan~s' }] };
+  assert.equal(checkTrace(compressedUser).valid, false, 'state.user is droppable by default');
+  assert.equal(checkTrace(compressedUser, { tierUpgrades: { 'state.user': 'compressible' } }).valid, true);
+  const omittedUser = { ...trace, excluded: [...trace.excluded, { item_id: 'user:plan', reason: 'over_budget', stage: 'assembler', slot: 'state.user' }] };
+  assert.equal(checkTrace(omittedUser).valid, true);
+  assert.deepEqual(checkTrace(omittedUser, { tierUpgrades: { 'state.user': 'protected' } }).findings.map(f => f.reason), ['protected_omitted']);
+});
+
+test('a compression must make the item strictly shorter', () => {
+  const same = { ...trace, compressed: [{ slot: 'evidence.knowledge', item_id: 'refunds-eu:v17#p4', from: 10, to: 10, method: 'extract', variant_id: 'v' }] };
+  assert.equal(checkTrace(same).valid, false);
+});
+
 test('missing evidence requires an explicit recovery handoff, not an in-assembly model call', () => {
   const refused = { ...trace, result: null, included: [], refused: { bool: true, reason: 'evidence_required' } };
   assert.equal(checkTrace(refused).valid, false);
@@ -244,7 +258,7 @@ test('conformance cases are complete, schema-valid, and agree with the published
     const snapshot = JSON.parse(await fs.readFile(file('snapshot.json'), 'utf8'));
     assert.equal(validateSnapshotSchema(snapshot), true, JSON.stringify(validateSnapshotSchema.errors));
     const expected = JSON.parse(await fs.readFile(file('expected.trace.json'), 'utf8'));
-    assert.equal(checkTrace(expected).valid, true);
+    assert.equal(checkTrace(expected, { tierUpgrades: snapshot.route_policy.tier_upgrades }).valid, true);
     const payload = await fs.readFile(file('expected.payload.txt')).catch(() => null);
     assert.equal(payload === null, expected.refused.bool);
     if (payload) assert.equal(expected.result.hash, createHash('sha256').update(payload).digest('hex'));
