@@ -32,7 +32,7 @@
   {
     "id": "R-7",
     "scope": "assembler",
-    "note": "Only governance maps to platform roles, and item bodies are escaped inside wrappers."
+    "note": "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers."
   },
   {
     "id": "R-8",

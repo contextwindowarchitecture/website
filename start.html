@@ -248,7 +248,7 @@ class Component extends DCLogic {
         const text = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
         let slot = this.classify(text, m.role);
         if (m.role === "user") { seenUsers++; if (seenUsers < users) slot = "interaction.history"; }
-        return { text, slot, src: "message:" + m.role + (m.name ? ":" + m.name : "") };
+        return { text, slot, src: "message:" + m.role + (m.name ? ":" + m.name : ""), model: m.role === "assistant" };
       });
     } else {
       chunks = src.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).map(text => ({ text, slot: this.classify(text, null), src: "prompt:literal" }));
@@ -257,15 +257,17 @@ class Component extends DCLogic {
     const total = chunks.reduce((a, c) => a + tok(c.text), 0) || 1;
     const gap = chunks.filter(c => c.slot === "unassigned").reduce((a, c) => a + tok(c.text), 0);
     const slots = new Set(chunks.map(c => c.slot).filter(s => s !== "unassigned"));
+    // R-1: prior model turns in history are generated content with untrusted authority.
+    const authority = c => c.model && c.slot === "interaction.history" ? "untrusted" : SLOT_META[c.slot][1];
     const items = chunks.map((c, i) => {
       const m = SLOT_META[c.slot];
-      return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + m[1] + " · ~" + tok(c.text) + " tok", preview: c.text.replace(/\s+/g, " "),
+      return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + authority(c) + " · ~" + tok(c.text) + " tok", preview: c.text.replace(/\s+/g, " "),
         flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs source · freshness") };
     });
     const y = (s) => JSON.stringify(s);
     const yaml = ["# proposed by the migrator · every item still needs a real source and freshness", "profile: policy-first-chat/v2   # pick one on /evidence", "items:"].concat(chunks.map((c, i) => {
       const m = SLOT_META[c.slot];
-      return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + m[1], "    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO timestamp\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text)].join("\n");
+      return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + authority(c)].concat(c.model && c.slot === "interaction.history" ? ["    lineage: generated   # prior model turn (R-1)"] : [], ["    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO timestamp\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text)]).join("\n");
     })).join("\n");
     return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: chunks.length + " chunk" + (chunks.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(chunks.filter(c => c.slot !== "unassigned").length), yaml };
   }

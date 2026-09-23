@@ -4,6 +4,7 @@ This is an integration guide, not a reference implementation or the full normati
 Use SPEC.md for numbered requirements, spec.html for definitions, and schema/ for JSON shapes.
 
 - Assign each item one of the eleven slots in contract/slot-defaults.json and its allowed authority role.
+- Render interaction.history as a transcript inside its wrapper, never as platform messages. Prior model turns carry lineage: generated and authority: untrusted.
 - Use freshness for the observation timestamp and expires for the separate deadline; as_of is not a JSON alias.
 - Keep instruction authority separate from factual precedence. Evidence cannot direct behavior. Resolve facts only through explicit, versioned route policy for the same fact and scope; escalate unresolved conflicts.
 - Supply typed conflict groups before assembly. Do not ask the assembler to infer contradictions from prose.

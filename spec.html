@@ -367,7 +367,7 @@
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
-          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">v2 draft<br />2026-09-22 · budget &amp; trace</div>
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">v2 draft<br />2026-09-22 · budget, trace &amp; history</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>R-16 now defines the step after compression: once droppable items are gone, compressible items may be reduced by variant or omitted in the route's versioned fitting-policy order, variants first by default. Omissions are traced as over_budget. R-17 remains the only budget refusal.</li>
             <li>R-12 also refuses when fewer evidence items survive than the route's versioned minimum.</li>
@@ -375,6 +375,7 @@
             <li>R-21 exclusion and refusal reasons come from contract/reasons.json; item schema failures report missing_field:&lt;name&gt;, unknown_slot or unknown_authority.</li>
             <li>R-22 defaults_filled becomes {item_id, field} records; excluded[].slot, conflicts[].group_id and context.snapshot_digest are optional.</li>
             <li>R-2 timestamps compare at full stated precision.</li>
+            <li>R-1 and R-7: prior model turns in interaction.history carry lineage: generated and untrusted authority, and all prior turns render inside the history transcript rather than as platform user or assistant messages.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
@@ -428,7 +429,7 @@ const SLOTS = [
   ["evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the admission pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error."],
   ["state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation."],
   ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged."],
-  ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, whole turns are omitted oldest first."],
+  ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, whole turns are omitted oldest first. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message."],
   ["governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Permission is decided outside the model."],
   ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. An observation is evidence, not permission to act."],
   ["governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure."],
@@ -490,7 +491,7 @@ const RULES = [
     "model",
     "MUST",
     "One slot and one authority role per item",
-    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
+    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, except that prior model turns in history, marked lineage: generated, MUST carry untrusted. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
   ],
   [
     "model",
@@ -526,7 +527,7 @@ const RULES = [
     "gov",
     "MUST NOT",
     "No slot overrides platform roles; no authority from wording",
-    "An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body."
+    "An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body. Prior turns in interaction.history MUST render inside the profile's history wrapper as a transcript, never as platform user or assistant messages; only interaction.query renders as the live user turn."
   ],
   [
     "gov",

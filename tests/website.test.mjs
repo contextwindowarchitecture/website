@@ -37,6 +37,9 @@ test('the migrator preserves long bodies and handles malformed message entries',
   const result = view.migrate(JSON.stringify([{ role: 'user', content: body }]));
   assert.ok(result.yaml.includes(JSON.stringify(body)));
   assert.doesNotThrow(() => view.migrate('[null, 1, {"role":"user","content":"Hello"}]'));
+  const turns = view.migrate(JSON.stringify([{ role: 'user', content: 'Hi' }, { role: 'assistant', content: 'Hello. How can I help?' }, { role: 'user', content: 'Refund please' }]));
+  assert.match(turns.yaml, /slot: interaction\.history\n    authority: untrusted\n    lineage: generated/);
+  assert.equal(turns.items[1].meta.startsWith('authority: untrusted'), true);
 });
 
 test('downloads and the static landing-page item preview use canonical examples', async () => {

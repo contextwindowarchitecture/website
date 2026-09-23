@@ -4,7 +4,7 @@ Generated from `contract/requirements.json`. The [Spec page](./spec.html) provid
 
 ## R-1: One slot and one authority role per item
 
-Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking.
+Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, except that prior model turns in history, marked lineage: generated, MUST carry untrusted. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking.
 
 ## R-2: Required fields and canonical JSON shape
 
@@ -28,7 +28,7 @@ An assembler MUST classify supplied conflict groups as instruction or fact befor
 
 ## R-7: No slot overrides platform roles; no authority from wording
 
-An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body.
+An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body. Prior turns in interaction.history MUST render inside the profile's history wrapper as a transcript, never as platform user or assistant messages; only interaction.query renders as the live user turn.
 
 ## R-8: State is application-written and current
 

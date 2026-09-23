@@ -48,6 +48,9 @@ function checkAuthority(item) {
   if (item.authority !== expected && (governing || item.authority !== 'untrusted')) {
     return [failure('authority_not_allowed', `This slot requires ${expected}${governing ? '' : ' or untrusted'}.`, 1)];
   }
+  if (item.slot === 'interaction.history' && item.lineage === 'generated' && item.authority !== 'untrusted') {
+    return [failure('authority_not_allowed', 'Prior model turns in history carry untrusted authority.', 1)];
+  }
   if (governing && (item.injection_risk !== 'none' || item.trust !== 'verified')) {
     return [failure('untrusted_in_governance', 'Governance requires verified, trusted content.', 10)];
   }

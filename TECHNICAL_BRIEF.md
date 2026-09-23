@@ -37,7 +37,7 @@ Every item belongs to exactly one of eleven slots, grouped into four planes. Pla
 
 Governance instructions and the current query must always be present. The output contract must also be present when a downstream parser consumes the response (R-4). Capabilities describe permitted tools; examples provide developer-owned steering and defer to instructions and the output contract.
 
-State is current, application-owned information. Task state comes from the application's state machine, not model output. Memory contains fallible summaries or inferences, carries a source turn and TTL, and can be revoked. History is a bounded transcript; overflow is summarized into memory rather than cut mid-thought.
+State is current, application-owned information. Task state comes from the application's state machine, not model output. Memory contains fallible summaries or inferences, carries a source turn and TTL, and can be revoked. History is a bounded transcript rendered inside its wrapper, never as platform messages; prior model turns carry `lineage: generated` and `untrusted` authority; overflow is summarized into memory rather than cut mid-thought.
 
 ### Item contract
 

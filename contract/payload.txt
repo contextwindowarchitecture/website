@@ -15,7 +15,7 @@
 <!-- interaction.memory · authority=generated · lineage=summary · ttl -->
 <memory></memory>
 
-<!-- interaction.history · authority=user · verbatim, bounded -->
+<!-- interaction.history · authority=user; model turns untrusted + lineage=generated · transcript, bounded -->
 <history></history>
 
 <!-- governance.capabilities · authority=governing · source=capability-policy -->
