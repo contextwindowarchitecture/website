@@ -82,12 +82,16 @@ The resolution vocabulary is breaking for stored traces: free-text `resolution` 
 
 ## Admission edge cases — 2026-09-23
 
-These follow the TypeScript assembler's M13 kickoff, which works from the published contract alone. `conformance/README.md` holds the rules.
+These follow the TypeScript assembler's M13 kickoff, which works from the published contract alone. `conformance/README.md` holds the rules, and `admission-reasons` checks each one.
 
 | Issue | Resolution |
 | --- | --- |
 | `contract.js` reported a variant missing a field as `missing_field:<name>`, which `reasons.json` defines for the item's own fields | A variant missing one of its fields is `invalid_structure`; `missing_field` names the item's own fields |
 | R-8 admits state only from producers of kind `state`, "whatever else a route policy lists", but named no code | `producer_slot_not_allowed` |
+| `duplicate_item_id` did not say which candidates count | Every other candidate, whatever its own outcome, and every producer exclusion, in any batch. Each copy takes the earliest code that applies to it |
+| `protected_tier_changed` did not say whether a slot the route raised to protected counts | Only slots protected by default. In a route-raised slot an item may lower its own tier, as `contract.js` already allowed |
+| Nothing said whether an unauthenticated producer's exclusion rows reach the trace | They do: they carry no content, and R-9 merges producer records |
+| Rows for candidates sharing an id had no order, so equal digests could give different traces | Ties order by RFC 8785 bytes, as the snapshot digest does |
 
 ## Review and migration implications
 

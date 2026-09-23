@@ -372,6 +372,9 @@
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>R-2: missing_field:&lt;name&gt; names a field of the item itself. A variant missing one of its own fields is invalid_structure.</li>
             <li>R-8: a state item from a producer whose kind is not state is excluded with producer_slot_not_allowed, even when the route lists that producer for the slot.</li>
+            <li>R-2: duplicate_item_id counts every other candidate, whatever its own outcome, and every producer exclusion, in any batch. Each candidate sharing an id takes the earliest code that applies to it.</li>
+            <li>R-16: protected_tier_changed guards the slots protected by default. In a slot the route raised to protected, an item may still lower its own tier.</li>
+            <li>R-9: producer exclusion rows reach the trace from every batch, including one whose producer the route does not admit. Rows that share an item_id, and candidates that share an id, order by their RFC 8785 bytes, as the snapshot digest does, so snapshots with the same digest give the same trace.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">

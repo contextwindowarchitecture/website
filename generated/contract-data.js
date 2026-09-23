@@ -1113,7 +1113,7 @@ export const REASONS = [
     "code": "duplicate_item_id",
     "kind": "exclusion",
     "rule": "R-2",
-    "text": "Another candidate or producer exclusion in the same assembly uses this ID."
+    "text": "Another candidate, in any batch and whatever its own outcome, or a producer exclusion from any batch uses this ID. Each candidate sharing it is excluded with the earliest code that applies to it."
   },
   {
     "code": "producer_slot_not_allowed",
@@ -1149,7 +1149,7 @@ export const REASONS = [
     "code": "protected_tier_changed",
     "kind": "exclusion",
     "rule": "R-16",
-    "text": "The item tries to downgrade a protected slot."
+    "text": "The item sets a tier below protected in a slot whose default tier is protected. In a slot only the route raised, an item may lower its own tier."
   },
   {
     "code": "tier_upgrade_not_allowed",
