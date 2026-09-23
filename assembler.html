@@ -191,7 +191,7 @@ const RULES = [
     "Resolves declared groups; evidence, state and memory never render as instructions.",
     "implemented",
     5,
-    5
+    6
   ],
   [
     "MUST NOT",
@@ -236,7 +236,7 @@ const RULES = [
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
     8,
-    8
+    9
   ],
   [
     "MUST NOT",
@@ -245,7 +245,7 @@ const RULES = [
     "Refuses with evidence_required and a recovery action.",
     "implemented",
     7,
-    7
+    8
   ],
   [
     "MUST NOT",
@@ -254,7 +254,7 @@ const RULES = [
     "Requires relevance and reference_only. It cannot tell whether a producer merged passages.",
     "boundary-checked",
     1,
-    1
+    2
   ],
   [
     "MUST NOT",
@@ -272,7 +272,7 @@ const RULES = [
     "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
     "boundary-checked",
     3,
-    3
+    4
   ],
   [
     "MUST",
@@ -281,7 +281,7 @@ const RULES = [
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
     19,
-    19
+    20
   ],
   [
     "MUST",
@@ -290,7 +290,7 @@ const RULES = [
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
     11,
-    11
+    12
   ],
   [
     "MUST NOT",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     34,
-    34
+    37
   ],
   [
     "SHOULD",
@@ -335,7 +335,7 @@ const RULES = [
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
     15,
-    15
+    16
   ],
   [
     "MUST",
@@ -353,7 +353,7 @@ const RULES = [
     "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "implemented",
     4,
-    4
+    6
   ],
   [
     "MUST",
@@ -362,7 +362,7 @@ const RULES = [
     "Keeps only the latest observation per producer and source in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "implemented",
     3,
-    3
+    4
   ],
   [
     "MUST",
@@ -371,10 +371,10 @@ const RULES = [
     "Keeps at most max_per_source items per producer and source in the slots a route opts in, after dedupe, keeping protected and grouped items.",
     "planned",
     0,
-    0
+    3
   ]
 ];
-const CONFORMANCE = {"passed":34,"total":34,"commit":"1bc277d"};
+const CONFORMANCE = {"passed":34,"total":37,"commit":"1bc277d"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
