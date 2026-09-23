@@ -23,11 +23,12 @@
   },
   {
     "name": "Document analysis",
-    "id": "document-analysis/v2",
+    "id": "document-analysis/v3",
     "short": "document",
     "route": "document-qa",
     "uses": "Long reports, contracts, corpora",
     "order": [
+      0,
       2,
       0,
       1,
@@ -38,12 +39,12 @@
       9,
       10
     ],
-    "principle": "Documents early and clearly delimited; instructions, examples and the question after them, near the end.",
+    "principle": "The instructions open the system text, which a message request always sends first. Documents follow, clearly delimited, and the instructions repeat after them with the examples and the question, near the end.",
     "evalNote": "unevaluated · illustrative profile; no reproducible run published"
   },
   {
     "name": "Long-context reinforced",
-    "id": "long-context-reinforced/v2",
+    "id": "long-context-reinforced/v3",
     "short": "reinforced",
     "route": "long-context-qa",
     "uses": "Very long inputs, multi-document synthesis",

@@ -1320,18 +1320,22 @@ export const PROFILES = [
   },
   {
     "id": "document-analysis",
-    "version": 2,
+    "version": 3,
     "route": "document-qa",
     "model_family": null,
     "route_policy_version": "illustrative/v2",
     "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
       {
         "slot": "evidence.knowledge",
         "wrap": "xml:evidence"
       },
       {
         "slot": "governance.instructions",
-        "wrap": "system"
+        "wrap": "xml:instructions"
       },
       {
         "slot": "state.user",
@@ -1372,7 +1376,7 @@ export const PROFILES = [
   },
   {
     "id": "long-context-reinforced",
-    "version": 2,
+    "version": 3,
     "route": "long-context-qa",
     "model_family": null,
     "route_policy_version": "illustrative/v2",
@@ -1411,7 +1415,7 @@ export const PROFILES = [
       },
       {
         "slot": "governance.instructions",
-        "wrap": "system"
+        "wrap": "xml:instructions"
       },
       {
         "slot": "interaction.query",

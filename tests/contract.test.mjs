@@ -158,6 +158,19 @@ test('every example profile is a valid, explicitly unevaluated draft', () => {
   assert.equal(checkProfile(falseClaim).valid, false);
 });
 
+test('every example profile can be realized as a cwa-messages/v1 request (R-7)', () => {
+  // conformance/README.md: system and tools only on governance (tools only capabilities), and no system after an xml: placement.
+  for (const profile of profiles) {
+    const wraps = profile.placement.map(p => p.wrap);
+    const firstXml = wraps.findIndex(w => w.startsWith('xml:'));
+    profile.placement.forEach(({ slot, wrap }, i) => {
+      assert.ok(wrap === 'system' || wrap === 'tools' || /^xml:[A-Za-z_][A-Za-z0-9_.-]*$/.test(wrap), `${profile.id} placement[${i}]`);
+      if (wrap === 'system') assert.ok(slot.startsWith('governance.') && i < firstXml, `${profile.id} placement[${i}]`);
+      if (wrap === 'tools') assert.equal(slot, 'governance.capabilities', `${profile.id} placement[${i}]`);
+    });
+  }
+});
+
 test('profiles cannot hide protected items or the parser contract', () => {
   const profile = { ...profiles[0], placement: profiles[0].placement.filter(p => p.slot !== 'governance.output_contract') };
   assert.equal(checkProfile(profile, { parser: true }).valid, false);

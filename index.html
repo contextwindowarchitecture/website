@@ -1064,7 +1064,7 @@ const BUDGETS = [8192, 4096, 2048, 1024];
 
 const PROFILES = [
   { name: "Policy-first chat", id: "policy-first-chat/v2", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
-  { name: "Document analysis", id: "document-analysis/v2", route: "document-qa", uses: "Long reports, contracts, corpora", order: [2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Documents early and clearly delimited; instructions, examples, and the question after them, near the end." },
+  { name: "Document analysis", id: "document-analysis/v3", route: "document-qa", uses: "Long reports, contracts, corpora", order: [0, 2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Instructions open the system text; documents follow, clearly delimited; the instructions repeat after them with the examples and the question, near the end." },
   { name: "Tool-using agent", id: "tool-agent/v2", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
   { name: "Structured extraction", id: "extraction/v2", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
 ];

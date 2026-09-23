@@ -283,18 +283,22 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "document-analysis",
-    "version": 2,
+    "version": 3,
     "route": "document-qa",
     "model_family": null,
     "route_policy_version": "illustrative/v2",
     "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
       {
         "slot": "evidence.knowledge",
         "wrap": "xml:evidence"
       },
       {
         "slot": "governance.instructions",
-        "wrap": "system"
+        "wrap": "xml:instructions"
       },
       {
         "slot": "state.user",
@@ -335,7 +339,7 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "long-context-reinforced",
-    "version": 2,
+    "version": 3,
     "route": "long-context-qa",
     "model_family": null,
     "route_policy_version": "illustrative/v2",
@@ -374,7 +378,7 @@ const PROFILE_CONTRACTS = [
       },
       {
         "slot": "governance.instructions",
-        "wrap": "system"
+        "wrap": "xml:instructions"
       },
       {
         "slot": "interaction.query",
@@ -515,11 +519,12 @@ const PROFILES = [
   },
   {
     "name": "Document analysis",
-    "id": "document-analysis/v2",
+    "id": "document-analysis/v3",
     "short": "document",
     "route": "document-qa",
     "uses": "Long reports, contracts, corpora",
     "order": [
+      0,
       2,
       0,
       1,
@@ -530,12 +535,12 @@ const PROFILES = [
       9,
       10
     ],
-    "principle": "Documents early and clearly delimited; instructions, examples and the question after them, near the end.",
+    "principle": "The instructions open the system text, which a message request always sends first. Documents follow, clearly delimited, and the instructions repeat after them with the examples and the question, near the end.",
     "evalNote": "unevaluated · illustrative profile; no reproducible run published"
   },
   {
     "name": "Long-context reinforced",
-    "id": "long-context-reinforced/v2",
+    "id": "long-context-reinforced/v3",
     "short": "reinforced",
     "route": "long-context-qa",
     "uses": "Very long inputs, multi-document synthesis",
