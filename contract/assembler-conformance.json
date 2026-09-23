@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "cd766808b2d1f7e8fa6b0f29ea8066b7b74f4d33",
+    "commit": "0c1d644ea9288d57cd5148cad72e34afcca27d8e",
     "dirty": false
   },
   "implementation": {
@@ -10,7 +10,7 @@
     "language": "python"
   },
   "contract": {
-    "website_commit": "6ff86575900f98dd804e1e26e13745e078f74089",
+    "website_commit": "a3ad83731e6c722e260508901a3fedc60ae76da4",
     "dirty": false
   },
   "cases": [
@@ -39,6 +39,23 @@
         "R-16",
         "R-21",
         "R-22"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "budget-margin",
+      "rules": [
+        "R-16",
+        "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "budget-margin-protected",
+      "rules": [
+        "R-16",
+        "R-17",
+        "R-21"
       ],
       "outcome": "passed"
     },
@@ -431,6 +448,14 @@
         "R-21",
         "R-22",
         "R-25"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "tokenizer-estimate-utf8",
+      "rules": [
+        "R-16",
+        "R-21"
       ],
       "outcome": "passed"
     }
