@@ -254,7 +254,7 @@ const RULES = [
     "Requires relevance and reference_only, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged passages or dropped one silently.",
     "boundary-checked",
     2,
-    2
+    3
   ],
   [
     "MUST NOT",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     40,
-    40
+    41
   ],
   [
     "SHOULD",
@@ -335,7 +335,7 @@ const RULES = [
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
     16,
-    16
+    17
   ],
   [
     "MUST",
@@ -353,7 +353,7 @@ const RULES = [
     "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "implemented",
     6,
-    6
+    7
   ],
   [
     "MUST",
@@ -374,7 +374,7 @@ const RULES = [
     3
   ]
 ];
-const CONFORMANCE = {"passed":40,"total":40,"commit":"f87b6fe"};
+const CONFORMANCE = {"passed":40,"total":41,"commit":"f87b6fe"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
