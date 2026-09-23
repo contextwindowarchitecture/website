@@ -348,7 +348,7 @@ test('route policies declare producers, slot rules, overrides and upgrades in cl
 
 test('refusal codes are listed in the order assembly checks them', () => {
   assert.deepEqual(REASONS.filter(r => r.kind === 'refusal').map(r => r.code),
-    ['assembly_time_required', 'required_slot_missing', 'conflict_unresolved', 'protected_content_over_budget', 'evidence_required']);
+    ['assembly_time_required', 'required_slot_missing', 'protected_slot_unplaced', 'conflict_unresolved', 'protected_content_over_budget', 'evidence_required']);
 });
 
 test('route policies declare required slots, evidence minimums and a fitting order', async () => {

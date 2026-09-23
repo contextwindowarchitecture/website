@@ -1119,6 +1119,12 @@ export const REASONS = [
     "text": "The route's eligibility predicate rejected the item, for example because it was observed longer ago than its slot's max_age_seconds."
   },
   {
+    "code": "slot_unplaced",
+    "kind": "exclusion",
+    "rule": "R-20",
+    "text": "The profile has no placement for the item's slot, and the item is not protected. A protected item in an unplaced slot is never excluded; assembly refuses with protected_slot_unplaced."
+  },
+  {
     "code": "conflict_deferred",
     "kind": "exclusion",
     "rule": "R-11",
@@ -1147,6 +1153,12 @@ export const REASONS = [
     "kind": "refusal",
     "rule": "R-4",
     "text": "governance.instructions or interaction.query, or governance.output_contract on a parser route, has no admitted item."
+  },
+  {
+    "code": "protected_slot_unplaced",
+    "kind": "refusal",
+    "rule": "R-20",
+    "text": "An admitted protected item's slot has no placement in the profile. The profile must not omit protected content, so the assembler refuses rather than drop it."
   },
   {
     "code": "conflict_unresolved",
