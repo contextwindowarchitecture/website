@@ -17,7 +17,8 @@ function itemSchemaErrors() {
   const errors = (validateItemSchema.errors || []).filter(error => error.keyword !== 'if');
   return errors.map(error => {
     const text = `${error.instancePath || '/'} ${error.message}`;
-    if (error.keyword === 'required') return failure(`missing_field:${error.params.missingProperty}`, text, 2);
+    // missing_field names the item's own fields; a variant missing one is invalid_structure.
+    if (error.keyword === 'required' && error.instancePath === '') return failure(`missing_field:${error.params.missingProperty}`, text, 2);
     if (error.keyword === 'enum' && error.instancePath === '/slot') return failure('unknown_slot', text, 1);
     if (error.keyword === 'enum' && error.instancePath === '/authority') return failure('unknown_authority', text, 1);
     return failure('invalid_structure', text, 2);
@@ -81,6 +82,10 @@ function checkProducer(item, context) {
   const producer = context.producer;
   if (!producer.authenticated) return [failure('producer_not_authenticated', 'Authenticate the producer outside the item.', 5)];
   if (!producer.slots?.includes(item.slot)) return [failure('producer_slot_not_allowed', 'This producer cannot emit this slot.', 7)];
+  // R-8: state comes only from producers of kind state, whatever else the route lists.
+  if (item.slot.startsWith('state.') && producer.kind !== 'state') {
+    return [failure('producer_slot_not_allowed', 'Only a producer of kind state may emit state.', 8)];
+  }
   if (item.slot === 'governance.capabilities' &&
       (producer.id !== context.capabilityPolicyId || !context.allowedCapabilityIds?.includes(item.id))) {
     return [failure('capability_not_allowed', 'The authenticated capability policy must admit this tool for this route and user.', 15)];

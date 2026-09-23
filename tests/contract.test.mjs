@@ -113,6 +113,18 @@ test('a forged capability-policy prefix cannot authenticate a producer', () => {
   assert.equal(checkItem({ ...capability, tier: 'droppable' }, allowed).valid, false);
 });
 
+test('state items come only from producers of kind state, whatever the route lists (R-8)', () => {
+  const state = { ...item, id: 'user:plan', slot: 'state.user', authority: 'state', injection_risk: 'none' };
+  delete state.relevance;
+  delete state.tier;
+  const producer = { id: 'state-svc', kind: 'state', authenticated: true, slots: ['state.user'] };
+  assert.equal(checkItem(state, { ...context, producer }).valid, true);
+  for (const kind of ['policy', 'retrieval', 'memory', 'mcp', 'capability_policy', 'interaction']) {
+    const findings = checkItem(state, { ...context, producer: { ...producer, kind } }).findings;
+    assert.deepEqual(findings.map(f => f.reason), ['producer_slot_not_allowed'], kind);
+  }
+});
+
 const traceMutations = {
   'wrong collection type': t => t.included = {},
   'null collection entry': t => t.excluded = [null],
@@ -322,6 +334,16 @@ test('item findings use registered reason codes, with specific schema codes', ()
   assert.equal(checkItem(missing, context).findings[0].reason, 'missing_field:body');
   assert.equal(checkItem({ ...item, slot: 'evidence.web' }, context).findings[0].reason, 'unknown_slot');
   assert.equal(checkItem({ ...item, authority: 'reference' }, context).findings[0].reason, 'unknown_authority');
+});
+
+test('missing_field names the item\'s own fields; a variant missing a field is invalid_structure', () => {
+  const variant = { id: 'short', body: 'Quote.', method: 'extract', lineage: 'extracted' };
+  assert.equal(checkItem({ ...item, variants: [variant] }, context).valid, true);
+  for (const field of Object.keys(variant)) {
+    const broken = { ...variant };
+    delete broken[field];
+    assert.deepEqual(checkItem({ ...item, variants: [broken] }, context).findings.map(f => f.reason), ['invalid_structure'], field);
+  }
 });
 
 test('reason registry is unique and cites permanent requirement IDs', () => {

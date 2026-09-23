@@ -33,6 +33,10 @@ Each `included[]` row carries the item's `source_version` and its `eligibility` 
 
 When an item fails several admission checks, the trace records the earliest applicable code in `contract/reasons.json` order (R-21).
 
+`missing_field:<name>` names a field of the item itself: one of the eight minimum fields, or one its slot requires, such as `expires` for memory. A variant missing one of its own fields is `invalid_structure`.
+
+A state item comes only from a producer of kind `state` (R-8). A route may list a producer of another kind for a state slot, but that producer's state items are excluded with `producer_slot_not_allowed`.
+
 The last admission check is placement (R-20). An item whose slot the profile does not place is excluded with `slot_unplaced`, unless it is protected: a protected item is admitted, and assembly then refuses with `protected_slot_unplaced`. An item is protected when its tier is, which is its own `tier` when it sets one and otherwise its slot's default raised by the route's `tier_upgrades`.
 
 ## Timestamps

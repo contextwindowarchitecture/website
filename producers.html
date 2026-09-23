@@ -422,7 +422,7 @@ const FAILURES = [
   ],
   [
     "missing_field:<name>",
-    "A required field is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for retrieval. Fix the producer; the assembler will not guess.",
+    "A required field of the item itself is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for retrieval. A variant missing one of its fields is invalid_structure. Fix the producer; the assembler will not guess.",
     2
   ],
   [
@@ -447,7 +447,7 @@ const FAILURES = [
   ],
   [
     "producer_slot_not_allowed",
-    "The authenticated producer is not permitted to emit into this slot.",
+    "The authenticated producer is not permitted to emit into this slot: the route does not list the slot for it, or the slot is a state slot and the producer's kind is not state (R-8), whatever the route lists.",
     15
   ],
   [

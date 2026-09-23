@@ -80,6 +80,15 @@ These follow the reference assembler's M3 kickoff (`cwa-assembler/docs/DESIGN.md
 
 The resolution vocabulary is breaking for stored traces: free-text `resolution` values no longer validate.
 
+## Admission edge cases — 2026-09-23
+
+These follow the TypeScript assembler's M13 kickoff, which works from the published contract alone. `conformance/README.md` holds the rules.
+
+| Issue | Resolution |
+| --- | --- |
+| `contract.js` reported a variant missing a field as `missing_field:<name>`, which `reasons.json` defines for the item's own fields | A variant missing one of its fields is `invalid_structure`; `missing_field` names the item's own fields |
+| R-8 admits state only from producers of kind `state`, "whatever else a route policy lists", but named no code | `producer_slot_not_allowed` |
+
 ## Review and migration implications
 
 This is a breaking **draft** revision. Existing traces need `context`, conflict `kind`, exclusion `stage`, and compression `item_id`/`variant_id`. Refused traces use the new null result shape. Item JSON no longer accepts `as_of`, loose scope strings, undefined authority aliases, or undeclared fields. Consumers should validate and migrate explicitly rather than silently coercing old data.
