@@ -503,13 +503,14 @@ test('each published rejection case breaks exactly one snapshot check (R-17)', a
   }
 });
 
-test('a conformance report lists rejection cases as rejected, accepted or skipped (R-17)', async () => {
+test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
   const { source, ...report } = await read('contract/assembler-conformance.json');
   for (const [row, valid] of [
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'rejected' }, true],
-    [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'accepted', detail: 'assembled a payload' }, true],
+    [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'failed', detail: 'assembled a payload' }, true],
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'skipped', detail: 'renderer fixture-xml/v1' }, true],
-    [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'accepted' }, false],
+    [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'failed' }, false],
+    [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'accepted', detail: 'assembled a payload' }, false],
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'passed' }, false],
   ]) {
     assert.equal(validateConformanceReportSchema({ ...report, rejections: [row] }), valid, JSON.stringify(row));
