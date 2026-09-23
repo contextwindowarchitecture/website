@@ -155,7 +155,7 @@ const RULES = [
     "Schema validation with format checking; timestamps compared at full precision.",
     "implemented",
     2,
-    2
+    3
   ],
   [
     "SHOULD",
@@ -191,7 +191,7 @@ const RULES = [
     "Resolves declared groups; evidence, state and memory never render as instructions.",
     "implemented",
     4,
-    4
+    5
   ],
   [
     "MUST NOT",
@@ -236,7 +236,7 @@ const RULES = [
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
     7,
-    7
+    8
   ],
   [
     "MUST NOT",
@@ -245,7 +245,7 @@ const RULES = [
     "Refuses with evidence_required and a recovery action.",
     "implemented",
     6,
-    6
+    7
   ],
   [
     "MUST NOT",
@@ -272,7 +272,7 @@ const RULES = [
     "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
     "boundary-checked",
     2,
-    2
+    3
   ],
   [
     "MUST",
@@ -281,7 +281,7 @@ const RULES = [
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
     18,
-    18
+    19
   ],
   [
     "MUST",
@@ -290,7 +290,7 @@ const RULES = [
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
     10,
-    10
+    11
   ],
   [
     "MUST NOT",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     31,
-    31
+    34
   ],
   [
     "SHOULD",
@@ -335,7 +335,7 @@ const RULES = [
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
     14,
-    14
+    15
   ],
   [
     "MUST",
@@ -353,7 +353,7 @@ const RULES = [
     "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "implemented",
     3,
-    3
+    4
   ],
   [
     "MUST",
@@ -362,10 +362,10 @@ const RULES = [
     "Keeps only the latest observation per producer and source in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "planned",
     0,
-    0
+    3
   ]
 ];
-const CONFORMANCE = {"passed":31,"total":31,"commit":"d412843"};
+const CONFORMANCE = {"passed":31,"total":34,"commit":"d412843"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
