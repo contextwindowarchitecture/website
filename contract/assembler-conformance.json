@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "d412843169a4b4312f1bbfe4a72562a2895117a3",
+    "commit": "1bc277daebdc74f395f09295545428c03ffcd75e",
     "dirty": false
   },
   "implementation": {
@@ -10,7 +10,7 @@
     "language": "python"
   },
   "contract": {
-    "website_commit": "d2e8bd66841039c0713eff1046094fe7c192ef1a",
+    "website_commit": "13d4ff9f47808c162572a60f16a37f71e69d27ea",
     "dirty": false
   },
   "cases": [
@@ -326,6 +326,39 @@
         "R-17",
         "R-21",
         "R-22"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "supersede-evidence-required",
+      "rules": [
+        "R-12",
+        "R-17",
+        "R-21",
+        "R-25"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "supersede-exemptions",
+      "rules": [
+        "R-6",
+        "R-11",
+        "R-16",
+        "R-21",
+        "R-24",
+        "R-25"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "supersede-observations",
+      "rules": [
+        "R-2",
+        "R-15",
+        "R-21",
+        "R-22",
+        "R-25"
       ],
       "outcome": "passed"
     }

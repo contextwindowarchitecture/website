@@ -154,7 +154,7 @@ const RULES = [
     "assembler",
     "Schema validation with format checking; timestamps compared at full precision.",
     "implemented",
-    2,
+    3,
     3
   ],
   [
@@ -190,7 +190,7 @@ const RULES = [
     "assembler",
     "Resolves declared groups; evidence, state and memory never render as instructions.",
     "implemented",
-    4,
+    5,
     5
   ],
   [
@@ -235,7 +235,7 @@ const RULES = [
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
-    7,
+    8,
     8
   ],
   [
@@ -244,7 +244,7 @@ const RULES = [
     "assembler",
     "Refuses with evidence_required and a recovery action.",
     "implemented",
-    6,
+    7,
     7
   ],
   [
@@ -271,7 +271,7 @@ const RULES = [
     "boundary",
     "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
     "boundary-checked",
-    2,
+    3,
     3
   ],
   [
@@ -280,7 +280,7 @@ const RULES = [
     "assembler",
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
-    18,
+    19,
     19
   ],
   [
@@ -289,7 +289,7 @@ const RULES = [
     "assembler",
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
-    10,
+    11,
     11
   ],
   [
@@ -325,7 +325,7 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    31,
+    34,
     34
   ],
   [
@@ -334,7 +334,7 @@ const RULES = [
     "assembler",
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
-    14,
+    15,
     15
   ],
   [
@@ -352,7 +352,7 @@ const RULES = [
     "assembler",
     "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
     "implemented",
-    3,
+    4,
     4
   ],
   [
@@ -360,12 +360,12 @@ const RULES = [
     "Route-requested supersession of stale observations",
     "assembler",
     "Keeps only the latest observation per producer and source in the slots a route opts in, after conflicts, keeping protected and grouped items.",
-    "planned",
-    0,
+    "implemented",
+    3,
     3
   ]
 ];
-const CONFORMANCE = {"passed":31,"total":34,"commit":"d412843"};
+const CONFORMANCE = {"passed":34,"total":34,"commit":"1bc277d"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
