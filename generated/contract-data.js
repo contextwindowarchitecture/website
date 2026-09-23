@@ -20,7 +20,7 @@ export const ITEM_SCHEMA = {
     "id": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     },
     "slot": {
       "type": "string",
@@ -41,12 +41,12 @@ export const ITEM_SCHEMA = {
     "source": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     },
     "source_version": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     },
     "authority": {
       "type": "string",
@@ -84,32 +84,32 @@ export const ITEM_SCHEMA = {
         "tenant": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "user": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "session": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "task": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "locale": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "step": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         }
       },
       "required": [],
@@ -164,7 +164,7 @@ export const ITEM_SCHEMA = {
     "body": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     },
     "variants": {
       "type": "array",
@@ -174,17 +174,17 @@ export const ITEM_SCHEMA = {
           "id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "body": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "method": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "lineage": {
             "type": "string",
@@ -214,7 +214,7 @@ export const ITEM_SCHEMA = {
     "revoked_by": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     }
   },
   "allOf": [
@@ -267,7 +267,7 @@ export const TRACE_SCHEMA = {
     "trace_id": {
       "type": "string",
       "minLength": 1,
-      "pattern": "\\S"
+      "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
     },
     "profile": {
       "type": "object",
@@ -275,7 +275,7 @@ export const TRACE_SCHEMA = {
         "id": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "version": {
           "type": "integer",
@@ -355,7 +355,7 @@ export const TRACE_SCHEMA = {
           "item_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "tokens": {
             "type": "integer",
@@ -364,12 +364,12 @@ export const TRACE_SCHEMA = {
           "source_version": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "eligibility": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           }
         },
         "required": [
@@ -404,7 +404,7 @@ export const TRACE_SCHEMA = {
           "item_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "from": {
             "type": "integer",
@@ -417,12 +417,12 @@ export const TRACE_SCHEMA = {
           "method": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "variant_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           }
         },
         "required": [
@@ -444,12 +444,12 @@ export const TRACE_SCHEMA = {
           "item_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "reason": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "stage": {
             "type": "string",
@@ -493,7 +493,7 @@ export const TRACE_SCHEMA = {
             "items": {
               "type": "string",
               "minLength": 1,
-              "pattern": "\\S"
+              "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
             },
             "minItems": 2,
             "uniqueItems": true
@@ -529,12 +529,12 @@ export const TRACE_SCHEMA = {
           "group_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "winner": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S",
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]",
             "description": "The member that prevailed, when one did. One of items."
           }
         },
@@ -649,7 +649,7 @@ export const TRACE_SCHEMA = {
             {
               "type": "string",
               "minLength": 1,
-              "pattern": "\\S"
+              "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
             },
             {
               "type": "null"
@@ -673,17 +673,17 @@ export const TRACE_SCHEMA = {
         "route_policy_version": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "tokenizer": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "renderer": {
           "type": "string",
           "minLength": 1,
-          "pattern": "\\S"
+          "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
         },
         "snapshot_digest": {
           "type": "string",
@@ -706,7 +706,7 @@ export const TRACE_SCHEMA = {
           "item_id": {
             "type": "string",
             "minLength": 1,
-            "pattern": "\\S"
+            "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
           },
           "field": {
             "type": "string",
@@ -795,7 +795,7 @@ export const TRACE_SCHEMA = {
               "reason": {
                 "type": "string",
                 "minLength": 1,
-                "pattern": "\\S"
+                "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
               }
             },
             "type": "object"

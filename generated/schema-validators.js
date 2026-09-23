@@ -285,11 +285,11 @@ var require_equal = __commonJS({
 
 // compiled-schemas.js
 var validateItemSchema = validate20;
-var schema31 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/context_item.schema.json", "title": "CWA context item", "description": "CWA v2 draft item structure. Admission additionally requires authenticated producer identity, route policy, scope, and an explicit assembly clock.", "type": "object", "additionalProperties": false, "required": ["id", "slot", "source", "source_version", "authority", "trust", "freshness", "body"], "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "source": { "type": "string", "minLength": 1, "pattern": "\\S" }, "source_version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "authority": { "type": "string", "enum": ["governing", "user", "state", "reference_only", "observation", "generated", "untrusted"] }, "trust": { "type": "string", "enum": ["verified", "unverified", "untrusted"] }, "freshness": { "type": "string", "format": "date-time", "description": "When it was true (as_of)" }, "expires": { "type": "string", "format": "date-time", "description": "When it must be revalidated; expired items are excluded, not aged silently" }, "scope": { "type": "object", "properties": { "tenant": { "type": "string", "minLength": 1, "pattern": "\\S" }, "user": { "type": "string", "minLength": 1, "pattern": "\\S" }, "session": { "type": "string", "minLength": 1, "pattern": "\\S" }, "task": { "type": "string", "minLength": 1, "pattern": "\\S" }, "locale": { "type": "string", "minLength": 1, "pattern": "\\S" }, "step": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "required": [], "additionalProperties": false }, "eligibility": { "type": "string", "description": "Human-readable admission rule description. Never evaluate this string as code; the route owns the executable predicate." }, "token_budget": { "type": ["integer", "null"], "minimum": 0, "description": "Cap on the tokens of the item's rendered body in each occurrence (R-3, R-16). An item over its cap is reduced before shedding: a compressible item to a supplied variant within the cap, otherwise it is omitted, and a protected item over its cap refuses the assembly. Null sets no per-item cap; budget.input still bounds the item." }, "tier": { "type": "string", "enum": ["protected", "compressible", "droppable"] }, "conflict_policy": { "type": "string", "enum": ["defers", "governs", "escalate"] }, "injection_risk": { "type": "string", "enum": ["none", "untrusted_content"] }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] }, "body": { "type": "string", "minLength": 1, "pattern": "\\S" }, "variants": { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "body": { "type": "string", "minLength": 1, "pattern": "\\S" }, "method": { "type": "string", "minLength": 1, "pattern": "\\S" }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] } }, "required": ["id", "body", "method", "lineage"], "additionalProperties": false } }, "relevance": { "type": "number", "description": "Finite rerank score; the scale and threshold belong to versioned route policy." }, "revoked_by": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "allOf": [{ "if": { "properties": { "slot": { "const": "interaction.memory" } } }, "then": { "required": ["expires"], "properties": { "expires": { "type": "string", "format": "date-time", "description": "When it must be revalidated; expired items are excluded, not aged silently" } } } }, { "if": { "properties": { "slot": { "const": "evidence.knowledge" } } }, "then": { "required": ["relevance"], "properties": { "relevance": { "type": "number", "description": "Finite rerank score; the scale and threshold belong to versioned route policy." } } } }] };
+var schema31 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/context_item.schema.json", "title": "CWA context item", "description": "CWA v2 draft item structure. Admission additionally requires authenticated producer identity, route policy, scope, and an explicit assembly clock.", "type": "object", "additionalProperties": false, "required": ["id", "slot", "source", "source_version", "authority", "trust", "freshness", "body"], "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "source": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "source_version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "authority": { "type": "string", "enum": ["governing", "user", "state", "reference_only", "observation", "generated", "untrusted"] }, "trust": { "type": "string", "enum": ["verified", "unverified", "untrusted"] }, "freshness": { "type": "string", "format": "date-time", "description": "When it was true (as_of)" }, "expires": { "type": "string", "format": "date-time", "description": "When it must be revalidated; expired items are excluded, not aged silently" }, "scope": { "type": "object", "properties": { "tenant": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "user": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "session": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "task": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "locale": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "step": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "required": [], "additionalProperties": false }, "eligibility": { "type": "string", "description": "Human-readable admission rule description. Never evaluate this string as code; the route owns the executable predicate." }, "token_budget": { "type": ["integer", "null"], "minimum": 0, "description": "Cap on the tokens of the item's rendered body in each occurrence (R-3, R-16). An item over its cap is reduced before shedding: a compressible item to a supplied variant within the cap, otherwise it is omitted, and a protected item over its cap refuses the assembly. Null sets no per-item cap; budget.input still bounds the item." }, "tier": { "type": "string", "enum": ["protected", "compressible", "droppable"] }, "conflict_policy": { "type": "string", "enum": ["defers", "governs", "escalate"] }, "injection_risk": { "type": "string", "enum": ["none", "untrusted_content"] }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] }, "body": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "variants": { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "body": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "method": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] } }, "required": ["id", "body", "method", "lineage"], "additionalProperties": false } }, "relevance": { "type": "number", "description": "Finite rerank score; the scale and threshold belong to versioned route policy." }, "revoked_by": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "allOf": [{ "if": { "properties": { "slot": { "const": "interaction.memory" } } }, "then": { "required": ["expires"], "properties": { "expires": { "type": "string", "format": "date-time", "description": "When it must be revalidated; expired items are excluded, not aged silently" } } } }, { "if": { "properties": { "slot": { "const": "evidence.knowledge" } } }, "then": { "required": ["relevance"], "properties": { "relevance": { "type": "number", "description": "Finite rerank score; the scale and threshold belong to versioned route policy." } } } }] };
 var formats0 = require_formats().fullFormats["date-time"];
 var func1 = Object.prototype.hasOwnProperty;
 var func2 = require_ucs2length().default;
-var pattern4 = new RegExp("\\S", "u");
+var pattern4 = new RegExp("[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]", "u");
 function validate20(data, { instancePath = "", parentData, parentDataProperty, rootData = data, dynamicAnchors = {} } = {}) {
   ;
   let vErrors = null;
@@ -550,7 +550,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data4)) {
-          const err19 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err19 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err19];
           } else {
@@ -602,7 +602,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data6)) {
-          const err24 = { instancePath: instancePath + "/source", schemaPath: "#/properties/source/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err24 = { instancePath: instancePath + "/source", schemaPath: "#/properties/source/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err24];
           } else {
@@ -633,7 +633,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data7)) {
-          const err27 = { instancePath: instancePath + "/source_version", schemaPath: "#/properties/source_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err27 = { instancePath: instancePath + "/source_version", schemaPath: "#/properties/source_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err27];
           } else {
@@ -764,7 +764,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data13)) {
-              const err39 = { instancePath: instancePath + "/scope/tenant", schemaPath: "#/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err39 = { instancePath: instancePath + "/scope/tenant", schemaPath: "#/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err39];
               } else {
@@ -795,7 +795,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data14)) {
-              const err42 = { instancePath: instancePath + "/scope/user", schemaPath: "#/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err42 = { instancePath: instancePath + "/scope/user", schemaPath: "#/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err42];
               } else {
@@ -826,7 +826,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data15)) {
-              const err45 = { instancePath: instancePath + "/scope/session", schemaPath: "#/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err45 = { instancePath: instancePath + "/scope/session", schemaPath: "#/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err45];
               } else {
@@ -857,7 +857,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data16)) {
-              const err48 = { instancePath: instancePath + "/scope/task", schemaPath: "#/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err48 = { instancePath: instancePath + "/scope/task", schemaPath: "#/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err48];
               } else {
@@ -888,7 +888,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data17)) {
-              const err51 = { instancePath: instancePath + "/scope/locale", schemaPath: "#/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err51 = { instancePath: instancePath + "/scope/locale", schemaPath: "#/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err51];
               } else {
@@ -919,7 +919,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data18)) {
-              const err54 = { instancePath: instancePath + "/scope/step", schemaPath: "#/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err54 = { instancePath: instancePath + "/scope/step", schemaPath: "#/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err54];
               } else {
@@ -1078,7 +1078,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data25)) {
-          const err69 = { instancePath: instancePath + "/body", schemaPath: "#/properties/body/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err69 = { instancePath: instancePath + "/body", schemaPath: "#/properties/body/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err69];
           } else {
@@ -1163,7 +1163,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data28)) {
-                  const err77 = { instancePath: instancePath + "/variants/" + i0 + "/id", schemaPath: "#/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err77 = { instancePath: instancePath + "/variants/" + i0 + "/id", schemaPath: "#/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err77];
                   } else {
@@ -1194,7 +1194,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data29)) {
-                  const err80 = { instancePath: instancePath + "/variants/" + i0 + "/body", schemaPath: "#/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err80 = { instancePath: instancePath + "/variants/" + i0 + "/body", schemaPath: "#/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err80];
                   } else {
@@ -1225,7 +1225,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data30)) {
-                  const err83 = { instancePath: instancePath + "/variants/" + i0 + "/method", schemaPath: "#/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err83 = { instancePath: instancePath + "/variants/" + i0 + "/method", schemaPath: "#/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err83];
                   } else {
@@ -1309,7 +1309,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data33)) {
-          const err91 = { instancePath: instancePath + "/revoked_by", schemaPath: "#/properties/revoked_by/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err91 = { instancePath: instancePath + "/revoked_by", schemaPath: "#/properties/revoked_by/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err91];
           } else {
@@ -1341,7 +1341,7 @@ function validate20(data, { instancePath = "", parentData, parentDataProperty, r
 }
 validate20.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
 var validateTraceSchema = validate21;
-var schema32 = { "type": "object", "properties": { "trace_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "profile": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "version": { "type": "integer", "minimum": 1 } }, "required": ["id", "version"], "additionalProperties": false }, "budget": { "type": "object", "properties": { "input": { "type": "integer", "minimum": 0 }, "reserved_output": { "type": "integer", "minimum": 0 } }, "required": ["input", "reserved_output"], "additionalProperties": false }, "result": { "anyOf": [{ "type": "null" }, { "type": "object", "properties": { "input_tokens": { "type": "integer", "minimum": 0 }, "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }, "required": ["input_tokens", "hash"], "additionalProperties": false }] }, "included": { "type": "array", "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "item_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "tokens": { "type": "integer", "minimum": 0 }, "source_version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "eligibility": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "required": ["slot", "item_id", "tokens"], "additionalProperties": false } }, "compressed": { "type": "array", "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "item_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "from": { "type": "integer", "minimum": 0 }, "to": { "type": "integer", "minimum": 0 }, "method": { "type": "string", "minLength": 1, "pattern": "\\S" }, "variant_id": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "required": ["slot", "item_id", "from", "to", "method", "variant_id"], "additionalProperties": false } }, "excluded": { "type": "array", "items": { "type": "object", "properties": { "item_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "reason": { "type": "string", "minLength": 1, "pattern": "\\S" }, "stage": { "type": "string", "enum": ["producer", "assembler"] }, "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] } }, "required": ["item_id", "reason", "stage"], "additionalProperties": false } }, "conflicts": { "type": "array", "items": { "type": "object", "properties": { "items": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "\\S" }, "minItems": 2, "uniqueItems": true }, "kind": { "type": "string", "enum": ["instruction", "fact"] }, "resolution": { "type": "string", "enum": ["resolved", "surfaced", "context_requested", "refused", "moot"], "description": "resolved when authority or policy decided the group; surfaced, context_requested or refused when it escalated, following the route's on_unresolved action; moot when fewer than two members were admitted (R-11)." }, "decided_by": { "type": "string", "enum": ["authority", "policy", "freshness", "escalated", "moot"] }, "group_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "winner": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "The member that prevailed, when one did. One of items." } }, "required": ["items", "kind", "resolution", "decided_by"], "additionalProperties": false, "allOf": [{ "if": { "type": "object", "properties": { "decided_by": { "const": "moot" } }, "required": ["decided_by"] }, "then": { "type": "object", "properties": { "resolution": { "const": "moot" } } }, "else": { "type": "object", "properties": { "resolution": { "not": { "const": "moot" } } } } }, { "if": { "type": "object", "properties": { "decided_by": { "const": "escalated" } }, "required": ["decided_by"] }, "then": { "type": "object", "properties": { "resolution": { "enum": ["surfaced", "context_requested", "refused"] } } }, "else": { "type": "object", "properties": { "resolution": { "not": { "enum": ["surfaced", "context_requested", "refused"] } } } } }, { "if": { "type": "object", "required": ["winner"], "properties": { "winner": true } }, "then": { "type": "object", "properties": { "resolution": { "const": "resolved" } } } }] } }, "refused": { "type": "object", "properties": { "bool": { "type": "boolean" }, "reason": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "\\S" }, { "type": "null" }] } }, "required": ["bool", "reason"], "additionalProperties": false }, "context": { "type": "object", "properties": { "assembly_time": { "type": "string", "format": "date-time" }, "route_policy_version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "tokenizer": { "type": "string", "minLength": 1, "pattern": "\\S" }, "renderer": { "type": "string", "minLength": 1, "pattern": "\\S" }, "snapshot_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }, "required": ["assembly_time", "route_policy_version", "tokenizer", "renderer"], "additionalProperties": false }, "defaults_filled": { "type": "array", "items": { "type": "object", "properties": { "item_id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "field": { "type": "string", "enum": ["token_budget", "variants", "conflict_policy", "lineage", "eligibility", "injection_risk"] } }, "required": ["item_id", "field"], "additionalProperties": false } }, "timings": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }, "recovery": { "type": "object", "properties": { "action": { "enum": ["retrieve_narrower", "precompute_summary", "request_context"] }, "detail": { "type": "string" } }, "required": ["action"], "additionalProperties": false } }, "required": ["trace_id", "profile", "budget", "result", "included", "compressed", "excluded", "conflicts", "refused", "context"], "additionalProperties": false, "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/trace.schema.json", "title": "CWA assembly trace", "allOf": [{ "if": { "properties": { "refused": { "properties": { "bool": { "const": true } }, "type": "object" } }, "type": "object" }, "then": { "properties": { "result": { "type": "null" }, "refused": { "properties": { "reason": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "type": "object" } }, "type": "object" }, "else": { "properties": { "result": { "type": "object" }, "refused": { "properties": { "reason": { "type": "null" } }, "type": "object" } }, "type": "object" } }, { "if": { "properties": { "refused": { "type": "object", "properties": { "reason": { "const": "evidence_required" } } } } }, "then": { "properties": { "recovery": { "type": "object", "properties": { "action": { "enum": ["retrieve_narrower", "precompute_summary", "request_context"] }, "detail": { "type": "string" } }, "required": ["action"], "additionalProperties": false } }, "required": ["recovery"] } }] };
+var schema32 = { "type": "object", "properties": { "trace_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "profile": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "version": { "type": "integer", "minimum": 1 } }, "required": ["id", "version"], "additionalProperties": false }, "budget": { "type": "object", "properties": { "input": { "type": "integer", "minimum": 0 }, "reserved_output": { "type": "integer", "minimum": 0 } }, "required": ["input", "reserved_output"], "additionalProperties": false }, "result": { "anyOf": [{ "type": "null" }, { "type": "object", "properties": { "input_tokens": { "type": "integer", "minimum": 0 }, "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }, "required": ["input_tokens", "hash"], "additionalProperties": false }] }, "included": { "type": "array", "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "item_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "tokens": { "type": "integer", "minimum": 0 }, "source_version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "eligibility": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "required": ["slot", "item_id", "tokens"], "additionalProperties": false } }, "compressed": { "type": "array", "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "item_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "from": { "type": "integer", "minimum": 0 }, "to": { "type": "integer", "minimum": 0 }, "method": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "variant_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "required": ["slot", "item_id", "from", "to", "method", "variant_id"], "additionalProperties": false } }, "excluded": { "type": "array", "items": { "type": "object", "properties": { "item_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "reason": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "stage": { "type": "string", "enum": ["producer", "assembler"] }, "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] } }, "required": ["item_id", "reason", "stage"], "additionalProperties": false } }, "conflicts": { "type": "array", "items": { "type": "object", "properties": { "items": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "minItems": 2, "uniqueItems": true }, "kind": { "type": "string", "enum": ["instruction", "fact"] }, "resolution": { "type": "string", "enum": ["resolved", "surfaced", "context_requested", "refused", "moot"], "description": "resolved when authority or policy decided the group; surfaced, context_requested or refused when it escalated, following the route's on_unresolved action; moot when fewer than two members were admitted (R-11)." }, "decided_by": { "type": "string", "enum": ["authority", "policy", "freshness", "escalated", "moot"] }, "group_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "winner": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]", "description": "The member that prevailed, when one did. One of items." } }, "required": ["items", "kind", "resolution", "decided_by"], "additionalProperties": false, "allOf": [{ "if": { "type": "object", "properties": { "decided_by": { "const": "moot" } }, "required": ["decided_by"] }, "then": { "type": "object", "properties": { "resolution": { "const": "moot" } } }, "else": { "type": "object", "properties": { "resolution": { "not": { "const": "moot" } } } } }, { "if": { "type": "object", "properties": { "decided_by": { "const": "escalated" } }, "required": ["decided_by"] }, "then": { "type": "object", "properties": { "resolution": { "enum": ["surfaced", "context_requested", "refused"] } } }, "else": { "type": "object", "properties": { "resolution": { "not": { "enum": ["surfaced", "context_requested", "refused"] } } } } }, { "if": { "type": "object", "required": ["winner"], "properties": { "winner": true } }, "then": { "type": "object", "properties": { "resolution": { "const": "resolved" } } } }] } }, "refused": { "type": "object", "properties": { "bool": { "type": "boolean" }, "reason": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, { "type": "null" }] } }, "required": ["bool", "reason"], "additionalProperties": false }, "context": { "type": "object", "properties": { "assembly_time": { "type": "string", "format": "date-time" }, "route_policy_version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "tokenizer": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "renderer": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "snapshot_digest": { "type": "string", "pattern": "^[a-f0-9]{64}$" } }, "required": ["assembly_time", "route_policy_version", "tokenizer", "renderer"], "additionalProperties": false }, "defaults_filled": { "type": "array", "items": { "type": "object", "properties": { "item_id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "field": { "type": "string", "enum": ["token_budget", "variants", "conflict_policy", "lineage", "eligibility", "injection_risk"] } }, "required": ["item_id", "field"], "additionalProperties": false } }, "timings": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } }, "recovery": { "type": "object", "properties": { "action": { "enum": ["retrieve_narrower", "precompute_summary", "request_context"] }, "detail": { "type": "string" } }, "required": ["action"], "additionalProperties": false } }, "required": ["trace_id", "profile", "budget", "result", "included", "compressed", "excluded", "conflicts", "refused", "context"], "additionalProperties": false, "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/trace.schema.json", "title": "CWA assembly trace", "allOf": [{ "if": { "properties": { "refused": { "properties": { "bool": { "const": true } }, "type": "object" } }, "type": "object" }, "then": { "properties": { "result": { "type": "null" }, "refused": { "properties": { "reason": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "type": "object" } }, "type": "object" }, "else": { "properties": { "result": { "type": "object" }, "refused": { "properties": { "reason": { "type": "null" } }, "type": "object" } }, "type": "object" } }, { "if": { "properties": { "refused": { "type": "object", "properties": { "reason": { "const": "evidence_required" } } } } }, "then": { "properties": { "recovery": { "type": "object", "properties": { "action": { "enum": ["retrieve_narrower", "precompute_summary", "request_context"] }, "detail": { "type": "string" } }, "required": ["action"], "additionalProperties": false } }, "required": ["recovery"] } }] };
 var pattern21 = new RegExp("^[a-f0-9]{64}$", "u");
 function validate21(data, { instancePath = "", parentData, parentDataProperty, rootData = data, dynamicAnchors = {} } = {}) {
   ;
@@ -1436,7 +1436,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data4)) {
-                const err5 = { instancePath: instancePath + "/refused/reason", schemaPath: "#/allOf/0/then/properties/refused/properties/reason/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err5 = { instancePath: instancePath + "/refused/reason", schemaPath: "#/allOf/0/then/properties/refused/properties/reason/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err5];
                 } else {
@@ -1799,7 +1799,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data13)) {
-          const err35 = { instancePath: instancePath + "/trace_id", schemaPath: "#/properties/trace_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err35 = { instancePath: instancePath + "/trace_id", schemaPath: "#/properties/trace_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err35];
           } else {
@@ -1862,7 +1862,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data15)) {
-              const err41 = { instancePath: instancePath + "/profile/id", schemaPath: "#/properties/profile/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err41 = { instancePath: instancePath + "/profile/id", schemaPath: "#/properties/profile/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err41];
               } else {
@@ -2202,7 +2202,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data26)) {
-                  const err71 = { instancePath: instancePath + "/included/" + i0 + "/item_id", schemaPath: "#/properties/included/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err71 = { instancePath: instancePath + "/included/" + i0 + "/item_id", schemaPath: "#/properties/included/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err71];
                   } else {
@@ -2256,7 +2256,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data28)) {
-                  const err76 = { instancePath: instancePath + "/included/" + i0 + "/source_version", schemaPath: "#/properties/included/items/properties/source_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err76 = { instancePath: instancePath + "/included/" + i0 + "/source_version", schemaPath: "#/properties/included/items/properties/source_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err76];
                   } else {
@@ -2287,7 +2287,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data29)) {
-                  const err79 = { instancePath: instancePath + "/included/" + i0 + "/eligibility", schemaPath: "#/properties/included/items/properties/eligibility/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err79 = { instancePath: instancePath + "/included/" + i0 + "/eligibility", schemaPath: "#/properties/included/items/properties/eligibility/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err79];
                   } else {
@@ -2431,7 +2431,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data33)) {
-                  const err93 = { instancePath: instancePath + "/compressed/" + i1 + "/item_id", schemaPath: "#/properties/compressed/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err93 = { instancePath: instancePath + "/compressed/" + i1 + "/item_id", schemaPath: "#/properties/compressed/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err93];
                   } else {
@@ -2508,7 +2508,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data36)) {
-                  const err100 = { instancePath: instancePath + "/compressed/" + i1 + "/method", schemaPath: "#/properties/compressed/items/properties/method/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err100 = { instancePath: instancePath + "/compressed/" + i1 + "/method", schemaPath: "#/properties/compressed/items/properties/method/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err100];
                   } else {
@@ -2539,7 +2539,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data37)) {
-                  const err103 = { instancePath: instancePath + "/compressed/" + i1 + "/variant_id", schemaPath: "#/properties/compressed/items/properties/variant_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err103 = { instancePath: instancePath + "/compressed/" + i1 + "/variant_id", schemaPath: "#/properties/compressed/items/properties/variant_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err103];
                   } else {
@@ -2635,7 +2635,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data40)) {
-                  const err112 = { instancePath: instancePath + "/excluded/" + i2 + "/item_id", schemaPath: "#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err112 = { instancePath: instancePath + "/excluded/" + i2 + "/item_id", schemaPath: "#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err112];
                   } else {
@@ -2666,7 +2666,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data41)) {
-                  const err115 = { instancePath: instancePath + "/excluded/" + i2 + "/reason", schemaPath: "#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err115 = { instancePath: instancePath + "/excluded/" + i2 + "/reason", schemaPath: "#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err115];
                   } else {
@@ -3200,7 +3200,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data54)) {
-                      const err153 = { instancePath: instancePath + "/conflicts/" + i3 + "/items/" + i4, schemaPath: "#/properties/conflicts/items/properties/items/items/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err153 = { instancePath: instancePath + "/conflicts/" + i3 + "/items/" + i4, schemaPath: "#/properties/conflicts/items/properties/items/items/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err153];
                       } else {
@@ -3327,7 +3327,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data58)) {
-                  const err164 = { instancePath: instancePath + "/conflicts/" + i3 + "/group_id", schemaPath: "#/properties/conflicts/items/properties/group_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err164 = { instancePath: instancePath + "/conflicts/" + i3 + "/group_id", schemaPath: "#/properties/conflicts/items/properties/group_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err164];
                   } else {
@@ -3358,7 +3358,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data59)) {
-                  const err167 = { instancePath: instancePath + "/conflicts/" + i3 + "/winner", schemaPath: "#/properties/conflicts/items/properties/winner/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err167 = { instancePath: instancePath + "/conflicts/" + i3 + "/winner", schemaPath: "#/properties/conflicts/items/properties/winner/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err167];
                   } else {
@@ -3455,7 +3455,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data62)) {
-              const err176 = { instancePath: instancePath + "/refused/reason", schemaPath: "#/properties/refused/properties/reason/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err176 = { instancePath: instancePath + "/refused/reason", schemaPath: "#/properties/refused/properties/reason/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err176];
               } else {
@@ -3600,7 +3600,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data65)) {
-              const err189 = { instancePath: instancePath + "/context/route_policy_version", schemaPath: "#/properties/context/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err189 = { instancePath: instancePath + "/context/route_policy_version", schemaPath: "#/properties/context/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err189];
               } else {
@@ -3631,7 +3631,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data66)) {
-              const err192 = { instancePath: instancePath + "/context/tokenizer", schemaPath: "#/properties/context/properties/tokenizer/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err192 = { instancePath: instancePath + "/context/tokenizer", schemaPath: "#/properties/context/properties/tokenizer/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err192];
               } else {
@@ -3662,7 +3662,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data67)) {
-              const err195 = { instancePath: instancePath + "/context/renderer", schemaPath: "#/properties/context/properties/renderer/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err195 = { instancePath: instancePath + "/context/renderer", schemaPath: "#/properties/context/properties/renderer/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err195];
               } else {
@@ -3761,7 +3761,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data71)) {
-                  const err204 = { instancePath: instancePath + "/defaults_filled/" + i6 + "/item_id", schemaPath: "#/properties/defaults_filled/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err204 = { instancePath: instancePath + "/defaults_filled/" + i6 + "/item_id", schemaPath: "#/properties/defaults_filled/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err204];
                   } else {
@@ -3925,7 +3925,7 @@ function validate21(data, { instancePath = "", parentData, parentDataProperty, r
 }
 validate21.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
 var validateProfileSchema = validate22;
-var schema33 = { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "version": { "type": "integer", "minimum": 1 }, "route": { "type": "string", "minLength": 1, "pattern": "\\S" }, "model_family": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "\\S" }, { "type": "null" }] }, "route_policy_version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "placement": { "type": "array", "minItems": 2, "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "wrap": { "type": "string", "minLength": 1, "pattern": "\\S" } }, "required": ["slot", "wrap"], "additionalProperties": false } }, "evaluation": { "type": "object", "properties": { "status": { "enum": ["unevaluated", "evaluated"] }, "suite": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "\\S" }, { "type": "null" }] }, "date": { "anyOf": [{ "type": "string", "format": "date" }, { "type": "null" }] }, "result": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "\\S" }, { "type": "null" }] }, "artifact": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "\\S" }, { "type": "null" }] } }, "required": ["status", "suite", "date", "result", "artifact"], "additionalProperties": false } }, "required": ["id", "version", "route", "model_family", "route_policy_version", "placement", "evaluation"], "additionalProperties": false, "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/profile.schema.json", "title": "CWA placement profile", "allOf": [{ "if": { "properties": { "evaluation": { "type": "object", "properties": { "status": { "const": "evaluated" } } } } }, "then": { "properties": { "model_family": { "type": "string", "minLength": 1, "pattern": "\\S" }, "evaluation": { "type": "object", "properties": { "suite": { "type": "string", "minLength": 1, "pattern": "\\S" }, "date": { "type": "string", "minLength": 1, "pattern": "\\S" }, "result": { "type": "string", "minLength": 1, "pattern": "\\S" }, "artifact": { "type": "string", "minLength": 1, "pattern": "\\S" } } } } } }] };
+var schema33 = { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "version": { "type": "integer", "minimum": 1 }, "route": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "model_family": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, { "type": "null" }] }, "route_policy_version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "placement": { "type": "array", "minItems": 2, "items": { "type": "object", "properties": { "slot": { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] }, "wrap": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } }, "required": ["slot", "wrap"], "additionalProperties": false } }, "evaluation": { "type": "object", "properties": { "status": { "enum": ["unevaluated", "evaluated"] }, "suite": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, { "type": "null" }] }, "date": { "anyOf": [{ "type": "string", "format": "date" }, { "type": "null" }] }, "result": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, { "type": "null" }] }, "artifact": { "anyOf": [{ "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, { "type": "null" }] } }, "required": ["status", "suite", "date", "result", "artifact"], "additionalProperties": false } }, "required": ["id", "version", "route", "model_family", "route_policy_version", "placement", "evaluation"], "additionalProperties": false, "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/profile.schema.json", "title": "CWA placement profile", "allOf": [{ "if": { "properties": { "evaluation": { "type": "object", "properties": { "status": { "const": "evaluated" } } } } }, "then": { "properties": { "model_family": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "evaluation": { "type": "object", "properties": { "suite": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "date": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "result": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "artifact": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } } } } } }] };
 var formats8 = require_formats().fullFormats.date;
 function validate22(data, { instancePath = "", parentData, parentDataProperty, rootData = data, dynamicAnchors = {} } = {}) {
   ;
@@ -3995,7 +3995,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
             errors++;
           }
           if (!pattern4.test(data2)) {
-            const err3 = { instancePath: instancePath + "/model_family", schemaPath: "#/allOf/0/then/properties/model_family/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+            const err3 = { instancePath: instancePath + "/model_family", schemaPath: "#/allOf/0/then/properties/model_family/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
             if (vErrors === null) {
               vErrors = [err3];
             } else {
@@ -4029,7 +4029,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data4)) {
-                const err6 = { instancePath: instancePath + "/evaluation/suite", schemaPath: "#/allOf/0/then/properties/evaluation/properties/suite/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err6 = { instancePath: instancePath + "/evaluation/suite", schemaPath: "#/allOf/0/then/properties/evaluation/properties/suite/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err6];
                 } else {
@@ -4060,7 +4060,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data5)) {
-                const err9 = { instancePath: instancePath + "/evaluation/date", schemaPath: "#/allOf/0/then/properties/evaluation/properties/date/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err9 = { instancePath: instancePath + "/evaluation/date", schemaPath: "#/allOf/0/then/properties/evaluation/properties/date/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err9];
                 } else {
@@ -4091,7 +4091,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data6)) {
-                const err12 = { instancePath: instancePath + "/evaluation/result", schemaPath: "#/allOf/0/then/properties/evaluation/properties/result/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err12 = { instancePath: instancePath + "/evaluation/result", schemaPath: "#/allOf/0/then/properties/evaluation/properties/result/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err12];
                 } else {
@@ -4122,7 +4122,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data7)) {
-                const err15 = { instancePath: instancePath + "/evaluation/artifact", schemaPath: "#/allOf/0/then/properties/evaluation/properties/artifact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err15 = { instancePath: instancePath + "/evaluation/artifact", schemaPath: "#/allOf/0/then/properties/evaluation/properties/artifact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err15];
                 } else {
@@ -4256,7 +4256,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data8)) {
-          const err28 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err28 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err28];
           } else {
@@ -4310,7 +4310,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data10)) {
-          const err33 = { instancePath: instancePath + "/route", schemaPath: "#/properties/route/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err33 = { instancePath: instancePath + "/route", schemaPath: "#/properties/route/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err33];
           } else {
@@ -4344,7 +4344,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data11)) {
-          const err36 = { instancePath: instancePath + "/model_family", schemaPath: "#/properties/model_family/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err36 = { instancePath: instancePath + "/model_family", schemaPath: "#/properties/model_family/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err36];
           } else {
@@ -4407,7 +4407,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data12)) {
-          const err41 = { instancePath: instancePath + "/route_policy_version", schemaPath: "#/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err41 = { instancePath: instancePath + "/route_policy_version", schemaPath: "#/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err41];
           } else {
@@ -4504,7 +4504,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data16)) {
-                  const err50 = { instancePath: instancePath + "/placement/" + i0 + "/wrap", schemaPath: "#/properties/placement/items/properties/wrap/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err50 = { instancePath: instancePath + "/placement/" + i0 + "/wrap", schemaPath: "#/properties/placement/items/properties/wrap/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err50];
                   } else {
@@ -4629,7 +4629,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data19)) {
-              const err62 = { instancePath: instancePath + "/evaluation/suite", schemaPath: "#/properties/evaluation/properties/suite/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err62 = { instancePath: instancePath + "/evaluation/suite", schemaPath: "#/properties/evaluation/properties/suite/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err62];
               } else {
@@ -4752,7 +4752,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data21)) {
-              const err71 = { instancePath: instancePath + "/evaluation/result", schemaPath: "#/properties/evaluation/properties/result/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err71 = { instancePath: instancePath + "/evaluation/result", schemaPath: "#/properties/evaluation/properties/result/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err71];
               } else {
@@ -4818,7 +4818,7 @@ function validate22(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data22)) {
-              const err76 = { instancePath: instancePath + "/evaluation/artifact", schemaPath: "#/properties/evaluation/properties/artifact/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err76 = { instancePath: instancePath + "/evaluation/artifact", schemaPath: "#/properties/evaluation/properties/artifact/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err76];
               } else {
@@ -5188,7 +5188,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data6)) {
-                  const err22 = { instancePath: instancePath + "/items/" + i0 + "/id", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err22 = { instancePath: instancePath + "/items/" + i0 + "/id", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err22];
                   } else {
@@ -5240,7 +5240,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data8)) {
-                  const err27 = { instancePath: instancePath + "/items/" + i0 + "/source", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/source/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err27 = { instancePath: instancePath + "/items/" + i0 + "/source", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/source/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err27];
                   } else {
@@ -5271,7 +5271,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data9)) {
-                  const err30 = { instancePath: instancePath + "/items/" + i0 + "/source_version", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/source_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err30 = { instancePath: instancePath + "/items/" + i0 + "/source_version", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/source_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err30];
                   } else {
@@ -5402,7 +5402,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data15)) {
-                      const err42 = { instancePath: instancePath + "/items/" + i0 + "/scope/tenant", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err42 = { instancePath: instancePath + "/items/" + i0 + "/scope/tenant", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err42];
                       } else {
@@ -5433,7 +5433,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data16)) {
-                      const err45 = { instancePath: instancePath + "/items/" + i0 + "/scope/user", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err45 = { instancePath: instancePath + "/items/" + i0 + "/scope/user", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err45];
                       } else {
@@ -5464,7 +5464,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data17)) {
-                      const err48 = { instancePath: instancePath + "/items/" + i0 + "/scope/session", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err48 = { instancePath: instancePath + "/items/" + i0 + "/scope/session", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err48];
                       } else {
@@ -5495,7 +5495,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data18)) {
-                      const err51 = { instancePath: instancePath + "/items/" + i0 + "/scope/task", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err51 = { instancePath: instancePath + "/items/" + i0 + "/scope/task", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err51];
                       } else {
@@ -5526,7 +5526,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data19)) {
-                      const err54 = { instancePath: instancePath + "/items/" + i0 + "/scope/locale", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err54 = { instancePath: instancePath + "/items/" + i0 + "/scope/locale", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err54];
                       } else {
@@ -5557,7 +5557,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data20)) {
-                      const err57 = { instancePath: instancePath + "/items/" + i0 + "/scope/step", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err57 = { instancePath: instancePath + "/items/" + i0 + "/scope/step", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err57];
                       } else {
@@ -5716,7 +5716,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data27)) {
-                  const err72 = { instancePath: instancePath + "/items/" + i0 + "/body", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/body/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err72 = { instancePath: instancePath + "/items/" + i0 + "/body", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/body/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err72];
                   } else {
@@ -5801,7 +5801,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data30)) {
-                          const err80 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/id", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err80 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/id", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err80];
                           } else {
@@ -5832,7 +5832,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data31)) {
-                          const err83 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/body", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err83 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/body", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err83];
                           } else {
@@ -5863,7 +5863,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data32)) {
-                          const err86 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/method", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err86 = { instancePath: instancePath + "/items/" + i0 + "/variants/" + i1 + "/method", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err86];
                           } else {
@@ -5947,7 +5947,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data35)) {
-                  const err94 = { instancePath: instancePath + "/items/" + i0 + "/revoked_by", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/revoked_by/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err94 = { instancePath: instancePath + "/items/" + i0 + "/revoked_by", schemaPath: "https://contextwindowarchitecture.io/schema/context_item.schema.json/properties/revoked_by/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err94];
                   } else {
@@ -6043,7 +6043,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data38)) {
-                  const err103 = { instancePath: instancePath + "/excluded/" + i2 + "/item_id", schemaPath: "#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err103 = { instancePath: instancePath + "/excluded/" + i2 + "/item_id", schemaPath: "#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err103];
                   } else {
@@ -6074,7 +6074,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data39)) {
-                  const err106 = { instancePath: instancePath + "/excluded/" + i2 + "/reason", schemaPath: "#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err106 = { instancePath: instancePath + "/excluded/" + i2 + "/reason", schemaPath: "#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err106];
                   } else {
@@ -6137,7 +6137,7 @@ function validate23(data, { instancePath = "", parentData, parentDataProperty, r
 }
 validate23.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
 var validateConflictGroupSchema = validate24;
-var schema36 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/conflict_group.schema.json", "title": "CWA conflict group", "description": "An application-declared conflict among items. The assembler resolves declared groups; it never discovers contradictions by interpreting prose. Every item id must name a candidate or producer exclusion in the snapshot, an item belongs to at most one group, and a fact group's fact must be a key of the route policy's facts; a snapshot that breaks these is rejected before assembly.", "type": "object", "additionalProperties": false, "required": ["id", "kind", "items"], "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "kind": { "type": "string", "enum": ["instruction", "fact"] }, "fact": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "Route-policy key identifying the fact in dispute; required for fact groups." }, "items": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "\\S" }, "minItems": 2, "uniqueItems": true } }, "allOf": [{ "if": { "properties": { "kind": { "const": "fact" } } }, "then": { "required": ["fact"], "properties": { "fact": { "type": "string", "minLength": 1, "pattern": "\\S" } } } }] };
+var schema36 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/conflict_group.schema.json", "title": "CWA conflict group", "description": "An application-declared conflict among items. The assembler resolves declared groups; it never discovers contradictions by interpreting prose. Every item id must name a candidate or producer exclusion in the snapshot, an item belongs to at most one group, and a fact group's fact must be a key of the route policy's facts; a snapshot that breaks these is rejected before assembly.", "type": "object", "additionalProperties": false, "required": ["id", "kind", "items"], "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "kind": { "type": "string", "enum": ["instruction", "fact"] }, "fact": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]", "description": "Route-policy key identifying the fact in dispute; required for fact groups." }, "items": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "minItems": 2, "uniqueItems": true } }, "allOf": [{ "if": { "properties": { "kind": { "const": "fact" } } }, "then": { "required": ["fact"], "properties": { "fact": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" } } } }] };
 function validate24(data, { instancePath = "", parentData, parentDataProperty, rootData = data, dynamicAnchors = {} } = {}) {
   ;
   let vErrors = null;
@@ -6199,7 +6199,7 @@ function validate24(data, { instancePath = "", parentData, parentDataProperty, r
             errors++;
           }
           if (!pattern4.test(data1)) {
-            const err3 = { instancePath: instancePath + "/fact", schemaPath: "#/allOf/0/then/properties/fact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+            const err3 = { instancePath: instancePath + "/fact", schemaPath: "#/allOf/0/then/properties/fact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
             if (vErrors === null) {
               vErrors = [err3];
             } else {
@@ -6287,7 +6287,7 @@ function validate24(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data2)) {
-          const err11 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err11 = { instancePath: instancePath + "/id", schemaPath: "#/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err11];
           } else {
@@ -6339,7 +6339,7 @@ function validate24(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data4)) {
-          const err16 = { instancePath: instancePath + "/fact", schemaPath: "#/properties/fact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err16 = { instancePath: instancePath + "/fact", schemaPath: "#/properties/fact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err16];
           } else {
@@ -6383,7 +6383,7 @@ function validate24(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data6)) {
-              const err20 = { instancePath: instancePath + "/items/" + i0, schemaPath: "#/properties/items/items/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err20 = { instancePath: instancePath + "/items/" + i0, schemaPath: "#/properties/items/items/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err20];
               } else {
@@ -6448,12 +6448,12 @@ function validate24(data, { instancePath = "", parentData, parentDataProperty, r
 }
 validate24.evaluated = { "props": true, "dynamicProps": false, "dynamicItems": false };
 var validateSnapshotSchema = validate25;
-var schema37 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/snapshot.schema.json", "title": "CWA assembly snapshot", "description": "Everything that can affect an assembly, frozen before assembly begins (R-23). Conformance cases use this shape so implementations in any language replay the same input. Batch items are raw producer output: admission validates each one and records an invalid item as an exclusion rather than rejecting the snapshot (R-2).", "type": "object", "additionalProperties": false, "required": ["assembly_time", "scope", "budget", "profile", "route_policy", "tokenizer", "renderer", "batches", "conflicts"], "properties": { "assembly_time": { "type": "string", "format": "date-time" }, "scope": { "$ref": "context_item.schema.json#/properties/scope" }, "budget": { "type": "object", "additionalProperties": false, "required": ["input", "reserved_output"], "properties": { "input": { "type": "integer", "minimum": 0 }, "reserved_output": { "type": "integer", "minimum": 0 } } }, "profile": { "$ref": "profile.schema.json" }, "route_policy": { "$ref": "route_policy.schema.json" }, "tokenizer": { "type": "string", "minLength": 1, "pattern": "\\S" }, "renderer": { "type": "string", "minLength": 1, "pattern": "\\S" }, "batches": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["producer", "items", "excluded"], "properties": { "producer": { "type": "object", "additionalProperties": false, "required": ["id", "kind"], "description": "The identity the application authenticated for this batch. Never derived from item fields.", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "kind": { "type": "string", "enum": ["policy", "state", "retrieval", "memory", "mcp", "capability_policy", "interaction"] } } }, "items": { "type": "array", "items": { "type": "object" }, "description": "Candidate items exactly as the producer emitted them. Validated per item at admission against context_item.schema.json." }, "excluded": { "$ref": "producer_batch.schema.json#/properties/excluded" } } } }, "capabilities": { "type": "object", "additionalProperties": false, "required": ["policy_producer", "allow_list_version", "allowed_ids"], "properties": { "policy_producer": { "type": "string", "minLength": 1, "pattern": "\\S" }, "allow_list_version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "allowed_ids": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "\\S" }, "uniqueItems": true } } }, "conflicts": { "type": "array", "description": "Declared conflict groups. Group ids are unique, every item id names a candidate or producer exclusion in this snapshot, no item belongs to two groups, and each fact group's fact is a key of route_policy.facts (R-11). The schema cannot express these cross-references; an assembler checks them before assembly.", "items": { "$ref": "conflict_group.schema.json" } } } };
-var schema40 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/route_policy.schema.json", "title": "CWA route policy", "description": "Versioned, application-owned policy for one route. Admission, conflict resolution, fitting and refusal read it, and it travels inside the snapshot (R-23).", "type": "object", "additionalProperties": false, "required": ["route", "version", "producers"], "properties": { "route": { "type": "string", "minLength": 1, "pattern": "\\S" }, "version": { "type": "string", "minLength": 1, "pattern": "\\S" }, "clock_skew_seconds": { "type": "integer", "minimum": 0, "description": "Tolerance for producer clocks: freshness may exceed assembly_time by this much before the item is excluded as future_freshness. Default 0." }, "parser": { "type": "boolean", "description": "A downstream parser consumes this route's responses, so assembly refuses with required_slot_missing when no governance.output_contract item is admitted (R-4). Default false." }, "requires_evidence": { "type": "boolean", "description": "Assembly refuses with evidence_required when fitting leaves no evidence.knowledge or evidence.tool_results item, or fewer items in an evidence slot than its min_included (R-12). Default false." }, "on_unresolved_instruction": { "enum": ["surface", "request_context", "refuse"], "description": "What assembly does with an instruction conflict group that has no unique supported resolution (R-11): surface keeps every member and marks it in the payload, request_context and refuse refuse with conflict_unresolved. Default refuse." }, "producers": { "type": "object", "description": "Producers this route admits, keyed by the identity the application authenticated. Batches from any other producer are refused.", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["kind", "slots"], "properties": { "kind": { "type": "string", "enum": ["policy", "state", "retrieval", "memory", "mcp", "capability_policy", "interaction"] }, "slots": { "type": "array", "items": { "$ref": "context_item.schema.json#/properties/slot" }, "minItems": 1, "uniqueItems": true }, "verified": { "type": "boolean", "description": "For kind mcp only: the route has verified this server, so its output need not be marked untrusted_content (R-15). Default false." } } } }, "slots": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Per-slot rules: the route's executable eligibility predicate (R-3) and its fitting policy (R-16).", "properties": { "evidence.knowledge": { "$ref": "#/$defs/slot_rules" }, "evidence.tool_results": { "$ref": "#/$defs/slot_rules" } }, "additionalProperties": { "$ref": "#/$defs/slot_rules", "not": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }, "default_overrides": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Route replacements for slot defaults, applied when an item omits a policy field (R-3).", "additionalProperties": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "token_budget": { "$ref": "context_item.schema.json#/properties/token_budget" }, "variants": { "$ref": "context_item.schema.json#/properties/variants" }, "conflict_policy": { "$ref": "context_item.schema.json#/properties/conflict_policy" }, "lineage": { "$ref": "context_item.schema.json#/properties/lineage" }, "eligibility": { "$ref": "context_item.schema.json#/properties/eligibility" }, "injection_risk": { "$ref": "context_item.schema.json#/properties/injection_risk" } } } }, "tier_upgrades": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Tiers this route raises above the slot default. Only raising is meaningful; items cannot raise their own (R-16).", "additionalProperties": { "type": "string", "enum": ["compressible", "protected"] } }, "fitting_order": { "type": "array", "uniqueItems": true, "description": "The order in which compressible items are reduced once every droppable item is gone (R-16). Each step compresses (selects supplied variants for) or omits one slot's compressible items, lowest-ranked first, until the payload fits. Steps the route does not list follow in the default order: compress each slot, then omit each slot, both in shedding order. With no steps, variants always come before omission.", "items": { "type": "object", "additionalProperties": false, "required": ["slot", "action"], "properties": { "slot": { "$ref": "context_item.schema.json#/properties/slot" }, "action": { "enum": ["compress", "omit"] } } } }, "facts": { "type": "object", "description": "Factual precedence, keyed by the fact key that fact conflict groups name (R-6, R-11). Instruction authority never ranks facts.", "propertyNames": { "type": "string", "minLength": 1, "pattern": "\\S" }, "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["precedence", "on_unresolved"], "properties": { "precedence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "pattern": "\\S" }, "description": "Producers whose claims about this fact are eligible, by the identity the application authenticated, most authoritative first. A member from any other producer is ineligible: it cannot win and is excluded when another member does. item.source never counts (R-15)." }, "scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys a member must carry to be eligible. Admission already requires every key an item carries to equal the request's value, so eligible members share this scope. Default []." }, "freshness_tiebreak": { "type": "boolean", "description": "When several eligible members share the highest-ranked producer, the single newest by freshness wins, comparing instants at full precision. Without it, or when the newest is tied, the group escalates. Default false." }, "on_unresolved": { "enum": ["surface", "request_context", "refuse"], "description": "What assembly does when this fact's policy cannot pick a unique winner: surface keeps every member and marks it in the payload, request_context and refuse refuse with conflict_unresolved (R-11)." } } } } }, "if": { "type": "object", "required": ["slots"], "properties": { "slots": { "anyOf": [{ "type": "object", "required": ["evidence.knowledge"], "properties": { "evidence.knowledge": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }, { "type": "object", "required": ["evidence.tool_results"], "properties": { "evidence.tool_results": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }] } } }, "then": { "type": "object", "required": ["requires_evidence"], "properties": { "requires_evidence": { "const": true } } }, "$defs": { "slot_rules": { "type": "object", "additionalProperties": false, "properties": { "min_relevance": { "type": "number", "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way. A score equal to the threshold passes." }, "max_age_seconds": { "type": "integer", "minimum": 0, "description": "Items observed longer ago than this are excluded: stale_state for state slots (R-8), not_eligible elsewhere. An item exactly this old is still admitted." }, "required_scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys an item must carry. Independently of this list, every key an item's scope does carry must equal the request's value for that key; a key the request lacks never matches. A missing key is out_of_scope, never a wildcard." }, "source_prefix": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "Prefix every item source must start with, e.g. turn: for memory's source turn (R-9)." }, "priority": { "type": "integer", "description": "Shedding order across slots under budget pressure (R-16): lower priorities shed first, and equal priorities shed in slot-name order. Default 0." }, "order_by": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["-relevance", "-freshness", "freshness"] }, "description": 'Rank within the slot; the lowest-ranked item sheds first (R-16). Keys compare in order, then id ascending. -relevance ranks higher scores first and unscored items last; -freshness ranks newer items first and freshness older ones, comparing instants at full precision. Default ["-relevance", "-freshness"].' }, "min_included": { "type": "integer", "minimum": 1, "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12)." } } } } };
+var schema37 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/snapshot.schema.json", "title": "CWA assembly snapshot", "description": "Everything that can affect an assembly, frozen before assembly begins (R-23). Conformance cases use this shape so implementations in any language replay the same input. Batch items are raw producer output: admission validates each one and records an invalid item as an exclusion rather than rejecting the snapshot (R-2).", "type": "object", "additionalProperties": false, "required": ["assembly_time", "scope", "budget", "profile", "route_policy", "tokenizer", "renderer", "batches", "conflicts"], "properties": { "assembly_time": { "type": "string", "format": "date-time" }, "scope": { "$ref": "context_item.schema.json#/properties/scope" }, "budget": { "type": "object", "additionalProperties": false, "required": ["input", "reserved_output"], "properties": { "input": { "type": "integer", "minimum": 0 }, "reserved_output": { "type": "integer", "minimum": 0 } } }, "profile": { "$ref": "profile.schema.json" }, "route_policy": { "$ref": "route_policy.schema.json" }, "tokenizer": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "renderer": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "batches": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["producer", "items", "excluded"], "properties": { "producer": { "type": "object", "additionalProperties": false, "required": ["id", "kind"], "description": "The identity the application authenticated for this batch. Never derived from item fields.", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "kind": { "type": "string", "enum": ["policy", "state", "retrieval", "memory", "mcp", "capability_policy", "interaction"] } } }, "items": { "type": "array", "items": { "type": "object" }, "description": "Candidate items exactly as the producer emitted them. Validated per item at admission against context_item.schema.json." }, "excluded": { "$ref": "producer_batch.schema.json#/properties/excluded" } } } }, "capabilities": { "type": "object", "additionalProperties": false, "required": ["policy_producer", "allow_list_version", "allowed_ids"], "properties": { "policy_producer": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "allow_list_version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "allowed_ids": { "type": "array", "items": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "uniqueItems": true } } }, "conflicts": { "type": "array", "description": "Declared conflict groups. Group ids are unique, every item id names a candidate or producer exclusion in this snapshot, no item belongs to two groups, and each fact group's fact is a key of route_policy.facts (R-11). The schema cannot express these cross-references; an assembler checks them before assembly.", "items": { "$ref": "conflict_group.schema.json" } } } };
+var schema40 = { "$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "https://contextwindowarchitecture.io/schema/route_policy.schema.json", "title": "CWA route policy", "description": "Versioned, application-owned policy for one route. Admission, conflict resolution, fitting and refusal read it, and it travels inside the snapshot (R-23).", "type": "object", "additionalProperties": false, "required": ["route", "version", "producers"], "properties": { "route": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "version": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "clock_skew_seconds": { "type": "integer", "minimum": 0, "description": "Tolerance for producer clocks: freshness may exceed assembly_time by this much before the item is excluded as future_freshness. Default 0." }, "parser": { "type": "boolean", "description": "A downstream parser consumes this route's responses, so assembly refuses with required_slot_missing when no governance.output_contract item is admitted (R-4). Default false." }, "requires_evidence": { "type": "boolean", "description": "Assembly refuses with evidence_required when fitting leaves no evidence.knowledge or evidence.tool_results item, or fewer items in an evidence slot than its min_included (R-12). Default false." }, "on_unresolved_instruction": { "enum": ["surface", "request_context", "refuse"], "description": "What assembly does with an instruction conflict group that has no unique supported resolution (R-11): surface keeps every member and marks it in the payload, request_context and refuse refuse with conflict_unresolved. Default refuse." }, "producers": { "type": "object", "description": "Producers this route admits, keyed by the identity the application authenticated. Batches from any other producer are refused.", "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["kind", "slots"], "properties": { "kind": { "type": "string", "enum": ["policy", "state", "retrieval", "memory", "mcp", "capability_policy", "interaction"] }, "slots": { "type": "array", "items": { "$ref": "context_item.schema.json#/properties/slot" }, "minItems": 1, "uniqueItems": true }, "verified": { "type": "boolean", "description": "For kind mcp only: the route has verified this server, so its output need not be marked untrusted_content (R-15). Default false." } } } }, "slots": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Per-slot rules: the route's executable eligibility predicate (R-3) and its fitting policy (R-16).", "properties": { "evidence.knowledge": { "$ref": "#/$defs/slot_rules" }, "evidence.tool_results": { "$ref": "#/$defs/slot_rules" } }, "additionalProperties": { "$ref": "#/$defs/slot_rules", "not": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }, "default_overrides": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Route replacements for slot defaults, applied when an item omits a policy field (R-3).", "additionalProperties": { "type": "object", "additionalProperties": false, "minProperties": 1, "properties": { "token_budget": { "$ref": "context_item.schema.json#/properties/token_budget" }, "variants": { "$ref": "context_item.schema.json#/properties/variants" }, "conflict_policy": { "$ref": "context_item.schema.json#/properties/conflict_policy" }, "lineage": { "$ref": "context_item.schema.json#/properties/lineage" }, "eligibility": { "$ref": "context_item.schema.json#/properties/eligibility" }, "injection_risk": { "$ref": "context_item.schema.json#/properties/injection_risk" } } } }, "tier_upgrades": { "type": "object", "propertyNames": { "$ref": "context_item.schema.json#/properties/slot" }, "description": "Tiers this route raises above the slot default. Only raising is meaningful; items cannot raise their own (R-16).", "additionalProperties": { "type": "string", "enum": ["compressible", "protected"] } }, "fitting_order": { "type": "array", "uniqueItems": true, "description": "The order in which compressible items are reduced once every droppable item is gone (R-16). Each step compresses (selects supplied variants for) or omits one slot's compressible items, lowest-ranked first, until the payload fits. Steps the route does not list follow in the default order: compress each slot, then omit each slot, both in shedding order. With no steps, variants always come before omission.", "items": { "type": "object", "additionalProperties": false, "required": ["slot", "action"], "properties": { "slot": { "$ref": "context_item.schema.json#/properties/slot" }, "action": { "enum": ["compress", "omit"] } } } }, "facts": { "type": "object", "description": "Factual precedence, keyed by the fact key that fact conflict groups name (R-6, R-11). Instruction authority never ranks facts.", "propertyNames": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "additionalProperties": { "type": "object", "additionalProperties": false, "required": ["precedence", "on_unresolved"], "properties": { "precedence": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "description": "Producers whose claims about this fact are eligible, by the identity the application authenticated, most authoritative first. A member from any other producer is ineligible: it cannot win and is excluded when another member does. item.source never counts (R-15)." }, "scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys a member must carry to be eligible. Admission already requires every key an item carries to equal the request's value, so eligible members share this scope. Default []." }, "freshness_tiebreak": { "type": "boolean", "description": "When several eligible members share the highest-ranked producer, the single newest by freshness wins, comparing instants at full precision. Without it, or when the newest is tied, the group escalates. Default false." }, "on_unresolved": { "enum": ["surface", "request_context", "refuse"], "description": "What assembly does when this fact's policy cannot pick a unique winner: surface keeps every member and marks it in the payload, request_context and refuse refuse with conflict_unresolved (R-11)." } } } } }, "if": { "type": "object", "required": ["slots"], "properties": { "slots": { "anyOf": [{ "type": "object", "required": ["evidence.knowledge"], "properties": { "evidence.knowledge": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }, { "type": "object", "required": ["evidence.tool_results"], "properties": { "evidence.tool_results": { "type": "object", "required": ["min_included"], "properties": { "min_included": true } } } }] } } }, "then": { "type": "object", "required": ["requires_evidence"], "properties": { "requires_evidence": { "const": true } } }, "$defs": { "slot_rules": { "type": "object", "additionalProperties": false, "properties": { "min_relevance": { "type": "number", "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way. A score equal to the threshold passes." }, "max_age_seconds": { "type": "integer", "minimum": 0, "description": "Items observed longer ago than this are excluded: stale_state for state slots (R-8), not_eligible elsewhere. An item exactly this old is still admitted." }, "required_scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys an item must carry. Independently of this list, every key an item's scope does carry must equal the request's value for that key; a key the request lacks never matches. A missing key is out_of_scope, never a wildcard." }, "source_prefix": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]", "description": "Prefix every item source must start with, e.g. turn: for memory's source turn (R-9)." }, "priority": { "type": "integer", "description": "Shedding order across slots under budget pressure (R-16): lower priorities shed first, and equal priorities shed in slot-name order. Default 0." }, "order_by": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["-relevance", "-freshness", "freshness"] }, "description": 'Rank within the slot; the lowest-ranked item sheds first (R-16). Keys compare in order, then id ascending. -relevance ranks higher scores first and unscored items last; -freshness ranks newer items first and freshness older ones, comparing instants at full precision. Default ["-relevance", "-freshness"].' }, "min_included": { "type": "integer", "minimum": 1, "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12)." } } } } };
 var schema41 = { "type": "string", "enum": ["governance.instructions", "governance.capabilities", "governance.examples", "governance.output_contract", "state.user", "state.task", "evidence.knowledge", "evidence.tool_results", "interaction.memory", "interaction.history", "interaction.query"] };
-var schema43 = { "type": "object", "additionalProperties": false, "properties": { "min_relevance": { "type": "number", "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way. A score equal to the threshold passes." }, "max_age_seconds": { "type": "integer", "minimum": 0, "description": "Items observed longer ago than this are excluded: stale_state for state slots (R-8), not_eligible elsewhere. An item exactly this old is still admitted." }, "required_scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys an item must carry. Independently of this list, every key an item's scope does carry must equal the request's value for that key; a key the request lacks never matches. A missing key is out_of_scope, never a wildcard." }, "source_prefix": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "Prefix every item source must start with, e.g. turn: for memory's source turn (R-9)." }, "priority": { "type": "integer", "description": "Shedding order across slots under budget pressure (R-16): lower priorities shed first, and equal priorities shed in slot-name order. Default 0." }, "order_by": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["-relevance", "-freshness", "freshness"] }, "description": 'Rank within the slot; the lowest-ranked item sheds first (R-16). Keys compare in order, then id ascending. -relevance ranks higher scores first and unscored items last; -freshness ranks newer items first and freshness older ones, comparing instants at full precision. Default ["-relevance", "-freshness"].' }, "min_included": { "type": "integer", "minimum": 1, "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12)." } } };
+var schema43 = { "type": "object", "additionalProperties": false, "properties": { "min_relevance": { "type": "number", "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way. A score equal to the threshold passes." }, "max_age_seconds": { "type": "integer", "minimum": 0, "description": "Items observed longer ago than this are excluded: stale_state for state slots (R-8), not_eligible elsewhere. An item exactly this old is still admitted." }, "required_scope": { "type": "array", "uniqueItems": true, "items": { "enum": ["tenant", "user", "session", "task", "locale", "step"] }, "description": "Scope keys an item must carry. Independently of this list, every key an item's scope does carry must equal the request's value for that key; a key the request lacks never matches. A missing key is out_of_scope, never a wildcard." }, "source_prefix": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]", "description": "Prefix every item source must start with, e.g. turn: for memory's source turn (R-9)." }, "priority": { "type": "integer", "description": "Shedding order across slots under budget pressure (R-16): lower priorities shed first, and equal priorities shed in slot-name order. Default 0." }, "order_by": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "enum": ["-relevance", "-freshness", "freshness"] }, "description": 'Rank within the slot; the lowest-ranked item sheds first (R-16). Keys compare in order, then id ascending. -relevance ranks higher scores first and unscored items last; -freshness ranks newer items first and freshness older ones, comparing instants at full precision. Default ["-relevance", "-freshness"].' }, "min_included": { "type": "integer", "minimum": 1, "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12)." } } };
 var schema47 = { "type": ["integer", "null"], "minimum": 0, "description": "Cap on the tokens of the item's rendered body in each occurrence (R-3, R-16). An item over its cap is reduced before shedding: a compressible item to a supplied variant within the cap, otherwise it is omitted, and a protected item over its cap refuses the assembly. Null sets no per-item cap; budget.input still bounds the item." };
-var schema48 = { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "\\S" }, "body": { "type": "string", "minLength": 1, "pattern": "\\S" }, "method": { "type": "string", "minLength": 1, "pattern": "\\S" }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] } }, "required": ["id", "body", "method", "lineage"], "additionalProperties": false } };
+var schema48 = { "type": "array", "items": { "type": "object", "properties": { "id": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "body": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "method": { "type": "string", "minLength": 1, "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, "lineage": { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] } }, "required": ["id", "body", "method", "lineage"], "additionalProperties": false } };
 var schema49 = { "type": "string", "enum": ["defers", "governs", "escalate"] };
 var schema50 = { "type": "string", "enum": ["verbatim", "summarised", "redacted", "translated", "extracted", "generated"] };
 var schema52 = { "type": "string", "enum": ["none", "untrusted_content"] };
@@ -6742,7 +6742,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data4)) {
-          const err20 = { instancePath: instancePath + "/route", schemaPath: "#/properties/route/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err20 = { instancePath: instancePath + "/route", schemaPath: "#/properties/route/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err20];
           } else {
@@ -6773,7 +6773,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data5)) {
-          const err23 = { instancePath: instancePath + "/version", schemaPath: "#/properties/version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err23 = { instancePath: instancePath + "/version", schemaPath: "#/properties/version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err23];
           } else {
@@ -7138,7 +7138,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data22)) {
-                    const err54 = { instancePath: instancePath + "/slots/" + key4.replace(/~/g, "~0").replace(/\//g, "~1") + "/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err54 = { instancePath: instancePath + "/slots/" + key4.replace(/~/g, "~0").replace(/\//g, "~1") + "/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err54];
                     } else {
@@ -7404,7 +7404,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data32)) {
-                  const err75 = { instancePath: instancePath + "/slots/evidence.knowledge/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err75 = { instancePath: instancePath + "/slots/evidence.knowledge/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err75];
                   } else {
@@ -7626,7 +7626,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data42)) {
-                  const err93 = { instancePath: instancePath + "/slots/evidence.tool_results/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err93 = { instancePath: instancePath + "/slots/evidence.tool_results/source_prefix", schemaPath: "#/$defs/slot_rules/properties/source_prefix/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err93];
                   } else {
@@ -7899,7 +7899,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data52)) {
-                          const err117 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/id", schemaPath: "context_item.schema.json#/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err117 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/id", schemaPath: "context_item.schema.json#/properties/variants/items/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err117];
                           } else {
@@ -7930,7 +7930,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data53)) {
-                          const err120 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/body", schemaPath: "context_item.schema.json#/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err120 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/body", schemaPath: "context_item.schema.json#/properties/variants/items/properties/body/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err120];
                           } else {
@@ -7961,7 +7961,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data54)) {
-                          const err123 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/method", schemaPath: "context_item.schema.json#/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err123 = { instancePath: instancePath + "/default_overrides/" + key9.replace(/~/g, "~0").replace(/\//g, "~1") + "/variants/" + i14 + "/method", schemaPath: "context_item.schema.json#/properties/variants/items/properties/method/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err123];
                           } else {
@@ -8302,7 +8302,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(key15)) {
-              const err154 = { instancePath: instancePath + "/facts", schemaPath: "#/properties/facts/propertyNames/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"', propertyName: key15 };
+              const err154 = { instancePath: instancePath + "/facts", schemaPath: "#/properties/facts/propertyNames/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"', propertyName: key15 };
               if (vErrors === null) {
                 vErrors = [err154];
               } else {
@@ -8388,7 +8388,7 @@ function validate26(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data69)) {
-                      const err162 = { instancePath: instancePath + "/facts/" + key16.replace(/~/g, "~0").replace(/\//g, "~1") + "/precedence/" + i17, schemaPath: "#/properties/facts/additionalProperties/properties/precedence/items/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err162 = { instancePath: instancePath + "/facts/" + key16.replace(/~/g, "~0").replace(/\//g, "~1") + "/precedence/" + i17, schemaPath: "#/properties/facts/additionalProperties/properties/precedence/items/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err162];
                       } else {
@@ -8692,7 +8692,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data2)) {
-              const err14 = { instancePath: instancePath + "/scope/tenant", schemaPath: "context_item.schema.json#/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err14 = { instancePath: instancePath + "/scope/tenant", schemaPath: "context_item.schema.json#/properties/scope/properties/tenant/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err14];
               } else {
@@ -8723,7 +8723,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data3)) {
-              const err17 = { instancePath: instancePath + "/scope/user", schemaPath: "context_item.schema.json#/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err17 = { instancePath: instancePath + "/scope/user", schemaPath: "context_item.schema.json#/properties/scope/properties/user/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err17];
               } else {
@@ -8754,7 +8754,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data4)) {
-              const err20 = { instancePath: instancePath + "/scope/session", schemaPath: "context_item.schema.json#/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err20 = { instancePath: instancePath + "/scope/session", schemaPath: "context_item.schema.json#/properties/scope/properties/session/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err20];
               } else {
@@ -8785,7 +8785,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data5)) {
-              const err23 = { instancePath: instancePath + "/scope/task", schemaPath: "context_item.schema.json#/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err23 = { instancePath: instancePath + "/scope/task", schemaPath: "context_item.schema.json#/properties/scope/properties/task/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err23];
               } else {
@@ -8816,7 +8816,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data6)) {
-              const err26 = { instancePath: instancePath + "/scope/locale", schemaPath: "context_item.schema.json#/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err26 = { instancePath: instancePath + "/scope/locale", schemaPath: "context_item.schema.json#/properties/scope/properties/locale/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err26];
               } else {
@@ -8847,7 +8847,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data7)) {
-              const err29 = { instancePath: instancePath + "/scope/step", schemaPath: "context_item.schema.json#/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err29 = { instancePath: instancePath + "/scope/step", schemaPath: "context_item.schema.json#/properties/scope/properties/step/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err29];
               } else {
@@ -9022,7 +9022,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                 errors++;
               }
               if (!pattern4.test(data14)) {
-                const err43 = { instancePath: instancePath + "/profile/model_family", schemaPath: "profile.schema.json/allOf/0/then/properties/model_family/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                const err43 = { instancePath: instancePath + "/profile/model_family", schemaPath: "profile.schema.json/allOf/0/then/properties/model_family/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                 if (vErrors === null) {
                   vErrors = [err43];
                 } else {
@@ -9056,7 +9056,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data16)) {
-                    const err46 = { instancePath: instancePath + "/profile/evaluation/suite", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/suite/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err46 = { instancePath: instancePath + "/profile/evaluation/suite", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/suite/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err46];
                     } else {
@@ -9087,7 +9087,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data17)) {
-                    const err49 = { instancePath: instancePath + "/profile/evaluation/date", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/date/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err49 = { instancePath: instancePath + "/profile/evaluation/date", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/date/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err49];
                     } else {
@@ -9118,7 +9118,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data18)) {
-                    const err52 = { instancePath: instancePath + "/profile/evaluation/result", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/result/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err52 = { instancePath: instancePath + "/profile/evaluation/result", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/result/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err52];
                     } else {
@@ -9149,7 +9149,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data19)) {
-                    const err55 = { instancePath: instancePath + "/profile/evaluation/artifact", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/artifact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err55 = { instancePath: instancePath + "/profile/evaluation/artifact", schemaPath: "profile.schema.json/allOf/0/then/properties/evaluation/properties/artifact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err55];
                     } else {
@@ -9283,7 +9283,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data20)) {
-              const err68 = { instancePath: instancePath + "/profile/id", schemaPath: "profile.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err68 = { instancePath: instancePath + "/profile/id", schemaPath: "profile.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err68];
               } else {
@@ -9337,7 +9337,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data22)) {
-              const err73 = { instancePath: instancePath + "/profile/route", schemaPath: "profile.schema.json/properties/route/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err73 = { instancePath: instancePath + "/profile/route", schemaPath: "profile.schema.json/properties/route/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err73];
               } else {
@@ -9371,7 +9371,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data23)) {
-              const err76 = { instancePath: instancePath + "/profile/model_family", schemaPath: "profile.schema.json/properties/model_family/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err76 = { instancePath: instancePath + "/profile/model_family", schemaPath: "profile.schema.json/properties/model_family/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err76];
               } else {
@@ -9434,7 +9434,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data24)) {
-              const err81 = { instancePath: instancePath + "/profile/route_policy_version", schemaPath: "profile.schema.json/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err81 = { instancePath: instancePath + "/profile/route_policy_version", schemaPath: "profile.schema.json/properties/route_policy_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err81];
               } else {
@@ -9531,7 +9531,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data28)) {
-                      const err90 = { instancePath: instancePath + "/profile/placement/" + i0 + "/wrap", schemaPath: "profile.schema.json/properties/placement/items/properties/wrap/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err90 = { instancePath: instancePath + "/profile/placement/" + i0 + "/wrap", schemaPath: "profile.schema.json/properties/placement/items/properties/wrap/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err90];
                       } else {
@@ -9656,7 +9656,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data31)) {
-                  const err102 = { instancePath: instancePath + "/profile/evaluation/suite", schemaPath: "profile.schema.json/properties/evaluation/properties/suite/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err102 = { instancePath: instancePath + "/profile/evaluation/suite", schemaPath: "profile.schema.json/properties/evaluation/properties/suite/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err102];
                   } else {
@@ -9779,7 +9779,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data33)) {
-                  const err111 = { instancePath: instancePath + "/profile/evaluation/result", schemaPath: "profile.schema.json/properties/evaluation/properties/result/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err111 = { instancePath: instancePath + "/profile/evaluation/result", schemaPath: "profile.schema.json/properties/evaluation/properties/result/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err111];
                   } else {
@@ -9845,7 +9845,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data34)) {
-                  const err116 = { instancePath: instancePath + "/profile/evaluation/artifact", schemaPath: "profile.schema.json/properties/evaluation/properties/artifact/anyOf/0/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err116 = { instancePath: instancePath + "/profile/evaluation/artifact", schemaPath: "profile.schema.json/properties/evaluation/properties/artifact/anyOf/0/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err116];
                   } else {
@@ -9934,7 +9934,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data36)) {
-          const err123 = { instancePath: instancePath + "/tokenizer", schemaPath: "#/properties/tokenizer/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err123 = { instancePath: instancePath + "/tokenizer", schemaPath: "#/properties/tokenizer/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err123];
           } else {
@@ -9965,7 +9965,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
           errors++;
         }
         if (!pattern4.test(data37)) {
-          const err126 = { instancePath: instancePath + "/renderer", schemaPath: "#/properties/renderer/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+          const err126 = { instancePath: instancePath + "/renderer", schemaPath: "#/properties/renderer/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
           if (vErrors === null) {
             vErrors = [err126];
           } else {
@@ -10073,7 +10073,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data41)) {
-                      const err136 = { instancePath: instancePath + "/batches/" + i1 + "/producer/id", schemaPath: "#/properties/batches/items/properties/producer/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err136 = { instancePath: instancePath + "/batches/" + i1 + "/producer/id", schemaPath: "#/properties/batches/items/properties/producer/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err136];
                       } else {
@@ -10206,7 +10206,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data47)) {
-                          const err148 = { instancePath: instancePath + "/batches/" + i1 + "/excluded/" + i3 + "/item_id", schemaPath: "producer_batch.schema.json#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err148 = { instancePath: instancePath + "/batches/" + i1 + "/excluded/" + i3 + "/item_id", schemaPath: "producer_batch.schema.json#/properties/excluded/items/properties/item_id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err148];
                           } else {
@@ -10237,7 +10237,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                           errors++;
                         }
                         if (!pattern4.test(data48)) {
-                          const err151 = { instancePath: instancePath + "/batches/" + i1 + "/excluded/" + i3 + "/reason", schemaPath: "producer_batch.schema.json#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                          const err151 = { instancePath: instancePath + "/batches/" + i1 + "/excluded/" + i3 + "/reason", schemaPath: "producer_batch.schema.json#/properties/excluded/items/properties/reason/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                           if (vErrors === null) {
                             vErrors = [err151];
                           } else {
@@ -10360,7 +10360,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data51)) {
-              const err163 = { instancePath: instancePath + "/capabilities/policy_producer", schemaPath: "#/properties/capabilities/properties/policy_producer/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err163 = { instancePath: instancePath + "/capabilities/policy_producer", schemaPath: "#/properties/capabilities/properties/policy_producer/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err163];
               } else {
@@ -10391,7 +10391,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
               errors++;
             }
             if (!pattern4.test(data52)) {
-              const err166 = { instancePath: instancePath + "/capabilities/allow_list_version", schemaPath: "#/properties/capabilities/properties/allow_list_version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+              const err166 = { instancePath: instancePath + "/capabilities/allow_list_version", schemaPath: "#/properties/capabilities/properties/allow_list_version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
               if (vErrors === null) {
                 vErrors = [err166];
               } else {
@@ -10426,7 +10426,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data54)) {
-                  const err169 = { instancePath: instancePath + "/capabilities/allowed_ids/" + i4, schemaPath: "#/properties/capabilities/properties/allowed_ids/items/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err169 = { instancePath: instancePath + "/capabilities/allowed_ids/" + i4, schemaPath: "#/properties/capabilities/properties/allowed_ids/items/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err169];
                   } else {
@@ -10543,7 +10543,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                     errors++;
                   }
                   if (!pattern4.test(data58)) {
-                    const err177 = { instancePath: instancePath + "/conflicts/" + i6 + "/fact", schemaPath: "conflict_group.schema.json/allOf/0/then/properties/fact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                    const err177 = { instancePath: instancePath + "/conflicts/" + i6 + "/fact", schemaPath: "conflict_group.schema.json/allOf/0/then/properties/fact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                     if (vErrors === null) {
                       vErrors = [err177];
                     } else {
@@ -10631,7 +10631,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data59)) {
-                  const err185 = { instancePath: instancePath + "/conflicts/" + i6 + "/id", schemaPath: "conflict_group.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err185 = { instancePath: instancePath + "/conflicts/" + i6 + "/id", schemaPath: "conflict_group.schema.json/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err185];
                   } else {
@@ -10683,7 +10683,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data61)) {
-                  const err190 = { instancePath: instancePath + "/conflicts/" + i6 + "/fact", schemaPath: "conflict_group.schema.json/properties/fact/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err190 = { instancePath: instancePath + "/conflicts/" + i6 + "/fact", schemaPath: "conflict_group.schema.json/properties/fact/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err190];
                   } else {
@@ -10727,7 +10727,7 @@ function validate25(data, { instancePath = "", parentData, parentDataProperty, r
                       errors++;
                     }
                     if (!pattern4.test(data63)) {
-                      const err194 = { instancePath: instancePath + "/conflicts/" + i6 + "/items/" + i7, schemaPath: "conflict_group.schema.json/properties/items/items/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                      const err194 = { instancePath: instancePath + "/conflicts/" + i6 + "/items/" + i7, schemaPath: "conflict_group.schema.json/properties/items/items/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                       if (vErrors === null) {
                         vErrors = [err194];
                       } else {
@@ -10913,7 +10913,7 @@ function validate28(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data2)) {
-                  const err8 = { instancePath: instancePath + "/profiles/" + i0 + "/id", schemaPath: "profile.schema.json#/properties/id/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err8 = { instancePath: instancePath + "/profiles/" + i0 + "/id", schemaPath: "profile.schema.json#/properties/id/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err8];
                   } else {
@@ -11054,7 +11054,7 @@ function validate28(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data7)) {
-                  const err21 = { instancePath: instancePath + "/route_policies/" + i1 + "/route", schemaPath: "route_policy.schema.json#/properties/route/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err21 = { instancePath: instancePath + "/route_policies/" + i1 + "/route", schemaPath: "route_policy.schema.json#/properties/route/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err21];
                   } else {
@@ -11085,7 +11085,7 @@ function validate28(data, { instancePath = "", parentData, parentDataProperty, r
                   errors++;
                 }
                 if (!pattern4.test(data8)) {
-                  const err24 = { instancePath: instancePath + "/route_policies/" + i1 + "/version", schemaPath: "route_policy.schema.json#/properties/version/pattern", keyword: "pattern", params: { pattern: "\\S" }, message: 'must match pattern "\\S"' };
+                  const err24 = { instancePath: instancePath + "/route_policies/" + i1 + "/version", schemaPath: "route_policy.schema.json#/properties/version/pattern", keyword: "pattern", params: { pattern: "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]" }, message: 'must match pattern "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"' };
                   if (vErrors === null) {
                     vErrors = [err24];
                   } else {
