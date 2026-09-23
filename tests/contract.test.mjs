@@ -384,3 +384,28 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
 });
 
+// RFC 8785 for documents of strings, integers, plain decimals, booleans, null, arrays and objects.
+const canonical = value => Array.isArray(value) ? `[${value.map(canonical).join(',')}]`
+  : value !== null && typeof value === 'object' ? `{${Object.keys(value).sort().map(k => `${JSON.stringify(k)}:${canonical(value[k])}`).join(',')}}`
+  : JSON.stringify(value);
+const sha256 = value => createHash('sha256').update(canonical(value), 'utf8').digest('hex');
+
+test('the registry lock pins the published profiles and conformance route policies by digest (R-20)', async () => {
+  const lock = await read('conformance/registry/lock.json');
+  const pinned = await read('conformance/registry/profiles.json');
+  const policies = await read('conformance/registry/route-policies.json');
+  assert.equal(validateRegistryLockSchema(lock), true, JSON.stringify(validateRegistryLockSchema.errors));
+  assert.deepEqual(pinned, [...profiles, await read('examples/fixture-profile.json')]);
+  assert.deepEqual(lock.profiles, pinned.map(({ evaluation, ...rest }) => ({ id: rest.id, version: rest.version, sha256: sha256(rest) })));
+  assert.deepEqual(lock.route_policies, policies.map(p => ({ route: p.route, version: p.version, sha256: sha256(p) })));
+  for (const policy of policies) assert.equal(validateRoutePolicySchema(policy), true);
+  const promoted = { ...copy(pinned[0]), model_family: 'example-model/1', evaluation: { status: 'evaluated', suite: 's/1', date: '2026-09-22', result: 'pass', artifact: 'https://example.org/run/1' } };
+  const { evaluation, ...configuration } = promoted;
+  assert.equal(sha256(configuration) === lock.profiles[0].sha256, false, 'a new model target changes the digest');
+  const { evaluation: _, ...unchanged } = { ...copy(pinned[0]), evaluation: promoted.evaluation };
+  assert.equal(sha256(unchanged), lock.profiles[0].sha256, 'evaluation alone does not');
+  for (const mutate of [l => l.profiles[0].sha256 = 'ABC', l => l.profiles[0].extra = 1, l => delete l.route_policies, l => l.route_policies[0].version = 3]) {
+    const candidate = copy(lock); mutate(candidate);
+    assert.equal(validateRegistryLockSchema(candidate), false, mutate.toString());
+  }
+});
