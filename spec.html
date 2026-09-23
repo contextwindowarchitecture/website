@@ -59,7 +59,7 @@
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page is the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered R-1 to R-23; numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
-        <span>Generated requirement reference: <a href="./SPEC.md">SPEC.md</a>. JSON contracts: <a href="./schema/context_item.schema.json">items</a> · <a href="./schema/trace.schema.json">traces</a>.</span>
+        <span>Generated requirement reference: <a href="./SPEC.md">SPEC.md</a>. JSON contracts: <a href="./schema/context_item.schema.json">items</a> · <a href="./schema/trace.schema.json">traces</a> · <a href="./schema/conflict_group.schema.json">conflict groups</a> · <a href="./contract/reasons.json">reason codes</a>.</span>
         <span>Licence: free to implement, no attribution required.</span>
       </div>
     </div>
@@ -241,7 +241,7 @@
           </sc-for>
         </div>
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">4.1 Budget tiers</div>
-        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Every slot sits in one of three tiers. <span style="color: var(--fg);">Protected</span> items are rendered whole or the assembly is refused. <span style="color: var(--fg);">Compressible</span> items may be replaced by a precomputed shorter variant. <span style="color: var(--fg);">Droppable</span> items may be omitted. Under pressure the assembler drops before it compresses, and never touches protected items.</p>
+        <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Every slot sits in one of three tiers. <span style="color: var(--fg);">Protected</span> items are rendered whole or the assembly is refused. <span style="color: var(--fg);">Droppable</span> items may be omitted. <span style="color: var(--fg);">Compressible</span> items may be replaced by a precomputed shorter variant or omitted, but only once droppable items are gone; the route's versioned fitting policy orders that step, and without one, variants come before omission. Every omission is traced as over_budget. The assembler never touches protected items.</p>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesFit }}" as="r" hint-placeholder-count="7">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
@@ -338,8 +338,8 @@
         <div style="border: 1px solid var(--line); background: var(--bg); padding: 18px 20px; margin-bottom: 24px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Trace fields</div>
           <div style="font-family: var(--mono); font-size: 12.5px; line-height: 1.75; color: var(--fg);">
-            <div><span style="color: var(--accent); font-weight: 600;">MUST</span> · trace_id · profile { id, version } · budget { input, reserved_output } · context { assembly_time, route_policy_version, tokenizer, renderer } · result { input_tokens, hash } or null · included[] { slot, item_id, tokens } · compressed[] { slot, item_id, from, to, method, variant_id } · excluded[] { item_id, reason, stage } · conflicts[] { kind, items, resolution, decided_by } · refused { bool, reason } · recovery.action when evidence is required</div>
-            <div style="margin-top: 8px;"><span style="color: var(--accent); font-weight: 600;">SHOULD</span> · per-item source_version · the eligibility rule text · admission-stage timings · defaults filled per item</div>
+            <div><span style="color: var(--accent); font-weight: 600;">MUST</span> · trace_id · profile { id, version } · budget { input, reserved_output } · context { assembly_time, route_policy_version, tokenizer, renderer } · result { input_tokens, hash } or null · included[] { slot, item_id, tokens } · compressed[] { slot, item_id, from, to, method, variant_id } · excluded[] { item_id, reason, stage } · conflicts[] { kind, items, resolution, decided_by } · refused { bool, reason } · recovery.action when evidence is required · reasons from contract/reasons.json</div>
+            <div style="margin-top: 8px;"><span style="color: var(--accent); font-weight: 600;">SHOULD</span> · per-item source_version · the eligibility rule text · excluded[].slot · conflicts[].group_id · context.snapshot_digest · admission-stage timings · defaults_filled[] { item_id, field }</div>
           </div>
         </div>
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">6.1 Tests the trace makes possible</div>
@@ -366,6 +366,17 @@
         <p style="font-size: 15px; line-height: 1.6;"><strong>2026-09-22 draft revision.</strong> Separated instruction authority from factual precedence; made freshness, producer rejections, refusal traces, clock snapshots, token accounting, and draft evaluation status explicit. Published executable JSON contracts and shared validators. Example profiles advance to v2 and are all unevaluated. Earlier changelog entries describe superseded draft behavior.</p>
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
+        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">v2 draft<br />2026-09-22 · budget &amp; trace</div>
+          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
+            <li>R-16 now defines the step after compression: once droppable items are gone, compressible items may be reduced by variant or omitted in the route's versioned fitting-policy order, variants first by default. Omissions are traced as over_budget. R-17 remains the only budget refusal.</li>
+            <li>R-12 also refuses when fewer evidence items survive than the route's versioned minimum.</li>
+            <li>R-11 conflict groups carry an id and, for facts, a fact key (schema/conflict_group.schema.json). decided_by renames tier to authority and adds moot.</li>
+            <li>R-21 exclusion and refusal reasons come from contract/reasons.json; item schema failures report missing_field:&lt;name&gt;, unknown_slot or unknown_authority.</li>
+            <li>R-22 defaults_filled becomes {item_id, field} records; excluded[].slot, conflicts[].group_id and context.snapshot_digest are optional.</li>
+            <li>R-2 timestamps compare at full stated precision.</li>
+          </ul>
+        </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">v2 draft<br />2026-09-20</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
@@ -417,7 +428,7 @@ const SLOTS = [
   ["evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the admission pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error."],
   ["state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation."],
   ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged."],
-  ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought."],
+  ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, whole turns are omitted oldest first."],
   ["governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Permission is decided outside the model."],
   ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. An observation is evidence, not permission to act."],
   ["governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure."],
@@ -468,7 +479,7 @@ const TESTS = [
   ["Golden task", "The correct evidence packet appears in the final context for a known request.", 21],
   ["Counterfactual ablation", "Remove evidence, task state or tool results and confirm what fails, and that the trace explains it.", 21],
   ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions.", 7],
-  ["Budget pressure", "At half the window, protected slots survive intact and compression happens in tier order.", 16],
+  ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible.", 16],
   ["Freshness", "Memory expired at assembly_time is excluded and its producer rejection reaches the trace.", 9],
   ["Refusal", "When essential evidence cannot fit, the assembler refuses to render rather than silently answering.", 17],
   ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is refused with capability_not_allowed.", 15]
@@ -485,7 +496,7 @@ const RULES = [
     "model",
     "MUST",
     "Required fields and canonical JSON shape",
-    "Every item MUST carry id, slot, source, source_version, authority, freshness, trust and body and MUST satisfy the published context_item.schema.json. freshness is an RFC 3339 date-time recording when the fact was observed or true; it is not an expiration time. expires is a separate deadline, exclusive at assembly_time. as_of is explanatory terminology, not a JSON alias. Adapters MUST normalize legacy names before validation and MUST reject conflicting aliases. Invalid structure MUST be refused and recorded."
+    "Every item MUST carry id, slot, source, source_version, authority, freshness, trust and body and MUST satisfy the published context_item.schema.json. freshness is an RFC 3339 date-time recording when the fact was observed or true; it is not an expiration time. expires is a separate deadline, exclusive at assembly_time. as_of is explanatory terminology, not a JSON alias. Adapters MUST normalize legacy names before validation and MUST reject conflicting aliases. Invalid structure MUST be refused and recorded. Assemblers and validators MUST compare timestamps as instants at their full stated precision and MUST NOT truncate fractional seconds."
   ],
   [
     "model",
@@ -539,13 +550,13 @@ const RULES = [
     "gov",
     "MUST",
     "Explicit conflict groups and traceable resolution",
-    "The application MUST supply conflict groups with kind: instruction or fact and the item IDs involved; assembly MUST NOT infer semantic contradictions by calling a model. Instruction conflicts follow platform roles, governing over user, then conflict_policy for permitted peers; unresolved conflicts escalate. Factual conflicts use route policy specifying eligible sources, fact identity, scope and any freshness tie-break; freshness alone MUST NOT make an unrelated or unverified claim win. Each trace conflict MUST record kind, items, resolution and decided_by: tier, policy, freshness or escalated. tier MUST NOT decide a factual conflict. A group lacking a unique supported resolution MUST be surfaced, routed for more context or refused, never silently discarded."
+    "The application MUST supply conflict groups satisfying schema/conflict_group.schema.json: a group id, kind: instruction or fact, the item IDs involved and, for fact groups, the fact key that route policy defines; assembly MUST NOT infer semantic contradictions by calling a model. Instruction conflicts follow platform roles, governing over user, then conflict_policy for permitted peers; unresolved conflicts escalate. Factual conflicts use the route policy for that fact key, specifying eligible sources, scope and any freshness tie-break; freshness alone MUST NOT make an unrelated or unverified claim win. Each trace conflict MUST record kind, items, resolution and decided_by: authority, policy, freshness, escalated or moot, and SHOULD record group_id. policy means the peers' conflict_policy for instruction groups and the route's fact policy for fact groups. authority MUST NOT decide a factual conflict. moot records a group left with fewer than two admitted items and MUST NOT be used while two or more remain. A group lacking a unique supported resolution MUST be surfaced, routed for more context or refused, never silently discarded."
   ],
   [
     "fit",
     "MUST NOT",
     "Never answer from nothing",
-    "When admission yields no valid evidence for a route that requires it, an assembler MUST NOT render a payload as though evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action as retrieve_narrower, precompute_summary or request_context. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot."
+    "When admission and fitting leave no valid evidence, or fewer evidence items than the route's versioned minimum, for a route that requires evidence, an assembler MUST NOT render a payload as though sufficient evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action as retrieve_narrower, precompute_summary or request_context. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot."
   ],
   [
     "fit",
@@ -568,8 +579,8 @@ const RULES = [
   [
     "fit",
     "MUST",
-    "Account for rendered tokens; drop before compressing",
-    "budget.input MUST be the maximum rendered input tokens after reserving budget.reserved_output from the model context limit. The assembler MUST count profile wrappers, separators, tool schemas and repeated slots with the declared tokenizer. It MUST drop droppable items before compressing compressible items and MUST NOT compress, truncate or omit protected items. The slot defaults define minimum protection; item metadata or profiles MUST NOT downgrade protected slots. Repeated occurrences count and are traced separately."
+    "Account for rendered tokens; shed in tier order",
+    "budget.input MUST be the maximum rendered input tokens after reserving budget.reserved_output from the model context limit. The assembler MUST count profile wrappers, separators, tool schemas and repeated slots with the declared tokenizer. Under budget pressure it MUST shed in tier order: it MUST omit droppable items before reducing any compressible item, and it MAY then reduce compressible items by selecting supplied variants or by omitting items, in the order given by the route's versioned fitting policy with a stable tie-break. When the route declares no order, the assembler MUST select variants before omitting any compressible item. It MUST NOT compress, truncate or omit protected items. Each omission for budget MUST be recorded in excluded with reason over_budget and stage assembler. The slot defaults define minimum protection; item metadata or profiles MUST NOT downgrade protected slots. Repeated occurrences count and are traced separately."
   ],
   [
     "fit",
@@ -599,13 +610,13 @@ const RULES = [
     "trace",
     "MUST",
     "Trace JSON matches the published schema",
-    "A conformant assembler MUST emit trace JSON satisfying schema/trace.schema.json: trace_id; profile {id, version}; budget {input, reserved_output}; context {assembly_time, route_policy_version, tokenizer, renderer}; result {input_tokens, hash} or null on refusal; included[] {slot, item_id, tokens}; compressed[] {slot, item_id, from, to, method, variant_id}; excluded[] {item_id, reason, stage}; conflicts[] {kind, items, resolution, decided_by}; refused {bool, reason}. included records represent rendered occurrences. result.input_tokens includes rendering overhead; hash is lowercase SHA-256 of the exact rendered UTF-8 payload. Schema validation alone MUST NOT be described as implementation conformance."
+    "A conformant assembler MUST emit trace JSON satisfying schema/trace.schema.json: trace_id; profile {id, version}; budget {input, reserved_output}; context {assembly_time, route_policy_version, tokenizer, renderer}; result {input_tokens, hash} or null on refusal; included[] {slot, item_id, tokens}; compressed[] {slot, item_id, from, to, method, variant_id}; excluded[] {item_id, reason, stage}; conflicts[] {kind, items, resolution, decided_by}; refused {bool, reason}. included records represent rendered occurrences. result.input_tokens includes rendering overhead; hash is lowercase SHA-256 of the exact rendered UTF-8 payload. Exclusion and refusal reasons MUST use the codes published in contract/reasons.json for the conditions those codes name. Schema validation alone MUST NOT be described as implementation conformance."
   ],
   [
     "trace",
     "SHOULD",
     "Recommended trace fields",
-    "A trace SHOULD include source_version and eligibility for each included occurrence, and non-negative admission-stage timings. Whenever defaults are filled under R-3, defaults_filled MUST identify each affected item and field; an empty list MAY be emitted when no defaults were applied."
+    "A trace SHOULD include source_version and eligibility for each included occurrence, the slot of each excluded item, context.snapshot_digest as a lowercase SHA-256 identifying the frozen assembly snapshot, and non-negative admission-stage timings. Whenever defaults are filled under R-3, defaults_filled MUST list one {item_id, field} record per affected item and field; an empty list MAY be emitted when no defaults were applied."
   ],
   [
     "trace",

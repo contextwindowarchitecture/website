@@ -8,7 +8,7 @@ Every item MUST name exactly one slot and one authority value from the closed se
 
 ## R-2: Required fields and canonical JSON shape
 
-Every item MUST carry id, slot, source, source_version, authority, freshness, trust and body and MUST satisfy the published context_item.schema.json. freshness is an RFC 3339 date-time recording when the fact was observed or true; it is not an expiration time. expires is a separate deadline, exclusive at assembly_time. as_of is explanatory terminology, not a JSON alias. Adapters MUST normalize legacy names before validation and MUST reject conflicting aliases. Invalid structure MUST be refused and recorded.
+Every item MUST carry id, slot, source, source_version, authority, freshness, trust and body and MUST satisfy the published context_item.schema.json. freshness is an RFC 3339 date-time recording when the fact was observed or true; it is not an expiration time. expires is a separate deadline, exclusive at assembly_time. as_of is explanatory terminology, not a JSON alias. Adapters MUST normalize legacy names before validation and MUST reject conflicting aliases. Invalid structure MUST be refused and recorded. Assemblers and validators MUST compare timestamps as instants at their full stated precision and MUST NOT truncate fractional seconds.
 
 ## R-3: Declared policy defaults, filled and traced
 
@@ -44,11 +44,11 @@ User-controlled quoted material, attachments, retrieved passages, memory and unv
 
 ## R-11: Explicit conflict groups and traceable resolution
 
-The application MUST supply conflict groups with kind: instruction or fact and the item IDs involved; assembly MUST NOT infer semantic contradictions by calling a model. Instruction conflicts follow platform roles, governing over user, then conflict_policy for permitted peers; unresolved conflicts escalate. Factual conflicts use route policy specifying eligible sources, fact identity, scope and any freshness tie-break; freshness alone MUST NOT make an unrelated or unverified claim win. Each trace conflict MUST record kind, items, resolution and decided_by: tier, policy, freshness or escalated. tier MUST NOT decide a factual conflict. A group lacking a unique supported resolution MUST be surfaced, routed for more context or refused, never silently discarded.
+The application MUST supply conflict groups satisfying schema/conflict_group.schema.json: a group id, kind: instruction or fact, the item IDs involved and, for fact groups, the fact key that route policy defines; assembly MUST NOT infer semantic contradictions by calling a model. Instruction conflicts follow platform roles, governing over user, then conflict_policy for permitted peers; unresolved conflicts escalate. Factual conflicts use the route policy for that fact key, specifying eligible sources, scope and any freshness tie-break; freshness alone MUST NOT make an unrelated or unverified claim win. Each trace conflict MUST record kind, items, resolution and decided_by: authority, policy, freshness, escalated or moot, and SHOULD record group_id. policy means the peers' conflict_policy for instruction groups and the route's fact policy for fact groups. authority MUST NOT decide a factual conflict. moot records a group left with fewer than two admitted items and MUST NOT be used while two or more remain. A group lacking a unique supported resolution MUST be surfaced, routed for more context or refused, never silently discarded.
 
 ## R-12: Never answer from nothing
 
-When admission yields no valid evidence for a route that requires it, an assembler MUST NOT render a payload as though evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action as retrieve_narrower, precompute_summary or request_context. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot.
+When admission and fitting leave no valid evidence, or fewer evidence items than the route's versioned minimum, for a route that requires evidence, an assembler MUST NOT render a payload as though sufficient evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action as retrieve_narrower, precompute_summary or request_context. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot.
 
 ## R-13: Retrievers emit scored packets, not blobs
 
@@ -62,9 +62,9 @@ A memory producer MUST emit only generated or untrusted memory items. It MUST NO
 
 MCP results and resources MUST be marked injection_risk: untrusted_content unless the route policy verifies that server. They MUST enter evidence slots, never governance. Adapters MAY propose tool specifications to the route capability policy. Only that authenticated application policy may emit governance.capabilities with authority: governing, trust: verified and injection_risk: none, after checking the versioned allow-list for the route and user. The application MUST bind producer identity outside item-controlled fields; a source prefix or self-declared trust MUST NOT prove authorization. Unauthorized capabilities MUST be excluded with reason capability_not_allowed. Tool guards MUST still enforce invocation permissions.
 
-## R-16: Account for rendered tokens; drop before compressing
+## R-16: Account for rendered tokens; shed in tier order
 
-budget.input MUST be the maximum rendered input tokens after reserving budget.reserved_output from the model context limit. The assembler MUST count profile wrappers, separators, tool schemas and repeated slots with the declared tokenizer. It MUST drop droppable items before compressing compressible items and MUST NOT compress, truncate or omit protected items. The slot defaults define minimum protection; item metadata or profiles MUST NOT downgrade protected slots. Repeated occurrences count and are traced separately.
+budget.input MUST be the maximum rendered input tokens after reserving budget.reserved_output from the model context limit. The assembler MUST count profile wrappers, separators, tool schemas and repeated slots with the declared tokenizer. Under budget pressure it MUST shed in tier order: it MUST omit droppable items before reducing any compressible item, and it MAY then reduce compressible items by selecting supplied variants or by omitting items, in the order given by the route's versioned fitting policy with a stable tie-break. When the route declares no order, the assembler MUST select variants before omitting any compressible item. It MUST NOT compress, truncate or omit protected items. Each omission for budget MUST be recorded in excluded with reason over_budget and stage assembler. The slot defaults define minimum protection; item metadata or profiles MUST NOT downgrade protected slots. Repeated occurrences count and are traced separately.
 
 ## R-17: Refused assembly has no rendered payload
 
@@ -84,11 +84,11 @@ Every trace MUST record profile id and version. Any change to placement, repetit
 
 ## R-21: Trace JSON matches the published schema
 
-A conformant assembler MUST emit trace JSON satisfying schema/trace.schema.json: trace_id; profile {id, version}; budget {input, reserved_output}; context {assembly_time, route_policy_version, tokenizer, renderer}; result {input_tokens, hash} or null on refusal; included[] {slot, item_id, tokens}; compressed[] {slot, item_id, from, to, method, variant_id}; excluded[] {item_id, reason, stage}; conflicts[] {kind, items, resolution, decided_by}; refused {bool, reason}. included records represent rendered occurrences. result.input_tokens includes rendering overhead; hash is lowercase SHA-256 of the exact rendered UTF-8 payload. Schema validation alone MUST NOT be described as implementation conformance.
+A conformant assembler MUST emit trace JSON satisfying schema/trace.schema.json: trace_id; profile {id, version}; budget {input, reserved_output}; context {assembly_time, route_policy_version, tokenizer, renderer}; result {input_tokens, hash} or null on refusal; included[] {slot, item_id, tokens}; compressed[] {slot, item_id, from, to, method, variant_id}; excluded[] {item_id, reason, stage}; conflicts[] {kind, items, resolution, decided_by}; refused {bool, reason}. included records represent rendered occurrences. result.input_tokens includes rendering overhead; hash is lowercase SHA-256 of the exact rendered UTF-8 payload. Exclusion and refusal reasons MUST use the codes published in contract/reasons.json for the conditions those codes name. Schema validation alone MUST NOT be described as implementation conformance.
 
 ## R-22: Recommended trace fields
 
-A trace SHOULD include source_version and eligibility for each included occurrence, and non-negative admission-stage timings. Whenever defaults are filled under R-3, defaults_filled MUST identify each affected item and field; an empty list MAY be emitted when no defaults were applied.
+A trace SHOULD include source_version and eligibility for each included occurrence, the slot of each excluded item, context.snapshot_digest as a lowercase SHA-256 identifying the frozen assembly snapshot, and non-negative admission-stage timings. Whenever defaults are filled under R-3, defaults_filled MUST list one {item_id, field} record per affected item and field; an empty list MAY be emitted when no defaults were applied.
 
 ## R-23: Determinism includes the clock and policy snapshot
 

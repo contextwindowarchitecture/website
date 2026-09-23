@@ -12,7 +12,7 @@ Use SPEC.md for numbered requirements, spec.html for definitions, and schema/ fo
 - Freeze items, variants, producer rejections, conflict groups, producer context, scope, assembly_time, policy, profile, tokenizer, renderer and budget before assembly. Do not call a model or read external state during assembly.
 - Fill and trace declared defaults. variants contains precomputed shorter bodies. eligibility is descriptive text, never code to execute.
 - Count all rendered tokens, including wrappers, tool schemas and repeated slots. budget.input is the input ceiling after reserving output; do not subtract output twice.
-- Drop droppable items before selecting compressible variants. Keep protected items intact. Profiles cannot omit admitted protected items or required slots.
+- Drop droppable items before reducing compressible items; then select variants or omit compressible items in the route's fitting-policy order (variants first when none is declared), tracing each omission as over_budget. Keep protected items intact. Profiles cannot omit admitted protected items or required slots.
 - Refusal means no payload, result: null, included: [], and a reason. Success hashes the exact rendered UTF-8 bytes with SHA-256.
 - Treat all provided v2 profiles as unevaluated drafts. Promotion needs a model version and a reproducible evaluation artifact.
 - Run npm test after contract edits; npm run build:contract regenerates the website artifacts. Schema validation does not establish full assembler conformance.

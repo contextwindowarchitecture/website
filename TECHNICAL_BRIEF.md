@@ -79,14 +79,14 @@ An unauthorized capability item is excluded with `capability_not_allowed` (R-15)
 
 ### Conflicts and budget pressure
 
-The application supplies instruction or fact conflict groups. Instruction authority follows platform roles and governing/user precedence. Factual conflicts use explicit route policy for the same fact and scope; unresolved groups escalate. Every resolution records its kind and deciding stage. `tier` cannot decide factual precedence (R-6, R-11).
+The application supplies instruction or fact conflict groups. Instruction authority follows platform roles and governing/user precedence. Factual conflicts use explicit route policy for the same fact and scope; unresolved groups escalate. Every resolution records its kind and deciding stage. `authority` cannot decide factual precedence (R-6, R-11). Groups follow `schema/conflict_group.schema.json`; fact groups name the route-policy fact key.
 
 The producer guide supplies these default budget tiers:
 
 | Tier | Slots | Behavior under pressure |
 | --- | --- | --- |
 | Protected | Instructions, capabilities, output contract, task state, query | Render whole; never compress, truncate, or omit |
-| Compressible | Knowledge, tool results, memory, history | Use precomputed shorter variants |
+| Compressible | Knowledge, tool results, memory, history | After droppable items are gone: use precomputed shorter variants or omit, in route fitting-policy order (variants first by default) |
 | Droppable | Examples, user state | Omit before compressing other items |
 
 If protected items cannot fit, refuse to render and record the reason (R-16–R-17). When a route requires evidence and none is valid, record a recovery decision such as narrower retrieval or routing for more context; do not assemble as though evidence existed (R-12). Implementations must account for the reserved output budget.
@@ -128,7 +128,7 @@ R-21 requires a JSON trace with:
 | `conflicts[]` | `kind`, `items`, `resolution`, `decided_by` |
 | `refused` | `bool`, `reason` |
 
-Recommended additions include source versions, eligibility rules, stage timings, and applied defaults. Identical immutable snapshots—including clock, policy, producer context, conflict groups, tokenizer, renderer and budget—must produce identical rendered UTF-8 bytes and SHA-256, or the same refusal (R-23).
+Exclusion and refusal reasons come from `contract/reasons.json`. Recommended additions include source versions, eligibility rules, the excluded item's slot, conflict group IDs, a snapshot digest, stage timings, and applied defaults as `{item_id, field}` records. Identical immutable snapshots—including clock, policy, producer context, conflict groups, tokenizer, renderer and budget—must produce identical rendered UTF-8 bytes and SHA-256, or the same refusal (R-23).
 
 The site proposes snapshot, golden-task, ablation, conflict, budget-pressure, freshness, refusal, and capability-source checks. A trace validator can check structure and reported decisions; passing it does not prove the implementation satisfies all 23 requirements.
 

@@ -1,12 +1,37 @@
 import { ITEM_SCHEMA, SLOT_DEFAULTS } from './generated/contract-data.js';
-import { validateItemSchema, validateTraceSchema, validateProfileSchema, validateProducerBatchSchema } from './generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateProfileSchema, validateProducerBatchSchema, validateConflictGroupSchema } from './generated/schema-validators.js';
 
-export { SLOT_DEFAULTS, ITEM_EXAMPLE, TRACE_EXAMPLE } from './generated/contract-data.js';
+export { SLOT_DEFAULTS, REASONS, ITEM_EXAMPLE, TRACE_EXAMPLE } from './generated/contract-data.js';
 
 const policyFields = ['token_budget', 'variants', 'conflict_policy', 'lineage', 'eligibility', 'injection_risk'];
 const failure = (reason, text, rule) => ({ reason, text, rule, level: 'error' });
 const schemaErrors = (validator, rule) => (validator.errors || []).map(error =>
   failure('invalid_structure', `${error.instancePath || '/'} ${error.message}`, rule));
+
+// Item schema errors map to the specific codes in contract/reasons.json.
+function itemSchemaErrors() {
+  const errors = (validateItemSchema.errors || []).filter(error => error.keyword !== 'if');
+  return errors.map(error => {
+    const text = `${error.instancePath || '/'} ${error.message}`;
+    if (error.keyword === 'required') return failure(`missing_field:${error.params.missingProperty}`, text, 2);
+    if (error.keyword === 'enum' && error.instancePath === '/slot') return failure('unknown_slot', text, 1);
+    if (error.keyword === 'enum' && error.instancePath === '/authority') return failure('unknown_authority', text, 1);
+    return failure('invalid_structure', text, 2);
+  });
+}
+
+// Compare RFC 3339 instants at full stated precision (R-2); Date.parse alone truncates to milliseconds.
+const INSTANT = /^(\d{4}-\d{2}-\d{2}[Tt]\d{2}:\d{2}:\d{2})(?:\.(\d+))?([Zz]|[+-]\d{2}:\d{2})$/;
+export function compareInstants(a, b) {
+  const [ma, mb] = [INSTANT.exec(a), INSTANT.exec(b)];
+  if (!ma || !mb) return NaN;
+  const [sa, sb] = [Date.parse(ma[1] + ma[3]), Date.parse(mb[1] + mb[3])];
+  if (!Number.isFinite(sa) || !Number.isFinite(sb)) return NaN;
+  if (sa !== sb) return sa < sb ? -1 : 1;
+  const width = Math.max((ma[2] || '').length, (mb[2] || '').length);
+  const [fa, fb] = [(ma[2] || '').padEnd(width, '0'), (mb[2] || '').padEnd(width, '0')];
+  return fa === fb ? 0 : fa < fb ? -1 : 1;
+}
 
 function fillDefaults(item) {
   const defaults = SLOT_DEFAULTS[item.slot];
@@ -30,14 +55,14 @@ function checkAuthority(item) {
 }
 
 function checkLifetime(item, assemblyTime) {
-  if (!assemblyTime || !Number.isFinite(Date.parse(assemblyTime))) {
+  if (!assemblyTime || Number.isNaN(compareInstants(assemblyTime, assemblyTime))) {
     return [failure('assembly_time_required', 'Supply the assembly snapshot time explicitly.', 23)];
   }
   if (item.revoked_by) return [failure('revoked', `Revoked by ${item.revoked_by}.`, 9)];
-  if (item.expires && Date.parse(item.expires) <= Date.parse(assemblyTime)) {
+  if (item.expires && compareInstants(item.expires, assemblyTime) <= 0) {
     return [failure('expired', `Expired at ${item.expires}.`, 9)];
   }
-  if (Date.parse(item.freshness) > Date.parse(assemblyTime)) {
+  if (compareInstants(item.freshness, assemblyTime) > 0) {
     return [failure('future_freshness', 'Freshness is later than the assembly snapshot.', 2)];
   }
   return [];
@@ -57,7 +82,7 @@ function checkProducer(item, context) {
 }
 
 export function checkItem(candidate, context = {}) {
-  if (!validateItemSchema(candidate)) return { valid: false, findings: schemaErrors(validateItemSchema, 2), filled: [], item: null };
+  if (!validateItemSchema(candidate)) return { valid: false, findings: itemSchemaErrors(), filled: [], item: null };
   const { item, filled } = fillDefaults(candidate);
   const findings = [...checkAuthority(item), ...checkLifetime(item, context.assemblyTime), ...checkProducer(item, context)];
   const verifiedMcp = context.producer?.authenticated && context.producer.kind === 'mcp' && context.verifiedServer === true;
@@ -87,6 +112,11 @@ function checkRenderedBudget(trace) {
       findings.push(failure('invalid_token_accounting', 'Rendered input must include all item tokens and fit the input ceiling.', 16));
     }
   } else if (trace.included.length) findings.push(failure('refused_payload_included', 'A refused assembly has no rendered included items.', 17));
+  for (const item of trace.excluded) {
+    if (item.reason === 'over_budget' && item.slot && SLOT_DEFAULTS[item.slot].tier === 'protected') {
+      findings.push(failure('protected_omitted', `A protected ${item.slot} item cannot be omitted for budget.`, 16));
+    }
+  }
   return findings;
 }
 
@@ -99,7 +129,7 @@ export function checkTrace(trace) {
     }
   }
   for (const conflict of trace.conflicts) {
-    if (conflict.kind === 'fact' && conflict.decided_by === 'tier') {
+    if (conflict.kind === 'fact' && conflict.decided_by === 'authority') {
       findings.push(failure('factual_authority_inversion', 'Instruction authority cannot decide factual precedence.', 6));
     }
   }
@@ -123,5 +153,13 @@ export function checkProducerBatch(batch) {
   if (!validateProducerBatchSchema(batch)) return { valid: false, findings: schemaErrors(validateProducerBatchSchema, 9) };
   const ids = [...batch.items.map(item => item.id), ...batch.excluded.map(item => item.item_id)];
   const findings = new Set(ids).size === ids.length ? [] : [failure('duplicate_item_id', 'Batch item IDs must be unique across candidates and exclusions.', 9)];
+  return { valid: findings.length === 0, findings };
+}
+
+export function checkConflictGroup(group, { itemIds } = {}) {
+  if (!validateConflictGroupSchema(group)) return { valid: false, findings: schemaErrors(validateConflictGroupSchema, 11) };
+  const known = itemIds && new Set(itemIds);
+  const findings = known ? group.items.filter(id => !known.has(id)).map(id =>
+    failure('unknown_conflict_item', `Conflict group ${group.id} names ${id}, which is not a candidate in this snapshot.`, 11)) : [];
   return { valid: findings.length === 0, findings };
 }

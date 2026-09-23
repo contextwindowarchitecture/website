@@ -194,6 +194,22 @@
               "producer",
               "assembler"
             ]
+          },
+          "slot": {
+            "type": "string",
+            "enum": [
+              "governance.instructions",
+              "governance.capabilities",
+              "governance.examples",
+              "governance.output_contract",
+              "state.user",
+              "state.task",
+              "evidence.knowledge",
+              "evidence.tool_results",
+              "interaction.memory",
+              "interaction.history",
+              "interaction.query"
+            ]
           }
         },
         "required": [
@@ -234,11 +250,17 @@
           "decided_by": {
             "type": "string",
             "enum": [
-              "tier",
+              "authority",
               "policy",
               "freshness",
-              "escalated"
+              "escalated",
+              "moot"
             ]
+          },
+          "group_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
           }
         },
         "required": [
@@ -296,6 +318,10 @@
           "type": "string",
           "minLength": 1,
           "pattern": "\\S"
+        },
+        "snapshot_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
         }
       },
       "required": [
@@ -309,9 +335,30 @@
     "defaults_filled": {
       "type": "array",
       "items": {
-        "type": "string",
-        "minLength": 1,
-        "pattern": "\\S"
+        "type": "object",
+        "properties": {
+          "item_id": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S"
+          },
+          "field": {
+            "type": "string",
+            "enum": [
+              "token_budget",
+              "variants",
+              "conflict_policy",
+              "lineage",
+              "eligibility",
+              "injection_risk"
+            ]
+          }
+        },
+        "required": [
+          "item_id",
+          "field"
+        ],
+        "additionalProperties": false
       }
     },
     "timings": {

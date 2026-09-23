@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { checkItem, checkTrace, checkProfile, checkProducerBatch } from '../contract.js';
+import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, compareInstants, REASONS } from '../contract.js';
 import { validateItemSchema, validateTraceSchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
@@ -102,7 +102,10 @@ const traceMutations = {
   'missing query': t => t.included = t.included.filter(i => i.slot !== 'interaction.query'),
   'invalid digest': t => t.result.hash = '7f…c1',
   'missing assembly snapshot': t => delete t.context,
-  'fact resolved by instruction rank': t => t.conflicts = [{ items: ['tool', 'document'], kind: 'fact', resolution: 'tool wins', decided_by: 'tier' }],
+  'fact resolved by instruction rank': t => t.conflicts = [{ items: ['tool', 'document'], kind: 'fact', resolution: 'tool wins', decided_by: 'authority' }],
+  'withdrawn decided_by tier': t => t.conflicts = [{ items: ['policy', 'example'], kind: 'instruction', resolution: 'policy governs', decided_by: 'tier' }],
+  'protected item omitted for budget': t => t.excluded.push({ item_id: 'task:8821', reason: 'over_budget', stage: 'assembler', slot: 'state.task' }),
+  'defaults_filled as ambiguous strings': t => t.defaults_filled = ['refunds-eu:v17#p4.lineage'],
   'protected compression': t => t.compressed = [{ slot: 'governance.instructions', item_id: 'policy', from: 90, to: 20, method: 'summary', variant_id: 'short' }]
 };
 for (const [name, mutate] of Object.entries(traceMutations)) {
@@ -125,7 +128,7 @@ test('missing evidence requires an explicit recovery handoff, not an in-assembly
 });
 
 test('factual precedence may report route policy or explicit escalation', () => {
-  for (const decided_by of ['policy', 'freshness', 'escalated']) {
+  for (const decided_by of ['policy', 'freshness', 'escalated', 'moot']) {
     const candidate = { ...trace, conflicts: [{ items: ['tool', 'document'], kind: 'fact', resolution: 'route-defined outcome', decided_by }] };
     assert.equal(checkTrace(candidate).valid, true);
   }
@@ -156,4 +159,54 @@ test('published trace hash and fixture token counts match the concrete sample pa
   const payload = await fs.readFile(new URL('../examples/payload.txt', import.meta.url));
   assert.equal(trace.result.hash, createHash('sha256').update(payload).digest('hex'));
   assert.equal(trace.result.input_tokens, payload.toString('utf8').match(/\S+/gu).length);
+});
+
+test('budget omissions of compressible items and structured defaults are valid trace records', () => {
+  const candidate = copy(trace);
+  candidate.excluded.push({ item_id: 'history:turn-3', reason: 'over_budget', stage: 'assembler', slot: 'interaction.history' });
+  candidate.defaults_filled = [{ item_id: 'refunds-eu:v17#p4', field: 'lineage' }];
+  candidate.conflicts = [{ group_id: 'g-format', items: ['policy:v12', 'example:tone-3'], kind: 'instruction', resolution: 'policy governs', decided_by: 'authority' }];
+  candidate.context.snapshot_digest = 'a'.repeat(64);
+  assert.equal(checkTrace(candidate).valid, true);
+});
+
+test('conflict groups need an id, and fact groups need a fact key that names known items', async () => {
+  const groups = await read('examples/conflict-groups.json');
+  const itemIds = ['refunds-eu:v17#p4', 'crm:order#42', 'policy:v12', 'example:tone-3'];
+  for (const group of groups) assert.equal(checkConflictGroup(group, { itemIds }).valid, true);
+  const { fact, ...factless } = groups[0];
+  assert.equal(checkConflictGroup(factless).valid, false);
+  assert.equal(checkConflictGroup({ ...groups[1], id: undefined }).valid, false);
+  assert.equal(checkConflictGroup({ ...groups[1], items: ['policy:v12'] }).valid, false);
+  assert.equal(checkConflictGroup(groups[0], { itemIds: ['refunds-eu:v17#p4'] }).valid, false);
+});
+
+test('timestamps compare at full stated precision, not milliseconds', () => {
+  const memory = { ...item, id: 'm1', slot: 'interaction.memory', authority: 'generated', source: 'turn:14', lineage: 'summarised' };
+  delete memory.relevance;
+  assert.equal(compareInstants('2026-09-22T12:00:00.0005Z', '2026-09-22T12:00:00Z'), 1);
+  assert.equal(compareInstants('2026-09-22T14:00:00+02:00', '2026-09-22T12:00:00.000Z'), 0);
+  assert.equal(checkItem({ ...memory, expires: '2026-09-22T12:00:00.0005Z' }, context).valid, true);
+  assert.equal(checkItem({ ...memory, expires: '2026-09-22T12:00:00.000Z' }, context).findings[0].reason, 'expired');
+});
+
+test('item findings use registered reason codes, with specific schema codes', () => {
+  const codes = new Set(REASONS.map(r => r.code));
+  const registered = reason => codes.has(reason.startsWith('missing_field:') ? 'missing_field:<name>' : reason);
+  const cases = { ...itemMutations, 'unknown slot': i => i.slot = 'evidence.web', 'forged capability': i => Object.assign(i, { slot: 'governance.capabilities', authority: 'governing', injection_risk: 'none' }) };
+  for (const mutate of Object.values(cases)) {
+    const candidate = copy(item); mutate(candidate);
+    for (const finding of checkItem(candidate, context).findings) assert.ok(registered(finding.reason), finding.reason);
+  }
+  const missing = copy(item); delete missing.body;
+  assert.equal(checkItem(missing, context).findings[0].reason, 'missing_field:body');
+  assert.equal(checkItem({ ...item, slot: 'evidence.web' }, context).findings[0].reason, 'unknown_slot');
+  assert.equal(checkItem({ ...item, authority: 'reference' }, context).findings[0].reason, 'unknown_authority');
+});
+
+test('reason registry is unique and cites permanent requirement IDs', () => {
+  const codes = REASONS.map(r => r.code);
+  assert.equal(new Set(codes).size, codes.length);
+  for (const reason of REASONS) assert.match(reason.rule, /^R-([1-9]|1\d|2[0-3])$/);
+  for (const code of ['over_budget', 'evidence_required', 'protected_content_over_budget']) assert.ok(codes.includes(code));
 });

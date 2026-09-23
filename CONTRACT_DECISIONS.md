@@ -31,6 +31,23 @@ The application supplies conflict groups with item IDs and `kind: instruction | 
 | Migrator truncates exported content | Full bodies are preserved; malformed message entries remain unassigned |
 | Missing specification mirror | Generated `SPEC.md` requirement reference with permanent IDs; Spec-page context remains normative |
 
+## Budget and trace amendments — 2026-09-22
+
+These follow the reference-assembler design review (`cwa-assembler/docs/DESIGN.md`, findings DA-3, DA-9, DA-10, DA-13, DA-14, DA-18, DA-24).
+
+| Issue | Resolution |
+| --- | --- |
+| R-16 left undefined what happens when compressed content still does not fit | Compressible items may be reduced by variant or omitted after droppable items are gone, in the route's versioned fitting-policy order; variants first when none is declared; omissions traced as `over_budget` |
+| Omission could quietly keep too little evidence | R-12 refuses with `evidence_required` below the route's versioned evidence minimum |
+| Fact conflict groups had no key into route policy | `schema/conflict_group.schema.json`: `id`, `kind`, `items`, and `fact` for fact groups |
+| `decided_by: tier` collided with the budget `tier` field; no value for moot groups | Renamed to `authority`; added `moot` for groups left with fewer than two admitted items |
+| Reason codes differed between the Producers page and `contract.js` | `contract/reasons.json` is canonical; the Producers table is generated; item schema failures report `missing_field:<name>`, `unknown_slot`, `unknown_authority` |
+| `defaults_filled` strings were ambiguous for IDs containing `#` or `:` | `{item_id, field}` records |
+| Millisecond truncation made JavaScript and Python disagree on expiry | Timestamps compare at full stated precision; `compareInstants()` in `contract.js` |
+| A trace could not point to its replay input; validators could not see an omitted item's slot | Optional `context.snapshot_digest`, `excluded[].slot`, `conflicts[].group_id` |
+
+Breaking for stored traces: `decided_by: "tier"` and string `defaults_filled` entries no longer validate. Migrate `tier` to `authority` and split strings into `{item_id, field}` records.
+
 ## Review and migration implications
 
 This is a breaking **draft** revision. Existing traces need `context`, conflict `kind`, exclusion `stage`, and compression `item_id`/`variant_id`. Refused traces use the new null result shape. Item JSON no longer accepts `as_of`, loose scope strings, undefined authority aliases, or undeclared fields. Consumers should validate and migrate explicitly rather than silently coercing old data.

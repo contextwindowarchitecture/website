@@ -185,9 +185,9 @@
 
       <section id="failures">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Admission failures</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Every refusal lands in the trace as <span style="font-family: var(--mono); font-size: 14px;">excluded[] { item_id, reason, stage }</span>. These are the reasons a producer will see, and what they mean.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Every refusal lands in the trace as <span style="font-family: var(--mono); font-size: 14px;">excluded[] { item_id, reason, stage }</span>. These are the reasons a producer will see, and what they mean. The list is generated from <a href="./contract/reasons.json">contract/reasons.json</a>, which also holds the assembly-level refusal reasons.</p>
         <div style="border: 1px solid var(--line);">
-          <sc-for list="{{ failures }}" as="f" hint-placeholder-count="7">
+          <sc-for list="{{ failures }}" as="f" hint-placeholder-count="19">
             <div style="display: grid; grid-template-columns: 210px minmax(0, 1fr) 60px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">{{ f.reason }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ f.text }}</span>
@@ -414,15 +414,101 @@ const STAGES = [
   ["Attribute", "assembler", "Carry citation requirements into the output contract so the answer can point back to the packet."]
 ];
 const FAILURES = [
-  ["missing_field:<name>", "One of the eight minimum fields is absent. Fix the producer; the assembler will not guess.", 2],
-  ["unknown_slot", "The slot name is not one of the eleven. Check spelling and plane prefix.", 1],
-  ["unknown_authority", "The authority value is not one of the seven roles. capability and steering are not authority values; use governing with a conflict_policy.", 1],
-  ["authority_not_allowed", "The authority value is not allowed for this slot or authenticated producer. These roles are not a factual ranking.", 14],
-  ["capability_not_allowed", "The authenticated emitter is not the route capability policy, or the tool is not on the route/user allow-list. Item source strings cannot prove permission.", 15],
-  ["untrusted_in_governance", "An item marked untrusted_content was aimed at a governance slot.", 10],
-  ["expired", "expires is at or before assembly_time. freshness describes when content was true; a past freshness is not itself expiration.", 9],
-  ["below_threshold", "The rerank score is under the route's versioned threshold.", 13],
-  ["out_of_scope", "Tenant, user or session scope does not match the request.", 2]
+  [
+    "missing_field:<name>",
+    "A required field is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for retrieval. Fix the producer; the assembler will not guess.",
+    2
+  ],
+  [
+    "unknown_slot",
+    "The slot name is not one of the eleven. Check spelling and plane prefix.",
+    1
+  ],
+  [
+    "unknown_authority",
+    "The authority value is not one of the seven roles. capability and steering are not authority values; use governing with a conflict_policy.",
+    1
+  ],
+  [
+    "invalid_structure",
+    "The item fails the published schema for another reason, such as a wrong type, an undeclared field or a malformed timestamp.",
+    2
+  ],
+  [
+    "authority_not_allowed",
+    "The authority value is not allowed for this slot or authenticated producer. These roles are not a factual ranking.",
+    1
+  ],
+  [
+    "producer_not_authenticated",
+    "The application did not authenticate the emitting producer. Identity comes from trusted context, never from item fields.",
+    15
+  ],
+  [
+    "producer_slot_not_allowed",
+    "The authenticated producer is not permitted to emit into this slot.",
+    15
+  ],
+  [
+    "capability_not_allowed",
+    "The authenticated emitter is not the route capability policy, or the tool is not on the route/user allow-list. Item source strings cannot prove permission.",
+    15
+  ],
+  [
+    "untrusted_in_governance",
+    "A governance item is not verified or is marked untrusted_content.",
+    10
+  ],
+  [
+    "untrusted_content_unmarked",
+    "User-controlled, retrieved or tool content is not marked injection_risk: untrusted_content, and the route has not verified its server.",
+    10
+  ],
+  [
+    "protected_tier_changed",
+    "The item tries to downgrade a protected slot.",
+    16
+  ],
+  [
+    "duplicate_item_id",
+    "Another candidate or producer exclusion in the same assembly uses this ID.",
+    2
+  ],
+  [
+    "duplicate_variant_id",
+    "Variant IDs repeat, or a variant reuses its parent item's ID.",
+    18
+  ],
+  [
+    "revoked",
+    "revoked_by is set. The item was contradicted or withdrawn.",
+    9
+  ],
+  [
+    "expired",
+    "expires is at or before assembly_time. freshness describes when content was true; a past freshness is not itself expiration.",
+    9
+  ],
+  [
+    "future_freshness",
+    "freshness is later than assembly_time.",
+    2
+  ],
+  [
+    "below_threshold",
+    "The rerank score is under the route's versioned threshold.",
+    13
+  ],
+  [
+    "out_of_scope",
+    "Tenant, user or session scope does not match the request.",
+    2
+  ],
+  [
+    "over_budget",
+    "The item was omitted to fit the rendered budget, in tier order and by the route's fitting policy.",
+    16
+  ]
 ];
 const SAMPLES = [
   { label: "retrieval · valid structure", src: {

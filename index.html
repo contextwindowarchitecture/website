@@ -863,7 +863,7 @@ const SLOTS = [
   ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
   ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged.", "authority generated\ntier compressible\nlifecycle ttl · revocable"],
-  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought.", "authority user\ntier compressible\nbound turns · tokens"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, whole turns are omitted oldest first.", "authority user\ntier compressible\nbound turns · tokens"],
   ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority, and permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
   ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
   ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure.", "authority governing\ntier droppable\nrank task similarity"],
@@ -1059,6 +1059,7 @@ const SLOT_TOKENS = [240, 90, 1500, 160, 320, 850, 400, 600, 450, 70, 40];
 const DROPPABLE = [8, 1];
 const COMPRESSIBLE = [4, 5, 2, 7];
 const COMPRESS = 0.4;
+const OMITTABLE = [4, 5];
 const BUDGETS = [8192, 4096, 2048, 1024];
 
 const PROFILES = [
@@ -1093,7 +1094,7 @@ const TESTS = [
   ["Golden task", "The correct evidence packet appears in the final context for a known request."],
   ["Counterfactual ablation", "Remove evidence, task state, or tool results and confirm what fails, and that the trace explains it."],
   ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions."],
-  ["Budget pressure", "At half the window, protected slots survive intact and compression happens in tier order."],
+  ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
   ["Freshness", "Expired memory is excluded using assembly_time and its producer rejection is traced."],
   ["Refusal", "When essential evidence cannot fit, the assembler refuses to render rather than silently answering."],
   ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is refused with capability_not_allowed."]
@@ -1314,7 +1315,7 @@ class Component extends DCLogic {
       { key: "payload", kicker: "The payload", title: "Every item is attributable",
         body: "Each block names its slot, its cost, and where it came from. The footer names the profile that ordered it and the trace that recorded it.", act: () => this.setState({ playing: false, step: 99 }) },
       { key: "budget", kicker: "The budget", title: "Real windows are finite",
-        body: "We just squeezed this one to 2k. The assembler now has to fit — and it does so by tier: drop droppable, compress compressible, keep protected intact.", act: () => this.setState({ budget: 2, playing: false, step: 99 }) },
+        body: "We just squeezed this one to 2k. The assembler now has to fit — and it does so by tier: drop droppable, then compress or omit compressible, keep protected intact.", act: () => this.setState({ budget: 2, playing: false, step: 99 }) },
       { key: "fill", kicker: "Fitting", title: "Dropped, compressed, or refused",
         body: "The bar is the window; the line beneath names what was dropped and what was compressed. Squeeze to 1k and watch the assembler refuse rather than answer without its evidence.",
         act: () => this.setState({ budget: 2, playing: false, step: 99 }) },
@@ -1507,6 +1508,8 @@ class Component extends DCLogic {
     let planned = picks.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0);
     for (const li of DROPPABLE) { if (planned <= budget) break; if (has(li)) { evicted[li] = true; planned -= SLOT_TOKENS[li]; } }
     for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { compressed[li] = true; planned -= SLOT_TOKENS[li] - Math.round(SLOT_TOKENS[li] * COMPRESS); } }
+    // R-16: compressible items may then be omitted. Memory and history go whole; omitting all evidence would refuse under R-12 instead.
+    for (const li of OMITTABLE) { if (planned <= budget) break; if (has(li)) { planned -= tok(li); delete compressed[li]; evicted[li] = true; } }
     const refused = planned > budget;
     const evictedNames = Object.keys(evicted).map(i => SLOTS[+i][1]);
     const compressedNames = Object.keys(compressed).map(i => SLOTS[+i][1]);
