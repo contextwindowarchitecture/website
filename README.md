@@ -22,6 +22,7 @@ npm test
 | `spec.html` | Normative definitions and explanatory context outside the generated requirements |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
+| `conformance/rejections/` | Snapshots that break exactly one snapshot check; an assembler must reject each before assembly, with no trace (R-17) |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
 | `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |
 | `contract/assembler-status.json` | The reference assembler's claimed status per requirement, imported from its `status.json` with `node scripts/import-assembler-status.mjs ../cwa-assembler` |

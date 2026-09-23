@@ -110,9 +110,9 @@ snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shap
     assembly_time=now,            <span style="color: var(--muted);"># read once, before freezing</span>
     route_policy=reg.route_policy(<span style="color: var(--p-evid);">"support-chat"</span>, <span style="color: var(--p-evid);">"v1"</span>),
     profile=reg.profile(<span style="color: var(--p-evid);">"policy-first-chat"</span>, 1, deployment=True),  <span style="color: var(--muted);"># evaluated only</span>
-    tokenizer=<span style="color: var(--p-evid);">"fixture-whitespace/v1"</span>,
+    tokenizer=<span style="color: var(--p-evid);">"estimate-utf8/v1"</span>,    <span style="color: var(--muted);"># or your own: Snapshot.freeze(..., tokenizers={...})</span>
     renderer=<span style="color: var(--p-evid);">"cwa-messages/v1"</span>,  <span style="color: var(--muted);"># render IR for a provider adapter</span>
-    budget={<span style="color: var(--p-evid);">"input"</span>: 8192, <span style="color: var(--p-evid);">"reserved_output"</span>: 1200},
+    budget={<span style="color: var(--p-evid);">"input"</span>: 8192, <span style="color: var(--p-evid);">"reserved_output"</span>: 1200, <span style="color: var(--p-evid);">"margin_percent"</span>: 15},  <span style="color: var(--muted);"># headroom for an estimate</span>
 )
 
 result = assemble(snapshot)       <span style="color: var(--muted);"># pure: no I/O, clock or model</span>
