@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, compareInstants, REASONS } from '../contract.js';
-import { validateItemSchema, validateTraceSchema } from '../generated/schema-validators.js';
+import { validateItemSchema, validateTraceSchema, validateSnapshotSchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
 const read = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
@@ -230,4 +230,34 @@ test('only route policy can raise a tier; items may lower non-protected tiers', 
   assert.deepEqual(reason(userFact), ['tier_upgrade_not_allowed']);
   assert.equal(checkItem(userFact, { ...context, tierUpgrades: { 'state.user': 'protected' } }).valid, true);
   assert.equal(checkItem(userFact, { ...context, tierUpgrades: { 'state.user': 'droppable' } }).valid, false);
+});
+
+test('conformance cases are complete, schema-valid, and agree with the published examples', async () => {
+  const root = new URL('../conformance/cases/', import.meta.url);
+  const cases = await fs.readdir(root);
+  assert.ok(cases.length > 0);
+  for (const name of cases) {
+    const file = f => new URL(`${name}/${f}`, root);
+    const meta = JSON.parse(await fs.readFile(file('case.json'), 'utf8'));
+    assert.equal(meta.id, name);
+    for (const rule of meta.rules) assert.match(rule, /^R-([1-9]|1\d|2[0-3])$/);
+    const snapshot = JSON.parse(await fs.readFile(file('snapshot.json'), 'utf8'));
+    assert.equal(validateSnapshotSchema(snapshot), true, JSON.stringify(validateSnapshotSchema.errors));
+    const expected = JSON.parse(await fs.readFile(file('expected.trace.json'), 'utf8'));
+    assert.equal(checkTrace(expected).valid, true);
+    const payload = await fs.readFile(file('expected.payload.txt')).catch(() => null);
+    assert.equal(payload === null, expected.refused.bool);
+    if (payload) assert.equal(expected.result.hash, createHash('sha256').update(payload).digest('hex'));
+  }
+  const fixture = new URL('fixture-three-slot/', root);
+  assert.deepEqual(JSON.parse(await fs.readFile(new URL('expected.trace.json', fixture), 'utf8')), trace);
+  assert.deepEqual(await fs.readFile(new URL('expected.payload.txt', fixture)), await fs.readFile(new URL('../examples/payload.txt', import.meta.url)));
+});
+
+test('snapshots bind identity per batch and reject undeclared fields', async () => {
+  const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  for (const mutate of [s => delete s.assembly_time, s => s.batches[0].producer.kind = 'self-declared', s => s.batches[0].items[0].surprise = 1, s => s.clock = 'now', s => delete s.batches[1].producer]) {
+    const candidate = copy(snapshot); mutate(candidate);
+    assert.equal(validateSnapshotSchema(candidate), false);
+  }
 });

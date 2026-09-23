@@ -1075,7 +1075,8 @@ export const TRACE_EXAMPLE = {
     {
       "slot": "governance.instructions",
       "item_id": "policy:v12",
-      "tokens": 9
+      "tokens": 9,
+      "source_version": "v12"
     },
     {
       "slot": "evidence.knowledge",
@@ -1086,7 +1087,8 @@ export const TRACE_EXAMPLE = {
     {
       "slot": "interaction.query",
       "item_id": "turn:18",
-      "tokens": 6
+      "tokens": 6,
+      "source_version": "1"
     }
   ],
   "compressed": [],
