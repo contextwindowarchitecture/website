@@ -23,6 +23,7 @@ Array order in the trace is part of the expectation:
 - `included[]` follows payload order.
 - `excluded[]` lists producer-stage rows first, ordered by producer id and then `item_id`. Assembler rows follow in pipeline order. Admission rows are ordered by producer id and then recorded `item_id`. Fitting rows follow in the order items were omitted. Later stages define their order when they are specified.
 - `compressed[]` has one row per included occurrence of a compressed item, in payload order.
+- Assembler rows in `excluded[]` carry `slot` whenever the candidate names one of the eleven slots, even when it fails for another reason (R-22). Producer rows carry what the producer reported, which has no slot.
 - `defaults_filled[]` is ordered by `item_id`, then by field in R-3 order: `token_budget`, `variants`, `conflict_policy`, `lineage`, `eligibility`, `injection_risk`. It covers every schema-valid item from a producer the route admits, including items later excluded, because later admission checks read the filled values.
 
 When an item fails several admission checks, the trace records the earliest applicable code in `contract/reasons.json` order (R-21).
