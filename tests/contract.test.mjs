@@ -242,9 +242,9 @@ test('a snapshot\'s groups name known items and facts, with no item in two group
   assert.deepEqual(checkConflictGroups([groups[0], { ...groups[1], id: groups[0].id }], options).findings.map(f => f.reason), ['duplicate_conflict_group']);
 });
 
-test('exclusions after admission follow the pipeline in the reason registry: conflicts, supersession, deduplication, fitting', () => {
+test('exclusions after admission follow the pipeline in the reason registry: conflicts, supersession, deduplication, diversity, fitting', () => {
   const exclusions = REASONS.filter(r => r.kind === 'exclusion').map(r => r.code);
-  assert.deepEqual(exclusions.slice(-5), ['conflict_deferred', 'conflict_lost', 'superseded', 'duplicate_content', 'over_budget']);
+  assert.deepEqual(exclusions.slice(-6), ['conflict_deferred', 'conflict_lost', 'superseded', 'duplicate_content', 'source_diversity_cap', 'over_budget']);
 });
 
 test('route policies declare fact precedence and unresolved-conflict actions (R-6, R-11)', async () => {
@@ -290,6 +290,20 @@ test('reason registry is unique and cites permanent requirement IDs', () => {
   assert.equal(new Set(codes).size, codes.length);
   for (const reason of REASONS) assert.match(reason.rule, PERMANENT_ID);
   for (const code of ['over_budget', 'evidence_required', 'protected_content_over_budget']) assert.ok(codes.includes(code));
+});
+
+test('source_diversity_cap is an R-26 exclusion that names nothing kept', () => {
+  assert.deepEqual(REASONS.find(r => r.code === 'source_diversity_cap')?.rule, 'R-26');
+  assert.equal(REASONS.find(r => r.code === 'source_diversity_cap').kind, 'exclusion');
+  const row = { item_id: 'kb:a#4', reason: 'source_diversity_cap', stage: 'assembler', slot: 'evidence.knowledge' };
+  assert.equal(checkTrace({ ...trace, excluded: [...trace.excluded, row] }).valid, true, JSON.stringify(validateTraceSchema.errors));
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, duplicate_of: 'kb:a#1' }] }), false);
+  assert.equal(validateTraceSchema({ ...trace, excluded: [...trace.excluded, { ...row, superseded_by: 'kb:a#1' }] }), false);
+});
+
+test('the source diversity cap never excludes a protected item', () => {
+  const task = { item_id: 'task:3', reason: 'source_diversity_cap', stage: 'assembler', slot: 'state.task' };
+  assert.deepEqual(checkTrace({ ...trace, excluded: [...trace.excluded, task] }).findings.map(f => f.reason), ['protected_diversity_excluded']);
 });
 
 test('superseded is an R-25 exclusion', () => {
@@ -427,6 +441,17 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(toolMinimum), true, 'both evidence slots accept a minimum');
   const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
+});
+
+test('route policies may cap any slot at a whole number of items per source, at least one', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const capped = { ...copy(policy), slots: { 'evidence.knowledge': { max_per_source: 2, dedupe: 'exact' }, 'interaction.memory': { max_per_source: 1 } } };
+  assert.equal(validateRoutePolicySchema(capped), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.slots['evidence.knowledge'].max_per_source = 0, p => p.slots['evidence.knowledge'].max_per_source = 1.5,
+    p => p.slots['evidence.knowledge'].max_per_source = null, p => p.slots['interaction.memory'].max_per_source = '1']) {
+    const candidate = copy(capped); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
 });
 
 test('route policies may ask any slot to supersede observations by source', async () => {

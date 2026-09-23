@@ -1231,6 +1231,12 @@ export const REASONS = [
     "text": "The route asked this slot for deduplication, and the item's body equals a kept item's body once whitespace is collapsed. duplicate_of names the item kept."
   },
   {
+    "code": "source_diversity_cap",
+    "kind": "exclusion",
+    "rule": "R-26",
+    "text": "The route caps this slot at max_per_source items per producer and source, and higher-ranked or exempt items from the same source filled every place."
+  },
+  {
     "code": "over_budget",
     "kind": "exclusion",
     "rule": "R-16",

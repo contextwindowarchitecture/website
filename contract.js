@@ -131,6 +131,9 @@ function checkRenderedBudget(trace, tierUpgrades) {
     if (['conflict_deferred', 'conflict_lost'].includes(item.reason) && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_conflict_excluded', `Conflict resolution cannot exclude a protected ${item.slot} item; its group escalates.`, 11));
     }
+    if (item.reason === 'source_diversity_cap' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+      findings.push(failure('protected_diversity_excluded', `The source diversity cap cannot exclude a protected ${item.slot} item; it counts toward the cap.`, 26));
+    }
     if (item.reason === 'superseded' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_superseded_excluded', `Supersession cannot exclude a protected ${item.slot} item; it is kept.`, 25));
     }
