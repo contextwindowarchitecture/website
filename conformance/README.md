@@ -9,6 +9,8 @@ Language-neutral test cases for assemblers. Each directory under `cases/` holds:
 | `expected.trace.json` | The trace a conformant assembler emits, valid against `schema/trace.schema.json` |
 | `expected.payload.txt` | The exact rendered payload bytes; absent when the case expects a refusal |
 
+Some cases have a generator in `generators/`. It holds a table of each candidate's intended outcome, and it derives the expected trace and payload from that table rather than from any assembler's logic. Regenerate a case with `python3 conformance/generators/<case>.py`, and review the diff.
+
 ## Running a case
 
 1. Validate `snapshot.json` against the snapshot schema and load it. Resolve `tokenizer` and `renderer` by ID; an implementation that does not provide one skips the case and reports it as skipped, not passed.
