@@ -1,12 +1,14 @@
 # CWA integration sketch — not runnable or a reference implementation.
 # Implement these application-owned helpers; producers run before assembly.
 def prepare_request(req):
-    batches = collect_producers(req)  # Includes candidate items and producer exclusions.
+    # Keep each batch whole: its items and exclusions stay bound to the producer identity
+    # your application authenticated. Never flatten items away from that identity or
+    # read identity from item.source.
+    batches = [bind_identity(authenticate(producer), producer.run(req)) for producer in producers_for(req)]
     snapshot = freeze_snapshot(
-        items=flatten_items(batches),
-        excluded=flatten_exclusions(batches),
-        producer_context=authenticated_producers(req),
-        conflicts=declared_conflict_groups(req),
+        batches=batches,
+        capabilities=capability_grant(req),  # Allow-list result for this route and user.
+        conflicts=declared_conflict_groups(req),  # schema/conflict_group.schema.json
         scope=request_scope(req),
         assembly_time=req.assembly_time,
         route_policy=load_versioned_policy(req.route),

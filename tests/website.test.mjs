@@ -66,7 +66,9 @@ test('specification, generated requirement reference, and status matrix share al
   const rules = await component('spec.html', 'RULES');
   const statuses = await component('assembler.html', 'RULES');
   assert.equal(rules.length, 23);
-  assert.deepEqual(JSON.parse(JSON.stringify(statuses)), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
+  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r.slice(0, 2)))), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
+  const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
+  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => [r[2], r[3]]))), scopes.map(s => [s.scope, s.note]));
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (let i = 1; i <= 23; i++) assert.ok(markdown.includes(`## R-${i}:`));
 });

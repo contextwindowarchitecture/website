@@ -22,6 +22,7 @@ npm test
 | `spec.html` | Normative definitions and explanatory context outside the generated requirements |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch and conflict-group JSON structures |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
+| `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
 | `examples/` | Concrete item, producer batch, profiles, payload and matching trace |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |

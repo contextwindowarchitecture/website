@@ -149,7 +149,7 @@ The checkout is a static HTML/JavaScript site. Page content and interactive logi
 
 ## Implementation status and content issues
 
-The Assembler page reports **in progress, no release**, with Python intended first and **0 of 23 requirements implemented** in its displayed matrix. Its API is explicitly provisional. The downloadable Python file is a scaffold with unresolved application helpers, not a runnable reference assembler.
+The Assembler page reports **in progress, no release**, with Python intended first and **0 of 22 checkable requirements implemented** in its displayed matrix. Each row carries a scope from `contract/assembler-scope.json`: 14 requirements are fully verifiable in assembly, 8 are checked at the producer or application boundary, and R-5 is an application obligation that is documented rather than tested. Its API takes one frozen snapshot and is explicitly provisional. The downloadable Python file is a scaffold with unresolved application helpers, not a runnable reference assembler.
 
 The reviewed inconsistencies are resolved in the current draft: canonical item fields and defaults, explicit producer rejection handoff, separate instruction/fact conflicts, authenticated capability context, clock snapshots, refusal traces, and profile evaluation status. Downloads and the landing-page item preview use canonical sources. The generated requirement reference and schemas have automated drift checks.
 

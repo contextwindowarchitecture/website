@@ -65,9 +65,14 @@ outputs.set('evidence.html', evidence.replace(/const PROFILES = \[[\s\S]*?\n\];/
 const requirements = (await read('contract/requirements.json')).sort((a, b) => Number(a.id.slice(2)) - Number(b.id.slice(2)));
 if (requirements.length !== 23 || requirements.some((rule, index) => rule.id !== `R-${index + 1}`)) throw new Error('Expected permanent requirement IDs R-1 through R-23.');
 const rules = requirements.map(rule => [rule.section, rule.keyword, rule.summary, rule.text]);
+// What a reference assembler can verify for each requirement; drives the Assembler page matrix.
+const scopes = await read('contract/assembler-scope.json');
+if (scopes.length !== 23 || scopes.some((row, index) => row.id !== `R-${index + 1}` || !['assembler', 'boundary', 'application'].includes(row.scope) || !row.note)) {
+  throw new Error('contract/assembler-scope.json needs R-1 through R-23 in order, each with a scope and a note.');
+}
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
-  const rows = page === 'spec.html' ? rules : rules.map(r => [r[1], r[2]]);
+  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note]);
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
   if (page === 'spec.html') {
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
