@@ -75,9 +75,16 @@ const scopes = await read('contract/assembler-scope.json');
 if (scopes.length !== 23 || scopes.some((row, index) => row.id !== `R-${index + 1}` || !['assembler', 'boundary', 'application'].includes(row.scope) || !row.note)) {
   throw new Error('contract/assembler-scope.json needs R-1 through R-23 in order, each with a scope and a note.');
 }
+// Claims imported from the reference assembler (scripts/import-assembler-status.mjs).
+const { requirements: statuses } = await read('contract/assembler-status.json');
+const allowed = { assembler: ['planned', 'in progress', 'implemented'], boundary: ['planned', 'in progress', 'boundary-checked'], application: ['documented'] };
+statuses.forEach((row, i) => {
+  if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`contract/assembler-status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
+});
+if (statuses.length !== 23) throw new Error('contract/assembler-status.json needs R-1 through R-23.');
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
-  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note]);
+  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status]);
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
   if (page === 'spec.html') {
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');

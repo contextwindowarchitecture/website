@@ -58,6 +58,7 @@
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification: admission, fitting, placement by profile, and the trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
+        <span>Milestone: <span style="color: var(--fg);">M1 admission</span></span>
         <span>Spec target: <span style="color: var(--fg);">v2 draft</span></span>
         <span>Language: <span style="color: var(--fg);">Python first</span>, others after conformance</span>
         <span>Updated: 2026-09-22</span>
@@ -70,7 +71,7 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
       <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
       <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
-      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span> only when a test in the conformance suite exercises every clause in its scope and passes. Once that suite exists, statuses will come from its report rather than from hand edits.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the reference assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
         <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
@@ -140,139 +141,162 @@ const RULES = [
     "MUST",
     "One slot and one authority role per item",
     "assembler",
-    "Admission checks each item's slot and authority."
+    "Admission checks each item's slot and authority.",
+    "implemented"
   ],
   [
     "MUST",
     "Required fields and canonical JSON shape",
     "assembler",
-    "Schema validation with format checking; timestamps compared at full precision."
+    "Schema validation with format checking; timestamps compared at full precision.",
+    "implemented"
   ],
   [
     "SHOULD",
     "Declared policy defaults, filled and traced",
     "assembler",
-    "Fills slot defaults and versioned route overrides, and records defaults_filled."
+    "Fills slot defaults and versioned route overrides, and records defaults_filled.",
+    "in progress"
   ],
   [
     "MUST",
     "Slots that are never omitted",
     "assembler",
-    "Refuses with required_slot_missing."
+    "Refuses with required_slot_missing.",
+    "planned"
   ],
   [
     "MUST NOT",
     "Rule zero: enforce outside the model",
     "application",
-    "Application guards enforce invariants. Nothing observable in assembly can prove it."
+    "Application guards enforce invariants. Nothing observable in assembly can prove it.",
+    "documented"
   ],
   [
     "MUST",
     "Separate instruction authority from factual precedence",
     "assembler",
-    "Resolves declared groups; evidence, state and memory never render as instructions."
+    "Resolves declared groups; evidence, state and memory never render as instructions.",
+    "planned"
   ],
   [
     "MUST NOT",
     "No slot overrides platform roles; no authority from wording",
     "assembler",
-    "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers."
+    "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers.",
+    "in progress"
   ],
   [
     "MUST",
     "State is application-written and current",
     "boundary",
-    "Checks producer kind and state age. Writing state stays with the application."
+    "Checks producer kind and state age. Writing state stays with the application.",
+    "boundary-checked"
   ],
   [
     "MUST",
     "Memory lifetime and rejection reporting",
     "boundary",
-    "Excludes expired and revoked memory and merges producer exclusions. Reporting them is the producer's duty."
+    "Excludes expired and revoked memory and merges producer exclusions. Reporting them is the producer's duty.",
+    "boundary-checked"
   ],
   [
     "MUST",
     "Untrusted content is marked, rendered as material, kept out of governance",
     "assembler",
-    "Checks untrusted marking, refuses it in governance, and renders it as material."
+    "Checks untrusted marking, refuses it in governance, and renders it as material.",
+    "in progress"
   ],
   [
     "MUST",
     "Explicit conflict groups and traceable resolution",
     "boundary",
-    "Resolves the groups it is given. It cannot detect a conflict the application did not declare."
+    "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
+    "planned"
   ],
   [
     "MUST NOT",
     "Never answer from nothing",
     "assembler",
-    "Refuses with evidence_required and a recovery action."
+    "Refuses with evidence_required and a recovery action.",
+    "planned"
   ],
   [
     "MUST NOT",
     "Retrievers emit scored packets, not blobs",
     "boundary",
-    "Requires relevance and reference_only. It cannot tell whether a producer merged passages."
+    "Requires relevance and reference_only. It cannot tell whether a producer merged passages.",
+    "boundary-checked"
   ],
   [
     "MUST NOT",
     "Memory producers suppress and report expired or revoked items",
     "boundary",
-    "Re-excludes expired or revoked memory as a backstop. Suppressing and reporting them is the producer's duty."
+    "Re-excludes expired or revoked memory as a backstop. Suppressing and reporting them is the producer's duty.",
+    "boundary-checked"
   ],
   [
     "MUST",
     "Authenticated capability admission; MCP output is evidence",
     "boundary",
-    "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls."
+    "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
+    "boundary-checked"
   ],
   [
     "MUST",
     "Account for rendered tokens; shed in tier order",
     "assembler",
-    "Counts rendered tokens and sheds in tier order."
+    "Counts rendered tokens and sheds in tier order.",
+    "in progress"
   ],
   [
     "MUST",
     "Refused assembly has no rendered payload",
     "assembler",
-    "Refusal traces carry no payload, no result and no included items."
+    "Refusal traces carry no payload, no result and no included items.",
+    "planned"
   ],
   [
     "MUST NOT",
     "Precomputed variants; no model calls during assembly",
     "boundary",
-    "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity."
+    "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
+    "in progress"
   ],
   [
     "MUST",
     "Draft profiles versus evaluated profiles",
     "boundary",
-    "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly."
+    "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly.",
+    "planned"
   ],
   [
     "MUST",
     "Profile version and mandatory-slot validation",
     "assembler",
-    "Pins profile content by hash and refuses unplaced protected content."
+    "Pins profile content by hash and refuses unplaced protected content.",
+    "planned"
   ],
   [
     "MUST",
     "Trace JSON matches the published schema",
     "assembler",
-    "Every emitted trace is validated against the published schema in tests."
+    "Every emitted trace is validated against the published schema in tests.",
+    "in progress"
   ],
   [
     "SHOULD",
     "Recommended trace fields",
     "assembler",
-    "Emits the recommended trace fields."
+    "Emits the recommended trace fields.",
+    "in progress"
   ],
   [
     "MUST",
     "Determinism includes the clock and policy snapshot",
     "assembler",
-    "Snapshot replay across processes, hash seeds and time zones."
+    "Snapshot replay across processes, hash seeds and time zones.",
+    "in progress"
   ]
 ];
 class Component extends DCLogic {
@@ -288,18 +312,20 @@ class Component extends DCLogic {
     this.setState({ theme: t });
   }
   renderVals() {
-    const SCOPE = { assembler: ["assembler", "var(--fg)"], boundary: ["boundary-checked", "var(--p-state)"], application: ["application", "var(--accent)"] };
+    const STATUS_COLOR = { implemented: "var(--p-evid)", "boundary-checked": "var(--p-evid)", "in progress": "var(--accent)", planned: "var(--muted)", documented: "var(--muted)" };
+    const SCOPE = { assembler: ["assembler", "var(--fg)"], boundary: ["boundary", "var(--p-state)"], application: ["application", "var(--accent)"] };
     const matrix = RULES.map((r, i) => ({
       id: "R-" + (i + 1), href: "./spec.html#R-" + (i + 1), kw: r[0], summary: r[1], note: r[3],
       scope: SCOPE[r[2]][0], scopeColor: SCOPE[r[2]][1],
-      status: r[2] === "application" ? "documented" : "planned", color: "var(--muted)"
+      status: r[4], color: STATUS_COLOR[r[4]]
     }));
     const checkable = matrix.filter(r => r.scope !== "application");
+    const met = checkable.filter(r => r.status === "implemented" || r.status === "boundary-checked");
     return {
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       matrix,
-      counts: "0 of " + checkable.length + " checkable requirements implemented."
+      counts: met.length + " of " + checkable.length + " checkable requirements implemented."
     };
   }
 }

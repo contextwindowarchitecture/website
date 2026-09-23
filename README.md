@@ -24,6 +24,7 @@ npm test
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
 | `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |
+| `contract/assembler-status.json` | The reference assembler's claimed status per requirement, imported from its `status.json` with `node scripts/import-assembler-status.mjs ../cwa-assembler` |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
 | `examples/` | Concrete item, producer batch, profiles, payload and matching trace |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |

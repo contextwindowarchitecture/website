@@ -1,0 +1,124 @@
+{
+  "source": {
+    "repository": "contextwindowarchitecture/assembler",
+    "commit": "d39b8fbb56d02b25a3d9ad2cd8e21cd239b7e5b8",
+    "dirty": false
+  },
+  "requirements": [
+    {
+      "id": "R-1",
+      "status": "implemented",
+      "tests": 5
+    },
+    {
+      "id": "R-2",
+      "status": "implemented",
+      "tests": 9
+    },
+    {
+      "id": "R-3",
+      "status": "in progress",
+      "tests": 3
+    },
+    {
+      "id": "R-4",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-5",
+      "status": "documented",
+      "tests": 0
+    },
+    {
+      "id": "R-6",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-7",
+      "status": "in progress",
+      "tests": 1
+    },
+    {
+      "id": "R-8",
+      "status": "boundary-checked",
+      "tests": 2
+    },
+    {
+      "id": "R-9",
+      "status": "boundary-checked",
+      "tests": 4
+    },
+    {
+      "id": "R-10",
+      "status": "in progress",
+      "tests": 3
+    },
+    {
+      "id": "R-11",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-12",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-13",
+      "status": "boundary-checked",
+      "tests": 3
+    },
+    {
+      "id": "R-14",
+      "status": "boundary-checked",
+      "tests": 3
+    },
+    {
+      "id": "R-15",
+      "status": "boundary-checked",
+      "tests": 7
+    },
+    {
+      "id": "R-16",
+      "status": "in progress",
+      "tests": 3
+    },
+    {
+      "id": "R-17",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-18",
+      "status": "in progress",
+      "tests": 2
+    },
+    {
+      "id": "R-19",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-20",
+      "status": "planned",
+      "tests": 0
+    },
+    {
+      "id": "R-21",
+      "status": "in progress",
+      "tests": 2
+    },
+    {
+      "id": "R-22",
+      "status": "in progress",
+      "tests": 2
+    },
+    {
+      "id": "R-23",
+      "status": "in progress",
+      "tests": 3
+    }
+  ]
+}

@@ -72,6 +72,11 @@ test('specification, generated requirement reference, and status matrix share al
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r.slice(0, 2)))), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
   const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => [r[2], r[3]]))), scopes.map(s => [s.scope, s.note]));
+  const imported = JSON.parse(await fs.readFile(new URL('../contract/assembler-status.json', import.meta.url), 'utf8'));
+  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r[4]))), imported.requirements.map(r => r.status));
+  const view = await component('assembler.html');
+  const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
+  assert.equal(view.renderVals().counts, `${met} of 22 checkable requirements implemented.`);
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (let i = 1; i <= 23; i++) assert.ok(markdown.includes(`## R-${i}:`));
 });
