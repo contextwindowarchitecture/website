@@ -1034,6 +1034,12 @@ export const REASONS = [
     "text": "governance.instructions or interaction.query, or governance.output_contract on a parser route, has no admitted item."
   },
   {
+    "code": "conflict_unresolved",
+    "kind": "refusal",
+    "rule": "R-11",
+    "text": "A declared conflict group has no unique supported resolution and route policy says to refuse or request context."
+  },
+  {
     "code": "protected_content_over_budget",
     "kind": "refusal",
     "rule": "R-17",
@@ -1044,12 +1050,6 @@ export const REASONS = [
     "kind": "refusal",
     "rule": "R-12",
     "text": "The route requires evidence and too little survived admission and fitting. The trace records recovery.action."
-  },
-  {
-    "code": "conflict_unresolved",
-    "kind": "refusal",
-    "rule": "R-11",
-    "text": "A declared conflict group has no unique supported resolution and route policy says to refuse or request context."
   }
 ];
 export const ITEM_EXAMPLE = {

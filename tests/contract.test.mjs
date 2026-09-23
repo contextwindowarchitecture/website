@@ -277,3 +277,28 @@ test('route policies declare producers, slot rules, overrides and upgrades in cl
     assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
   }
 });
+
+test('refusal codes are listed in the order assembly checks them', () => {
+  assert.deepEqual(REASONS.filter(r => r.kind === 'refusal').map(r => r.code),
+    ['assembly_time_required', 'required_slot_missing', 'conflict_unresolved', 'protected_content_over_budget', 'evidence_required']);
+});
+
+test('route policies declare required slots, evidence minimums and a fitting order', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const full = { ...copy(policy), parser: true, requires_evidence: true,
+    slots: { 'evidence.knowledge': { priority: 10, order_by: ['-relevance', 'freshness'], min_included: 2 }, 'interaction.history': { priority: -1, order_by: ['-freshness'] } },
+    fitting_order: [{ slot: 'evidence.knowledge', action: 'omit' }, { slot: 'interaction.history', action: 'compress' }] };
+  assert.equal(validateRoutePolicySchema(full), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.parser = 'yes', p => p.slots['evidence.knowledge'].priority = 1.5, p => p.slots['evidence.knowledge'].order_by = ['relevance'],
+    p => p.slots['evidence.knowledge'].order_by = [], p => p.slots['evidence.knowledge'].min_included = 0,
+    p => p.slots['interaction.history'].min_included = 1, p => delete p.requires_evidence, p => p.requires_evidence = false,
+    p => p.fitting_order.push({ slot: 'evidence.knowledge', action: 'omit' }), p => p.fitting_order[0].action = 'truncate',
+    p => p.fitting_order[0].slot = 'evidence.web', p => p.fitting_order[0].priority = 1]) {
+    const candidate = copy(full); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
+  const toolMinimum = copy(full); toolMinimum.slots['evidence.tool_results'] = { min_included: 1 };
+  assert.equal(validateRoutePolicySchema(toolMinimum), true, 'both evidence slots accept a minimum');
+  const noMinimum = copy(full); delete noMinimum.slots['evidence.knowledge'].min_included; noMinimum.requires_evidence = false;
+  assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
+});

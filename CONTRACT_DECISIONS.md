@@ -50,6 +50,20 @@ These follow the reference-assembler design review (`cwa-assembler/docs/DESIGN.m
 
 Breaking for stored traces: `decided_by: "tier"` and string `defaults_filled` entries no longer validate. Migrate `tier` to `authority` and split strings into `{item_id, field}` records.
 
+## Fitting and refusal — 2026-09-22
+
+These follow the reference assembler's M2 kickoff (`cwa-assembler/docs/DESIGN.md` §8).
+
+| Issue | Resolution |
+| --- | --- |
+| R-4 did not say how an assembler knows a downstream parser exists | Route policy `parser: true` makes `governance.output_contract` required |
+| R-12's "route that requires evidence" and "versioned minimum" had no fields | Route policy `requires_evidence`, and `slots.<evidence slot>.min_included`, which the schema accepts only on a route that requires evidence |
+| R-16's "route's versioned fitting policy" had no fields | Per-slot `priority` and `order_by`, and a route-level `fitting_order` of compress and omit steps. Without steps, variants come before omission |
+| Two implementations could shed differently and both claim R-16 | `conformance/README.md` fixes one procedure: one item at a time, whole-payload recount, longest variant that fits or else the shortest |
+| R-12 named three recovery actions without saying when each applies | `request_context` when budget omitted no evidence, `precompute_summary` when omitted evidence had no variants, `retrieve_narrower` otherwise |
+| Several refusals could apply at once | R-21: the earliest refusal code in `contract/reasons.json` order, which is now the order assembly checks them. `conflict_unresolved` moved ahead of the budget refusals |
+| An invalid snapshot had no refusal code | None needed: a snapshot that fails its schema is rejected before assembly and has no trace |
+
 ## Review and migration implications
 
 This is a breaking **draft** revision. Existing traces need `context`, conflict `kind`, exclusion `stage`, and compression `item_id`/`variant_id`. Refused traces use the new null result shape. Item JSON no longer accepts `as_of`, loose scope strings, undefined authority aliases, or undeclared fields. Consumers should validate and migrate explicitly rather than silently coercing old data.
