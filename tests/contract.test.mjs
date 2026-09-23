@@ -478,10 +478,13 @@ test('a conformance report records one outcome per case, and why any case did no
   const report = { implementation: { name: 'cwa-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
     cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'skipped', detail: 'no cwa-messages/v1 renderer' }] };
   assert.equal(validateConformanceReportSchema(report), true, JSON.stringify(validateConformanceReportSchema.errors));
-  for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = ['R-24'],
+  for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = [`R-${requirementIds.length + 1}`],
     r => r.cases[0].rules = ['R-1\n'], r => r.cases[0].rules = [], r => r.contract.website_commit = 'abc1234', r => r.contract.website_commit += '\n',
     r => delete r.implementation.version, r => r.implementation.name = '\ufeff', r => r.cases[0].passed = true, r => delete r.contract.dirty]) {
     const candidate = copy(report); mutate(candidate);
     assert.equal(validateConformanceReportSchema(candidate), false, mutate.toString());
+  }
+  for (const id of requirementIds) {
+    assert.equal(validateConformanceReportSchema({ ...report, cases: [{ ...report.cases[0], rules: [id] }] }), true, `${id} is a published requirement`);
   }
 });
