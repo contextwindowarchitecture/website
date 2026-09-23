@@ -1,7 +1,7 @@
 [
   {
     "name": "Policy-first chat",
-    "id": "policy-first-chat/v2",
+    "id": "policy-first-chat/v1",
     "short": "policy-first",
     "route": "support-chat",
     "uses": "Support, assistants, workflows",
@@ -23,7 +23,7 @@
   },
   {
     "name": "Document analysis",
-    "id": "document-analysis/v3",
+    "id": "document-analysis/v1",
     "short": "document",
     "route": "document-qa",
     "uses": "Long reports, contracts, corpora",
@@ -44,7 +44,7 @@
   },
   {
     "name": "Long-context reinforced",
-    "id": "long-context-reinforced/v3",
+    "id": "long-context-reinforced/v1",
     "short": "reinforced",
     "route": "long-context-qa",
     "uses": "Very long inputs, multi-document synthesis",
@@ -66,7 +66,7 @@
   },
   {
     "name": "Tool-using agent",
-    "id": "tool-agent/v2",
+    "id": "tool-agent/v1",
     "short": "tool-agent",
     "route": "agent-loop",
     "uses": "Multi-step work",
@@ -87,7 +87,7 @@
   },
   {
     "name": "Structured extraction",
-    "id": "extraction/v2",
+    "id": "extraction/v1",
     "short": "extraction",
     "route": "extract",
     "uses": "Parsing and classification",

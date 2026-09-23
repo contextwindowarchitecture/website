@@ -1,4 +1,4 @@
-<!-- profile: policy-first-chat/v2 -->
+<!-- profile: policy-first-chat/v1 -->
 
 <!-- governance.instructions · authority=governing · protected -->
 <instructions version=""></instructions>

@@ -12,7 +12,7 @@ def prepare_request(req):
         scope=request_scope(req),
         assembly_time=req.assembly_time,
         route_policy=load_versioned_policy(req.route),
-        profile=load_profile('policy-first-chat/v2'),
+        profile=load_profile('policy-first-chat/v1'),
         tokenizer=req.tokenizer,
         renderer=req.renderer,
         budget=req.budget,  # input is already net of reserved_output.

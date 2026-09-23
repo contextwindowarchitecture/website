@@ -1305,7 +1305,7 @@ export const ITEM_EXAMPLE = {
   "conflict_policy": "defers",
   "injection_risk": "untrusted_content",
   "lineage": "verbatim",
-  "eligibility": "support-chat/v2: tenant acme; rerank at least 0.82",
+  "eligibility": "support-chat/v1: tenant acme; rerank at least 0.82",
   "body": "Pro plans refund in full within 30 days of purchase."
 };
 export const TRACE_EXAMPLE = {
@@ -1335,7 +1335,7 @@ export const TRACE_EXAMPLE = {
       "item_id": "refunds-eu:v17#p4",
       "tokens": 10,
       "source_version": "2026-09-10",
-      "eligibility": "support-chat/v2: tenant acme; rerank at least 0.82"
+      "eligibility": "support-chat/v1: tenant acme; rerank at least 0.82"
     },
     {
       "slot": "interaction.query",
@@ -1363,17 +1363,17 @@ export const TRACE_EXAMPLE = {
     "route_policy_version": "fixture/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "34906f58f0ba64c5179848577ece87a42908b8d7f1e1391c6dadda8f5625680c"
+    "snapshot_digest": "23942d766ef7da272699d35969562c4669ec71fb52f2b761f1a921f9509a40d5"
   },
   "defaults_filled": []
 };
 export const PROFILES = [
   {
     "id": "policy-first-chat",
-    "version": 2,
+    "version": 1,
     "route": "support-chat",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -1430,10 +1430,10 @@ export const PROFILES = [
   },
   {
     "id": "document-analysis",
-    "version": 3,
+    "version": 1,
     "route": "document-qa",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -1486,10 +1486,10 @@ export const PROFILES = [
   },
   {
     "id": "long-context-reinforced",
-    "version": 3,
+    "version": 1,
     "route": "long-context-qa",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -1542,10 +1542,10 @@ export const PROFILES = [
   },
   {
     "id": "tool-agent",
-    "version": 2,
+    "version": 1,
     "route": "agent-loop",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -1598,10 +1598,10 @@ export const PROFILES = [
   },
   {
     "id": "extraction",
-    "version": 2,
+    "version": 1,
     "route": "extract",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",

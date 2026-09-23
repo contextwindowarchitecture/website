@@ -122,7 +122,7 @@
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
           <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
         </div>
-        <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are v2 drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. The former v1 evaluation summaries are withdrawn because supporting runs are unavailable.</p>
+        <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. Earlier evaluation summaries are withdrawn because supporting runs are unavailable.</p>
       </section>
 
       <section id="explorer">
@@ -223,10 +223,10 @@ const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("s
 const PROFILE_CONTRACTS = [
   {
     "id": "policy-first-chat",
-    "version": 2,
+    "version": 1,
     "route": "support-chat",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -283,10 +283,10 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "document-analysis",
-    "version": 3,
+    "version": 1,
     "route": "document-qa",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -339,10 +339,10 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "long-context-reinforced",
-    "version": 3,
+    "version": 1,
     "route": "long-context-qa",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -395,10 +395,10 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "tool-agent",
-    "version": 2,
+    "version": 1,
     "route": "agent-loop",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -451,10 +451,10 @@ const PROFILE_CONTRACTS = [
   },
   {
     "id": "extraction",
-    "version": 2,
+    "version": 1,
     "route": "extract",
     "model_family": null,
-    "route_policy_version": "illustrative/v2",
+    "route_policy_version": "illustrative/v1",
     "placement": [
       {
         "slot": "governance.instructions",
@@ -497,7 +497,7 @@ const PROFILE_CONTRACTS = [
 const PROFILES = [
   {
     "name": "Policy-first chat",
-    "id": "policy-first-chat/v2",
+    "id": "policy-first-chat/v1",
     "short": "policy-first",
     "route": "support-chat",
     "uses": "Support, assistants, workflows",
@@ -519,7 +519,7 @@ const PROFILES = [
   },
   {
     "name": "Document analysis",
-    "id": "document-analysis/v3",
+    "id": "document-analysis/v1",
     "short": "document",
     "route": "document-qa",
     "uses": "Long reports, contracts, corpora",
@@ -540,7 +540,7 @@ const PROFILES = [
   },
   {
     "name": "Long-context reinforced",
-    "id": "long-context-reinforced/v3",
+    "id": "long-context-reinforced/v1",
     "short": "reinforced",
     "route": "long-context-qa",
     "uses": "Very long inputs, multi-document synthesis",
@@ -562,7 +562,7 @@ const PROFILES = [
   },
   {
     "name": "Tool-using agent",
-    "id": "tool-agent/v2",
+    "id": "tool-agent/v1",
     "short": "tool-agent",
     "route": "agent-loop",
     "uses": "Multi-step work",
@@ -583,7 +583,7 @@ const PROFILES = [
   },
   {
     "name": "Structured extraction",
-    "id": "extraction/v2",
+    "id": "extraction/v1",
     "short": "extraction",
     "route": "extract",
     "uses": "Parsing and classification",

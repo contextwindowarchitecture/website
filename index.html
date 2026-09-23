@@ -130,7 +130,7 @@
           </div>
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px;">
             <span>{{ mTokens }}</span>
-            <span>profile · policy-first-chat/v2</span>
+            <span>profile · policy-first-chat/v1</span>
           </div>
         </div>
       </div>
@@ -526,7 +526,7 @@
   "conflict_policy": "defers",
   "injection_risk": "untrusted_content",
   "lineage": "verbatim",
-  "eligibility": "support-chat/v2: tenant acme; rerank at least 0.82",
+  "eligibility": "support-chat/v1: tenant acme; rerank at least 0.82",
   "body": "Pro plans refund in full within 30 days of purchase."
 }</pre>
 <!-- CONTRACT_ITEM_END -->
@@ -599,7 +599,7 @@
         <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA does not dictate syntax, so tag slots however your stack prefers: XML-style blocks, message roles, or delimited sections. What matters is that every item names its slot and authority, evidence arrives as packets with provenance, and the profile that ordered them is recorded.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
-        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v2</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v1</span></div>
         <div style="padding: 20px 18px; display: flex; flex-direction: column;">
           <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-gov);">&lt;!-- governance.instructions · authority=governing · v12 --&gt;</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;system&gt;</span>You are Ada, a support agent for Northwind.</div>
@@ -635,7 +635,7 @@
           <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-inter);">&lt;!-- interaction.query · authority=user · the trigger --&gt;</div>
           <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;query&gt;</span>Can you just process it now?<span style="color: var(--accent);">&lt;/query&gt;</span></div>
           <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);">&lt;!-- trace ctx_01J9K · 3 items excluded · 0 conflicts · policy-first-chat/v2 --&gt;</div>
+          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);">&lt;!-- trace ctx_01J9K · 3 items excluded · 0 conflicts · policy-first-chat/v1 --&gt;</div>
         </div>
       </div>
     </div>
@@ -1063,10 +1063,10 @@ const OMITTABLE = [4, 5];
 const BUDGETS = [8192, 4096, 2048, 1024];
 
 const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v2", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
-  { name: "Document analysis", id: "document-analysis/v3", route: "document-qa", uses: "Long reports, contracts, corpora", order: [0, 2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Instructions open the system text; documents follow, clearly delimited; the instructions repeat after them with the examples and the question, near the end." },
-  { name: "Tool-using agent", id: "tool-agent/v2", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
-  { name: "Structured extraction", id: "extraction/v2", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
+  { name: "Policy-first chat", id: "policy-first-chat/v1", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
+  { name: "Document analysis", id: "document-analysis/v1", route: "document-qa", uses: "Long reports, contracts, corpora", order: [0, 2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Instructions open the system text; documents follow, clearly delimited; the instructions repeat after them with the examples and the question, near the end." },
+  { name: "Tool-using agent", id: "tool-agent/v1", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
+  { name: "Structured extraction", id: "extraction/v1", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
 ];
 
 const AUTHORITY = [
@@ -1568,7 +1568,7 @@ class Component extends DCLogic {
       segments,
       tokenLabel: "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
       evictionLabel, evictionStyle,
-      profileName: "policy-first-chat/v2",
+      profileName: "policy-first-chat/v1",
       traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
       budgets: BUDGETS.map((b, i) => ({ label: b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k", style: this.ucTabStyle(i === (this.state.budget || 0)), select: () => this.setState({ budget: i }) })),
       playLabel: this.state.playing ? "Pause" : "Play",
