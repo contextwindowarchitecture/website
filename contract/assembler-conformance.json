@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "ea577106df3def165c61bf5a73b89eec7b4a9aba",
+    "commit": "d0129dbf7f8d50302bba4c26d6e27eb210724652",
     "dirty": false
   },
   "implementation": {
@@ -10,7 +10,7 @@
     "language": "python"
   },
   "contract": {
-    "website_commit": "31d415808566d920a3ed79ac20cfa2ea37dd95e0",
+    "website_commit": "387a3e96248e0d5d496e4fa82497cdef755b4b39",
     "dirty": false
   },
   "cases": [
@@ -55,6 +55,14 @@
       "rules": [
         "R-16",
         "R-17",
+        "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "budget-margin-rounding",
+      "rules": [
+        "R-16",
         "R-21"
       ],
       "outcome": "passed"
@@ -404,6 +412,14 @@
       "rules": [
         "R-16",
         "R-17",
+        "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "render-attribute-escaping",
+      "rules": [
+        "R-11",
         "R-21"
       ],
       "outcome": "passed"
