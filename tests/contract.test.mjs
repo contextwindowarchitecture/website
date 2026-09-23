@@ -15,6 +15,11 @@ const context = { assemblyTime: '2026-09-22T12:00:00Z' };
 const copy = value => structuredClone(value);
 const requirementIds = (await read('contract/requirements.json')).map(r => r.id);
 const PERMANENT_ID = new RegExp(`^(${requirementIds.join('|')})$`);
+// The published tokenizers, counted independently of the Python generators (conformance/README.md).
+const TOKENIZERS = {
+  'fixture-whitespace/v1': text => (text.match(/\S+/gu) ?? []).length,
+  'estimate-utf8/v1': text => Math.floor((Buffer.byteLength(text, 'utf8') + 3) / 4),
+};
 
 test('downloaded item and schema are the canonical published data', async () => {
   const example = JSON.parse(SCAFFOLDS.find(s => s.filename === 'context_item.yaml').text);
@@ -423,6 +428,13 @@ test('conformance cases are complete, schema-valid, and agree with the published
     if (payload) assert.equal(expected.result.hash, createHash('sha256').update(payload).digest('hex'));
     assert.equal(expected.context.snapshot_digest, snapshotDigest(snapshot), `${name}: snapshot_digest`);
     assert.equal(expected.context.spec, snapshot.profile.spec, `${name}: context.spec`);
+    if (payload && snapshot.renderer === 'fixture-xml/v1') {
+      const count = TOKENIZERS[snapshot.tokenizer];
+      assert.equal(expected.result.input_tokens, count(payload.toString('utf8')), `${name}: input_tokens`);
+      const margin = snapshot.budget.margin_percent ?? 0;
+      assert.ok(Math.floor((expected.result.input_tokens * (100 + margin) + 99) / 100) <= snapshot.budget.input, `${name}: the payload fits`);
+      assert.equal(expected.budget.margin_percent, snapshot.budget.margin_percent, `${name}: budget.margin_percent`);
+    }
   }
   const fixture = new URL('fixture-three-slot/', root);
   assert.deepEqual(JSON.parse(await fs.readFile(new URL('expected.trace.json', fixture), 'utf8')), trace);
