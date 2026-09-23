@@ -164,7 +164,7 @@ const RULES = [
     "Fills slot defaults and versioned route overrides, and records defaults_filled.",
     "implemented",
     4,
-    4
+    5
   ],
   [
     "MUST",
@@ -281,7 +281,7 @@ const RULES = [
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
     14,
-    14
+    17
   ],
   [
     "MUST",
@@ -290,7 +290,7 @@ const RULES = [
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
     8,
-    8
+    9
   ],
   [
     "MUST NOT",
@@ -299,7 +299,7 @@ const RULES = [
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
     "boundary-checked",
     5,
-    5
+    7
   ],
   [
     "MUST",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     25,
-    25
+    28
   ],
   [
     "SHOULD",
@@ -335,7 +335,7 @@ const RULES = [
     "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
     "implemented",
     12,
-    12
+    13
   ],
   [
     "MUST",
@@ -347,7 +347,7 @@ const RULES = [
     2
   ]
 ];
-const CONFORMANCE = {"passed":25,"total":25,"commit":"136133c"};
+const CONFORMANCE = {"passed":25,"total":28,"commit":"136133c"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
