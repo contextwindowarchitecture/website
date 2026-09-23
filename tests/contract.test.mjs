@@ -385,6 +385,17 @@ test('route policies declare required slots, evidence minimums and a fitting ord
   assert.equal(validateRoutePolicySchema(noMinimum), true, 'a route without minimums need not require evidence');
 });
 
+test('route policies may cap any slot with max_tokens, a whole number of tokens', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const capped = { ...copy(policy), slots: { 'evidence.knowledge': { max_tokens: 400 }, 'state.task': { max_tokens: 0 } } };
+  assert.equal(validateRoutePolicySchema(capped), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.slots['evidence.knowledge'].max_tokens = -1, p => p.slots['evidence.knowledge'].max_tokens = 1.5,
+    p => p.slots['evidence.knowledge'].max_tokens = null, p => p.slots['state.task'].max_tokens = '0']) {
+    const candidate = copy(capped); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
+});
+
 // RFC 8785 for documents of strings, integers, plain decimals, booleans, null, arrays and objects.
 const canonical = value => Array.isArray(value) ? `[${value.map(canonical).join(',')}]`
   : value !== null && typeof value === 'object' ? `{${Object.keys(value).sort().map(k => `${JSON.stringify(k)}:${canonical(value[k])}`).join(',')}}`

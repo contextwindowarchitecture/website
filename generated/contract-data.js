@@ -1148,7 +1148,7 @@ export const REASONS = [
     "code": "over_budget",
     "kind": "exclusion",
     "rule": "R-16",
-    "text": "The item was omitted to fit the rendered budget or its own token_budget, in tier order and by the route's fitting policy."
+    "text": "The item was omitted to fit the rendered budget, its own token_budget or its slot's max_tokens, in tier order and by the route's fitting policy."
   },
   {
     "code": "assembly_time_required",
@@ -1178,7 +1178,7 @@ export const REASONS = [
     "code": "protected_content_over_budget",
     "kind": "refusal",
     "rule": "R-17",
-    "text": "Protected content alone exceeds budget.input, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating."
+    "text": "Protected content alone exceeds budget.input or its slot's max_tokens, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating."
   },
   {
     "code": "evidence_required",
