@@ -52,7 +52,7 @@ When admission and fitting leave no valid evidence, or fewer evidence items than
 
 ## R-13: Retrievers emit scored packets, not blobs
 
-A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score.
+A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch.
 
 ## R-14: Memory producers suppress and report expired or revoked items
 

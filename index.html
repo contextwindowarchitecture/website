@@ -1104,7 +1104,7 @@ const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
   ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
-  ["Deduplicate", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever."],
+  ["Deduplicate", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever, which reports each one it drops as duplicate_content (R-13)."],
   ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],

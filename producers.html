@@ -136,7 +136,7 @@
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Retrieval → evidence.knowledge</div>
             <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">One scored packet per passage, never a blob.</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Emit one item per passage, each with its rerank score and source version, and set source to the document the passage comes from, so passages from one document share it. The retriever owns rewrite, retrieve and rerank, and any near-duplicate filtering; the assembler owns exact deduplication and the per-source cap where the route asks for them, then filter, packetize, budget and attribute. An empty result set is a valid, recorded outcome, so do not pad it.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Emit one item per passage, each with its rerank score and source version, and set source to the document the passage comes from, so passages from one document share it. The retriever owns rewrite, retrieve and rerank, and any near-duplicate filtering, reporting each passage it drops as duplicate_content with duplicate_of naming the passage it kept; the assembler owns exact deduplication and the per-source cap where the route asks for them, then filter, packetize, budget and attribute. An empty result set is a valid, recorded outcome, so do not pad it.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Role <span style="color: var(--muted);">authority: reference_only</span> · <a href="./spec.html#R-13">R-13</a> · <a href="./spec.html#R-12">R-12</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
@@ -408,7 +408,7 @@ const STAGES = [
   ["Rewrite", "producer", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "producer", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
   ["Rerank", "producer", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
-  ["Deduplicate", "assembler", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever."],
+  ["Deduplicate", "assembler", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever, which reports each one it drops as duplicate_content (R-13)."],
   ["Filter", "assembler", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "assembler", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "assembler", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],
@@ -547,7 +547,7 @@ const FAILURES = [
   ],
   [
     "duplicate_content",
-    "The route asked this slot for deduplication, and the item's body equals a kept item's body once whitespace is collapsed. duplicate_of names the item kept.",
+    "The item's body duplicates a kept item's: either the route asked this slot for exact deduplication and the bodies match once whitespace is collapsed (R-24), or a retriever dropped it as a near-duplicate and reported it at stage producer (R-13). duplicate_of names the item kept.",
     24
   ],
   [

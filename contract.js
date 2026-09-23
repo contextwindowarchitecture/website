@@ -181,6 +181,12 @@ export function checkProducerBatch(batch) {
   if (!validateProducerBatchSchema(batch)) return { valid: false, findings: schemaErrors(validateProducerBatchSchema, 9) };
   const ids = [...batch.items.map(item => item.id), ...batch.excluded.map(item => item.item_id)];
   const findings = new Set(ids).size === ids.length ? [] : [failure('duplicate_item_id', 'Batch item IDs must be unique across candidates and exclusions.', 9)];
+  const candidates = new Set(batch.items.map(item => item.id));
+  for (const row of batch.excluded) {
+    if (row.duplicate_of !== undefined && !candidates.has(row.duplicate_of)) {
+      findings.push(failure('unknown_duplicate_of', `${row.item_id} names ${row.duplicate_of} as kept, which is not a candidate in this batch.`, 13));
+    }
+  }
   return { valid: findings.length === 0, findings };
 }
 

@@ -66,6 +66,21 @@ test('memory requires expiry and records revocation without emitting the body ag
   assert.equal(batch.excluded[0].body, undefined);
 });
 
+test('a retriever reports each near-duplicate it drops, naming the candidate it kept (R-13)', () => {
+  const dropped = { item_id: 'kb:paraphrase', reason: 'duplicate_content', stage: 'producer', duplicate_of: item.id };
+  assert.equal(checkProducerBatch({ ...batch, excluded: [...batch.excluded, dropped] }).valid, true, JSON.stringify(checkProducerBatch({ ...batch, excluded: [...batch.excluded, dropped] }).findings));
+  const { duplicate_of, ...unnamed } = dropped;
+  assert.equal(checkProducerBatch({ ...batch, excluded: [...batch.excluded, unnamed] }).valid, false, 'duplicate_content names the kept candidate');
+  assert.equal(checkProducerBatch({ ...batch, excluded: [...batch.excluded, { ...dropped, reason: 'expired' }] }).valid, false, 'only duplicate_content names one');
+  assert.deepEqual(checkProducerBatch({ ...batch, excluded: [...batch.excluded, { ...dropped, duplicate_of: 'kb:elsewhere' }] }).findings.map(f => f.reason),
+    ['unknown_duplicate_of']);
+  assert.deepEqual(checkProducerBatch({ ...batch, excluded: [...batch.excluded, { ...dropped, duplicate_of: batch.excluded[0].item_id }] }).findings.map(f => f.reason),
+    ['unknown_duplicate_of'], 'the kept item is a candidate, not another exclusion');
+  const row = { ...dropped };
+  assert.equal(checkTrace({ ...trace, excluded: [row, ...trace.excluded] }).valid, true, 'the trace carries the producer row as reported');
+  assert.match(REASONS.find(r => r.code === 'duplicate_content').text, /producer/);
+});
+
 test('producer batch rejects ambiguous identity and non-producer rejection stages', () => {
   assert.equal(checkProducerBatch({ ...batch, excluded: [{ item_id: item.id, reason: 'expired', stage: 'producer' }] }).valid, false);
   assert.equal(checkProducerBatch({ ...batch, excluded: [{ item_id: 'other', reason: 'expired', stage: 'assembler' }] }).valid, false);

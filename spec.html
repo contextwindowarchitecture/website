@@ -373,6 +373,7 @@
             <li>A route may hold a slot at a floor with slots.&lt;slot&gt;.min_tokens (R-16). Budget pressure never makes a reduction that leaves the slot below it, and freezes the slot once one is withheld; the payload then either fits or is refused with slot_floor_over_budget (R-17). A floored slot may keep droppable items while other slots compress, the one exception to R-16's tier order.</li>
             <li>New R-24: a route may ask a slot for exact deduplication with slots.&lt;slot&gt;.dedupe: exact. After conflict resolution, an item whose body equals a kept item's body once whitespace is collapsed is excluded with duplicate_content, and excluded[].duplicate_of names the item kept. Protected items and conflict-group members are never excluded.</li>
             <li>New R-25: a route may ask a slot to supersede stale observations with slots.&lt;slot&gt;.supersede: source. After conflict resolution and before deduplication, an item is excluded as superseded when the same authenticated producer sent an item with the same source and a later freshness; items tied for the latest instant are all kept, excluded[].superseded_by names the item kept, and protected items and conflict-group members are never excluded.</li>
+            <li>R-13: a retriever that drops a passage as a near-duplicate reports it in its batch's excluded list as duplicate_content, with duplicate_of naming the candidate it kept; the trace carries the row as reported.</li>
             <li>New R-26: a route may cap a slot at slots.&lt;slot&gt;.max_per_source items per authenticated producer and source. After deduplication, the lowest-ranked items beyond the cap are excluded with source_diversity_cap; protected items and conflict-group members are never excluded and take places first.</li>
             <li>Requirement IDs stay permanent: new requirements append after R-23 rather than renumbering a section.</li>
           </ul>
@@ -479,7 +480,7 @@ const STAGES = [
   ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
   ["Retrieve", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
   ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
-  ["Deduplicate", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever."],
+  ["Deduplicate", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever, which reports each one it drops as duplicate_content (R-13)."],
   ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
   ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
   ["Budget", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],
@@ -584,7 +585,7 @@ const RULES = [
     "fit",
     "MUST NOT",
     "Retrievers emit scored packets, not blobs",
-    "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score."
+    "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch."
   ],
   [
     "fit",
