@@ -49,6 +49,8 @@ ROWS = [
     ("policy-corpus", item("kb:sub-ms", "evidence.knowledge", "Refunds return to the original card.", expires="2026-09-22T12:00:00.0005Z"), "admit"),
     ("policy-corpus", item("kb:missing-body", "evidence.knowledge", "x", omit=("body",)), "missing_field:body"),
     ("policy-corpus", item(None, "evidence.knowledge", "An item without an id.", omit=("id",)), "missing_field:id"),
+    # Without a slot, no slot-specific field is required: the item is missing its slot, not its expires.
+    ("policy-corpus", item("kb:no-slot", "evidence.knowledge", "An item without a slot.", omit=("slot",)), "missing_field:slot"),
     # Blank means ECMAScript whitespace only (conformance/README.md, Blank strings): U+FEFF is blank, U+001C is not.
     ("policy-corpus", item("\ufeff", "evidence.knowledge", "An id that is only a byte order mark."), "invalid_structure"),
     ("policy-corpus", item("\u001c", "evidence.knowledge", "An id that is a control character.", relevance=0.79), "below_threshold"),

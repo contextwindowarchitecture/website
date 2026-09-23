@@ -336,6 +336,19 @@ test('item findings use registered reason codes, with specific schema codes', ()
   assert.equal(checkItem({ ...item, authority: 'reference' }, context).findings[0].reason, 'unknown_authority');
 });
 
+test('an item without a slot is missing_field:slot, not a slot-specific field (R-2, R-21)', () => {
+  const noSlot = copy(item);
+  delete noSlot.slot;
+  delete noSlot.expires;
+  assert.deepEqual(checkItem(noSlot, context).findings.map(f => f.reason), ['missing_field:slot']);
+  const memory = { ...copy(item), slot: 'interaction.memory', authority: 'generated', source: 'turn:14' };
+  delete memory.expires;
+  assert.deepEqual(checkItem(memory, context).findings.map(f => f.reason), ['missing_field:expires']);
+  const passage = copy(item);
+  delete passage.relevance;
+  assert.deepEqual(checkItem(passage, context).findings.map(f => f.reason), ['missing_field:relevance']);
+});
+
 test('missing_field names the item\'s own fields; a variant missing a field is invalid_structure', () => {
   const variant = { id: 'short', body: 'Quote.', method: 'extract', lineage: 'extracted' };
   assert.equal(checkItem({ ...item, variants: [variant] }, context).valid, true);

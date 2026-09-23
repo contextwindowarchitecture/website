@@ -222,6 +222,9 @@ export const ITEM_SCHEMA = {
   "allOf": [
     {
       "if": {
+        "required": [
+          "slot"
+        ],
         "properties": {
           "slot": {
             "const": "interaction.memory"
@@ -244,6 +247,9 @@ export const ITEM_SCHEMA = {
     },
     {
       "if": {
+        "required": [
+          "slot"
+        ],
         "properties": {
           "slot": {
             "const": "evidence.knowledge"

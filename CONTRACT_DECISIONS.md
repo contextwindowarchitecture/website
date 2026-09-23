@@ -92,6 +92,7 @@ These follow the TypeScript assembler's M13 kickoff, which works from the publis
 | `protected_tier_changed` did not say whether a slot the route raised to protected counts | Only slots protected by default. In a route-raised slot an item may lower its own tier, as `contract.js` already allowed |
 | Nothing said whether an unauthenticated producer's exclusion rows reach the trace | They do: they carry no content, and R-9 merges producer records |
 | Rows for candidates sharing an id had no order, so equal digests could give different traces | Ties order by RFC 8785 bytes, as the snapshot digest does |
+| An item without a slot also failed the memory and knowledge conditionals, whose `if` passes over an absent slot, so R-21 recorded `missing_field:expires` | Each `if` requires `slot`; such an item is `missing_field:slot` |
 
 ## Review and migration implications
 
