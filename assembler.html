@@ -172,7 +172,7 @@ const RULES = [
     "assembler",
     "Refuses with required_slot_missing.",
     "implemented",
-    4,
+    6,
     6
   ],
   [
@@ -199,7 +199,7 @@ const RULES = [
     "assembler",
     "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers.",
     "implemented",
-    3,
+    4,
     4
   ],
   [
@@ -235,7 +235,7 @@ const RULES = [
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
-    9,
+    13,
     13
   ],
   [
@@ -253,7 +253,7 @@ const RULES = [
     "boundary",
     "Requires relevance and reference_only, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged passages or dropped one silently.",
     "boundary-checked",
-    3,
+    4,
     4
   ],
   [
@@ -271,7 +271,7 @@ const RULES = [
     "boundary",
     "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
     "boundary-checked",
-    4,
+    5,
     5
   ],
   [
@@ -289,7 +289,7 @@ const RULES = [
     "assembler",
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
-    14,
+    28,
     28
   ],
   [
@@ -307,7 +307,7 @@ const RULES = [
     "boundary",
     "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly.",
     "boundary-checked",
-    0,
+    1,
     1
   ],
   [
@@ -316,7 +316,7 @@ const RULES = [
     "assembler",
     "Pins profile content by hash and refuses unplaced protected content.",
     "implemented",
-    3,
+    8,
     8
   ],
   [
@@ -343,7 +343,7 @@ const RULES = [
     "assembler",
     "Snapshot replay across processes, hash seeds, time zones and locales, with ordering, blank strings, timestamps and the digest pinned for every language.",
     "implemented",
-    2,
+    3,
     3
   ],
   [
@@ -374,7 +374,7 @@ const RULES = [
     3
   ]
 ];
-const CONFORMANCE = {"passed":44,"total":58,"commit":"0c1d644"};
+const CONFORMANCE = {"passed":58,"total":58,"commit":"fbe1def"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
