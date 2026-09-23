@@ -301,6 +301,12 @@ export const TRACE_SCHEMA = {
         "reserved_output": {
           "type": "integer",
           "minimum": 0
+        },
+        "margin_percent": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "The snapshot's budget.margin_percent, repeated when the snapshot sets it (R-16)."
         }
       },
       "required": [

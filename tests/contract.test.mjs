@@ -429,6 +429,18 @@ test('conformance cases are complete, schema-valid, and agree with the published
   assert.deepEqual(await fs.readFile(new URL('expected.payload.txt', fixture)), await fs.readFile(new URL('../examples/payload.txt', import.meta.url)));
 });
 
+test('a budget may reserve an integer margin percent of at most 100, and the trace repeats it (R-16)', async () => {
+  const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  for (const [margin, valid] of [[0, true], [15, true], [100, true], [-1, false], [101, false], [7.5, false], ['10', false]]) {
+    const candidate = copy(snapshot);
+    candidate.budget.margin_percent = margin;
+    assert.equal(validateSnapshotSchema(candidate), valid, `snapshot margin ${margin}`);
+    const traced = copy(trace);
+    traced.budget.margin_percent = margin;
+    assert.equal(validateTraceSchema(traced), valid, `trace margin ${margin}`);
+  }
+});
+
 test('snapshots bind identity per batch and reject undeclared fields, but carry raw items for admission', async () => {
   const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
   for (const mutate of [s => delete s.assembly_time, s => s.batches[0].producer.kind = 'self-declared', s => s.clock = 'now', s => delete s.batches[1].producer, s => s.batches[0].producer.verified_server = true, s => s.batches[0].items.push('not an object')]) {
