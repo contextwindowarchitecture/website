@@ -281,7 +281,7 @@ const RULES = [
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
     20,
-    20
+    23
   ],
   [
     "MUST",
@@ -290,7 +290,7 @@ const RULES = [
     "Refusal traces carry no payload, no result and no included items.",
     "implemented",
     12,
-    12
+    13
   ],
   [
     "MUST NOT",
@@ -299,7 +299,7 @@ const RULES = [
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
     "boundary-checked",
     7,
-    7
+    9
   ],
   [
     "MUST",
@@ -326,7 +326,7 @@ const RULES = [
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
     37,
-    37
+    40
   ],
   [
     "SHOULD",
@@ -374,7 +374,7 @@ const RULES = [
     3
   ]
 ];
-const CONFORMANCE = {"passed":37,"total":37,"commit":"639ddc0"};
+const CONFORMANCE = {"passed":37,"total":40,"commit":"639ddc0"};
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
