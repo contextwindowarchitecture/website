@@ -10,6 +10,7 @@ follow from the groups' resolutions. Budgets are generous, so fitting never acts
 """
 import copy, hashlib, json, os, sys
 
+sys.dont_write_bytecode = True  # importing fitting must not leave a __pycache__ for implementations to vendor
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fitting import DEFAULTS, PLACEMENT, SCOPE, T, count, esc, item  # noqa: E402
 
