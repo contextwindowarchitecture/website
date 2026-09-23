@@ -110,7 +110,7 @@ for (const page of ['spec.html', 'assembler.html']) {
   }
   outputs.set(page, updated);
 }
-outputs.set('SPEC.md', '# CWA v2 draft — numbered requirements\n\nGenerated from `contract/requirements.json`. The [Spec page](./spec.html) provides the normative definitions and context. Published schemas in `schema/` define JSON field shapes.\n\n' +
+outputs.set('SPEC.md', '# CWA draft — numbered requirements\n\nGenerated from `contract/requirements.json`. The [Spec page](./spec.html) provides the normative definitions and context. Published schemas in `schema/` define JSON field shapes.\n\n' +
   rules.map((r, i) => `## R-${i + 1}: ${r[2]}\n\n${r[3]}\n`).join('\n'));
 
 for (const [path, content] of outputs) {

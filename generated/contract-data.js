@@ -3,7 +3,7 @@ export const ITEM_SCHEMA = {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://contextwindowarchitecture.io/schema/context_item.schema.json",
   "title": "CWA context item",
-  "description": "CWA v2 draft item structure. Admission additionally requires authenticated producer identity, route policy, scope, and an explicit assembly clock.",
+  "description": "CWA draft item structure. Admission additionally requires authenticated producer identity, route policy, scope, and an explicit assembly clock.",
   "type": "object",
   "additionalProperties": false,
   "required": [

@@ -1,4 +1,4 @@
-# CWA v2 draft — numbered requirements
+# CWA draft — numbered requirements
 
 Generated from `contract/requirements.json`. The [Spec page](./spec.html) provides the normative definitions and context. Published schemas in `schema/` define JSON field shapes.
 

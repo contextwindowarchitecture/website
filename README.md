@@ -1,6 +1,6 @@
 # CWA website and executable contracts
 
-Static website for the CWA v2 draft. Serve this directory over HTTP; no application server or browser-side package installation is required. The reference assembler remains unreleased.
+Static website for the CWA draft. Serve this directory over HTTP; no application server or browser-side package installation is required. The reference assembler remains unreleased.
 
 ## Development
 
