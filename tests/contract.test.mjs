@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
-import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, compareInstants, REASONS } from '../contract.js';
+import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, REASONS } from '../contract.js';
 import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema } from '../generated/schema-validators.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
@@ -102,8 +102,8 @@ const traceMutations = {
   'missing query': t => t.included = t.included.filter(i => i.slot !== 'interaction.query'),
   'invalid digest': t => t.result.hash = '7f…c1',
   'missing assembly snapshot': t => delete t.context,
-  'fact resolved by instruction rank': t => t.conflicts = [{ items: ['tool', 'document'], kind: 'fact', resolution: 'tool wins', decided_by: 'authority' }],
-  'withdrawn decided_by tier': t => t.conflicts = [{ items: ['policy', 'example'], kind: 'instruction', resolution: 'policy governs', decided_by: 'tier' }],
+  'fact resolved by instruction rank': t => t.conflicts = [{ items: ['tool', 'document'], kind: 'fact', resolution: 'resolved', decided_by: 'authority' }],
+  'withdrawn decided_by tier': t => t.conflicts = [{ items: ['policy', 'example'], kind: 'instruction', resolution: 'resolved', decided_by: 'tier' }],
   'protected item omitted for budget': t => t.excluded.push({ item_id: 'task:8821', reason: 'over_budget', stage: 'assembler', slot: 'state.task' }),
   'defaults_filled as ambiguous strings': t => t.defaults_filled = ['refunds-eu:v17#p4.lineage'],
   'protected compression': t => t.compressed = [{ slot: 'governance.instructions', item_id: 'policy', from: 90, to: 20, method: 'summary', variant_id: 'short' }]
@@ -142,8 +142,8 @@ test('missing evidence requires an explicit recovery handoff, not an in-assembly
 });
 
 test('factual precedence may report route policy or explicit escalation', () => {
-  for (const decided_by of ['policy', 'freshness', 'escalated', 'moot']) {
-    const candidate = { ...trace, conflicts: [{ items: ['tool', 'document'], kind: 'fact', resolution: 'route-defined outcome', decided_by }] };
+  for (const [decided_by, resolution] of [['policy', 'resolved'], ['freshness', 'resolved'], ['escalated', 'surfaced'], ['escalated', 'context_requested'], ['escalated', 'refused'], ['moot', 'moot']]) {
+    const candidate = { ...trace, conflicts: [{ items: ['tool', 'document'], kind: 'fact', resolution, decided_by }] };
     assert.equal(checkTrace(candidate).valid, true);
   }
 });
@@ -179,7 +179,7 @@ test('budget omissions of compressible items and structured defaults are valid t
   const candidate = copy(trace);
   candidate.excluded.push({ item_id: 'history:turn-3', reason: 'over_budget', stage: 'assembler', slot: 'interaction.history' });
   candidate.defaults_filled = [{ item_id: 'refunds-eu:v17#p4', field: 'lineage' }];
-  candidate.conflicts = [{ group_id: 'g-format', items: ['policy:v12', 'example:tone-3'], kind: 'instruction', resolution: 'policy governs', decided_by: 'authority' }];
+  candidate.conflicts = [{ group_id: 'g-format', items: ['policy:v12', 'example:tone-3'], kind: 'instruction', resolution: 'resolved', winner: 'policy:v12', decided_by: 'authority' }];
   candidate.context.snapshot_digest = 'a'.repeat(64);
   assert.equal(checkTrace(candidate).valid, true);
 });
@@ -193,6 +193,58 @@ test('conflict groups need an id, and fact groups need a fact key that names kno
   assert.equal(checkConflictGroup({ ...groups[1], id: undefined }).valid, false);
   assert.equal(checkConflictGroup({ ...groups[1], items: ['policy:v12'] }).valid, false);
   assert.equal(checkConflictGroup(groups[0], { itemIds: ['refunds-eu:v17#p4'] }).valid, false);
+});
+
+test('conflict resolutions use a closed vocabulary that agrees with decided_by (R-11)', () => {
+  const record = fields => ({ ...trace, conflicts: [{ group_id: 'g1', items: ['a', 'b'], kind: 'fact', ...fields }] });
+  assert.equal(checkTrace(record({ decided_by: 'policy', resolution: 'resolved', winner: 'a' })).valid, true);
+  assert.equal(checkTrace(record({ decided_by: 'authority', resolution: 'resolved' })).valid, false, 'authority never decides a fact');
+  assert.equal(checkTrace({ ...record({ decided_by: 'authority', resolution: 'resolved' }), conflicts: [{ items: ['a', 'b'], kind: 'instruction', decided_by: 'authority', resolution: 'resolved' }] }).valid, true,
+    'an instruction group decided by authority may have no winner');
+  for (const fields of [{ decided_by: 'policy', resolution: 'route-defined outcome' }, { decided_by: 'moot', resolution: 'resolved' },
+    { decided_by: 'policy', resolution: 'moot' }, { decided_by: 'escalated', resolution: 'resolved' }, { decided_by: 'policy', resolution: 'surfaced' },
+    { decided_by: 'escalated', resolution: 'surfaced', winner: 'a' }, { decided_by: 'policy', resolution: 'resolved', winner: 'c' }]) {
+    assert.equal(checkTrace(record(fields)).valid, false, JSON.stringify(fields));
+  }
+});
+
+test('conflict resolution never excludes a protected item', () => {
+  const row = (reason, slot) => ({ ...trace, excluded: [...trace.excluded, { item_id: 'x', reason, stage: 'assembler', slot }] });
+  assert.equal(checkTrace(row('conflict_deferred', 'governance.examples')).valid, true);
+  assert.equal(checkTrace(row('conflict_lost', 'evidence.knowledge')).valid, true);
+  assert.deepEqual(checkTrace(row('conflict_deferred', 'governance.instructions')).findings.map(f => f.reason), ['protected_conflict_excluded']);
+  assert.deepEqual(checkTrace(row('conflict_lost', 'state.task')).findings.map(f => f.reason), ['protected_conflict_excluded']);
+  assert.equal(checkTrace(row('conflict_lost', 'state.user'), { tierUpgrades: { 'state.user': 'protected' } }).valid, false);
+});
+
+test('a snapshot\'s groups name known items and facts, with no item in two groups', async () => {
+  const groups = await read('examples/conflict-groups.json');
+  const options = { itemIds: ['refunds-eu:v17#p4', 'crm:order#42', 'policy:v12', 'example:tone-3'], facts: { 'refund.window': {} } };
+  assert.equal(checkConflictGroups(groups, options).valid, true);
+  assert.deepEqual(checkConflictGroups(groups, { ...options, facts: {} }).findings.map(f => f.reason), ['unknown_fact']);
+  assert.deepEqual(checkConflictGroups([...groups, { ...groups[1], id: 'g-other' }], options).findings.map(f => f.reason),
+    ['overlapping_conflict_groups', 'overlapping_conflict_groups']);
+  assert.deepEqual(checkConflictGroups([groups[0], { ...groups[1], id: groups[0].id }], options).findings.map(f => f.reason), ['duplicate_conflict_group']);
+});
+
+test('conflict exclusions sit between admission and fitting in the reason registry', () => {
+  const exclusions = REASONS.filter(r => r.kind === 'exclusion').map(r => r.code);
+  assert.deepEqual(exclusions.slice(-3), ['conflict_deferred', 'conflict_lost', 'over_budget']);
+});
+
+test('route policies declare fact precedence and unresolved-conflict actions (R-6, R-11)', async () => {
+  const { route_policy: policy } = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
+  const full = { ...copy(policy), on_unresolved_instruction: 'surface',
+    facts: { 'refund.window': { precedence: ['policy-corpus', 'crm-mcp'], scope: ['tenant'], freshness_tiebreak: true, on_unresolved: 'request_context' },
+      'order.status': { precedence: ['crm-mcp'], on_unresolved: 'refuse' } } };
+  assert.equal(validateRoutePolicySchema(full), true, JSON.stringify(validateRoutePolicySchema.errors));
+  for (const mutate of [p => p.on_unresolved_instruction = 'ignore', p => delete p.facts['order.status'].on_unresolved,
+    p => delete p.facts['order.status'].precedence, p => p.facts['order.status'].precedence = [],
+    p => p.facts['refund.window'].precedence = ['crm-mcp', 'crm-mcp'], p => p.facts['refund.window'].scope = ['org'],
+    p => p.facts['refund.window'].freshness_tiebreak = 'yes', p => p.facts['refund.window'].authority = ['governing'], p => p.facts[' '] = p.facts['order.status']]) {
+    const candidate = copy(full); mutate(candidate);
+    assert.equal(validateRoutePolicySchema(candidate), false, mutate.toString());
+  }
 });
 
 test('timestamps compare at full stated precision, not milliseconds', () => {

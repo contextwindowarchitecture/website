@@ -79,7 +79,7 @@ An unauthorized capability item is excluded with `capability_not_allowed` (R-15)
 
 ### Conflicts and budget pressure
 
-The application supplies instruction or fact conflict groups. Instruction authority follows platform roles and governing/user precedence. Factual conflicts use explicit route policy for the same fact and scope; unresolved groups escalate. Every resolution records its kind and deciding stage. `authority` cannot decide factual precedence (R-6, R-11). Groups follow `schema/conflict_group.schema.json`; fact groups name the route-policy fact key.
+The application supplies instruction or fact conflict groups. Instruction authority follows platform roles and governing/user precedence. Among governing peers, one that governs excludes the peers that defer. Factual conflicts use explicit route policy for the fact key: eligible producers in precedence order, required scope and an optional freshness tie-break; the other members are excluded. No conflict excludes a protected item. Unresolved groups escalate to the route's action: surface, request context or refuse. Every resolution records its kind, outcome and deciding stage. `authority` cannot decide factual precedence (R-6, R-11). Groups follow `schema/conflict_group.schema.json`; fact groups name the route-policy fact key.
 
 The producer guide supplies these default budget tiers:
 

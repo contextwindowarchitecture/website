@@ -526,6 +526,16 @@ const FAILURES = [
     3
   ],
   [
+    "conflict_deferred",
+    "The item is a peer instruction with conflict_policy defers, and the one peer in its declared conflict group that governs prevailed. A protected item is never excluded this way; its group escalates.",
+    11
+  ],
+  [
+    "conflict_lost",
+    "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates.",
+    6
+  ],
+  [
     "over_budget",
     "The item was omitted to fit the rendered budget or its own token_budget, in tier order and by the route's fitting policy.",
     16

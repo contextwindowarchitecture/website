@@ -128,6 +128,9 @@ function checkRenderedBudget(trace, tierUpgrades) {
     if (item.reason === 'over_budget' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
       findings.push(failure('protected_omitted', `A protected ${item.slot} item cannot be omitted for budget.`, 16));
     }
+    if (['conflict_deferred', 'conflict_lost'].includes(item.reason) && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+      findings.push(failure('protected_conflict_excluded', `Conflict resolution cannot exclude a protected ${item.slot} item; its group escalates.`, 11));
+    }
   }
   return findings;
 }
@@ -144,6 +147,9 @@ export function checkTrace(trace, context = {}) {
   for (const conflict of trace.conflicts) {
     if (conflict.kind === 'fact' && conflict.decided_by === 'authority') {
       findings.push(failure('factual_authority_inversion', 'Instruction authority cannot decide factual precedence.', 6));
+    }
+    if (conflict.winner !== undefined && !conflict.items.includes(conflict.winner)) {
+      findings.push(failure('unknown_conflict_winner', `The winner ${conflict.winner} is not a member of its conflict group.`, 11));
     }
   }
   return { valid: findings.length === 0, findings };
@@ -169,10 +175,27 @@ export function checkProducerBatch(batch) {
   return { valid: findings.length === 0, findings };
 }
 
-export function checkConflictGroup(group, { itemIds } = {}) {
+// itemIds: candidate and producer-exclusion ids in the snapshot. facts: the route policy's facts.
+export function checkConflictGroup(group, { itemIds, facts } = {}) {
   if (!validateConflictGroupSchema(group)) return { valid: false, findings: schemaErrors(validateConflictGroupSchema, 11) };
   const known = itemIds && new Set(itemIds);
   const findings = known ? group.items.filter(id => !known.has(id)).map(id =>
     failure('unknown_conflict_item', `Conflict group ${group.id} names ${id}, which is not a candidate in this snapshot.`, 11)) : [];
+  if (facts && group.kind === 'fact' && !Object.hasOwn(facts, group.fact)) {
+    findings.push(failure('unknown_fact', `Conflict group ${group.id} names fact ${group.fact}, which the route policy does not define.`, 11));
+  }
+  return { valid: findings.length === 0, findings };
+}
+
+// A snapshot's groups: each valid on its own, with distinct ids, and no item in two groups (R-11).
+export function checkConflictGroups(groups, options = {}) {
+  const findings = groups.flatMap(group => checkConflictGroup(group, options).findings);
+  const ids = groups.map(group => group.id);
+  if (new Set(ids).size !== ids.length) findings.push(failure('duplicate_conflict_group', 'Conflict group ids must be unique.', 11));
+  const seen = new Map();
+  for (const group of groups) for (const id of group.items ?? []) {
+    if (seen.has(id)) findings.push(failure('overlapping_conflict_groups', `${id} belongs to both ${seen.get(id)} and ${group.id}; an item belongs to at most one group.`, 11));
+    else seen.set(id, group.id);
+  }
   return { valid: findings.length === 0, findings };
 }

@@ -65,6 +65,21 @@ These follow the reference assembler's M2 kickoff (`cwa-assembler/docs/DESIGN.md
 | `token_budget` was called a cap, but nothing said what happens to an item over it, and "null means the route allocation" named a field that does not exist | Caps are enforced before shedding, whether or not the payload fits: a compressible item takes its longest variant within the cap or is omitted, a droppable item is omitted, and a protected item over its cap refuses with `protected_content_over_budget` (R-16). R-3 now says null sets no per-item cap and `budget.input` still bounds the item; per-slot allocations are deferred |
 | An invalid snapshot had no refusal code | None needed: a snapshot that fails its schema is rejected before assembly and has no trace |
 
+## Conflict resolution — 2026-09-22
+
+These follow the reference assembler's M3 kickoff (`cwa-assembler/docs/DESIGN.md` §8). `conformance/README.md`'s Conflicts section holds the procedure.
+
+| Issue | Resolution |
+| --- | --- |
+| R-11 said how instruction groups are decided but not what that does to the payload; the user query is protected and cannot be excluded | Authority excludes nothing. Among two or more peers at the top instructing authority, one `governs` and the rest `defers` excludes the deferring peers with `conflict_deferred`; any other pattern escalates |
+| R-11's fact policy ("eligible sources, scope and any freshness tie-break") had no fields | Route policy `facts.<key>`: `precedence` (authenticated producer ids, never `item.source`), `scope`, `freshness_tiebreak`, `on_unresolved`. Losers are excluded with `conflict_lost` |
+| Nothing stopped a conflict from excluding protected content | No conflict excludes a protected item; such a group escalates. Required slots therefore survive conflict resolution |
+| "Surfaced, routed for more context or refused" had no switch | `on_unresolved` per fact and `on_unresolved_instruction` per route (default `refuse`). `request_context` and `refuse` refuse with `conflict_unresolved`; `surface` keeps every member and marks it in the payload (`fixture-xml/v1` adds `conflict="<group id>"`) |
+| `conflicts[].resolution` was free text, so conformance could not compare it | A closed vocabulary tied to `decided_by`, plus an optional `winner` |
+| Groups could name unknown items, share items, or name undefined facts, and the outcome would depend on processing order | Each is rejected with the snapshot, before assembly. Members excluded at admission make a group `moot` |
+
+The resolution vocabulary is breaking for stored traces: free-text `resolution` values no longer validate.
+
 ## Review and migration implications
 
 This is a breaking **draft** revision. Existing traces need `context`, conflict `kind`, exclusion `stage`, and compression `item_id`/`variant_id`. Refused traces use the new null result shape. Item JSON no longer accepts `as_of`, loose scope strings, undefined authority aliases, or undeclared fields. Consumers should validate and migrate explicitly rather than silently coercing old data.

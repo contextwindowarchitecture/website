@@ -507,8 +507,14 @@ export const TRACE_SCHEMA = {
           },
           "resolution": {
             "type": "string",
-            "minLength": 1,
-            "pattern": "\\S"
+            "enum": [
+              "resolved",
+              "surfaced",
+              "context_requested",
+              "refused",
+              "moot"
+            ],
+            "description": "resolved when authority or policy decided the group; surfaced, context_requested or refused when it escalated, following the route's on_unresolved action; moot when fewer than two members were admitted (R-11)."
           },
           "decided_by": {
             "type": "string",
@@ -524,6 +530,12 @@ export const TRACE_SCHEMA = {
             "type": "string",
             "minLength": 1,
             "pattern": "\\S"
+          },
+          "winner": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "\\S",
+            "description": "The member that prevailed, when one did. One of items."
           }
         },
         "required": [
@@ -532,7 +544,98 @@ export const TRACE_SCHEMA = {
           "resolution",
           "decided_by"
         ],
-        "additionalProperties": false
+        "additionalProperties": false,
+        "allOf": [
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "decided_by": {
+                  "const": "moot"
+                }
+              },
+              "required": [
+                "decided_by"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "const": "moot"
+                }
+              }
+            },
+            "else": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "not": {
+                    "const": "moot"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "properties": {
+                "decided_by": {
+                  "const": "escalated"
+                }
+              },
+              "required": [
+                "decided_by"
+              ]
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "enum": [
+                    "surfaced",
+                    "context_requested",
+                    "refused"
+                  ]
+                }
+              }
+            },
+            "else": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "not": {
+                    "enum": [
+                      "surfaced",
+                      "context_requested",
+                      "refused"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "type": "object",
+              "required": [
+                "winner"
+              ],
+              "properties": {
+                "winner": true
+              }
+            },
+            "then": {
+              "type": "object",
+              "properties": {
+                "resolution": {
+                  "const": "resolved"
+                }
+              }
+            }
+          }
+        ]
       }
     },
     "refused": {
@@ -1016,6 +1119,18 @@ export const REASONS = [
     "text": "The route's eligibility predicate rejected the item, for example because it was observed longer ago than its slot's max_age_seconds."
   },
   {
+    "code": "conflict_deferred",
+    "kind": "exclusion",
+    "rule": "R-11",
+    "text": "The item is a peer instruction with conflict_policy defers, and the one peer in its declared conflict group that governs prevailed. A protected item is never excluded this way; its group escalates."
+  },
+  {
+    "code": "conflict_lost",
+    "kind": "exclusion",
+    "rule": "R-6",
+    "text": "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates."
+  },
+  {
     "code": "over_budget",
     "kind": "exclusion",
     "rule": "R-16",
@@ -1037,7 +1152,7 @@ export const REASONS = [
     "code": "conflict_unresolved",
     "kind": "refusal",
     "rule": "R-11",
-    "text": "A declared conflict group has no unique supported resolution and route policy says to refuse or request context."
+    "text": "A declared conflict group has no unique supported resolution, and route policy says to refuse or request context. The trace records recovery.action request_context when every such group asked for context."
   },
   {
     "code": "protected_content_over_budget",
