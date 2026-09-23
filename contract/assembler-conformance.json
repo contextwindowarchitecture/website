@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler",
-    "commit": "7817552742c49455e7d5d3e2f9c9b78cc447d968",
+    "commit": "d412843169a4b4312f1bbfe4a72562a2895117a3",
     "dirty": false
   },
   "implementation": {
@@ -10,7 +10,7 @@
     "language": "python"
   },
   "contract": {
-    "website_commit": "05266860655ea82ce3b552edae93db6a5fff3d8e",
+    "website_commit": "d2e8bd66841039c0713eff1046094fe7c192ef1a",
     "dirty": false
   },
   "cases": [
@@ -159,6 +159,36 @@
         "R-4",
         "R-11",
         "R-21"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "dedupe-evidence-required",
+      "rules": [
+        "R-12",
+        "R-17",
+        "R-21",
+        "R-24"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "dedupe-exact",
+      "rules": [
+        "R-21",
+        "R-22",
+        "R-24"
+      ],
+      "outcome": "passed"
+    },
+    {
+      "id": "dedupe-exemptions",
+      "rules": [
+        "R-6",
+        "R-11",
+        "R-16",
+        "R-21",
+        "R-24"
       ],
       "outcome": "passed"
     },
