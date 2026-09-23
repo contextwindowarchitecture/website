@@ -309,6 +309,8 @@ test('conformance cases are complete, schema-valid, and agree with the published
     for (const rule of meta.rules) assert.match(rule, /^R-([1-9]|1\d|2[0-3])$/);
     const snapshot = JSON.parse(await fs.readFile(file('snapshot.json'), 'utf8'));
     assert.equal(validateSnapshotSchema(snapshot), true, JSON.stringify(validateSnapshotSchema.errors));
+    const itemIds = snapshot.batches.flatMap(b => [...b.items.map(i => i.id), ...b.excluded.map(e => e.item_id)]);
+    assert.equal(checkConflictGroups(snapshot.conflicts, { itemIds, facts: snapshot.route_policy.facts ?? {} }).valid, true, name);
     const expected = JSON.parse(await fs.readFile(file('expected.trace.json'), 'utf8'));
     assert.equal(checkTrace(expected, { tierUpgrades: snapshot.route_policy.tier_upgrades }).valid, true);
     const payload = await fs.readFile(file('expected.payload.txt')).catch(() => null);
