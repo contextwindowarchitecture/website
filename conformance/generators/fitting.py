@@ -9,6 +9,7 @@ fits after the last action and not before it, and each chosen variant is the one
 conformance/README.md's Fitting section selects.
 """
 import copy, hashlib, json, os, re, sys
+U16 = lambda s: s.encode("utf-16-be")  # strings order by UTF-16 code units (conformance/README.md, Ordering)
 
 WEB = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 DEFAULTS = json.load(open(os.path.join(WEB, "contract/slot-defaults.json")))
@@ -54,7 +55,7 @@ def render(placement, kept):
     """kept: {id: (item, body)}. Returns payload bytes and included rows, per the fixture renderer."""
     parts, included = [], []
     for slot in placement:
-        for it, body in sorted((v for v in kept.values() if v[0]["slot"] == slot), key=lambda v: v[0]["id"]):
+        for it, body in sorted((v for v in kept.values() if v[0]["slot"] == slot), key=lambda v: U16(v[0]["id"])):
             b = esc(body)
             parts.append(f'<{slot} id="{esc(it["id"]).replace(chr(34), "&quot;")}">\n{b}\n</{slot}>\n')
             included.append({"slot": slot, "item_id": it["id"], "tokens": count(b), "source_version": it["source_version"]})
@@ -85,10 +86,10 @@ def build(case):
         batches.setdefault(PRODUCER[it["slot"]], []).append(it)
     snapshot = {"assembly_time": T, "scope": SCOPE, "budget": {"input": budget, "reserved_output": 1024}, "profile": profile,
                 "route_policy": policy, "tokenizer": "fixture-whitespace/v1", "renderer": "fixture-xml/v1",
-                "batches": [{"producer": {"id": p, "kind": KINDS[p]}, "items": batches[p], "excluded": []} for p in sorted(batches)],
+                "batches": [{"producer": {"id": p, "kind": KINDS[p]}, "items": batches[p], "excluded": []} for p in sorted(batches, key=U16)],
                 "conflicts": []}
 
-    admission = sorted(((PRODUCER[it["slot"]], it["id"], r, it["slot"]) for it, r in rows if r != "admit"), key=lambda r: (r[0], r[1]))
+    admission = sorted(((PRODUCER[it["slot"]], it["id"], r, it["slot"]) for it, r in rows if r != "admit"), key=lambda r: (U16(r[0]), U16(r[1])))
     excluded = [{"item_id": i, "reason": r, "stage": "assembler", "slot": s} for _, i, r, s in admission]
     admitted = {it["id"]: it for it, r in rows if r == "admit"}
     kept = {i: (it, it["body"]) for i, it in admitted.items()}
