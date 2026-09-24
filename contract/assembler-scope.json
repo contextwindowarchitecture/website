@@ -47,7 +47,7 @@
   {
     "id": "R-10",
     "scope": "assembler",
-    "note": "Checks untrusted marking, refuses it in governance, and renders it as material."
+    "note": "Checks untrusted marking, excludes it from governance, and renders it as material."
   },
   {
     "id": "R-11",

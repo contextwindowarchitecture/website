@@ -173,7 +173,7 @@
       </div>
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Traceable</div>
-        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Every assembly run emits a trace: what got in, what was compressed, what was refused, and why.</div>
+        <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Every assembly run emits a trace: what got in, what was compressed, what was left out, and why.</div>
       </div>
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
@@ -858,7 +858,7 @@ const PLANES = [
 
 /* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
 const SLOTS = [
-  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler refuses untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
+  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler excludes untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
   ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
   ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
@@ -867,7 +867,7 @@ const SLOTS = [
   ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority, and permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
   ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
   ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract. They're droppable, so when the budget gets tight they go before anything compressible.", "authority governing\ntier droppable\nrank task similarity"],
-  ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. Safety disclosures outrank format constraints.", "authority governing\ntier protected\nreinforced near the query"],
+  ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates.", "authority governing\ntier protected\nreinforced near the query"],
   ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile has tested that it belongs.", "authority user\ntier protected\nrole trigger"]
 ];
 
@@ -1085,7 +1085,7 @@ const CONFLICTS = [
   ["Canonical task state vs conversational recollection", "Route policy identifies canonical application state for its owned facts; the model does not write that state."],
   ["User correction vs inferred memory", "The application explicitly revokes affected memory and reports the exclusion."],
   ["Conflicting retrieved sources", "Surface the conflict, retrieve more, or abstain and escalate. Never silently pick one."],
-  ["Format constraint vs required safety disclosure", "Safety and correctness govern; the contract bends."],
+  ["Format constraint vs required safety disclosure", "Both are governing and protected, so if you group them the conflict escalates. Write the disclosure into the contract so they never collide."],
   ["Steering example vs instruction or output contract", "The instruction or contract governs. Examples defer within the governing tier."]
 ];
 
@@ -1097,7 +1097,7 @@ const TESTS = [
   ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
   ["Freshness", "Expired memory is excluded using assembly_time and its producer rejection is traced."],
   ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it."],
-  ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is refused with capability_not_allowed."]
+  ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is excluded with capability_not_allowed."]
 ];
 
 const EVIDENCE_STAGES = [
