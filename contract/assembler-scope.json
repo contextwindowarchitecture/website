@@ -27,12 +27,12 @@
   {
     "id": "R-6",
     "scope": "assembler",
-    "note": "Resolves declared groups; evidence, state and memory never render as instructions."
+    "note": "Classifies each declared group as instruction or fact and resolves it by authority or route policy; state, evidence, memory and untrusted content never render as instructions."
   },
   {
     "id": "R-7",
     "scope": "assembler",
-    "note": "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers."
+    "note": "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside wrappers."
   },
   {
     "id": "R-8",
@@ -82,7 +82,7 @@
   {
     "id": "R-17",
     "scope": "assembler",
-    "note": "Refusal traces carry no payload, no result and no included items."
+    "note": "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace."
   },
   {
     "id": "R-18",
@@ -92,12 +92,12 @@
   {
     "id": "R-19",
     "scope": "boundary",
-    "note": "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly."
+    "note": "Rejects a profile written for another spec, and in deployment mode an unevaluated one. Evaluation itself happens outside assembly."
   },
   {
     "id": "R-20",
     "scope": "assembler",
-    "note": "Pins profile content by hash and refuses unplaced protected content."
+    "note": "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement."
   },
   {
     "id": "R-21",

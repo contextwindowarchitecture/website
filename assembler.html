@@ -55,13 +55,13 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Reference assembler</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">In progress. No release yet.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification: admission, conflict resolution, fitting, placement by profile, and the trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A reference implementation of the specification, covering the four steps the spec gives the assembler (<a href="./spec.html#s4">section 4</a>): admit, resolve, fit, and render with a trace. It exists to prove the spec is buildable and to give conformance tests something to run against. This page tracks its status against every requirement and will grow into the API documentation once the API settles.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
         <span>Milestone: <span style="color: var(--fg);">M13 second implementation</span>, done; v1 release next</span>
         <span>Spec target: <span style="color: var(--fg);">draft</span></span>
         <span>Language: <span style="color: var(--fg);">Python and TypeScript</span>, two independent implementations</span>
-        <span>Updated: 2026-09-23</span>
+        <span>Updated: 2026-09-24</span>
       </div>
     </div>
   </section>
@@ -105,7 +105,7 @@
 
 reg = Registry.from_json(lock, profiles, policies)  <span style="color: var(--muted);"># pinned by digest; an edit under the same version fails</span>
 
-snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shaped, as snapshot.schema.json</span>
+snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shaped, as snapshot.schema.json; SnapshotError rejects an invalid one</span>
     batches=batches,              <span style="color: var(--muted);"># items + exclusions, one authenticated producer each</span>
     capabilities=grant,           <span style="color: var(--muted);"># allow-list result for this route and user</span>
     conflicts=groups,             <span style="color: var(--muted);"># conflict_group.schema.json</span>
@@ -120,7 +120,7 @@ snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shap
 
 result = assemble(snapshot)       <span style="color: var(--muted);"># pure: no I/O, clock or model</span>
 
-result.payload    <span style="color: var(--muted);"># bytes, or None when refused</span>
+result.payload    <span style="color: var(--muted);"># bytes, or None when the assembly is refused</span>
 result.trace      <span style="color: var(--muted);"># dict matching trace.schema.json</span>
 result.refused    <span style="color: var(--muted);"># bool · reason in trace.refused</span>
 snapshot.digest() <span style="color: var(--muted);"># context.snapshot_digest, the replay key</span></div>
@@ -206,7 +206,7 @@ const RULES = [
     "MUST",
     "Separate instruction authority from factual precedence",
     "assembler",
-    "Resolves declared groups; evidence, state and memory never render as instructions.",
+    "Classifies each declared group as instruction or fact and resolves it by authority or route policy; state, evidence, memory and untrusted content never render as instructions.",
     "implemented",
     6,
     [
@@ -218,7 +218,7 @@ const RULES = [
     "MUST NOT",
     "No slot overrides platform roles; no authority from wording",
     "assembler",
-    "Only governance maps to platform roles, history renders as a transcript, and item bodies are escaped inside wrappers.",
+    "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside wrappers.",
     "implemented",
     4,
     [
@@ -338,7 +338,7 @@ const RULES = [
     "MUST",
     "Refused assembly has no rendered payload",
     "assembler",
-    "Refusal traces carry no payload, no result and no included items.",
+    "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
     28,
     [
@@ -362,7 +362,7 @@ const RULES = [
     "MUST",
     "Draft profiles versus evaluated profiles",
     "boundary",
-    "Can refuse unevaluated profiles in deployment mode. Evaluation itself happens outside assembly.",
+    "Rejects a profile written for another spec, and in deployment mode an unevaluated one. Evaluation itself happens outside assembly.",
     "boundary-checked",
     1,
     [
@@ -374,7 +374,7 @@ const RULES = [
     "MUST",
     "Profile version and mandatory-slot validation",
     "assembler",
-    "Pins profile content by hash and refuses unplaced protected content.",
+    "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement.",
     "implemented",
     8,
     [
