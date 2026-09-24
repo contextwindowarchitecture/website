@@ -90,7 +90,8 @@ Conflict resolution runs right after admission (R-6, R-11). It acts only on the 
 
 1. Only `governing` and `user` authority may instruct. Members with any other authority stay in the payload as material and take no part in the decision.
 2. The *peers* are the members at the highest instructing authority present: `governing`, or else `user`. With one peer, or none, the group is decided by authority, and nothing is excluded: `decided_by: authority`, `resolution: resolved`, and `winner` is that peer when there is one.
-3. With two or more peers, if exactly one peer's `conflict_policy` is `governs` and every other peer's is `defers`, the deferring peers are excluded with `conflict_deferred`: `decided_by: policy`, `resolution: resolved`, `winner` the governing peer. Any other combination escalates.
+3. With two or more peers, if exactly one peer's `conflict_policy` is `governs` and every other peer's is `defers`, the deferring peers are excluded with `conflict_deferred`: `decided_by: policy`, `resolution: resolved`, `winner` the governing peer. Any other combination escalates: two peers that govern, peers that all defer, or any peer whose `conflict_policy` is `escalate`. A lone peer is decided by authority in step 2 whatever its `conflict_policy` says, so `escalate` takes effect only against another peer.
+4. Only peers are excluded. A member below the peers, such as a `user` member when governing peers are present, stays in the payload however the peers are decided.
 
 **Fact groups** use the route's `facts[<fact>]` policy.
 
@@ -163,6 +164,8 @@ A slot's *size* is the sum of `included[].tokens` over the slot's rows: the toke
 
 *Shedding order* takes slots by ascending `priority` (default 0), then by slot name, and within each slot takes items from the lowest rank up. Rank sorts by the slot's `order_by` keys, then by `id`, with the first item ranked highest. The default keys are `["-relevance", "-freshness"]`: higher scores rank first and unscored items last, then newer items first.
 
+Fitting treats a member of a surfaced conflict group like any other item: it may omit one, with an `over_budget` row, and the members it keeps still render marked as conflicting, since the conflict was real (R-11). The `conflict-surfaced-shed` case checks this.
+
 Fitting decides per item. A slot the profile places twice sheds or compresses both occurrences together. When those placements render a body differently, as `system` and an `xml:` wrap do in `cwa-messages/v1`, the size of the item's body or of a variant, wherever this section compares one with a cap or with another, is the largest of its occurrences' renderings: a cap bounds the body however it is rendered. Each omitted item adds one `excluded[]` row with reason `over_budget`, stage `assembler` and its slot. Each included occurrence of a compressed item adds one `compressed[]` row: `from` counts the original body and `to` and `included[].tokens` the variant, each as that occurrence renders it, and `method` and `variant_id` name the variant (R-18).
 
 *Cost.* Every reduction in steps 4 and 5 is its own fit test, and every fit test counts the whole payload. Work therefore grows with the number of reductions times the payload's size, and becomes quadratic when most candidates are shed: the reference assembler tokenizes about 49 million characters, in about a third of a second, when budget pressure sheds 498 of 500 chunks. An implementation may reach the same decisions faster, but no shortcut may change one; that rules out, for example, adding up the counts of an item's parts where the tokenizer does not count the whole as the sum of its parts. Keep the cost down at the source: a retriever sends no more chunks than the route's budget can use, and a route can bound a slot before budget pressure: `max_per_source` (R-26) drops surplus chunks without counting anything, and `max_tokens` (R-16) measures only the slot's own items.
@@ -195,12 +198,12 @@ Wherever this document counts the payload, in `result.input_tokens` and in every
 
 ## Registry
 
-A registry holds the profiles and route policies an application assembles with, each pinned in a lock that validates against `schema/registry_lock.schema.json` (R-19, R-20). It works before snapshots are built, outside assembly: a snapshot carries the profile and route policy the registry returned.
+A registry holds the profiles and route policies an application assembles with, each pinned in a lock that validates against `schema/registry_lock.schema.json`. Profiles follow R-19 and R-20; route policies are versioned wherever the requirements say "versioned route policy", as R-3, R-6 and R-16 do. It works before snapshots are built, outside assembly: a snapshot carries the profile and route policy the registry returned.
 
 - **Digests.** A profile's digest is the lowercase SHA-256 of the RFC 8785 serialization of the profile without its `evaluation` member, so a change of evaluation status alone keeps the digest, and may keep the version (R-20). A route policy's digest covers the whole policy.
 - **Loading.** Every profile and route policy a registry is given must be valid against its schema, and must match a lock entry with the same identity (`id` and `version` for a profile, `route` and `version` for a route policy) and the same digest. Loading fails when an entry has the same identity and another digest, because the content changed without a version increase. It also fails for content with no entry, and for a lock that lists an identity twice.
 - **Locking.** Locking adds an entry for each identity not yet pinned. It refuses content whose identity is already pinned with another digest, so the author must increase the version instead. It never rewrites an entry.
-- **Deployment.** An application deploying a profile asks for it in deployment mode, which returns only a profile with `evaluation.status: evaluated`. The profile schema then requires a concrete `model_family` and the evaluation's `suite`, `date`, `result` and `artifact` (R-19). Draft use, such as development and these conformance cases, may load unevaluated profiles.
+- **Deployment.** An application deploying a profile asks for it in deployment mode, which returns only a profile with `evaluation.status: evaluated`. The profile schema then requires a concrete `model_family` and the evaluation's `suite`, `date`, `result` and `artifact` (R-19). Draft use, such as development and these conformance cases, may load unevaluated profiles. A profile's digest covers `model_family`, so promoting a draft that has `model_family: null` changes its model target and needs a new version (R-20); only a profile that already names its model can be promoted at the same version, by changing `evaluation` alone.
 
 `registry/` holds the published example profiles, four conformance route policies and a lock that pins them, so that implementations can check they compute the same digests. `generators/registry.py` builds it.
 
@@ -216,7 +219,7 @@ It also holds one entry per directory under `rejections/`, ordered by id, in `re
 
 - `rejected`: the implementation rejected the snapshot before assembly, with no payload and no trace;
 - `failed`: anything else: it assembled a payload, refused, or raised something other than a rejection. `detail` says what happened;
-- `skipped`: it does not provide the case's tokenizer or renderer. `detail` names it.
+- `skipped`: it does not provide the case's renderer, and the check the case breaks is the renderer's (`profile-unrealizable`, `profile-invalid-tag` and the `messages-*` cases). `detail` names it. Every other check runs before a renderer is needed, so its case is never skipped.
 
 Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of both implementations, the Python reference assembler (beside its `status.json`) and the TypeScript one. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.website_commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
 
