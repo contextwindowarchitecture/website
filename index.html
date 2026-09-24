@@ -863,12 +863,12 @@ const SLOTS = [
   ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, inside its freshness limits, and not an exact duplicate in slots where the route asks for deduplication (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
   ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries past expires at assembly_time, or carrying revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
-  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nbound turns · tokens"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "Before assembly, overflow gets summarised into memory rather than cut mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nbound turns · tokens"],
   ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority, and permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
   ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
   ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract. They're droppable, so when the budget gets tight they go before anything compressible.", "authority governing\ntier droppable\nrank task similarity"],
   ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates.", "authority governing\ntier protected\nreinforced near the query"],
-  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile has tested that it belongs.", "authority user\ntier protected\nrole trigger"]
+  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile puts it.", "authority user\ntier protected\nrole trigger"]
 ];
 
 const UCS = [
@@ -1076,7 +1076,7 @@ const AUTHORITY = [
   ["Reference evidence", "Retrieved chunks. Informs the answer; never directs behaviour."],
   ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
   ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
-  ["Untrusted content", "Anything user-controlled or fetched. Rendered as material, never as instruction."]
+  ["Untrusted content", "Prior model turns in history, and anything a producer wants handled with the least privilege. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
 ];
 
 const CONFLICTS = [
@@ -1084,9 +1084,9 @@ const CONFLICTS = [
   ["Fresh verified tool output vs retrieved document", "Route policy may prefer a verified observation for the same current fact; unresolved conflicts escalate."],
   ["Canonical task state vs conversational recollection", "Route policy identifies canonical application state for its owned facts; the model does not write that state."],
   ["User correction vs inferred memory", "The application explicitly revokes affected memory and reports the exclusion."],
-  ["Conflicting retrieved sources", "Surface the conflict, retrieve more, or abstain and escalate. Never silently pick one."],
+  ["Conflicting retrieved sources", "The route's fact policy picks by producer precedence, and the loser shows up as conflict_lost. If it can't pick, the conflict is surfaced, more context is requested, or the assembly is refused."],
   ["Format constraint vs required safety disclosure", "Both are governing and protected, so if you group them the conflict escalates. Write the disclosure into the contract so they never collide."],
-  ["Steering example vs instruction or output contract", "The instruction or contract governs. Examples defer within the governing tier."]
+  ["Steering example vs instruction or output contract", "The instruction or contract governs. Examples defer to other governing items."]
 ];
 
 const TESTS = [
@@ -1120,7 +1120,9 @@ const ITEM_FIELDS = [
   ["budget", "How much it may consume, which tier it sits in, and what shortens first under pressure."],
   ["conflict_policy", "For permitted instruction peers: this one defers, governs, or forces escalation."],
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
-  ["trust", "Verified, unverified, or untrusted. Untrusted content can never issue instructions."]
+  ["trust", "Verified, unverified, or untrusted. Untrusted content can never issue instructions."],
+  ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
+  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10)."]
 ];
 
 
