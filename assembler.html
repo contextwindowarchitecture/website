@@ -184,7 +184,7 @@ const RULES = [
     "assembler",
     "Refuses with required_slot_missing.",
     "implemented",
-    6,
+    7,
     [
       6,
       6
@@ -256,7 +256,7 @@ const RULES = [
     "assembler",
     "Checks untrusted marking, excludes it from governance, and renders it as material.",
     "implemented",
-    2,
+    3,
     [
       0,
       0
@@ -268,7 +268,7 @@ const RULES = [
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
-    14,
+    15,
     [
       11,
       11
@@ -328,7 +328,7 @@ const RULES = [
     "assembler",
     "Counts rendered tokens and sheds in tier order.",
     "implemented",
-    27,
+    29,
     [
       25,
       25
@@ -340,7 +340,7 @@ const RULES = [
     "assembler",
     "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
-    28,
+    29,
     [
       28,
       28
@@ -352,7 +352,7 @@ const RULES = [
     "boundary",
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
     "boundary-checked",
-    9,
+    10,
     [
       8,
       8
@@ -388,7 +388,7 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    46,
+    49,
     [
       41,
       41
@@ -455,7 +455,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":60,"passed":55,"stale":5},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":60,"passed":55,"stale":5}];
+const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":63,"passed":55,"stale":5},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":63,"passed":55,"stale":5}];
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {

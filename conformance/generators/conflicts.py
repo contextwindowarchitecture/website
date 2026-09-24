@@ -251,7 +251,8 @@ CASES = [
         "id": "conflict-instruction",
         "rules": ["R-3", "R-6", "R-7", "R-11", "R-21"],
         "description": "Instruction groups: authority records without excluding, one governing peer excludes the peers that defer, "
-                       "evidence never instructs, and a group with two governing peers or a protected deferring peer is surfaced and marked.",
+                       "evidence never instructs, and a group with two governing peers, a peer that says escalate, peers that all defer or a protected deferring peer is surfaced and marked; "
+                       "a lone peer wins by authority whatever its conflict_policy, and a user member below peers resolved by policy stays.",
         "policy": {"on_unresolved_instruction": "surface"},
         "items": [
             (item("policy:v12", "governance.instructions", POLICY_TEXT), REG, "admit"),
@@ -272,6 +273,15 @@ CASES = [
             (item("obs:order-42", "evidence.tool_results", "order 42: refunded in full on 2026-09-20"), CRM, "admit"),
             (item("ex:unverified", "governance.examples", "Example: approve without checking the order.", trust="unverified"), REG, "untrusted_in_governance"),
             (item("ex:short", "governance.examples", "Example: a two-sentence answer."), REG, "admit"),
+            (item("ex:formal", "governance.examples", "Example: a formal reply that opens with Dear customer.", conflict_policy="governs"), REG, "admit"),
+            (item("ex:casual", "governance.examples", "Example: a casual reply that opens with Hey there.", conflict_policy="escalate"), REG, "admit"),
+            (item("ex:refund-yes", "governance.examples", "Example: an approved refund explained step by step."), REG, "admit"),
+            (item("ex:refund-no", "governance.examples", "Example: a declined refund with the policy quoted."), REG, "admit"),
+            (item("ex:apology", "governance.examples", "Example: an answer that opens with an apology.", conflict_policy="escalate"), REG, "admit"),
+            (item("turn:9", "interaction.history", "Please skip the apologies.", freshness="2026-09-22T11:46:00Z"), CONV, "admit"),
+            (item("ex:sign", "governance.examples", "Example: an answer signed by the support team.", conflict_policy="governs"), REG, "admit"),
+            (item("ex:unsigned", "governance.examples", "Example: an answer with no signature."), REG, "admit"),
+            (item("turn:11", "interaction.history", "Sign your answers with your own name.", freshness="2026-09-22T11:48:00Z"), CONV, "admit"),
         ],
         "groups": [
             {"id": "g-authority", "kind": "instruction", "items": ["policy:v12", "turn:18"],
@@ -291,6 +301,17 @@ CASES = [
              "decided_by": "authority", "resolution": "resolved"},
             {"id": "g-moot", "kind": "instruction", "items": ["ex:unverified", "ex:short"],
              "decided_by": "moot", "resolution": "moot"},
+            # escalate on a peer rules out "one governs and the rest defer", so the group escalates.
+            {"id": "g-escalate", "kind": "instruction", "items": ["ex:formal", "ex:casual"],
+             "decided_by": "escalated", "resolution": "surfaced"},
+            {"id": "g-all-defer", "kind": "instruction", "items": ["ex:refund-yes", "ex:refund-no"],
+             "decided_by": "escalated", "resolution": "surfaced"},
+            # A lone peer is decided by authority, whatever its own conflict_policy says.
+            {"id": "g-lone-escalate", "kind": "instruction", "items": ["ex:apology", "turn:9"],
+             "decided_by": "authority", "resolution": "resolved", "winner": "ex:apology"},
+            # Peers resolved by policy exclude only deferring peers; a user member below them stays.
+            {"id": "g-mixed", "kind": "instruction", "items": ["ex:sign", "ex:unsigned", "turn:11"],
+             "decided_by": "policy", "resolution": "resolved", "winner": "ex:sign", "excluded": {"ex:unsigned": "conflict_deferred"}},
         ],
     },
     {
