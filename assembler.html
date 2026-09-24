@@ -184,7 +184,7 @@ const RULES = [
     "assembler",
     "Refuses with required_slot_missing.",
     "implemented",
-    7,
+    8,
     [
       6,
       6
@@ -220,10 +220,10 @@ const RULES = [
     "assembler",
     "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside wrappers.",
     "implemented",
-    4,
+    6,
     [
-      2,
-      2
+      1,
+      1
     ]
   ],
   [
@@ -340,10 +340,10 @@ const RULES = [
     "assembler",
     "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
-    29,
+    34,
     [
-      28,
-      28
+      27,
+      27
     ]
   ],
   [
@@ -376,10 +376,10 @@ const RULES = [
     "assembler",
     "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement.",
     "implemented",
-    8,
+    13,
     [
-      8,
-      8
+      7,
+      7
     ]
   ],
   [
@@ -455,7 +455,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":63,"passed":55,"stale":5},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":63,"passed":55,"stale":5}];
+const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":68,"passed":54,"stale":6},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":68,"passed":54,"stale":6}];
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {

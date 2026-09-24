@@ -572,10 +572,23 @@ test('every published case is a valid snapshot, and each snapshot check rejects 
   }
 });
 
+// The one check each rejection case breaks, as checkSnapshot names it.
+const REJECTION_CHECKS = {
+  'conflict-group-overlap': 'overlapping_conflict_groups', 'conflict-group-repeated-id': 'duplicate_conflict_group',
+  'conflict-group-unknown-fact': 'unknown_fact', 'conflict-group-unknown-item': 'unknown_conflict_item',
+  'duplicate-of-unknown': 'unknown_duplicate_of', 'producer-in-two-batches': 'duplicate_producer',
+  'profile-missing-instructions': 'protected_slot_omitted', 'profile-missing-output-contract': 'protected_slot_omitted',
+  'profile-missing-query': 'protected_slot_omitted', 'profile-route-mismatch': 'profile_route_mismatch',
+  'profile-route-policy-mismatch': 'profile_route_policy_mismatch', 'profile-unrealizable': 'unrealizable_profile',
+  'profile-invalid-tag': 'unrealizable_profile', 'messages-system-on-evidence': 'unrealizable_profile',
+  'messages-tools-on-instructions': 'unrealizable_profile', 'messages-system-after-xml': 'unrealizable_profile',
+  'schema-missing-budget': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'unpaired_surrogate',
+};
+
 test('each published rejection case breaks exactly one snapshot check (R-17)', async () => {
   const root = new URL('../conformance/rejections/', import.meta.url);
   const names = await fs.readdir(root);
-  assert.ok(names.length > 0);
+  assert.deepEqual(names.sort(), Object.keys(REJECTION_CHECKS).sort());
   for (const name of names) {
     const meta = JSON.parse(await fs.readFile(new URL(`${name}/case.json`, root), 'utf8'));
     assert.equal(meta.id, name);
@@ -583,7 +596,7 @@ test('each published rejection case breaks exactly one snapshot check (R-17)', a
     for (const rule of meta.rules) assert.match(rule, PERMANENT_ID);
     assert.deepEqual((await fs.readdir(new URL(`${name}/`, root))).sort(), ['case.json', 'snapshot.json'], name);
     const { findings } = checkSnapshot(JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8')));
-    assert.equal(findings.length, 1, `${name}: ${JSON.stringify(findings)}`);
+    assert.deepEqual(findings.map(f => f.reason), [REJECTION_CHECKS[name]], `${name}: ${JSON.stringify(findings)}`);
   }
 });
 

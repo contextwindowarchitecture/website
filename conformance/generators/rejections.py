@@ -1,14 +1,17 @@
 """Builds conformance/rejections/: snapshots that break exactly one of conformance/README.md's Snapshot checks
 or their schemas. A conformant assembler rejects each before assembly, with no payload and no trace (R-17).
 
-Each case changes fixture-three-slot's snapshot in one place. The website's tests check each with
-contract.js's checkSnapshot, which must find exactly one problem, independently of this generator.
+Each case changes fixture-three-slot's snapshot in one place, or messages-render's for the cwa-messages/v1
+rules. The website's tests check each with contract.js's checkSnapshot, which must find exactly one
+problem, independently of this generator.
 """
 import copy, json, os, shutil, sys
 
 WEB = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 BASE = json.load(open(os.path.join(WEB, "conformance/cases/fixture-three-slot/snapshot.json")))
 LONE = "LONE"  # stands in for an unpaired surrogate, which UTF-8 cannot encode; written as the escape \ud800
+
+MESSAGES = json.load(open(os.path.join(WEB, "conformance/cases/messages-render/snapshot.json")))
 
 
 def group(id, items, **extra):
@@ -51,15 +54,26 @@ CASES = [
      lambda s: s["profile"].update(placement=[p for p in s["profile"]["placement"] if p["slot"] != "interaction.query"])),
     ("profile-missing-output-contract", ["R-4", "R-17", "R-20"], "The route sets parser: true, and the profile does not place governance.output_contract.",
      lambda s: s["route_policy"].update(parser=True)),
-    ("profile-unrealizable", ["R-7", "R-17", "R-20"], "The profile wraps evidence.knowledge as system, which fixture-xml/v1 cannot render.",
+    ("profile-missing-instructions", ["R-4", "R-17", "R-20"], "The profile does not place governance.instructions, which every assembly needs.",
+     lambda s: s["profile"].update(placement=[p for p in s["profile"]["placement"] if p["slot"] != "governance.instructions"])),
+    ("profile-unrealizable", ["R-17", "R-20"], "The profile wraps evidence.knowledge as system, which fixture-xml/v1 cannot render: it supports only xml: wraps.",
      lambda s: s["profile"]["placement"][1].update(wrap="system")),
+    ("profile-invalid-tag", ["R-17", "R-20"], "The profile wraps evidence.knowledge as xml:1evidence, and an xml: tag must start with a letter or underscore.",
+     lambda s: s["profile"]["placement"][1].update(wrap="xml:1evidence")),
+    # cwa-messages/v1 (conformance/README.md, Tokenizers and renderers): no slot but governance takes a platform role (R-7).
+    ("messages-system-on-evidence", ["R-7", "R-17", "R-20"], "Under cwa-messages/v1 the profile puts evidence.knowledge in system, a platform role only governance slots may take.",
+     lambda s: s["profile"]["placement"][3].update(wrap="system"), MESSAGES),
+    ("messages-tools-on-instructions", ["R-7", "R-17", "R-20"], "Under cwa-messages/v1 the profile puts governance.instructions in tools, which only governance.capabilities may use.",
+     lambda s: s["profile"]["placement"][0].update(wrap="tools"), MESSAGES),
+    ("messages-system-after-xml", ["R-7", "R-17", "R-20"], "Under cwa-messages/v1 a system placement follows an xml: one, and a message request cannot put material ahead of its system text.",
+     lambda s: s["profile"]["placement"].append({"slot": "governance.output_contract", "wrap": "system"}), MESSAGES),
 ]
 
 if __name__ == "__main__":
     root = os.path.join(WEB, "conformance/rejections")
     shutil.rmtree(root, ignore_errors=True)
-    for name, rules, description, mutate in CASES:
-        snapshot = copy.deepcopy(BASE)
+    for name, rules, description, mutate, *base in CASES:
+        snapshot = copy.deepcopy(base[0] if base else BASE)
         mutate(snapshot)
         out = os.path.join(root, name)
         os.makedirs(out)
