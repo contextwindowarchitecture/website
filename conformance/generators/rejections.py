@@ -46,6 +46,11 @@ CASES = [
     ("duplicate-of-unknown", ["R-13", "R-17"], "A producer exclusion's duplicate_of names an item that is not a candidate in its batch.",
      lambda s: batch("memory-svc")(s)["excluded"].append(
          {"item_id": "memory:dup", "reason": "duplicate_content", "stage": "producer", "duplicate_of": "memory:gone"})),
+    ("superseded-by-unknown", ["R-9", "R-17"], "A producer exclusion's superseded_by names an item that is not a candidate in its batch.",
+     lambda s: batch("memory-svc")(s)["excluded"].append(
+         {"item_id": "memory:old", "reason": "superseded", "stage": "producer", "superseded_by": "memory:gone"})),
+    ("producer-reason-unknown", ["R-9", "R-17", "R-21"], "A producer exclusion's reason, rate_limited, is not an exclusion code in contract/reasons.json.",
+     lambda s: batch("memory-svc")(s)["excluded"].append({"item_id": "memory:late", "reason": "rate_limited", "stage": "producer"})),
     ("profile-route-mismatch", ["R-17", "R-20"], "The profile is for route another-route, and the route policy for contract-fixture.",
      lambda s: s["profile"].update(route="another-route")),
     ("profile-route-policy-mismatch", ["R-17", "R-20"], "The profile expects route policy fixture/v2, and the snapshot carries fixture/v1.",

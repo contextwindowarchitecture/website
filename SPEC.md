@@ -36,7 +36,7 @@ state.* items MUST be written by the application and MUST be current at assembly
 
 ## R-9: Memory lifetime and producer exclusion reporting
 
-interaction.memory items MUST carry expires and a source identifying the source turn. Any item expired at assembly_time or carrying revoked_by MUST be excluded, memory or not. Producers MUST report suppressed entries as excluded records containing item_id, reason and stage: producer; the assembler MUST merge those records into its trace, including those from a batch whose producer the route does not admit. Expiration MUST use the explicit assembly_time snapshot, not an ambient clock.
+interaction.memory items MUST carry expires and a source identifying the source turn. Any item expired at assembly_time or carrying revoked_by MUST be excluded, memory or not. Producers MUST report suppressed entries as excluded records containing item_id, reason and stage: producer, with reason one of the exclusion codes in contract/reasons.json; a record with reason superseded MUST carry superseded_by naming a candidate in the same batch, as R-13 requires duplicate_of; the assembler MUST merge those records into its trace, including those from a batch whose producer the route does not admit. Expiration MUST use the explicit assembly_time snapshot, not an ambient clock.
 
 ## R-10: Untrusted content is marked, rendered as material, kept out of governance
 

@@ -599,11 +599,18 @@ test('every published case is a valid snapshot, and each snapshot check rejects 
   }
 });
 
+test('producer rows use the exclusion codes in contract/reasons.json (R-9, R-21)', async () => {
+  const schema = await read('schema/producer_batch.schema.json');
+  const listed = schema.properties.excluded.items.properties.reason.anyOf[0].enum;
+  assert.deepEqual(listed, REASONS.filter(r => r.kind === 'exclusion' && r.code !== 'missing_field:<name>').map(r => r.code));
+});
+
 // The one check each rejection case breaks, as checkSnapshot names it.
 const REJECTION_CHECKS = {
   'conflict-group-overlap': 'overlapping_conflict_groups', 'conflict-group-repeated-id': 'duplicate_conflict_group',
   'conflict-group-unknown-fact': 'unknown_fact', 'conflict-group-unknown-item': 'unknown_conflict_item',
-  'duplicate-of-unknown': 'unknown_duplicate_of', 'producer-in-two-batches': 'duplicate_producer',
+  'duplicate-of-unknown': 'unknown_duplicate_of', 'superseded-by-unknown': 'unknown_superseded_by',
+  'producer-reason-unknown': 'invalid_structure', 'producer-in-two-batches': 'duplicate_producer',
   'profile-missing-instructions': 'protected_slot_omitted', 'profile-missing-output-contract': 'protected_slot_omitted',
   'profile-missing-query': 'protected_slot_omitted', 'profile-route-mismatch': 'profile_route_mismatch',
   'profile-route-policy-mismatch': 'profile_route_policy_mismatch', 'profile-unrealizable': 'unrealizable_profile',
@@ -623,7 +630,9 @@ test('each published rejection case breaks exactly one snapshot check (R-17)', a
     for (const rule of meta.rules) assert.match(rule, PERMANENT_ID);
     assert.deepEqual((await fs.readdir(new URL(`${name}/`, root))).sort(), ['case.json', 'snapshot.json'], name);
     const { findings } = checkSnapshot(JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8')));
-    assert.deepEqual(findings.map(f => f.reason), [REJECTION_CHECKS[name]], `${name}: ${JSON.stringify(findings)}`);
+    // A schema failure is one check, however many errors its validator lists (an anyOf reports each branch).
+    assert.deepEqual([...new Set(findings.map(f => f.reason))], [REJECTION_CHECKS[name]], `${name}: ${JSON.stringify(findings)}`);
+    if (REJECTION_CHECKS[name] !== 'invalid_structure') assert.equal(findings.length, 1, name);
   }
 });
 

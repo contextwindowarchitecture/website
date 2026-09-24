@@ -217,9 +217,9 @@ export function checkProducerBatch(batch) {
   const ids = [...batch.items.map(item => item.id), ...batch.excluded.map(item => item.item_id)];
   const findings = new Set(ids).size === ids.length ? [] : [failure('duplicate_item_id', 'Batch item IDs must be unique across candidates and exclusions.', 2)];
   const candidates = new Set(batch.items.map(item => item.id));
-  for (const row of batch.excluded) {
-    if (row.duplicate_of !== undefined && !candidates.has(row.duplicate_of)) {
-      findings.push(failure('unknown_duplicate_of', `${row.item_id} names ${row.duplicate_of} as kept, which is not a candidate in this batch.`, 13));
+  for (const row of batch.excluded) for (const [field, rule] of [['duplicate_of', 13], ['superseded_by', 9]]) {
+    if (row[field] !== undefined && !candidates.has(row[field])) {
+      findings.push(failure(`unknown_${field}`, `${row.item_id} names ${row[field]} as kept, which is not a candidate in this batch.`, rule));
     }
   }
   return { valid: findings.length === 0, findings };
@@ -287,8 +287,10 @@ export function checkSnapshot(snapshot) {
   findings.push(...checkConflictGroups(snapshot.conflicts, { itemIds, facts: snapshot.route_policy.facts ?? {} }).findings);
   for (const batch of snapshot.batches) {
     const candidates = new Set(batch.items.map(item => item?.id));
-    for (const row of batch.excluded) if (row.duplicate_of !== undefined && !candidates.has(row.duplicate_of)) {
-      findings.push(failure('unknown_duplicate_of', `${row.item_id} names ${row.duplicate_of} as kept, which is not a candidate in ${batch.producer.id}'s batch.`, 13));
+    for (const row of batch.excluded) for (const [field, rule] of [['duplicate_of', 13], ['superseded_by', 9]]) {
+      if (row[field] !== undefined && !candidates.has(row[field])) {
+        findings.push(failure(`unknown_${field}`, `${row.item_id} names ${row[field]} as kept, which is not a candidate in ${batch.producer.id}'s batch.`, rule));
+      }
     }
   }
   const { profile, route_policy: policy } = snapshot;

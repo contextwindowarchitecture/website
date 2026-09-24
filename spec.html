@@ -377,6 +377,7 @@
             <li>R-11: a conflict group may name a producer exclusion, and group ids are unique. R-15: one batch per producer. R-20: a profile's route and route policy version match the snapshot's, its renderer can realize it, and an unplaced protected item refuses with protected_slot_unplaced.</li>
             <li>R-17 points to the Snapshot checks in conformance/README.md and rejects strings that aren't well-formed Unicode. R-21 makes that README normative wherever the requirements leave an ordering, tie-break or boundary open.</li>
             <li>R-22's provenance fields, R-11's group_id and winner, and the rows a refused trace keeps (R-17) are now MUST: the cases already compared them, so an assembler that met every MUST could still fail. Only admission-stage timings stay SHOULD. A refused trace also has compressed: [], and defaults_filled is always present, if empty.</li>
+            <li>R-9: a producer row's reason must be an exclusion code from contract/reasons.json, and the batch schema now checks it. A row with reason superseded carries superseded_by, which must name a candidate in the same batch, just as R-13's duplicate_of does. Before, such a row couldn't satisfy the trace schema at all.</li>
             <li>assembly_time_required is gone from contract/reasons.json. A snapshot without a valid assembly_time fails its schema and is rejected, so that refusal could never happen.</li>
           </ul>
         </div>
@@ -606,7 +607,7 @@ const RULES = [
     "gov",
     "MUST",
     "Memory lifetime and producer exclusion reporting",
-    "interaction.memory items MUST carry expires and a source identifying the source turn. Any item expired at assembly_time or carrying revoked_by MUST be excluded, memory or not. Producers MUST report suppressed entries as excluded records containing item_id, reason and stage: producer; the assembler MUST merge those records into its trace, including those from a batch whose producer the route does not admit. Expiration MUST use the explicit assembly_time snapshot, not an ambient clock."
+    "interaction.memory items MUST carry expires and a source identifying the source turn. Any item expired at assembly_time or carrying revoked_by MUST be excluded, memory or not. Producers MUST report suppressed entries as excluded records containing item_id, reason and stage: producer, with reason one of the exclusion codes in contract/reasons.json; a record with reason superseded MUST carry superseded_by naming a candidate in the same batch, as R-13 requires duplicate_of; the assembler MUST merge those records into its trace, including those from a batch whose producer the route does not admit. Expiration MUST use the explicit assembly_time snapshot, not an ambient clock."
   ],
   [
     "gov",
