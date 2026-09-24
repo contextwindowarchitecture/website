@@ -8,6 +8,13 @@ const TIER_RANK = { droppable: 0, compressible: 1, protected: 2 };
 // A slot's default tier, raised by trusted route policy (tierUpgrades); never lowered (R-16).
 const effectiveTier = (slot, tierUpgrades) => [SLOT_DEFAULTS[slot].tier, tierUpgrades?.[slot]]
   .filter(tier => tier in TIER_RANK).reduce((a, b) => TIER_RANK[b] > TIER_RANK[a] ? b : a);
+// An item's tier: its own tier when it set one, else its slot's. An item may lower its own tier only in a slot
+// that is not protected by default; admission excludes the rest (R-16).
+const itemTier = (slot, id, context) => {
+  const slotTier = effectiveTier(slot, context.tierUpgrades);
+  const own = context.itemTiers?.[id];
+  return own in TIER_RANK && SLOT_DEFAULTS[slot].tier !== 'protected' && TIER_RANK[own] <= TIER_RANK[slotTier] ? own : slotTier;
+};
 const failure = (reason, text, rule) => ({ reason, text, rule, level: 'error' });
 const schemaErrors = (validator, rule) => (validator.errors || []).map(error =>
   failure('invalid_structure', `${error.instancePath || '/'} ${error.message}`, rule));
@@ -62,7 +69,15 @@ function checkAuthority(item) {
   return [];
 }
 
-function checkLifetime(item, assemblyTime) {
+// Move an instant back by whole seconds, keeping its fraction, so the result compares at full precision (R-2).
+function minusSeconds(instant, seconds) {
+  const match = INSTANT.exec(instant);
+  if (!match || !seconds) return instant;
+  const base = new Date(Date.parse(match[1] + match[3]) - seconds * 1000).toISOString().slice(0, 19);
+  return `${base}${match[2] ? `.${match[2]}` : ''}Z`;
+}
+
+function checkLifetime(item, assemblyTime, clockSkewSeconds = 0) {
   if (!assemblyTime || Number.isNaN(compareInstants(assemblyTime, assemblyTime))) {
     return [failure('assembly_time_required', 'Supply the assembly snapshot time explicitly.', 23)];
   }
@@ -70,8 +85,9 @@ function checkLifetime(item, assemblyTime) {
   if (item.expires && compareInstants(item.expires, assemblyTime) <= 0) {
     return [failure('expired', `Expired at ${item.expires}.`, 9)];
   }
-  if (compareInstants(item.freshness, assemblyTime) > 0) {
-    return [failure('future_freshness', 'Freshness is later than the assembly snapshot.', 2)];
+  // The route's clock_skew_seconds lets producer clocks run ahead of assembly_time by that much.
+  if (compareInstants(minusSeconds(item.freshness, clockSkewSeconds), assemblyTime) > 0) {
+    return [failure('future_freshness', 'Freshness is later than the assembly snapshot, beyond the route\'s clock skew.', 2)];
   }
   return [];
 }
@@ -80,8 +96,8 @@ function checkProducer(item, context) {
   // Identity must come from trusted application context, never from item.source.
   if (!context.producer) return [];
   const producer = context.producer;
-  if (!producer.authenticated) return [failure('producer_not_authenticated', 'Authenticate the producer outside the item.', 5)];
-  if (!producer.slots?.includes(item.slot)) return [failure('producer_slot_not_allowed', 'This producer cannot emit this slot.', 7)];
+  if (!producer.authenticated) return [failure('producer_not_authenticated', 'Authenticate the producer outside the item.', 15)];
+  if (!producer.slots?.includes(item.slot)) return [failure('producer_slot_not_allowed', 'This producer cannot emit this slot.', 15)];
   // R-8: state comes only from producers of kind state, whatever else the route lists.
   if (item.slot.startsWith('state.') && producer.kind !== 'state') {
     return [failure('producer_slot_not_allowed', 'Only a producer of kind state may emit state.', 8)];
@@ -96,13 +112,13 @@ function checkProducer(item, context) {
 export function checkItem(candidate, context = {}) {
   if (!validateItemSchema(candidate)) return { valid: false, findings: itemSchemaErrors(), filled: [], item: null };
   const { item, filled } = fillDefaults(candidate);
-  const findings = [...checkAuthority(item), ...checkLifetime(item, context.assemblyTime), ...checkProducer(item, context)];
+  const findings = [...checkAuthority(item), ...checkLifetime(item, context.assemblyTime, context.clockSkewSeconds), ...checkProducer(item, context)];
   const verifiedMcp = context.producer?.authenticated && context.producer.kind === 'mcp' && context.verifiedServer === true;
   if (SLOT_DEFAULTS[item.slot].injection_risk === 'untrusted_content' && item.injection_risk !== 'untrusted_content' && !verifiedMcp) {
     findings.push(failure('untrusted_content_unmarked', 'User-controlled and retrieved content must remain marked as untrusted content.', 10));
   }
   if (item.slot === 'evidence.knowledge' && item.authority !== 'reference_only') {
-    findings.push(failure('authority_not_allowed', 'Retrieved chunks carry reference_only authority.', 13));
+    findings.push(failure('authority_not_allowed', 'Retrieved chunks carry reference_only authority.', 1));
   }
   if (item.variants.some(variant => variant.id === item.id) || new Set(item.variants.map(v => v.id)).size !== item.variants.length) {
     findings.push(failure('duplicate_variant_id', 'Variants need distinct IDs, different from the item ID.', 18));
@@ -118,31 +134,35 @@ export function checkItem(candidate, context = {}) {
   return { valid: findings.length === 0, findings, filled, item };
 }
 
-function checkRenderedBudget(trace, tierUpgrades) {
+function checkRenderedBudget(trace, context) {
   const findings = [];
   if (!trace.refused.bool) {
     for (const slot of ['governance.instructions', 'interaction.query']) {
       if (!trace.included.some(item => item.slot === slot)) findings.push(failure('missing_required_slot', `Missing ${slot}.`, 4));
     }
     const includedTokens = trace.included.reduce((sum, item) => sum + item.tokens, 0);
-    if (trace.result.input_tokens < includedTokens || trace.result.input_tokens > trace.budget.input) {
+    // The payload fits when its count, charged with budget.margin_percent and rounded up, is within budget.input (R-16).
+    const charged = Math.floor((trace.result.input_tokens * (100 + (trace.budget.margin_percent ?? 0)) + 99) / 100);
+    if (trace.result.input_tokens < includedTokens || charged > trace.budget.input) {
       findings.push(failure('invalid_token_accounting', 'Rendered input must include all item tokens and fit the input ceiling.', 16));
     }
-  } else if (trace.included.length) findings.push(failure('refused_payload_included', 'A refused assembly has no rendered included items.', 17));
+  } else if (trace.included.length || trace.compressed.length) {
+    findings.push(failure('refused_payload_included', 'A refused assembly has no rendered included or compressed items.', 17));
+  }
   for (const item of trace.excluded) {
-    if (item.reason === 'over_budget' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+    if (item.reason === 'over_budget' && item.slot && itemTier(item.slot, item.item_id, context) === 'protected') {
       findings.push(failure('protected_omitted', `A protected ${item.slot} item cannot be omitted for budget.`, 16));
     }
-    if (['conflict_deferred', 'conflict_lost'].includes(item.reason) && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+    if (['conflict_deferred', 'conflict_lost'].includes(item.reason) && item.slot && itemTier(item.slot, item.item_id, context) === 'protected') {
       findings.push(failure('protected_conflict_excluded', `Conflict resolution cannot exclude a protected ${item.slot} item; its group escalates.`, 11));
     }
-    if (item.reason === 'source_diversity_cap' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+    if (item.reason === 'source_diversity_cap' && item.slot && itemTier(item.slot, item.item_id, context) === 'protected') {
       findings.push(failure('protected_diversity_excluded', `The source diversity cap cannot exclude a protected ${item.slot} item; it counts toward the cap.`, 26));
     }
-    if (item.reason === 'superseded' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+    if (item.reason === 'superseded' && item.slot && itemTier(item.slot, item.item_id, context) === 'protected') {
       findings.push(failure('protected_superseded_excluded', `Supersession cannot exclude a protected ${item.slot} item; it is kept.`, 25));
     }
-    if (item.reason === 'duplicate_content' && item.slot && effectiveTier(item.slot, tierUpgrades) === 'protected') {
+    if (item.reason === 'duplicate_content' && item.slot && itemTier(item.slot, item.item_id, context) === 'protected') {
       findings.push(failure('protected_duplicate_excluded', `Deduplication cannot exclude a protected ${item.slot} item; it is kept.`, 24));
     }
   }
@@ -150,11 +170,12 @@ function checkRenderedBudget(trace, tierUpgrades) {
 }
 
 // context.tierUpgrades is the route policy's tier_upgrades; without it, slots keep their default tiers.
+// context.itemTiers maps item ids to the tiers items set themselves; without it, each item takes its slot's tier.
 export function checkTrace(trace, context = {}) {
   if (!validateTraceSchema(trace)) return { valid: false, findings: schemaErrors(validateTraceSchema, 21) };
-  const findings = checkRenderedBudget(trace, context.tierUpgrades);
+  const findings = checkRenderedBudget(trace, context);
   for (const item of trace.compressed) {
-    if (item.to >= item.from || effectiveTier(item.slot, context.tierUpgrades) !== 'compressible') {
+    if (item.to >= item.from || itemTier(item.slot, item.item_id, context) !== 'compressible') {
       findings.push(failure('invalid_compression', 'Compression must shorten a compressible item.', 16));
     }
   }
@@ -185,7 +206,7 @@ export function checkProfile(profile, { parser = false, protectedSlots = [] } = 
 export function checkProducerBatch(batch) {
   if (!validateProducerBatchSchema(batch)) return { valid: false, findings: schemaErrors(validateProducerBatchSchema, 9) };
   const ids = [...batch.items.map(item => item.id), ...batch.excluded.map(item => item.item_id)];
-  const findings = new Set(ids).size === ids.length ? [] : [failure('duplicate_item_id', 'Batch item IDs must be unique across candidates and exclusions.', 9)];
+  const findings = new Set(ids).size === ids.length ? [] : [failure('duplicate_item_id', 'Batch item IDs must be unique across candidates and exclusions.', 2)];
   const candidates = new Set(batch.items.map(item => item.id));
   for (const row of batch.excluded) {
     if (row.duplicate_of !== undefined && !candidates.has(row.duplicate_of)) {

@@ -164,6 +164,55 @@ test('trace checks use the route-raised tier when the route policy is supplied',
   assert.deepEqual(checkTrace(omittedUser, { tierUpgrades: { 'state.user': 'protected' } }).findings.map(f => f.reason), ['protected_omitted']);
 });
 
+test('an item that lowered its own tier in a route-raised slot may be shed or compressed (R-16)', () => {
+  const raised = { tierUpgrades: { 'state.user': 'protected' } };
+  const omittedUser = { ...trace, excluded: [...trace.excluded, { item_id: 'user:plan', reason: 'over_budget', stage: 'assembler', slot: 'state.user' }] };
+  assert.equal(checkTrace(omittedUser, { ...raised, itemTiers: { 'user:plan': 'droppable' } }).valid, true);
+  const compressedUser = { ...trace, compressed: [{ slot: 'state.user', item_id: 'user:plan', from: 9, to: 3, method: 'extract', variant_id: 'user:plan~s' }] };
+  assert.equal(checkTrace(compressedUser, { ...raised, itemTiers: { 'user:plan': 'compressible' } }).valid, true);
+  const omittedInstruction = { ...trace, excluded: [...trace.excluded, { item_id: 'sys:x', reason: 'over_budget', stage: 'assembler', slot: 'governance.instructions' }] };
+  assert.deepEqual(checkTrace(omittedInstruction, { itemTiers: { 'sys:x': 'droppable' } }).findings.map(f => f.reason), ['protected_omitted'],
+    'a slot protected by default never lets an item lower its tier');
+});
+
+test('the fit test charges budget.margin_percent, rounding up (R-16)', () => {
+  const tokens = trace.result.input_tokens;
+  const tight = { ...trace, budget: { ...trace.budget, input: tokens } };
+  assert.equal(checkTrace(tight).valid, true);
+  assert.deepEqual(checkTrace({ ...tight, budget: { ...tight.budget, margin_percent: 1 } }).findings.map(f => f.reason), ['invalid_token_accounting']);
+  assert.equal(checkTrace({ ...tight, budget: { ...tight.budget, input: tokens + Math.ceil(tokens / 100), margin_percent: 1 } }).valid, true);
+});
+
+test('a refused trace has no compressed rows either (R-17)', () => {
+  const refused = { ...trace, result: null, included: [], refused: { bool: true, reason: 'protected_content_over_budget' } };
+  const row = { slot: 'evidence.knowledge', item_id: 'refunds-eu:v17#p4', from: 10, to: 4, method: 'extract', variant_id: 'v' };
+  assert.deepEqual(checkTrace({ ...refused, compressed: [row] }).findings.map(f => f.reason), ['refused_payload_included']);
+});
+
+test('freshness may run ahead of assembly_time by the route clock skew, at full precision (R-2)', () => {
+  const ahead = { ...item, freshness: '2026-09-22T12:00:05Z' };
+  assert.equal(checkItem(ahead, context).findings[0].reason, 'future_freshness');
+  assert.equal(checkItem(ahead, { ...context, clockSkewSeconds: 5 }).valid, true);
+  assert.equal(checkItem({ ...ahead, freshness: '2026-09-22T12:00:05.000001Z' }, { ...context, clockSkewSeconds: 5 }).findings[0].reason, 'future_freshness');
+  assert.equal(checkItem({ ...ahead, freshness: '2026-09-22T14:00:05+02:00' }, { ...context, clockSkewSeconds: 5 }).valid, true);
+});
+
+test('findings cite the requirement their reason code names in contract/reasons.json', () => {
+  const rule = code => Number(REASONS.find(r => r.code === code).rule.slice(2));
+  const state = { ...item, id: 'user:plan', slot: 'state.user', authority: 'state', injection_risk: 'none' };
+  delete state.relevance;
+  delete state.tier;
+  const cases = [
+    [state, { ...context, producer: { id: 'x', kind: 'state', authenticated: false, slots: ['state.user'] } }],
+    [state, { ...context, producer: { id: 'x', kind: 'state', authenticated: true, slots: ['state.task'] } }],
+    [{ ...item, authority: 'observation' }, context],
+  ];
+  for (const [candidate, ctx] of cases) for (const f of checkItem(candidate, ctx).findings) assert.equal(f.rule, rule(f.reason), f.reason);
+  for (const f of checkProducerBatch({ ...batch, excluded: [{ item_id: batch.items[0].id, reason: 'expired', stage: 'producer' }] }).findings) {
+    assert.equal(f.rule, rule(f.reason), f.reason);
+  }
+});
+
 test('a compression must make the item strictly shorter', () => {
   const same = { ...trace, compressed: [{ slot: 'evidence.knowledge', item_id: 'refunds-eu:v17#p4', from: 10, to: 10, method: 'extract', variant_id: 'v' }] };
   assert.equal(checkTrace(same).valid, false);
