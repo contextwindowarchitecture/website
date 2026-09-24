@@ -386,7 +386,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "f7b45c1bc48fbd824367a35f23726d8861870890a07fc57a556c89c8c2b10d0f"
+    "snapshot_digest": "ffe0b5e0e49792b71736cd501269ef7f211268d7412f56981712764341ee7b26"
   },
   "defaults_filled": [
     {

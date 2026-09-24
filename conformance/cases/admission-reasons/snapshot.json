@@ -789,7 +789,7 @@
           "authority": "reference_only",
           "trust": "unverified",
           "freshness": "2026-09-12T15:30:00Z",
-          "body": "Long passage.",
+          "body": "Long chunk.",
           "token_budget": null,
           "variants": [
             {
@@ -854,7 +854,7 @@
           "authority": "reference_only",
           "trust": "unverified",
           "freshness": "2026-09-12T15:30:00Z",
-          "body": "Unmarked passage.",
+          "body": "Unmarked chunk.",
           "token_budget": null,
           "variants": [],
           "conflict_policy": "defers",
@@ -895,7 +895,7 @@
           "authority": "reference_only",
           "trust": "unverified",
           "freshness": "2026-09-12T15:30:00Z",
-          "body": "Long passage.",
+          "body": "Long chunk.",
           "token_budget": null,
           "variants": [
             {
@@ -922,7 +922,7 @@
           "authority": "reference_only",
           "trust": "unverified",
           "freshness": "2026-09-12T15:30:00Z",
-          "body": "Withdrawn passage.",
+          "body": "Withdrawn chunk.",
           "token_budget": null,
           "variants": [],
           "conflict_policy": "defers",
@@ -943,7 +943,7 @@
           "authority": "reference_only",
           "trust": "unverified",
           "freshness": "2026-09-12T15:30:00Z",
-          "body": "Expired passage.",
+          "body": "Expired chunk.",
           "token_budget": null,
           "variants": [],
           "conflict_policy": "defers",

@@ -344,9 +344,9 @@ test('an item without a slot is missing_field:slot, not a slot-specific field (R
   const memory = { ...copy(item), slot: 'interaction.memory', authority: 'generated', source: 'turn:14' };
   delete memory.expires;
   assert.deepEqual(checkItem(memory, context).findings.map(f => f.reason), ['missing_field:expires']);
-  const passage = copy(item);
-  delete passage.relevance;
-  assert.deepEqual(checkItem(passage, context).findings.map(f => f.reason), ['missing_field:relevance']);
+  const chunk = copy(item);
+  delete chunk.relevance;
+  assert.deepEqual(checkItem(chunk, context).findings.map(f => f.reason), ['missing_field:relevance']);
 });
 
 test('missing_field names the item\'s own fields; a variant missing a field is invalid_structure', () => {

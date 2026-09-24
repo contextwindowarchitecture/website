@@ -89,7 +89,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Tool · steps 1 and 3</div>
       <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Prompt → slots migrator</h2>
-      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each chunk, assigns the slot's default authority, and reports what an assembler would still be missing. It is a heuristic, deliberately conservative: anything it cannot place is left unassigned rather than guessed. Nothing leaves your browser.</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each piece, assigns the slot's default authority, and reports what an assembler would still be missing. It is a heuristic, deliberately conservative: anything it cannot place is left unassigned rather than guessed. Nothing leaves your browser.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
         <button onClick="{{ loadPrompt }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · system prompt</button>
         <button onClick="{{ loadMessages }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · message array</button>
@@ -229,7 +229,7 @@ class Component extends DCLogic {
     if (/^(current )?task:|task state|workflow|status=|=pending|=done|approval/.test(t)) return "state.task";
     if (/^(customer|user) profile|plan=|region=|locale|entitlement|tenant/.test(t)) return "state.user";
     if (/earlier in this conversation|previously|prior (conversation|discussion)|the user (mentioned|said|prefers)|remember(ed)? that/.test(t)) return "interaction.memory";
-    if (/policy \(|\bv\d+\)|retrieved|according to|source:|passage|document|<doc|faq|knowledge base|refunds? (return|in full)/.test(t)) return "evidence.knowledge";
+    if (/policy \(|\bv\d+\)|retrieved|according to|source:|passage|chunk|document|<doc|faq|knowledge base|refunds? (return|in full)/.test(t)) return "evidence.knowledge";
     if (role === "user") return "interaction.query";
     if (/^user:|^customer:|^q:/.test(t)) return "interaction.query";
     if (/^you are|\byou are an?\b|never |always |do not |don't |must |be (warm|brief|concise|polite)|refuse/.test(t)) return "governance.instructions";
@@ -237,13 +237,13 @@ class Component extends DCLogic {
     return "unassigned";
   }
   migrate(src) {
-    let chunks = [];
+    let pieces = [];
     let parsed = null;
     try { parsed = JSON.parse(src); } catch (e) {}
     if (Array.isArray(parsed)) {
       const users = parsed.filter(m => m && m.role === "user").length;
       let seenUsers = 0;
-      chunks = parsed.map(m => {
+      pieces = parsed.map(m => {
         if (!m || typeof m !== "object" || Array.isArray(m) || m.content === undefined) return { text: JSON.stringify(m), slot: "unassigned", src: "message:invalid" };
         const text = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
         let slot = this.classify(text, m.role);
@@ -251,25 +251,25 @@ class Component extends DCLogic {
         return { text, slot, src: "message:" + m.role + (m.name ? ":" + m.name : ""), model: m.role === "assistant" };
       });
     } else {
-      chunks = src.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).map(text => ({ text, slot: this.classify(text, null), src: "prompt:literal" }));
+      pieces = src.split(/\n\s*\n/).map(s => s.trim()).filter(Boolean).map(text => ({ text, slot: this.classify(text, null), src: "prompt:literal" }));
     }
     const tok = s => Math.max(1, Math.round(s.length / 4));
-    const total = chunks.reduce((a, c) => a + tok(c.text), 0) || 1;
-    const gap = chunks.filter(c => c.slot === "unassigned").reduce((a, c) => a + tok(c.text), 0);
-    const slots = new Set(chunks.map(c => c.slot).filter(s => s !== "unassigned"));
+    const total = pieces.reduce((a, c) => a + tok(c.text), 0) || 1;
+    const gap = pieces.filter(c => c.slot === "unassigned").reduce((a, c) => a + tok(c.text), 0);
+    const slots = new Set(pieces.map(c => c.slot).filter(s => s !== "unassigned"));
     // R-1: prior model turns in history are generated content with untrusted authority.
     const authority = c => c.model && c.slot === "interaction.history" ? "untrusted" : SLOT_META[c.slot][1];
-    const items = chunks.map((c, i) => {
+    const items = pieces.map((c, i) => {
       const m = SLOT_META[c.slot];
       return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + authority(c) + " · ~" + tok(c.text) + " tok", preview: c.text.replace(/\s+/g, " "),
         flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs source · freshness") };
     });
     const y = (s) => JSON.stringify(s);
-    const yaml = ["# proposed by the migrator · every item still needs a real source and freshness", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(chunks.map((c, i) => {
+    const yaml = ["# proposed by the migrator · every item still needs a real source and freshness", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(pieces.map((c, i) => {
       const m = SLOT_META[c.slot];
       return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + authority(c)].concat(c.model && c.slot === "interaction.history" ? ["    lineage: generated   # prior model turn (R-1)"] : [], ["    source: " + c.src + "   # TODO real producer", "    source_version: \"TODO\"", "    freshness: \"TODO timestamp\"", "    trust: " + (c.slot.startsWith("governance") ? "verified" : "unverified"), "    body: " + y(c.text)]).join("\n");
     })).join("\n");
-    return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: chunks.length + " chunk" + (chunks.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(chunks.filter(c => c.slot !== "unassigned").length), yaml };
+    return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: pieces.length + " piece" + (pieces.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(pieces.filter(c => c.slot !== "unassigned").length), yaml };
   }
   download(name, text) {
     const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
@@ -294,7 +294,7 @@ class Component extends DCLogic {
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       steps: [
-        { n: "01", anchor: "step-1", title: "Name the slots you already send", rules: "R-1", text: "Take the function that builds your model call and split its output into chunks. Give each chunk one of the eleven slot names. Anything that does not fit is a finding: either it belongs in two slots and should be two items, or it should not be in the window at all.", done: "Done when: every chunk has a slot, or is written down as unassigned." },
+        { n: "01", anchor: "step-1", title: "Name the slots you already send", rules: "R-1", text: "Take the function that builds your model call and split its output into pieces. Give each piece one of the eleven slot names. Anything that does not fit is a finding: either it belongs in two slots and should be two items, or it should not be in the window at all.", done: "Done when: every piece has a slot, or is written down as unassigned." },
         { n: "02", anchor: "step-2", title: "Wrap the payload in the scaffold", rules: "assemble.py · payload.txt", text: "Use the integration sketch below to identify the application helpers you must implement. It is not runnable as downloaded. Build an assembly function that returns a payload and trace, then compare its rendering with your existing request builder.", done: "Done when: the model receives the same bytes as before, produced by your implementation." },
         { n: "03", anchor: "step-3", title: "Give every item an authority and a source", rules: "R-2 · R-3", text: "Each item needs the eight minimum fields. Authority comes from the slot's ceiling. Source and source_version name where the content really came from: a policy file and its commit, a database row and its read time, a retriever and its index version. If you cannot name a source, you have found content with no owner.", done: "Done when: the item linter on /producers admits every item." },
         { n: "04", anchor: "step-4", title: "Emit the trace and run the checks", rules: "R-21 · R-23", text: "Your implementation must emit the required trace fields. Paste one into the trace validator and fix what it flags. Then run two of the conformance tests: assemble twice with identical inputs and compare the hash; drop one evidence item and confirm the trace names it.", done: "Done when: the trace passes structural validation and both implementation tests pass." },

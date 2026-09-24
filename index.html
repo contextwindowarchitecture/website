@@ -431,7 +431,7 @@
           <button onClick="{{ setSlotsMode }}" style="{{ tabSlots }}">Slots</button>
         </div>
       </div>
-      <p style="margin: 0 0 44px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved passage, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
+      <p style="margin: 0 0 44px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
 
       <sc-if value="{{ isPlanesMode }}" hint-placeholder-val="{{ true }}">
         <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
@@ -490,7 +490,7 @@
       <div>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The unit</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">A slot holds items, not a paragraph.</h2>
-        <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved passages, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
+        <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved chunks, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
         <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line);">
           <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="9">
             <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line);">
@@ -567,7 +567,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Evidence selection</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Retrieval feeds Evidence through an admission pipeline.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload there are eight steps: four the retriever does before assembly, and four the assembler does, each one a rule the trace can point at. For high-stakes answers the slot holds evidence packets, each carrying source, passage, version, relevance and authority, rather than undifferentiated "knowledge."</p>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload there are eight steps: four the retriever does before assembly, and four the assembler does, each one a rule the trace can point at. For high-stakes answers the slot holds evidence items, each carrying its chunk plus source, version, relevance and authority, rather than undifferentiated "knowledge."</p>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <sc-for list="{{ evidenceStages }}" as="s" hint-placeholder-count="8">
           <div style="background: var(--bg); padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 10px;">
@@ -585,7 +585,7 @@
         </div>
         <div style="background: var(--bg); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Factual precedence is route policy</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A recent observation and an older passage are both evidence. A route may prefer a verified observation for the same current fact; neither age nor source kind establishes a universal truth ranking.</div>
+          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A recent observation and an older retrieved chunk are both evidence. A route may prefer a verified observation for the same current fact; neither age nor source kind establishes a universal truth ranking.</div>
         </div>
       </div>
     </div>
@@ -596,7 +596,7 @@
       <div style="position: sticky; top: 100px;">
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">In practice</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">What an assembled request looks like on the wire.</h2>
-        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA does not dictate syntax, so tag slots however your stack prefers: XML-style blocks, message roles, or delimited sections. What matters is that every item names its slot and authority, evidence arrives as packets with provenance, and the profile that ordered them is recorded.</p>
+        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">CWA does not dictate syntax, so tag slots however your stack prefers: XML-style blocks, message roles, or delimited sections. What matters is that every item names its slot and authority, evidence arrives as separate items with provenance, and the profile that ordered them is recorded.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
         <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v1</span></div>
@@ -649,7 +649,7 @@
       <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <a href="https://contextwindowarchitecture.io/stack/rag" target="_blank" rel="noopener" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
           <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">RAG</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Retrieval produces candidates for the Evidence plane. CWA decides which are admitted, how they're packetized, and what they may never overrule.</p>
+          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Retrieval produces candidates for the Evidence plane. CWA decides which are admitted, where they're placed, and what they may never overrule.</p>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
         </a>
         <a href="https://contextwindowarchitecture.io/stack/mcp" target="_blank" rel="noopener" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
@@ -852,7 +852,7 @@
 const PLANES = [
   { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
   { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
-  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved passages, tool observations, artifacts, and citations. Each arrives as a packet with provenance, freshness, and trust, and is treated as reference material, not instruction." },
+  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved chunks, tool observations, artifacts, and citations. Each arrives as its own evidence item with provenance, freshness, and trust, and is treated as reference material, not instruction." },
   { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
 ];
 
@@ -860,7 +860,7 @@ const PLANES = [
 const SLOTS = [
   ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler excludes untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
   ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
-  ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
+  ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, inside its freshness limits, and not an exact duplicate in slots where the route asks for deduplication (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
   ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries past expires at assembly_time, or carrying revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
   ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nbound turns · tokens"],
@@ -898,7 +898,7 @@ const UCS = [
       [9, "Max 3 sentences. No bullet lists."],
       [10, "Can you just process it now?"]
     ],
-    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund passage arrives as a packet with a version and a trust tier, rather than as pasted text.",
+    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund policy chunk arrives as an evidence item with a version and a trust tier, rather than as pasted text.",
     questions: ["The price rule is stated in governance.instructions, but is it also enforced by a tool guard? Language guidance belongs in context; invariants belong in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
   },
   {
@@ -1073,7 +1073,7 @@ const AUTHORITY = [
   ["Governing instruction", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
   ["User intent / preference", "What the user asks for and how they want it. Cannot lift a constraint above it."],
   ["Canonical state", "Application-owned facts about the task and session. Precedence is defined by the route for the facts it owns."],
-  ["Reference evidence", "Retrieved passages. Informs the answer; never directs behaviour."],
+  ["Reference evidence", "Retrieved chunks. Informs the answer; never directs behaviour."],
   ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
   ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
   ["Untrusted content", "Anything user-controlled or fetched. Rendered as material, never as instruction."]
@@ -1091,9 +1091,9 @@ const CONFLICTS = [
 
 const TESTS = [
   ["Assembly snapshot", "Identical immutable snapshots produce identical rendered bytes and hashes."],
-  ["Golden task", "The correct evidence packet appears in the final context for a known request."],
+  ["Golden task", "The right evidence item appears in the final context for a known request."],
   ["Counterfactual ablation", "Remove evidence, task state, or tool results and confirm what fails, and that the trace explains it."],
-  ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions."],
+  ["Conflict", "A malicious retrieved chunk with imperative text does not alter governing instructions."],
   ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
   ["Freshness", "Expired memory is excluded using assembly_time and its producer rejection is traced."],
   ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it."],
@@ -1102,9 +1102,9 @@ const TESTS = [
 
 const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
-  ["Retrieve", "Pull passage-sized candidates from sources whose provenance you can name."],
+  ["Retrieve", "Pull candidate chunks from sources whose provenance you can name."],
   ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Packetize", "Send each passage as its own item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
   ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
   ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
   ["Fit", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],

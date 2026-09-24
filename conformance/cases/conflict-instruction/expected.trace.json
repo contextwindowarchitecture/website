@@ -10,7 +10,7 @@
   },
   "result": {
     "input_tokens": 129,
-    "hash": "4af5d6fcc33bc0ab88f3d2f29bf385ab4cbe40e321631febcd3a2801c2ad23b7"
+    "hash": "5cf1b42e412a99934569f96190d951e81aa5326b4334a4838a6abf26ed8417a5"
   },
   "included": [
     {
@@ -229,7 +229,7 @@
     "route_policy_version": "conflict-instruction/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "a3efb88b785b4ff775eb1ffa0ac349507367375dd88831060e2372ee2f23dec6"
+    "snapshot_digest": "1fb64836f718b2e6ca4806d7bc78b8144ab521b9d58d3211f0d68db9c02f4ddb"
   },
   "defaults_filled": []
 }

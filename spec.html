@@ -113,7 +113,7 @@
       <section id="s2">
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">2</div>
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Model: planes, slots, items</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A model call is assembled from <strong>items</strong>. Every item belongs to exactly one <strong>slot</strong>; slots are grouped into four <strong>planes</strong>. The planes answer four different questions and are never merged.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A model call is assembled from <strong>items</strong>. Every item belongs to exactly one <strong>slot</strong>; slots are grouped into four <strong>planes</strong>. The planes answer four different questions and are never merged. An item in one of the two evidence slots is an <strong>evidence item</strong>, and the piece of a document a retriever pulls is a <strong>chunk</strong>.</p>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ planes }}" as="p" hint-placeholder-count="4">
             <div style="display: grid; grid-template-columns: 6px 150px minmax(0, 1fr); gap: 0 18px; padding: 16px 18px; border-bottom: 1px solid var(--line); align-items: start;">
@@ -372,8 +372,9 @@
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>No requirement changed meaning. The tables and notes around them had drifted, and now say what R-1 to R-26 already said.</li>
             <li>R-16 now says outright what the 09-23 entry below already said: items can't lower a tier in a slot that's protected by default, but can in a slot only the route raised.</li>
-            <li>The eight evidence steps now show who owns what. Rerank and Packetize belong to the producer (R-13). Conflicts, supersession, deduplication and source caps get their own step. Attribute is gone, because the assembler never edits the output contract.</li>
+            <li>The eight evidence steps now show who owns what. Rerank and Package belong to the producer (R-13). Conflicts, supersession, deduplication and source caps get their own step. Attribute is gone, because the assembler never edits the output contract.</li>
             <li>§1 says which MUSTs belong to the application and which to producers, section 3 included. §3.1 shows the actual authority values. §6 lists defaults_filled, margin_percent, duplicate_of and superseded_by as MUSTs where they apply.</li>
+            <li>Retrieved passages are now chunks, which is what most retrieval tooling calls them. Evidence packets are now evidence items, meaning items in an evidence slot, and the Packetize step is now Package. Neither old word was ever a field, so no schema changed. The five conformance cases that used "passage" in a body or description changed too.</li>
             <li>The format-vs-safety row said the contract bends. It can't: both sides are governing and protected, and R-11 never excludes a protected item, so the group escalates. The fix is to write the disclosure into the contract.</li>
             <li>"Refuse" now means refusing the whole assembly (R-17) and nothing else. R-2, R-10 and R-16 used it for dropping a single item, and now say exclude. Nothing behaves differently.</li>
           </ul>
@@ -459,7 +460,7 @@
       <section id="future" style="border-top: 1px solid var(--line); padding-top: 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Future work · non-normative</div>
         <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A future revision will describe request intent as a typed tree that items bind to, so that eligibility rules can reference the part of the request an item serves rather than the request as a whole. Machine-readable schemas and contract fixtures are available in this repository.</p>
-        <p style="margin: 14px 0 0; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Two extensions wait until a producer needs them. A <strong>producer call key</strong> would let supersession (R-25) group observations by the call they answer rather than by source, so that source could name the server or tool a citation points to; supersede is an enum, so a call-key mode can join source without a new field. A <strong>cluster mode</strong> for deduplication (R-24) would collapse passages that share a retriever-computed cluster id; until a clustering service spans producers, a retriever drops its own near-duplicates and reports each one (R-13), which keeps every exclusion in the trace. A reference assembler implementing the complete specification remains in progress; its conformance status is tracked on the <a href="./assembler.html">Assembler</a> page.</p>
+        <p style="margin: 14px 0 0; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Two extensions wait until a producer needs them. A <strong>producer call key</strong> would let supersession (R-25) group observations by the call they answer rather than by source, so that source could name the server or tool a citation points to; supersede is an enum, so a call-key mode can join source without a new field. A <strong>cluster mode</strong> for deduplication (R-24) would collapse chunks that share a retriever-computed cluster id; until a clustering service spans producers, a retriever drops its own near-duplicates and reports each one (R-13), which keeps every exclusion in the trace. A reference assembler implementing the complete specification remains in progress; its conformance status is tracked on the <a href="./assembler.html">Assembler</a> page.</p>
       </section>
 
     </article>
@@ -476,7 +477,7 @@ const PLANES = [
 const SLOTS = [
   ["governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Untrusted content is excluded here."],
   ["state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Unverified user claims remain source-linked memory; only application-confirmed facts enter state."],
-  ["evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet has to clear admission: a relevance score at or above the route's min_relevance, inside its freshness limits, and not an exact duplicate in slots where the route asks for deduplication (R-24). An empty result is recorded as an outcome, not treated as an error."],
+  ["evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, inside its freshness limits, and not an exact duplicate in slots where the route asks for deduplication (R-24). An empty result is recorded as an outcome, not treated as an error."],
   ["state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation."],
   ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries past expires at assembly_time, or carrying revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it."],
   ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message."],
@@ -490,7 +491,7 @@ const AUTHORITY = [
   ["Governing instruction", "governing", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
   ["User intent / preference", "user", "What the user asks for and how they want it. It cannot lift a constraint set above it."],
   ["Canonical state", "state", "Application-owned facts about the task and session. The route defines the facts for which this source is canonical."],
-  ["Reference evidence", "reference_only", "Retrieved passages, which inform the answer but never direct behaviour."],
+  ["Reference evidence", "reference_only", "Retrieved chunks, which inform the answer but never direct behaviour."],
   ["Tool observation", "observation", "What a tool returned: evidence about the world, not permission to act on it."],
   ["Generated memory", "generated", "Summaries and inferences the system wrote. They are fallible, they expire, and they can be revoked."],
   ["Untrusted content", "untrusted", "Anything user-controlled or fetched, rendered as material and never as instruction."]
@@ -506,9 +507,9 @@ const CONFLICTS = [
 ];
 const STAGES = [
   ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
-  ["Retrieve", "Pull passage-sized candidates from sources whose provenance you can name."],
+  ["Retrieve", "Pull candidate chunks from sources whose provenance you can name."],
   ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Packetize", "Send each passage as its own item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
   ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
   ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
   ["Fit", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
@@ -527,9 +528,9 @@ const ITEM_FIELDS = [
 ];
 const TESTS = [
   ["Assembly snapshot", "Identical immutable assembly snapshots produce identical rendered bytes and hashes.", 23],
-  ["Golden task", "The correct evidence packet appears in the final context for a known request.", 21],
+  ["Golden task", "The right evidence item appears in the final context for a known request.", 21],
   ["Counterfactual ablation", "Remove evidence, task state or tool results and confirm what fails, and that the trace explains it.", 21],
-  ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions.", 7],
+  ["Conflict", "A malicious retrieved chunk with imperative text does not alter governing instructions.", 7],
   ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible.", 16],
   ["Freshness", "Memory expired at assembly_time is excluded and its producer rejection reaches the trace.", 9],
   ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it.", 12],
@@ -595,7 +596,7 @@ const RULES = [
     "gov",
     "MUST",
     "Untrusted content is marked, rendered as material, kept out of governance",
-    "User-controlled quoted material, attachments, retrieved passages, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15."
+    "User-controlled quoted material, attachments, retrieved chunks, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15."
   ],
   [
     "gov",
@@ -612,7 +613,7 @@ const RULES = [
   [
     "fit",
     "MUST NOT",
-    "Retrievers emit scored packets, not blobs",
+    "Retrievers emit one scored item per chunk, never a blob",
     "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch."
   ],
   [

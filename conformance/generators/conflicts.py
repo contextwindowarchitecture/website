@@ -261,7 +261,7 @@ CASES = [
             (item("policy:format", "governance.instructions", "Answer in at most three sentences."), REG, "admit"),
             (item("ex:long", "governance.examples", "Example: a five-paragraph answer that walks through every refund rule."), REG, "admit"),
             (item("ex:bullets", "governance.examples", "Example: an answer written as a long bulleted list."), REG, "admit"),
-            (item("policy:cite", "governance.instructions", "Cite every passage you rely on."), REG, "admit"),
+            (item("policy:cite", "governance.instructions", "Cite every source you rely on."), REG, "admit"),
             (item("policy:nocite", "governance.instructions", "Never mention internal document ids."), REG, "admit"),
             (item("contract:json", "governance.output_contract", "Answer as JSON with fields decision and citations.", conflict_policy="defers"), REG, "admit"),
             (item("policy:plain", "governance.instructions", "Answer in plain prose."), REG, "admit"),

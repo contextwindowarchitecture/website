@@ -1,5 +1,5 @@
 <governance.instructions id="policy:cite" conflict="g-two-govern">
-Cite every passage you rely on.
+Cite every source you rely on.
 </governance.instructions>
 <governance.instructions id="policy:format">
 Answer in at most three sentences.

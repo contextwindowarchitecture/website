@@ -40,7 +40,7 @@ interaction.memory items MUST carry expires and a source identifying the source 
 
 ## R-10: Untrusted content is marked, rendered as material, kept out of governance
 
-User-controlled quoted material, attachments, retrieved passages, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15.
+User-controlled quoted material, attachments, retrieved chunks, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15.
 
 ## R-11: Explicit conflict groups and traceable resolution
 
@@ -50,7 +50,7 @@ The application MUST supply conflict groups satisfying schema/conflict_group.sch
 
 When admission and fitting leave no valid evidence, or fewer evidence items than the route's versioned minimum, for a route that requires evidence, an assembler MUST NOT render a payload as though sufficient evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action as retrieve_narrower, precompute_summary or request_context. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot.
 
-## R-13: Retrievers emit scored packets, not blobs
+## R-13: Retrievers emit one scored item per chunk, never a blob
 
 A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch.
 

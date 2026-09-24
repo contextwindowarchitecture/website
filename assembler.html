@@ -150,8 +150,8 @@ const RULES = [
     "implemented",
     1,
     [
-      1,
-      1
+      0,
+      0
     ]
   ],
   [
@@ -162,8 +162,8 @@ const RULES = [
     "implemented",
     3,
     [
-      3,
-      3
+      2,
+      2
     ]
   ],
   [
@@ -174,8 +174,8 @@ const RULES = [
     "implemented",
     5,
     [
-      5,
-      5
+      3,
+      3
     ]
   ],
   [
@@ -210,8 +210,8 @@ const RULES = [
     "implemented",
     6,
     [
-      6,
-      6
+      4,
+      4
     ]
   ],
   [
@@ -222,8 +222,8 @@ const RULES = [
     "implemented",
     4,
     [
-      4,
-      4
+      2,
+      2
     ]
   ],
   [
@@ -234,8 +234,8 @@ const RULES = [
     "boundary-checked",
     1,
     [
-      1,
-      1
+      0,
+      0
     ]
   ],
   [
@@ -246,8 +246,8 @@ const RULES = [
     "boundary-checked",
     2,
     [
-      2,
-      2
+      1,
+      1
     ]
   ],
   [
@@ -258,8 +258,8 @@ const RULES = [
     "implemented",
     2,
     [
-      2,
-      2
+      0,
+      0
     ]
   ],
   [
@@ -270,8 +270,8 @@ const RULES = [
     "boundary-checked",
     14,
     [
-      14,
-      14
+      11,
+      11
     ]
   ],
   [
@@ -288,14 +288,14 @@ const RULES = [
   ],
   [
     "MUST NOT",
-    "Retrievers emit scored packets, not blobs",
+    "Retrievers emit one scored item per chunk, never a blob",
     "boundary",
-    "Requires relevance and reference_only, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged passages or dropped one silently.",
+    "Requires relevance and reference_only, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
     "boundary-checked",
     4,
     [
-      4,
-      4
+      2,
+      2
     ]
   ],
   [
@@ -306,8 +306,8 @@ const RULES = [
     "boundary-checked",
     1,
     [
-      1,
-      1
+      0,
+      0
     ]
   ],
   [
@@ -318,8 +318,8 @@ const RULES = [
     "boundary-checked",
     5,
     [
-      5,
-      5
+      3,
+      3
     ]
   ],
   [
@@ -330,8 +330,8 @@ const RULES = [
     "implemented",
     27,
     [
-      27,
-      27
+      25,
+      25
     ]
   ],
   [
@@ -354,8 +354,8 @@ const RULES = [
     "boundary-checked",
     9,
     [
-      9,
-      9
+      8,
+      8
     ]
   ],
   [
@@ -390,8 +390,8 @@ const RULES = [
     "implemented",
     46,
     [
-      46,
-      46
+      41,
+      41
     ]
   ],
   [
@@ -402,8 +402,8 @@ const RULES = [
     "implemented",
     17,
     [
-      17,
-      17
+      15,
+      15
     ]
   ],
   [
@@ -426,8 +426,8 @@ const RULES = [
     "implemented",
     7,
     [
-      7,
-      7
+      5,
+      5
     ]
   ],
   [
@@ -438,8 +438,8 @@ const RULES = [
     "implemented",
     4,
     [
-      4,
-      4
+      3,
+      3
     ]
   ],
   [
@@ -450,12 +450,12 @@ const RULES = [
     "implemented",
     3,
     [
-      3,
-      3
+      1,
+      1
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":60,"passed":60,"stale":0},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":60,"passed":60,"stale":0}];
+const CONFORMANCE = [{"label":"Python","commit":"ed68911","website":"387a3e9","total":60,"passed":55,"stale":5},{"label":"TypeScript","commit":"6723350","website":"387a3e9","total":60,"passed":55,"stale":5}];
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {

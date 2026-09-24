@@ -6,7 +6,7 @@
 <!-- state.user · authority=state · scope=user,session -->
 <user_facts></user_facts>
 
-<!-- evidence.knowledge · authority=reference_only · one <evidence> per packet -->
+<!-- evidence.knowledge · authority=reference_only · one <evidence> per evidence item -->
 <evidence id="" source="" version="" trust="" freshness=""></evidence>
 
 <!-- state.task · authority=state · app-owned, canonical -->

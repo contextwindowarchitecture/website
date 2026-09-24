@@ -102,7 +102,7 @@ export function checkItem(candidate, context = {}) {
     findings.push(failure('untrusted_content_unmarked', 'User-controlled and retrieved content must remain marked as untrusted content.', 10));
   }
   if (item.slot === 'evidence.knowledge' && item.authority !== 'reference_only') {
-    findings.push(failure('authority_not_allowed', 'Retrieval packets carry reference_only authority.', 13));
+    findings.push(failure('authority_not_allowed', 'Retrieved chunks carry reference_only authority.', 13));
   }
   if (item.variants.some(variant => variant.id === item.id) || new Set(item.variants.map(v => v.id)).size !== item.variants.length) {
     findings.push(failure('duplicate_variant_id', 'Variants need distinct IDs, different from the item ID.', 18));

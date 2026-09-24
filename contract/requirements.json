@@ -67,7 +67,7 @@
     "section": "gov",
     "keyword": "MUST",
     "summary": "Untrusted content is marked, rendered as material, kept out of governance",
-    "text": "User-controlled quoted material, attachments, retrieved passages, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15."
+    "text": "User-controlled quoted material, attachments, retrieved chunks, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15."
   },
   {
     "id": "R-11",
@@ -87,7 +87,7 @@
     "id": "R-13",
     "section": "fit",
     "keyword": "MUST NOT",
-    "summary": "Retrievers emit scored packets, not blobs",
+    "summary": "Retrievers emit one scored item per chunk, never a blob",
     "text": "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch."
   },
   {
