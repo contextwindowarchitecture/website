@@ -120,6 +120,11 @@
       "stage": "producer"
     },
     {
+      "item_id": "m:revoked",
+      "reason": "revoked",
+      "stage": "producer"
+    },
+    {
       "item_id": "rogue:0",
       "reason": "below_threshold",
       "stage": "producer"
@@ -143,6 +148,12 @@
       "slot": "governance.capabilities"
     },
     {
+      "item_id": "obs:unmarked",
+      "reason": "untrusted_content_unmarked",
+      "stage": "assembler",
+      "slot": "evidence.tool_results"
+    },
+    {
       "item_id": "legacy:1",
       "reason": "producer_not_authenticated",
       "stage": "assembler",
@@ -151,6 +162,24 @@
     {
       "item_id": "m:bad-source",
       "reason": "source_invalid",
+      "stage": "assembler",
+      "slot": "interaction.memory"
+    },
+    {
+      "item_id": "m:expired-late",
+      "reason": "expired",
+      "stage": "assembler",
+      "slot": "interaction.memory"
+    },
+    {
+      "item_id": "m:no-expires",
+      "reason": "missing_field:expires",
+      "stage": "assembler",
+      "slot": "interaction.memory"
+    },
+    {
+      "item_id": "m:revoked-late",
+      "reason": "revoked",
       "stage": "assembler",
       "slot": "interaction.memory"
     },
@@ -250,6 +279,12 @@
       "slot": "evidence.knowledge"
     },
     {
+      "item_id": "kb:no-relevance",
+      "reason": "missing_field:relevance",
+      "stage": "assembler",
+      "slot": "evidence.knowledge"
+    },
+    {
       "item_id": "kb:no-slot",
       "reason": "missing_field:slot",
       "stage": "assembler"
@@ -303,6 +338,12 @@
       "slot": "evidence.knowledge"
     },
     {
+      "item_id": "kb:variant-twins",
+      "reason": "duplicate_variant_id",
+      "stage": "assembler",
+      "slot": "evidence.knowledge"
+    },
+    {
       "item_id": "kb:variants",
       "reason": "duplicate_variant_id",
       "stage": "assembler",
@@ -337,6 +378,12 @@
       "reason": "duplicate_item_id",
       "stage": "assembler",
       "slot": "evidence.knowledge"
+    },
+    {
+      "item_id": "policy:injectable",
+      "reason": "untrusted_in_governance",
+      "stage": "assembler",
+      "slot": "governance.instructions"
     },
     {
       "item_id": "policy:plan",
@@ -386,7 +433,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "ffe0b5e0e49792b71736cd501269ef7f211268d7412f56981712764341ee7b26"
+    "snapshot_digest": "6147170704a0bff4a582c62f332f9a0447a5fc7a389fa6b193b1be2c3e9bb176"
   },
   "defaults_filled": [
     {

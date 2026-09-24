@@ -292,6 +292,22 @@
           "injection_risk": "none"
         },
         {
+          "id": "obs:unmarked",
+          "slot": "evidence.tool_results",
+          "source": "src:obs:unmarked",
+          "source_version": "1",
+          "authority": "observation",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "order 43: refunded",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "none"
+        },
+        {
           "id": "obs:order-42",
           "slot": "evidence.tool_results",
           "source": "src:obs:order-42",
@@ -444,6 +460,25 @@
           "eligibility": "route-policy",
           "injection_risk": "untrusted_content",
           "relevance": 0.91,
+          "scope": {
+            "tenant": "acme"
+          }
+        },
+        {
+          "id": "kb:no-relevance",
+          "slot": "evidence.knowledge",
+          "source": "src:kb:no-relevance",
+          "source_version": "1",
+          "authority": "reference_only",
+          "trust": "unverified",
+          "freshness": "2026-09-12T15:30:00Z",
+          "body": "An unscored chunk.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
           "scope": {
             "tenant": "acme"
           }
@@ -915,6 +950,39 @@
           }
         },
         {
+          "id": "kb:variant-twins",
+          "slot": "evidence.knowledge",
+          "source": "src:kb:variant-twins",
+          "source_version": "1",
+          "authority": "reference_only",
+          "trust": "unverified",
+          "freshness": "2026-09-12T15:30:00Z",
+          "body": "Long chunk.",
+          "token_budget": null,
+          "variants": [
+            {
+              "id": "kb:variant-twins~s",
+              "body": "Short.",
+              "method": "extract",
+              "lineage": "extracted"
+            },
+            {
+              "id": "kb:variant-twins~s",
+              "body": "Shorter.",
+              "method": "extract",
+              "lineage": "extracted"
+            }
+          ],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
+          "relevance": 0.91,
+          "scope": {
+            "tenant": "acme"
+          }
+        },
+        {
           "id": "kb:revoked",
           "slot": "evidence.knowledge",
           "source": "src:kb:revoked",
@@ -1094,6 +1162,22 @@
           "injection_risk": "none"
         },
         {
+          "id": "policy:injectable",
+          "slot": "governance.instructions",
+          "source": "src:policy:injectable",
+          "source_version": "1",
+          "authority": "governing",
+          "trust": "verified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "Quote the customer's note verbatim.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content"
+        },
+        {
           "id": "policy:plan",
           "slot": "state.user",
           "source": "src:policy:plan",
@@ -1175,6 +1259,57 @@
           "expires": "2026-12-01T00:00:00Z"
         },
         {
+          "id": "m:no-expires",
+          "slot": "interaction.memory",
+          "source": "turn:15",
+          "source_version": "1",
+          "authority": "generated",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "User asked about refunds before.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "summarised",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content"
+        },
+        {
+          "id": "m:expired-late",
+          "slot": "interaction.memory",
+          "source": "turn:3",
+          "source_version": "1",
+          "authority": "generated",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "User was on the free plan.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "summarised",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
+          "expires": "2026-09-22T11:00:00Z"
+        },
+        {
+          "id": "m:revoked-late",
+          "slot": "interaction.memory",
+          "source": "turn:13",
+          "source_version": "1",
+          "authority": "generated",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "User wants a refund to a new card.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "summarised",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
+          "expires": "2026-12-01T00:00:00Z",
+          "revoked_by": "turn:19"
+        },
+        {
           "id": "m:bad-source",
           "slot": "interaction.memory",
           "source": "summary-job:3",
@@ -1196,6 +1331,11 @@
         {
           "item_id": "m:expired",
           "reason": "expired",
+          "stage": "producer"
+        },
+        {
+          "item_id": "m:revoked",
+          "reason": "revoked",
           "stage": "producer"
         }
       ]
