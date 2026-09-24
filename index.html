@@ -567,7 +567,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Evidence selection</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Retrieval feeds Evidence through an admission pipeline.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload sit eight decisions, and each one is a deterministic rule the trace can point at. For high-stakes answers the slot holds evidence packets, each carrying source, passage, version, relevance, authority, and whether it is binding or informative, rather than undifferentiated "knowledge."</p>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload there are eight steps: four the retriever does before assembly, and four the assembler does, each one a rule the trace can point at. For high-stakes answers the slot holds evidence packets, each carrying source, passage, version, relevance and authority, rather than undifferentiated "knowledge."</p>
       <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <sc-for list="{{ evidenceStages }}" as="s" hint-placeholder-count="8">
           <div style="background: var(--bg); padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 10px;">
@@ -862,11 +862,11 @@ const SLOTS = [
   ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
   ["Knowledge", "evidence.knowledge", 2, "Retrieved passages as evidence packets: source, version, relevance, trust, binding or informative.", "Each packet passes the evidence pipeline: reranked, deduplicated, above threshold, and inside freshness limits. An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
-  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries a TTL and a source. Entries that have expired or that the user has contradicted are excluded and logged.", "authority generated\ntier compressible\nlifecycle ttl · revocable"],
-  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, whole turns are omitted oldest first. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nbound turns · tokens"],
+  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries past expires at assembly_time, or carrying revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "When the bound is reached, overflow is summarised into memory rather than truncated mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nbound turns · tokens"],
   ["Capabilities", "governance.capabilities", 0, "The tools, functions, and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority, and permission is decided outside the model.", "authority governing\ntier protected*\n*when tools are in use"],
-  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "Fresh observations replace stale ones for the same call when the route asks (R-25): the latest per producer and source is kept. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
-  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract, and they are the first items dropped under budget pressure.", "authority governing\ntier droppable\nrank task similarity"],
+  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
+  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone, or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract. They're droppable, so when the budget gets tight they go before anything compressible.", "authority governing\ntier droppable\nrank task similarity"],
   ["Output contract", "governance.output_contract", 0, "Structure, style, length, and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. Safety disclosures outrank format constraints.", "authority governing\ntier protected\nreinforced near the query"],
   ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile has tested that it belongs.", "authority user\ntier protected\nrole trigger"]
 ];
@@ -1096,19 +1096,19 @@ const TESTS = [
   ["Conflict", "A malicious retrieved passage with imperative text does not alter governing instructions."],
   ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
   ["Freshness", "Expired memory is excluded using assembly_time and its producer rejection is traced."],
-  ["Refusal", "When essential evidence cannot fit, the assembler refuses to render rather than silently answering."],
+  ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it."],
   ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is refused with capability_not_allowed."]
 ];
 
 const EVIDENCE_STAGES = [
-  ["Rewrite", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
-  ["Retrieve", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
-  ["Rerank", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
-  ["Deduplicate", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever, which reports each one it drops as duplicate_content (R-13)."],
-  ["Filter", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
-  ["Packetize", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
-  ["Budget", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],
-  ["Attribute", "Carry citation requirements into the output contract so the answer can point back to the packet."]
+  ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
+  ["Retrieve", "Pull passage-sized candidates from sources whose provenance you can name."],
+  ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
+  ["Packetize", "Send each passage as its own item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
+  ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
+  ["Fit", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
+  ["Render & trace", "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."]
 ];
 
 const ITEM_FIELDS = [
@@ -1116,7 +1116,7 @@ const ITEM_FIELDS = [
   ["authority", "Exactly one of seven values: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content."],
   ["freshness", "freshness records observation time; expires is the separate expiration deadline. Expired items are excluded rather than aged silently."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
-  ["eligibility", "The deterministic rule that admitted it into this request, stated so a test can replay it."],
+  ["eligibility", "A short note on why this item belongs in the request, for whoever reads the trace. It isn't code; the route owns the rule that actually decides (R-3)."],
   ["budget", "How much it may consume, which tier it sits in, and what shortens first under pressure."],
   ["conflict_policy", "For permitted instruction peers: this one defers, governs, or forces escalation."],
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],

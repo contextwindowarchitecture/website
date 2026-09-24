@@ -142,7 +142,7 @@
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-inter);">Memory → interaction.memory</div>
             <div style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">The state-versus-memory distinction, expressed as fields.</div>
-            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Every entry carries <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">expires</span> (the TTL), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source</span> (the turn it was derived from), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">lineage: summarised | generated</span>, a revocation reference when the user has contradicted it, and <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">trust: unverified</span>. Expired or revoked entries are omitted from candidate items and reported in the producer batch excluded list, with stage: producer. The assembler merges those rejections into its trace.</p>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Every entry carries <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">expires</span> (an absolute deadline, not a duration), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">source</span> (the turn it was derived from), <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">lineage: summarised | generated</span>, a revocation reference when the user has contradicted it, and <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">trust: unverified</span>. Expired or revoked entries are omitted from candidate items and reported in the producer batch excluded list, with stage: producer. The assembler merges those rejections into its trace.</p>
             <div style="margin-top: 8px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">Role <span style="color: var(--muted);">authority: generated</span> · <a href="./spec.html#R-14">R-14</a> · <a href="./spec.html#R-9">R-9</a></div>
           </div>
           <div style="background: var(--bg); padding: 24px 22px; display: flex; flex-direction: column; gap: 10px;">
@@ -405,14 +405,14 @@ const SLOT_DEFAULTS = {
 };
 const PLANE_COLOR = { gov: "var(--p-gov)", state: "var(--p-state)", evid: "var(--p-evid)", inter: "var(--p-inter)" };
 const STAGES = [
-  ["Rewrite", "producer", "Decide whether the query is rewritten for retrieval, and record the rewritten form."],
-  ["Retrieve", "producer", "Pull a candidate set, passage-level, from sources with declared provenance and authority roles."],
-  ["Rerank", "producer", "Score candidates against the query. Anything below the threshold is excluded, and the threshold itself is versioned."],
-  ["Deduplicate", "assembler", "In the slots the route asks, drop passages whose bodies match a kept one exactly once whitespace is collapsed (R-24), and keep at most max_per_source passages from each source (R-26). Near-duplicates stay with the retriever, which reports each one it drops as duplicate_content (R-13)."],
-  ["Filter", "assembler", "Apply freshness limits, jurisdiction, tenant scope, and trust tier as deterministic rules the trace can cite."],
-  ["Packetize", "assembler", "Wrap each survivor with id, source, version, relevance, and whether it is binding or informative."],
-  ["Budget", "assembler", "Use the route's versioned selection and stable tie-break rules; admit only content that fits the rendered budget."],
-  ["Attribute", "assembler", "Carry citation requirements into the output contract so the answer can point back to the packet."]
+  ["Rewrite", "producer", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
+  ["Retrieve", "producer", "Pull passage-sized candidates from sources whose provenance you can name."],
+  ["Rerank", "producer", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
+  ["Packetize", "producer", "Send each passage as its own item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Admit", "assembler", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
+  ["Resolve", "assembler", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
+  ["Fit", "assembler", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
+  ["Render & trace", "assembler", "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."]
 ];
 const FAILURES = [
   [
