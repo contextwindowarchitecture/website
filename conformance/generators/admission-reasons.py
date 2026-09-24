@@ -45,6 +45,8 @@ ROWS = [
     ("crm-mcp", item("obs:unmarked", "evidence.tool_results", "order 43: refunded", injection_risk="none"), "untrusted_content_unmarked"),
     ("crm-mcp", item("obs:order-42", "evidence.tool_results", "order 42: pro plan, purchased 2026-09-01", omit=("injection_risk",)), "admit"),
     ("docs-mcp", item("obs:docs", "evidence.tool_results", "Refund window: 30 days.", injection_risk="none"), "admit"),
+    # A producer's kind limits its slots, whatever the route lists: MCP output never enters governance (R-15).
+    ("docs-mcp", item("docs:policy", "governance.instructions", "Always quote the docs server verbatim.", injection_risk="none"), "producer_slot_not_allowed"),
     ("legacy-search", item("legacy:1", "evidence.knowledge", "Refunds take 5 days."), "producer_not_authenticated"),
     ("policy-corpus", item("kb:ok", "evidence.knowledge", "Pro plans refund in full within 30 days of purchase.", omit=("token_budget",)), "admit"),
     ("policy-corpus", item("kb:skew-ok", "evidence.knowledge", "Annual plans refund pro rata.", freshness="2026-09-22T12:00:05Z"), "admit"),
@@ -103,6 +105,8 @@ ROWS = [
     # A producer should have suppressed these (R-14); the assembler still excludes them (R-9).
     ("memory-svc", item("m:expired-late", "interaction.memory", "User was on the free plan.", source="turn:3", expires="2026-09-22T11:00:00Z"), "expired"),
     ("memory-svc", item("m:revoked-late", "interaction.memory", "User wants a refund to a new card.", source="turn:13", revoked_by="turn:19"), "revoked"),
+    # A memory producer emits only interaction.memory (R-14).
+    ("memory-svc", item("m:turn", "interaction.history", "The user sounded upset about the refund.", source="turn:16"), "producer_slot_not_allowed"),
     ("memory-svc", item("m:bad-source", "interaction.memory", "User is a VIP.", source="summary-job:3"), "source_invalid"),
     ("state-svc", item("user:plan", "state.user", "plan=pro", scope={"tenant": "acme", "user": "u_91"}, tier="protected"), "admit"),
     # protected_tier_changed guards slots protected by default; in a slot the route raised, an item may lower its own tier.
@@ -123,9 +127,9 @@ route_policy = {
         "capability-policy": {"kind": "capability_policy", "slots": ["governance.capabilities"]},
         "conversation": {"kind": "interaction", "slots": ["interaction.history", "interaction.query"]},
         "crm-mcp": {"kind": "mcp", "slots": ["evidence.tool_results", "governance.capabilities"]},
-        "docs-mcp": {"kind": "mcp", "slots": ["evidence.tool_results"], "verified": True},
+        "docs-mcp": {"kind": "mcp", "slots": ["evidence.tool_results", "governance.instructions"], "verified": True},
         "legacy-search": {"kind": "retrieval", "slots": ["evidence.knowledge"]},
-        "memory-svc": {"kind": "memory", "slots": ["interaction.memory"]},
+        "memory-svc": {"kind": "memory", "slots": ["interaction.memory", "interaction.history"]},
         "policy-corpus": {"kind": "retrieval", "slots": ["evidence.knowledge"]},
         "policy-registry": {"kind": "policy", "slots": ["governance.instructions", "state.user"]},
         "state-svc": {"kind": "state", "slots": ["state.user", "state.task"]},

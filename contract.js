@@ -103,6 +103,14 @@ function checkProducer(item, context) {
   if (item.slot.startsWith('state.') && producer.kind !== 'state') {
     return [failure('producer_slot_not_allowed', 'Only a producer of kind state may emit state.', 8)];
   }
+  // R-14: memory producers emit only memory. R-15: MCP output enters evidence slots, never governance; a tool
+  // specification it sends to governance.capabilities falls to the capability check below.
+  if (producer.kind === 'memory' && item.slot !== 'interaction.memory') {
+    return [failure('producer_slot_not_allowed', 'A producer of kind memory may emit only interaction.memory.', 14)];
+  }
+  if (producer.kind === 'mcp' && !item.slot.startsWith('evidence.') && item.slot !== 'governance.capabilities') {
+    return [failure('producer_slot_not_allowed', 'A producer of kind mcp may emit only evidence slots.', 15)];
+  }
   if (item.slot === 'governance.capabilities' &&
       (producer.id !== context.capabilityPolicyId || !context.allowedCapabilityIds?.includes(item.id))) {
     return [failure('capability_not_allowed', 'The authenticated capability policy must admit this tool for this route and user.', 15)];

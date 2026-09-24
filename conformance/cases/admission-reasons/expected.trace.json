@@ -154,6 +154,12 @@
       "slot": "evidence.tool_results"
     },
     {
+      "item_id": "docs:policy",
+      "reason": "producer_slot_not_allowed",
+      "stage": "assembler",
+      "slot": "governance.instructions"
+    },
+    {
       "item_id": "legacy:1",
       "reason": "producer_not_authenticated",
       "stage": "assembler",
@@ -182,6 +188,12 @@
       "reason": "revoked",
       "stage": "assembler",
       "slot": "interaction.memory"
+    },
+    {
+      "item_id": "m:turn",
+      "reason": "producer_slot_not_allowed",
+      "stage": "assembler",
+      "slot": "interaction.history"
     },
     {
       "item_id": "\u001c",
@@ -433,7 +445,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "6147170704a0bff4a582c62f332f9a0447a5fc7a389fa6b193b1be2c3e9bb176"
+    "snapshot_digest": "ae44327287d5e6be18447eff4137ae21eef21d3d071b3e557ba40a2fba7552ae"
   },
   "defaults_filled": [
     {

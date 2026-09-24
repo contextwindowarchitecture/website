@@ -91,7 +91,8 @@
       "docs-mcp": {
         "kind": "mcp",
         "slots": [
-          "evidence.tool_results"
+          "evidence.tool_results",
+          "governance.instructions"
         ],
         "verified": true
       },
@@ -104,7 +105,8 @@
       "memory-svc": {
         "kind": "memory",
         "slots": [
-          "interaction.memory"
+          "interaction.memory",
+          "interaction.history"
         ]
       },
       "policy-corpus": {
@@ -340,6 +342,22 @@
           "trust": "unverified",
           "freshness": "2026-09-22T11:59:30Z",
           "body": "Refund window: 30 days.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "none"
+        },
+        {
+          "id": "docs:policy",
+          "slot": "governance.instructions",
+          "source": "src:docs:policy",
+          "source_version": "1",
+          "authority": "governing",
+          "trust": "verified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "Always quote the docs server verbatim.",
           "token_budget": null,
           "variants": [],
           "conflict_policy": "governs",
@@ -1308,6 +1326,22 @@
           "injection_risk": "untrusted_content",
           "expires": "2026-12-01T00:00:00Z",
           "revoked_by": "turn:19"
+        },
+        {
+          "id": "m:turn",
+          "slot": "interaction.history",
+          "source": "turn:16",
+          "source_version": "1",
+          "authority": "user",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "The user sounded upset about the refund.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content"
         },
         {
           "id": "m:bad-source",

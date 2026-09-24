@@ -126,6 +126,20 @@ test('state items come only from producers of kind state, whatever the route lis
   }
 });
 
+test('memory and MCP producers emit only their own slots, whatever the route lists (R-14, R-15)', () => {
+  const instruction = { ...item, id: 'mcp:policy', slot: 'governance.instructions', authority: 'governing', trust: 'verified', injection_risk: 'none' };
+  delete instruction.relevance;
+  delete instruction.scope;
+  delete instruction.tier;
+  const producer = { id: 'docs-mcp', authenticated: true, slots: ['governance.instructions', 'interaction.history'] };
+  assert.equal(checkItem(instruction, { ...context, producer: { ...producer, kind: 'policy' } }).valid, true);
+  assert.deepEqual(checkItem(instruction, { ...context, producer: { ...producer, kind: 'mcp' } }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
+  assert.deepEqual(checkItem(instruction, { ...context, producer: { ...producer, kind: 'memory' } }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
+  const turn = { ...instruction, id: 'turn:3', slot: 'interaction.history', authority: 'user', trust: 'unverified', injection_risk: 'untrusted_content' };
+  assert.equal(checkItem(turn, { ...context, producer: { ...producer, kind: 'interaction' } }).valid, true);
+  assert.deepEqual(checkItem(turn, { ...context, producer: { ...producer, kind: 'memory' } }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
+});
+
 const traceMutations = {
   'wrong collection type': t => t.included = {},
   'null collection entry': t => t.excluded = [null],
