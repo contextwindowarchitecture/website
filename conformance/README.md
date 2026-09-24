@@ -174,8 +174,8 @@ Fitting decides per item. A slot the profile places twice sheds or compresses bo
 
 A snapshot is *valid* when it satisfies `snapshot.schema.json`, and the schemas it references, and passes every check below. An invalid snapshot is rejected before assembly, with no payload and no trace, because its profile, budget or context may be missing or contradictory (R-17). Rejection reports the application's error in building the snapshot. An implementation lists the problems in its own words, since no reason code names them; the codes in `contract/reasons.json` describe assemblies of valid snapshots, refusals included.
 
-- **Well-formed Unicode.** No string holds an unpaired surrogate (Snapshot digest).
-- **One batch per producer.** No producer id heads more than one batch. A batch is one authenticated producer's output for the call (R-15), and rows, ranks, supersession and source diversity all key on that producer.
+- **Well-formed Unicode (R-17).** No string holds an unpaired surrogate (Snapshot digest).
+- **One batch per producer (R-15).** No producer id heads more than one batch. A batch is one authenticated producer's output for the call (R-15), and rows, ranks, supersession and source diversity all key on that producer.
 - **Conflict groups (R-11).** Group ids are unique, every item id a group names is the id of a candidate or a producer exclusion in the snapshot, no item belongs to two groups, and a fact group's `fact` is a key of the route's `facts`.
 - **Producer exclusions (R-13).** An exclusion's `duplicate_of` is the id of a candidate in the same batch.
 - **Profile (R-19, R-20).** Its `spec` is `cwa/draft`, which the profile schema fixes and the trace repeats as `context.spec` (R-21). Its `route` and `route_policy_version` equal the route policy's `route` and `version`. It places `governance.instructions` and `interaction.query`, and `governance.output_contract` when the route sets `parser: true`. The snapshot's renderer can realize it (Tokenizers and renderers).

@@ -78,8 +78,9 @@ function minusSeconds(instant, seconds) {
 }
 
 function checkLifetime(item, assemblyTime, clockSkewSeconds = 0) {
+  // Assembly never reads an ambient clock (R-23); a snapshot without a valid assembly_time is rejected (R-17).
   if (!assemblyTime || Number.isNaN(compareInstants(assemblyTime, assemblyTime))) {
-    return [failure('assembly_time_required', 'Supply the assembly snapshot time explicitly.', 23)];
+    throw new TypeError('checkItem needs context.assemblyTime, a valid RFC 3339 date-time');
   }
   if (item.revoked_by) return [failure('revoked', `Revoked by ${item.revoked_by}.`, 9)];
   if (item.expires && compareInstants(item.expires, assemblyTime) <= 0) {
@@ -269,7 +270,7 @@ const wellFormed = value => typeof value === 'string' ? value.isWellFormed()
 export function checkSnapshot(snapshot) {
   if (!validateSnapshotSchema(snapshot)) return { valid: false, findings: schemaErrors(validateSnapshotSchema, 17) };
   const findings = [];
-  if (!wellFormed(snapshot)) findings.push(failure('unpaired_surrogate', 'Every string must be well-formed Unicode, with no unpaired surrogate.', 23));
+  if (!wellFormed(snapshot)) findings.push(failure('unpaired_surrogate', 'Every string must be well-formed Unicode, with no unpaired surrogate.', 17));
   const producers = snapshot.batches.map(batch => batch.producer.id);
   for (const id of new Set(producers.filter((id, i) => producers.indexOf(id) !== i))) {
     findings.push(failure('duplicate_producer', `Producer ${id} heads more than one batch.`, 15));

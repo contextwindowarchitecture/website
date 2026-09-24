@@ -44,7 +44,7 @@
     },
     "producers": {
       "type": "object",
-      "description": "Producers this route admits, keyed by the identity the application authenticated. Batches from any other producer are refused.",
+      "description": "Producers this route admits, keyed by the identity the application authenticated. Items from any other producer, or from a producer listed with another kind, are excluded with producer_not_authenticated (R-15).",
       "additionalProperties": {
         "type": "object",
         "additionalProperties": false,

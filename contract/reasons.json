@@ -3,7 +3,7 @@
     "code": "producer_not_authenticated",
     "kind": "exclusion",
     "rule": "R-15",
-    "text": "The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields."
+    "text": "The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields. A snapshot with two batches from one producer is rejected before assembly."
   },
   {
     "code": "missing_field:<name>",
@@ -99,7 +99,7 @@
     "code": "future_freshness",
     "kind": "exclusion",
     "rule": "R-2",
-    "text": "freshness is later than assembly_time."
+    "text": "freshness is later than assembly_time by more than the route's clock_skew_seconds (default 0), compared at full precision."
   },
   {
     "code": "stale_state",
@@ -110,32 +110,32 @@
   {
     "code": "source_invalid",
     "kind": "exclusion",
-    "rule": "R-9",
-    "text": "The item's source does not start with its slot's source_prefix. For memory, this is how the source turn is identified."
+    "rule": "R-3",
+    "text": "The item's source does not start with its slot's source_prefix. For memory, this is how the source turn is identified (R-9)."
   },
   {
     "code": "out_of_scope",
     "kind": "exclusion",
     "rule": "R-2",
-    "text": "Tenant, user or session scope does not match the request."
+    "text": "A scope key the item carries has a value other than the request's, or the request lacks that key, or the item lacks a key its slot's required_scope lists. A missing key is never a wildcard."
   },
   {
     "code": "below_threshold",
     "kind": "exclusion",
     "rule": "R-13",
-    "text": "The rerank score is under the route's versioned threshold."
+    "text": "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes."
   },
   {
     "code": "not_eligible",
     "kind": "exclusion",
     "rule": "R-3",
-    "text": "The route's eligibility predicate rejected the item, for example because it was observed longer ago than its slot's max_age_seconds."
+    "text": "The route's eligibility predicate excluded the item, for example because it was observed longer ago than its slot's max_age_seconds."
   },
   {
     "code": "slot_unplaced",
     "kind": "exclusion",
     "rule": "R-20",
-    "text": "The profile has no placement for the item's slot, and the item is not protected. A protected item in an unplaced slot is never excluded; assembly refuses with protected_slot_unplaced."
+    "text": "The profile has no placement for the item's slot, and the item is not protected. A protected item in an unplaced slot is never excluded; assembly refuses with protected_slot_unplaced. A profile that does not place instructions and query, or the output contract on a parser route, is rejected with its snapshot before assembly."
   },
   {
     "code": "conflict_deferred",
@@ -146,7 +146,7 @@
   {
     "code": "conflict_lost",
     "kind": "exclusion",
-    "rule": "R-6",
+    "rule": "R-11",
     "text": "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates."
   },
   {
@@ -174,12 +174,6 @@
     "text": "The item was omitted to fit the rendered budget, its own token_budget or its slot's max_tokens, in tier order and by the route's fitting policy."
   },
   {
-    "code": "assembly_time_required",
-    "kind": "refusal",
-    "rule": "R-23",
-    "text": "The snapshot has no explicit, valid assembly_time. Assembly never reads an ambient clock."
-  },
-  {
     "code": "required_slot_missing",
     "kind": "refusal",
     "rule": "R-4",
@@ -201,7 +195,7 @@
     "code": "protected_content_over_budget",
     "kind": "refusal",
     "rule": "R-17",
-    "text": "Protected content alone exceeds budget.input or its slot's max_tokens, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating."
+    "text": "The payload rendered from protected content alone does not fit budget.input, charged with any margin_percent, or protected items exceed their slot's max_tokens, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating."
   },
   {
     "code": "slot_floor_over_budget",

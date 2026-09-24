@@ -418,7 +418,7 @@ const STAGES = [
 const FAILURES = [
   [
     "producer_not_authenticated",
-    "The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields.",
+    "The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields. A snapshot with two batches from one producer is rejected before assembly.",
     15
   ],
   [
@@ -498,7 +498,7 @@ const FAILURES = [
   ],
   [
     "future_freshness",
-    "freshness is later than assembly_time.",
+    "freshness is later than assembly_time by more than the route's clock_skew_seconds (default 0), compared at full precision.",
     2
   ],
   [
@@ -508,27 +508,27 @@ const FAILURES = [
   ],
   [
     "source_invalid",
-    "The item's source does not start with its slot's source_prefix. For memory, this is how the source turn is identified.",
-    9
+    "The item's source does not start with its slot's source_prefix. For memory, this is how the source turn is identified (R-9).",
+    3
   ],
   [
     "out_of_scope",
-    "Tenant, user or session scope does not match the request.",
+    "A scope key the item carries has a value other than the request's, or the request lacks that key, or the item lacks a key its slot's required_scope lists. A missing key is never a wildcard.",
     2
   ],
   [
     "below_threshold",
-    "The rerank score is under the route's versioned threshold.",
+    "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes.",
     13
   ],
   [
     "not_eligible",
-    "The route's eligibility predicate rejected the item, for example because it was observed longer ago than its slot's max_age_seconds.",
+    "The route's eligibility predicate excluded the item, for example because it was observed longer ago than its slot's max_age_seconds.",
     3
   ],
   [
     "slot_unplaced",
-    "The profile has no placement for the item's slot, and the item is not protected. A protected item in an unplaced slot is never excluded; assembly refuses with protected_slot_unplaced.",
+    "The profile has no placement for the item's slot, and the item is not protected. A protected item in an unplaced slot is never excluded; assembly refuses with protected_slot_unplaced. A profile that does not place instructions and query, or the output contract on a parser route, is rejected with its snapshot before assembly.",
     20
   ],
   [
@@ -539,7 +539,7 @@ const FAILURES = [
   [
     "conflict_lost",
     "Route fact policy chose another member of the item's declared fact conflict group, by authenticated producer precedence or an allowed freshness tie-break. A protected item is never excluded this way; its group escalates.",
-    6
+    11
   ],
   [
     "superseded",

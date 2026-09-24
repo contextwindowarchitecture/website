@@ -59,7 +59,8 @@ test('past freshness is not expiry; expiry equality is excluded', () => {
   assert.equal(checkItem(item, context).valid, true);
   assert.equal(checkItem({ ...item, expires: context.assemblyTime }, context).findings[0].reason, 'expired');
   assert.equal(checkItem(item, { assemblyTime: '2027-01-01T00:00:00Z' }).valid, false);
-  assert.equal(checkItem(item).valid, false);
+  assert.throws(() => checkItem(item), TypeError, 'assembly never reads an ambient clock');
+  assert.throws(() => checkItem(item, { assemblyTime: 'yesterday' }), TypeError);
 });
 
 test('memory requires expiry and records revocation without emitting the body again', () => {
@@ -640,7 +641,7 @@ test('route policies declare producers, slot rules, overrides and upgrades in cl
 
 test('refusal codes are listed in the order assembly checks them', () => {
   assert.deepEqual(REASONS.filter(r => r.kind === 'refusal').map(r => r.code),
-    ['assembly_time_required', 'required_slot_missing', 'protected_slot_unplaced', 'conflict_unresolved', 'protected_content_over_budget',
+    ['required_slot_missing', 'protected_slot_unplaced', 'conflict_unresolved', 'protected_content_over_budget',
       'slot_floor_over_budget', 'evidence_required']);
   assert.equal(REASONS.find(r => r.code === 'slot_floor_over_budget').rule, 'R-17');
 });
