@@ -187,7 +187,8 @@ test('the fit test charges budget.margin_percent, rounding up (R-16)', () => {
 test('a refused trace has no compressed rows either (R-17)', () => {
   const refused = { ...trace, result: null, included: [], refused: { bool: true, reason: 'protected_content_over_budget' } };
   const row = { slot: 'evidence.knowledge', item_id: 'refunds-eu:v17#p4', from: 10, to: 4, method: 'extract', variant_id: 'v' };
-  assert.deepEqual(checkTrace({ ...refused, compressed: [row] }).findings.map(f => f.reason), ['refused_payload_included']);
+  assert.equal(validateTraceSchema({ ...refused, compressed: [row] }), false, 'the schema requires compressed: [] on refusal');
+  assert.equal(checkTrace({ ...refused, compressed: [row] }).valid, false);
 });
 
 test('freshness may run ahead of assembly_time by the route clock skew, at full precision (R-2)', () => {
@@ -227,7 +228,7 @@ test('missing evidence requires an explicit recovery handoff, not an in-assembly
 
 test('factual precedence may report route policy or explicit escalation', () => {
   for (const [decided_by, resolution] of [['policy', 'resolved'], ['freshness', 'resolved'], ['escalated', 'surfaced'], ['escalated', 'context_requested'], ['escalated', 'refused'], ['moot', 'moot']]) {
-    const candidate = { ...trace, conflicts: [{ items: ['tool', 'document'], kind: 'fact', resolution, decided_by }] };
+    const candidate = { ...trace, conflicts: [{ group_id: 'g1', items: ['tool', 'document'], kind: 'fact', resolution, decided_by }] };
     assert.equal(checkTrace(candidate).valid, true);
   }
 });
@@ -311,11 +312,22 @@ test('conflict groups need an id, and fact groups need a fact key that names kno
   assert.equal(checkConflictGroup(groups[0], { itemIds: ['refunds-eu:v17#p4'] }).valid, false);
 });
 
+test('a trace carries the provenance fields R-11, R-17 and R-22 make MUST', () => {
+  const without = (mutate) => { const candidate = copy(trace); mutate(candidate); return validateTraceSchema(candidate); };
+  assert.equal(without(t => delete t.included[0].source_version), false);
+  assert.equal(without(t => delete t.included[0].eligibility), false);
+  assert.equal(without(t => delete t.context.snapshot_digest), false);
+  assert.equal(without(t => delete t.defaults_filled), false);
+  assert.equal(without(t => { t.defaults_filled = []; }), true, 'an empty defaults_filled is how a trace says none were filled');
+  assert.equal(without(t => { t.conflicts = [{ items: ['a', 'b'], kind: 'fact', decided_by: 'moot', resolution: 'moot' }]; }), false, 'group_id');
+  assert.equal(without(t => { delete t.timings; }), true, 'timings stay SHOULD');
+});
+
 test('conflict resolutions use a closed vocabulary that agrees with decided_by (R-11)', () => {
   const record = fields => ({ ...trace, conflicts: [{ group_id: 'g1', items: ['a', 'b'], kind: 'fact', ...fields }] });
   assert.equal(checkTrace(record({ decided_by: 'policy', resolution: 'resolved', winner: 'a' })).valid, true);
   assert.equal(checkTrace(record({ decided_by: 'authority', resolution: 'resolved' })).valid, false, 'authority never decides a fact');
-  assert.equal(checkTrace({ ...record({ decided_by: 'authority', resolution: 'resolved' }), conflicts: [{ items: ['a', 'b'], kind: 'instruction', decided_by: 'authority', resolution: 'resolved' }] }).valid, true,
+  assert.equal(checkTrace({ ...record({ decided_by: 'authority', resolution: 'resolved' }), conflicts: [{ group_id: 'g1', items: ['a', 'b'], kind: 'instruction', decided_by: 'authority', resolution: 'resolved' }] }).valid, true,
     'an instruction group decided by authority may have no winner');
   for (const fields of [{ decided_by: 'policy', resolution: 'route-defined outcome' }, { decided_by: 'moot', resolution: 'resolved' },
     { decided_by: 'policy', resolution: 'moot' }, { decided_by: 'escalated', resolution: 'resolved' }, { decided_by: 'policy', resolution: 'surfaced' },

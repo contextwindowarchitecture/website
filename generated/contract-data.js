@@ -392,7 +392,9 @@ export const TRACE_SCHEMA = {
         "required": [
           "slot",
           "item_id",
-          "tokens"
+          "tokens",
+          "source_version",
+          "eligibility"
         ],
         "additionalProperties": false
       }
@@ -630,8 +632,9 @@ export const TRACE_SCHEMA = {
           }
         },
         "required": [
-          "items",
+          "group_id",
           "kind",
+          "items",
           "resolution",
           "decided_by"
         ],
@@ -785,7 +788,8 @@ export const TRACE_SCHEMA = {
           "type": "string",
           "pattern": "^[a-f0-9]{64}$",
           "minLength": 64,
-          "maxLength": 64
+          "maxLength": 64,
+          "description": "Lowercase SHA-256 of the normalized snapshot, as conformance/README.md's Snapshot digest defines it (R-22)."
         }
       },
       "required": [
@@ -793,7 +797,8 @@ export const TRACE_SCHEMA = {
         "assembly_time",
         "route_policy_version",
         "tokenizer",
-        "renderer"
+        "renderer",
+        "snapshot_digest"
       ],
       "additionalProperties": false
     },
@@ -824,7 +829,8 @@ export const TRACE_SCHEMA = {
           "field"
         ],
         "additionalProperties": false
-      }
+      },
+      "description": "One record per item and policy field filled under R-3; an empty list when none were (R-22)."
     },
     "timings": {
       "type": "object",
@@ -863,7 +869,8 @@ export const TRACE_SCHEMA = {
     "excluded",
     "conflicts",
     "refused",
-    "context"
+    "context",
+    "defaults_filled"
   ],
   "additionalProperties": false,
   "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -898,6 +905,14 @@ export const TRACE_SCHEMA = {
               }
             },
             "type": "object"
+          },
+          "included": {
+            "type": "array",
+            "maxItems": 0
+          },
+          "compressed": {
+            "type": "array",
+            "maxItems": 0
           }
         },
         "type": "object"
