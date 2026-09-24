@@ -26,7 +26,9 @@ def jcs(value):
     if value is None or isinstance(value, bool):
         return json.dumps(value)
     if isinstance(value, int):
-        return str(value)
+        if abs(value) <= 2 ** 53:
+            return str(value)
+        value = float(value)  # RFC 8785 numbers are doubles; beyond 2^53 an integer rounds as JavaScript rounds it
     if isinstance(value, float):
         assert math.isfinite(value)
         if value == int(value) and abs(value) < 1e21:

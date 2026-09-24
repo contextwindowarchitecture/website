@@ -569,7 +569,7 @@ const group = (id, items, extra = {}) => ({ id, kind: 'instruction', items, ...e
 const REJECTS = [
   ['invalid_structure', s => { delete s.budget; }],
   ['invalid_structure', s => { s.profile.spec = 'cwa/1'; }],
-  ['unpaired_surrogate', s => { s.batches[0].items[0].body += '\uD800'; }],
+  ['not_i_json', s => { s.batches[0].items[0].body += '\uD800'; }], ['not_i_json', s => { s.batches[0].items[0].relevance = Infinity; }],
   ['duplicate_producer', s => { s.batches[3].producer = { ...s.batches[0].producer }; }],
   ['unknown_conflict_item', s => { s.conflicts = [group('g1', ['policy:v12', 'nope'])]; }],
   ['duplicate_conflict_group', s => { s.conflicts = [group('g1', ['policy:v12', 'turn:18']), group('g1', ['refunds-eu:v17#p4', 'memory:expired'])]; }],
@@ -616,7 +616,7 @@ const REJECTION_CHECKS = {
   'profile-route-policy-mismatch': 'profile_route_policy_mismatch', 'profile-unrealizable': 'unrealizable_profile',
   'profile-invalid-tag': 'unrealizable_profile', 'messages-system-on-evidence': 'unrealizable_profile',
   'messages-tools-on-instructions': 'unrealizable_profile', 'messages-system-after-xml': 'unrealizable_profile',
-  'schema-missing-budget': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'unpaired_surrogate',
+  'schema-missing-budget': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'not_i_json', 'number-out-of-range': 'not_i_json',
 };
 
 test('each published rejection case breaks exactly one snapshot check (R-17)', async () => {

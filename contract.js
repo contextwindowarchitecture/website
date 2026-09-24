@@ -269,7 +269,10 @@ const REALIZE = {
   },
 };
 
-const wellFormed = value => typeof value === 'string' ? value.isWellFormed()
+// I-JSON (RFC 7493): well-formed strings and numbers a double can hold, so RFC 8785 can serialize the snapshot.
+// JSON.parse reads a number beyond the double range, such as 1e400, as Infinity.
+const wellFormed = value => typeof value === 'number' ? Number.isFinite(value)
+  : typeof value === 'string' ? value.isWellFormed()
   : Array.isArray(value) ? value.every(wellFormed)
   : value !== null && typeof value === 'object' ? Object.entries(value).every(([k, v]) => k.isWellFormed() && wellFormed(v)) : true;
 
@@ -278,7 +281,7 @@ const wellFormed = value => typeof value === 'string' ? value.isWellFormed()
 export function checkSnapshot(snapshot) {
   if (!validateSnapshotSchema(snapshot)) return { valid: false, findings: schemaErrors(validateSnapshotSchema, 17) };
   const findings = [];
-  if (!wellFormed(snapshot)) findings.push(failure('unpaired_surrogate', 'Every string must be well-formed Unicode, with no unpaired surrogate.', 17));
+  if (!wellFormed(snapshot)) findings.push(failure('not_i_json', 'Every string must be well-formed Unicode and every number within the IEEE 754 double range.', 17));
   const producers = snapshot.batches.map(batch => batch.producer.id);
   for (const id of new Set(producers.filter((id, i) => producers.indexOf(id) !== i))) {
     findings.push(failure('duplicate_producer', `Producer ${id} heads more than one batch.`, 15));

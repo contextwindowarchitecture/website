@@ -231,6 +231,12 @@
       "slot": "evidence.knowledge"
     },
     {
+      "item_id": "kb:blank-eligibility",
+      "reason": "invalid_structure",
+      "stage": "assembler",
+      "slot": "evidence.knowledge"
+    },
+    {
       "item_id": "kb:dup",
       "reason": "duplicate_item_id",
       "stage": "assembler",
@@ -445,7 +451,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "ae44327287d5e6be18447eff4137ae21eef21d3d071b3e557ba40a2fba7552ae"
+    "snapshot_digest": "0bfeaa9375a7b46c51095080f073fe1f5620f77396afc63449616892526d026e"
   },
   "defaults_filled": [
     {

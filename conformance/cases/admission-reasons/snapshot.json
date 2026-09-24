@@ -616,6 +616,26 @@
           }
         },
         {
+          "id": "kb:blank-eligibility",
+          "slot": "evidence.knowledge",
+          "source": "src:kb:blank-eligibility",
+          "source_version": "1",
+          "authority": "reference_only",
+          "trust": "unverified",
+          "freshness": "2026-09-12T15:30:00Z",
+          "body": "A chunk with a blank eligibility note.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": " ",
+          "injection_risk": "untrusted_content",
+          "relevance": 0.91,
+          "scope": {
+            "tenant": "acme"
+          }
+        },
+        {
           "id": "kb:bad-date",
           "slot": "evidence.knowledge",
           "source": "src:kb:bad-date",

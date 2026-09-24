@@ -62,6 +62,8 @@ ROWS = [
     ("policy-corpus", item("\u001c", "evidence.knowledge", "An id that is a control character.", relevance=0.79), "below_threshold"),
     ("policy-corpus", item("kb:bad-slot", "evidence.web", "Web result."), "unknown_slot"),
     ("policy-corpus", item("kb:bad-authority", "evidence.knowledge", "Old vocabulary.", authority="reference"), "unknown_authority"),
+    # eligibility is never blank: the trace repeats it for every included occurrence (R-22).
+    ("policy-corpus", item("kb:blank-eligibility", "evidence.knowledge", "A chunk with a blank eligibility note.", eligibility=" "), "invalid_structure"),
     ("policy-corpus", item("kb:bad-date", "evidence.knowledge", "Impossible date.", freshness="2026-02-30T12:00:00Z"), "invalid_structure"),
     # Timestamps follow the portable profile in conformance/README.md, whatever a format checker allows.
     ("policy-corpus", item("kb:leap-second", "evidence.knowledge", "A leap second.", freshness="2016-12-31T23:59:60Z"), "invalid_structure"),
