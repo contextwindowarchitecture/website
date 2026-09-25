@@ -47,7 +47,7 @@
   {
     "id": "R-10",
     "scope": "assembler",
-    "note": "Checks untrusted marking, excludes it from governance, and renders it as material."
+    "note": "Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole; delimiting material pasted into a body is the application's job."
   },
   {
     "id": "R-11",

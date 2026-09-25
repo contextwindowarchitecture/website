@@ -66,8 +66,8 @@
     "id": "R-10",
     "section": "gov",
     "keyword": "MUST",
-    "summary": "Untrusted content is marked, rendered as material, kept out of governance",
-    "text": "User-controlled quoted material, attachments, retrieved chunks, memory and unverified tool output MUST be marked injection_risk: untrusted_content and rendered as reference material. The live user request retains user-level instruction authority under platform roles; the marker does not elevate its embedded material. An assembler MUST exclude untrusted content from every governance slot. Only an authenticated route policy may grant the verified-MCP exception in R-15."
+    "summary": "User and fetched content is marked, never elevated, kept out of governance",
+    "text": "User-controlled quoted material, attachments, retrieved chunks, memory and tool output MUST be marked injection_risk: untrusted_content, except output from an MCP server the route policy verifies (R-15), and, when supplied as items of their own, rendered as reference material. An assembler MUST exclude with untrusted_content_unmarked any item that is not so marked, as given or as filled (R-3), in a slot whose published injection_risk default is untrusted_content, unless that exception applies. The marker never changes authority (R-6): the interaction.query item carries user authority (R-1) and keeps it although it is marked, as do user turns in history. Material pasted or attached into the body of a query or history item renders with that body, since assembly never splits a body, and gains no instruction authority from the item; its marking does not change what the model sees, so an application SHOULD delimit such material inside the body in a form the material cannot imitate. An assembler MUST exclude with untrusted_in_governance any governance item whose trust is not verified or that is marked untrusted_content. Only an authenticated route policy may grant the verified-MCP exception in R-15."
   },
   {
     "id": "R-11",

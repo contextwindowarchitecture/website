@@ -858,7 +858,7 @@ const PLANES = [
 
 /* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
 const SLOTS = [
-  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler excludes untrusted content here.", "authority governing\ntier protected\nlineage verbatim"],
+  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. The assembler excludes items that aren't verified, or that carry the injection marker, here.", "authority governing\ntier protected\nlineage verbatim"],
   ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences — each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Claims the user made about themselves are marked as claims, not as verified state.", "authority state\ntier droppable\nscope user · session"],
   ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, and inside its freshness limits. Where the route asks for it, exact duplicates go after conflicts are resolved (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
   ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When they disagree, canonical state wins over any recollection.", "authority state\ntier protected\nowner application"],
@@ -1113,7 +1113,7 @@ const EVIDENCE_STAGES = [
 
 const ITEM_FIELDS = [
   ["provenance", "Which document, turn, tool call, database field, or memory write it came from, and which version."],
-  ["authority", "Exactly one of seven values: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content."],
+  ["authority", "Exactly one of seven values: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted. Only governing and user can instruct."],
   ["freshness", "freshness records observation time; expires is the separate expiration deadline. Expired items are excluded rather than aged silently."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
   ["eligibility", "A short note on why this item belongs in the request, for whoever reads the trace. It isn't code; the route owns the rule that actually decides (R-3)."],
@@ -1122,7 +1122,7 @@ const ITEM_FIELDS = [
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
   ["trust", "Verified, unverified, or untrusted: the producer's own claim about its source, so it proves nothing (R-15). Only the governance gate reads it, which admits verified items alone (R-10). It never decides who can instruct or which fact wins."],
   ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
-  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10)."]
+  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
 ];
 
 

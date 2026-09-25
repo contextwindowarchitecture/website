@@ -1166,7 +1166,7 @@ export const REASONS = [
     "code": "untrusted_content_unmarked",
     "kind": "exclusion",
     "rule": "R-10",
-    "text": "User-controlled, retrieved or tool content is not marked injection_risk: untrusted_content, and the route has not verified its server."
+    "text": "The item is in a slot whose published injection_risk default is untrusted_content (evidence.knowledge, evidence.tool_results, interaction.memory, interaction.history or interaction.query) but is not marked untrusted_content, and no MCP server the route verified produced it (R-10, R-15)."
   },
   {
     "code": "protected_tier_changed",

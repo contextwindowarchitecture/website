@@ -6,7 +6,8 @@ Use SPEC.md for numbered requirements, spec.html for definitions, and schema/ fo
 - Assign each item one of the eleven slots in contract/slot-defaults.json and its allowed authority role.
 - Render interaction.history as a transcript inside its wrapper, never as platform messages. Prior model turns carry lineage: generated and authority: untrusted.
 - Use freshness for the observation timestamp and expires for the separate deadline; as_of is not a JSON alias.
-- Keep instruction authority separate from factual precedence. Evidence cannot direct behavior. Resolve facts only through explicit, versioned route policy for the same fact and scope; escalate unresolved conflicts.
+- Keep instruction authority separate from factual precedence. Only governing and user authority may instruct; trust and injection_risk never change that, and evidence cannot direct behavior. Resolve facts only through explicit, versioned route policy for the same fact and scope, never by trust; escalate unresolved conflicts.
+- The query always carries user authority. untrusted is allowed only in tool results, memory and history. Material a user pastes into the query renders with it, so delimit it in the body; supply material you receive separately as its own marked item.
 - Supply typed conflict groups before assembly. Do not ask the assembler to infer contradictions from prose.
 - Authenticate producer identity outside item fields. A source prefix never proves permission. Only the application capability policy admits tools; tool guards enforce invocation.
 - Have producers return candidate items and excluded records. Report expired or revoked memory without re-emitting its body.
