@@ -507,6 +507,20 @@ test('prior model turns in history carry untrusted authority; user turns keep us
   assert.equal(checkItem({ ...reply, authority: 'untrusted' }, context).valid, true);
 });
 
+test('untrusted is an exception only in tool results, memory and history; the query always carries user (R-1)', () => {
+  const own = { 'evidence.tool_results': 'observation', 'interaction.memory': 'generated', 'interaction.history': 'user', 'interaction.query': 'user',
+    'state.user': 'state', 'state.task': 'state', 'evidence.knowledge': 'reference_only' };
+  const lowerable = new Set(['evidence.tool_results', 'interaction.memory', 'interaction.history']);
+  for (const [slot, authority] of Object.entries(own)) {
+    const candidate = { ...item, id: `x:${slot}`, slot, authority, injection_risk: slot.startsWith('state.') ? 'none' : 'untrusted_content' };
+    delete candidate.tier;
+    if (slot !== 'evidence.knowledge') delete candidate.relevance;
+    assert.equal(checkItem(candidate, context).valid, true, `${slot} with ${authority}`);
+    const lowered = checkItem({ ...candidate, authority: 'untrusted' }, context).findings.map(f => f.reason);
+    assert.deepEqual(lowered, lowerable.has(slot) ? [] : ['authority_not_allowed'], slot);
+  }
+});
+
 test('only route policy can raise a tier; items may lower non-protected tiers', () => {
   const reason = (candidate, ctx = context) => checkItem(candidate, ctx).findings.map(f => f.reason);
   assert.deepEqual(reason({ ...item, tier: 'protected' }), ['tier_upgrade_not_allowed']);

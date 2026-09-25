@@ -1076,7 +1076,7 @@ const AUTHORITY = [
   ["Reference evidence", "Retrieved chunks. Informs the answer; never directs behaviour."],
   ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
   ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
-  ["Untrusted content", "Prior model turns in history, and anything a producer wants handled with the least privilege. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
+  ["Untrusted (least privilege)", "Prior model turns in history, which must carry it, and any other item in tool results, memory or history whose producer wants it handled with the least privilege. It keeps the item out of an instruction group's peers and changes nothing else. Governance, knowledge, state and the query never carry it. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
 ];
 
 const CONFLICTS = [
@@ -1120,7 +1120,7 @@ const ITEM_FIELDS = [
   ["budget", "How much it may consume, which tier it sits in, and what shortens first under pressure."],
   ["conflict_policy", "For permitted instruction peers: this one defers, governs, or forces escalation."],
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
-  ["trust", "Verified, unverified, or untrusted. Untrusted content can never issue instructions."],
+  ["trust", "Verified, unverified, or untrusted: the producer's own claim about its source, so it proves nothing (R-15). Only the governance gate reads it, which admits verified items alone (R-10). It never decides who can instruct or which fact wins."],
   ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
   ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10)."]
 ];

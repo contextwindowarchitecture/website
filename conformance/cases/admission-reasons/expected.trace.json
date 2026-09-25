@@ -9,8 +9,8 @@
     "reserved_output": 1200
   },
   "result": {
-    "input_tokens": 112,
-    "hash": "87d0382bd47f2b8f70517fa6d861bb23b87f6a245c8338ceb3fe174fff911253"
+    "input_tokens": 139,
+    "hash": "5f30634d7a9eb27cdea7ecf6446fefca4d2546a1ad6f4010e22bb432773369b5"
   },
   "included": [
     {
@@ -84,9 +84,30 @@
       "eligibility": "route-policy"
     },
     {
+      "slot": "evidence.tool_results",
+      "item_id": "obs:untrusted",
+      "tokens": 4,
+      "source_version": "1",
+      "eligibility": "route-policy"
+    },
+    {
       "slot": "interaction.memory",
       "item_id": "m:ok",
       "tokens": 4,
+      "source_version": "1",
+      "eligibility": "route-policy"
+    },
+    {
+      "slot": "interaction.memory",
+      "item_id": "m:untrusted",
+      "tokens": 7,
+      "source_version": "1",
+      "eligibility": "route-policy"
+    },
+    {
+      "slot": "interaction.history",
+      "item_id": "turn:16",
+      "tokens": 7,
       "source_version": "1",
       "eligibility": "route-policy"
     },
@@ -140,6 +161,12 @@
       "reason": "authority_not_allowed",
       "stage": "assembler",
       "slot": "interaction.history"
+    },
+    {
+      "item_id": "turn:18u",
+      "reason": "authority_not_allowed",
+      "stage": "assembler",
+      "slot": "interaction.query"
     },
     {
       "item_id": "cap:refund-direct",
@@ -434,6 +461,12 @@
       "slot": "state.task"
     },
     {
+      "item_id": "task:untrusted",
+      "reason": "authority_not_allowed",
+      "stage": "assembler",
+      "slot": "state.task"
+    },
+    {
       "item_id": "user:other",
       "reason": "out_of_scope",
       "stage": "assembler",
@@ -451,7 +484,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "0bfeaa9375a7b46c51095080f073fe1f5620f77396afc63449616892526d026e"
+    "snapshot_digest": "b05ac031f06550b90520c1dfee1f9c4ac5d10d8095d173524e2d43403926ab60"
   },
   "defaults_filled": [
     {

@@ -4,7 +4,7 @@ Generated from `contract/requirements.json`. The [Spec page](./spec.html) provid
 
 ## R-1: One slot and one authority role per item
 
-Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, except that prior model turns in history, marked lineage: generated, MUST carry untrusted. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking.
+Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, with two exceptions: prior model turns in history, marked lineage: generated, MUST carry untrusted, and any other item in evidence.tool_results, interaction.memory or interaction.history MAY carry untrusted instead. An assembler MUST exclude any other value from that set with authority_not_allowed. untrusted only keeps an item out of an instruction group's peers, so a group neither lets it prevail nor excludes it (R-6, R-11); every other rule of its slot still applies. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking.
 
 ## R-2: Required fields and canonical JSON shape
 

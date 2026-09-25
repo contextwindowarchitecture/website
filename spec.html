@@ -371,6 +371,7 @@
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-09-25 · one field, one decision</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>Two conflict checks left five questions about authority, trust and the injection marker that only the README, the cases or a careful reading could answer. The requirements now answer them, and each field decides one thing.</li>
+            <li>R-1: untrusted used to be allowed in every slot outside governance and knowledge, beside a MUST that each slot carry its own role, with nothing saying which won. Now it is an explicit exception for tool results, memory and history. State never carries it, because the application writes state (R-8). Nor does the query: an untrusted query still rendered as the live user turn, where the model takes its orders, while the spec said it couldn't instruct. Both are now excluded with authority_not_allowed, which is new behaviour; no case carried either. admission-reasons gains rows for both, and for untrusted items admitted in the three slots that allow it.</li>
             <li>R-6: authority alone decides who may instruct: governing and user items, and nothing else. "Untrusted content" used to name the authority value, the marker and the trust field at once. An item's trust and injection_risk never add or remove that standing, so a marked history turn with user authority is a peer like any other. R-11 now defines an instruction group's peers, and says a group with one peer or none is decided by authority. Nothing behaves differently; the conflict-instruction case gains g-trust-blind to pin it.</li>
             <li>R-11: in a fact group, a member is eligible exactly when its producer is listed and it carries the policy's scope keys, and freshness breaks a tie only among the leaders from the top-ranked producer. Trust, the marker and the route's verified flag are never read; a route that prefers a verified server lists it first. The old "unverified claim" meant an ineligible member all along. Nothing behaves differently; the conflict-fact case gains f-trust-blind to pin it.</li>
           </ul>
@@ -511,7 +512,7 @@ const SLOTS = [
   ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act."],
   ["governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract. They're droppable, so under budget pressure they go before anything compressible."],
   ["governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates."],
-  ["interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted. It is the trigger for generation, placed wherever the route's profile puts it."]
+  ["interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it."]
 ];
 const AUTHORITY = [
   ["Governing instruction", "governing", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
@@ -520,7 +521,7 @@ const AUTHORITY = [
   ["Reference evidence", "reference_only", "Retrieved chunks, which inform the answer but never direct behaviour."],
   ["Tool observation", "observation", "What a tool returned: evidence about the world, not permission to act on it."],
   ["Generated memory", "generated", "Summaries and inferences the system wrote. They are fallible, they expire, and they can be revoked."],
-  ["Untrusted content", "untrusted", "Prior model turns in history, and anything a producer wants handled with the least privilege. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
+  ["Untrusted (least privilege)", "untrusted", "Prior model turns in history, which must carry it, and any other item in tool results, memory or history whose producer wants it handled with the least privilege. It keeps the item out of an instruction group's peers and changes nothing else. Governance, knowledge, state and the query never carry it. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
 ];
 const CONFLICTS = [
   ["System or developer policy vs user request", "Higher-authority policy governs."],
@@ -543,7 +544,7 @@ const STAGES = [
 ];
 const ITEM_FIELDS = [
   ["provenance", "source and source_version: which document, turn, tool call, database field or memory write it came from, and which version."],
-  ["authority", "Exactly one of the seven roles in section 3.1: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted content. No other value is valid."],
+  ["authority", "Exactly one of the seven roles in section 3.1: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted. Each slot takes its own role; tool results, memory and history may take untrusted instead (R-1). Only governing and user can instruct. No other value is valid."],
   ["freshness", "freshness records when content was observed or true; expires is the separate expiration deadline. as_of is prose, not a JSON alias."],
   ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
   ["eligibility", "A short note on why this item belongs in the request, for whoever reads the trace. It isn't code; the route owns the rule that actually decides (R-3)."],
@@ -570,7 +571,7 @@ const RULES = [
     "model",
     "MUST",
     "One slot and one authority role per item",
-    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, except that prior model turns in history, marked lineage: generated, MUST carry untrusted. Non-governance slots other than knowledge MAY carry untrusted to reduce handling privileges. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
+    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, with two exceptions: prior model turns in history, marked lineage: generated, MUST carry untrusted, and any other item in evidence.tool_results, interaction.memory or interaction.history MAY carry untrusted instead. An assembler MUST exclude any other value from that set with authority_not_allowed. untrusted only keeps an item out of an instruction group's peers, so a group neither lets it prevail nor excludes it (R-6, R-11); every other rule of its slot still applies. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
   ],
   [
     "model",

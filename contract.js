@@ -54,11 +54,16 @@ function fillDefaults(item) {
   };
 }
 
+// R-1: only these slots may carry untrusted instead of their own role. Not governance or knowledge, not state,
+// which the application writes (R-8), and not the query, which always carries user.
+const UNTRUSTED_ALLOWED = new Set(['evidence.tool_results', 'interaction.memory', 'interaction.history']);
+
 function checkAuthority(item) {
   const expected = SLOT_DEFAULTS[item.slot].authority;
   const governing = item.slot.startsWith('governance.');
-  if (item.authority !== expected && (governing || item.authority !== 'untrusted')) {
-    return [failure('authority_not_allowed', `This slot requires ${expected}${governing ? '' : ' or untrusted'}.`, 1)];
+  const lowerable = UNTRUSTED_ALLOWED.has(item.slot);
+  if (item.authority !== expected && !(lowerable && item.authority === 'untrusted')) {
+    return [failure('authority_not_allowed', `This slot requires ${expected}${lowerable ? ' or untrusted' : ''}.`, 1)];
   }
   if (item.slot === 'interaction.history' && item.lineage === 'generated' && item.authority !== 'untrusted') {
     return [failure('authority_not_allowed', 'Prior model turns in history carry untrusted authority.', 1)];
@@ -125,9 +130,6 @@ export function checkItem(candidate, context = {}) {
   const verifiedMcp = context.producer?.authenticated && context.producer.kind === 'mcp' && context.verifiedServer === true;
   if (SLOT_DEFAULTS[item.slot].injection_risk === 'untrusted_content' && item.injection_risk !== 'untrusted_content' && !verifiedMcp) {
     findings.push(failure('untrusted_content_unmarked', 'User-controlled and retrieved content must remain marked as untrusted content.', 10));
-  }
-  if (item.slot === 'evidence.knowledge' && item.authority !== 'reference_only') {
-    findings.push(failure('authority_not_allowed', 'Retrieved chunks carry reference_only authority.', 1));
   }
   if (item.variants.some(variant => variant.id === item.id) || new Set(item.variants.map(v => v.id)).size !== item.variants.length) {
     findings.push(failure('duplicate_variant_id', 'Variants need distinct IDs, different from the item ID.', 18));
