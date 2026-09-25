@@ -75,7 +75,7 @@
           },
           "verified": {
             "type": "boolean",
-            "description": "For kind mcp only: the route has verified this server, so its output need not be marked untrusted_content (R-15). Default false."
+            "description": "For kind mcp only: the route has verified this server, so its output need not be marked untrusted_content (R-15). It does nothing else: it never ranks the server's claims in a fact group (R-11). Default false."
           }
         }
       }
@@ -202,7 +202,7 @@
               "minLength": 1,
               "pattern": "[^\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]"
             },
-            "description": "Producers whose claims about this fact are eligible, by the identity the application authenticated, most authoritative first. A member from any other producer is ineligible: it cannot win and is excluded when another member does. item.source never counts (R-15)."
+            "description": "Producers whose claims about this fact are eligible, by the identity the application authenticated, most authoritative first. A member from any other producer is ineligible: it cannot win and is excluded when another member does. item.source never counts (R-15), and neither do a member's trust and injection_risk or the producer's verified flag (R-11): a route that prefers a verified server lists it earlier."
           },
           "scope": {
             "type": "array",

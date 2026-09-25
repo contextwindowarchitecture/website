@@ -88,7 +88,7 @@ Conflict resolution runs right after admission (R-6, R-11). It acts only on the 
 
 **Instruction groups.**
 
-1. Only `governing` and `user` authority may instruct. Members with any other authority stay in the payload as material and take no part in the decision.
+1. Only `governing` and `user` authority may instruct (R-6). Members with any other authority, `untrusted` included, stay in the payload as material and take no part in the decision. A member's `trust` and `injection_risk` are never read here: a marked history turn with `authority: user` may instruct like any other user member.
 2. The *peers* are the members at the highest instructing authority present: `governing`, or else `user`. With one peer, or none, the group is decided by authority, and nothing is excluded: `decided_by: authority`, `resolution: resolved`, and `winner` is that peer when there is one.
 3. With two or more peers, if exactly one peer's `conflict_policy` is `governs` and every other peer's is `defers`, the deferring peers are excluded with `conflict_deferred`: `decided_by: policy`, `resolution: resolved`, `winner` the governing peer. Any other combination escalates: two peers that govern, peers that all defer, or any peer whose `conflict_policy` is `escalate`. A lone peer is decided by authority in step 2 whatever its `conflict_policy` says, so `escalate` takes effect only against another peer.
 4. Only peers are excluded. A member below the peers, such as a `user` member when governing peers are present, stays in the payload however the peers are decided.
@@ -98,6 +98,8 @@ Conflict resolution runs right after admission (R-6, R-11). It acts only on the 
 1. A member is *eligible* when the authenticated producer of its batch appears in `precedence` and its `scope` carries every key the policy's `scope` lists.
 2. The *leaders* are the eligible members whose producer comes earliest in `precedence`. A single leader wins: `decided_by: policy`. When there are several, the policy has `freshness_tiebreak: true`, and one leader's `freshness` is strictly later than every other leader's, that leader wins: `decided_by: freshness`. Otherwise, and when no member is eligible, the group escalates.
 3. Every other member, eligible or not, is excluded with `conflict_lost`. The result has `resolution: resolved` and `winner` the winning member.
+
+Nothing else decides eligibility or precedence: not a member's `authority`, `trust` or `injection_risk`, and not its producer's `verified` flag (R-11). A route that wants a verified server's output to win lists that producer earlier in `precedence`.
 
 **Protected members.** Resolution never excludes a protected item (R-16's tier, as Fitting defines it). A decision that would exclude one escalates instead, and nothing in the group is excluded.
 

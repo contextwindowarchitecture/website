@@ -216,6 +216,38 @@
           "lineage": "verbatim",
           "eligibility": "route-policy",
           "injection_risk": "untrusted_content"
+        },
+        {
+          "id": "turn:13",
+          "slot": "interaction.history",
+          "source": "src:turn:13",
+          "source_version": "1",
+          "authority": "user",
+          "trust": "untrusted",
+          "freshness": "2026-09-22T11:53:00Z",
+          "body": "Use bullet points in your answers.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content"
+        },
+        {
+          "id": "turn:14",
+          "slot": "interaction.history",
+          "source": "src:turn:14",
+          "source_version": "1",
+          "authority": "user",
+          "trust": "verified",
+          "freshness": "2026-09-22T11:54:00Z",
+          "body": "Plain paragraphs, please.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content"
         }
       ],
       "excluded": []
@@ -689,6 +721,14 @@
         "ex:sign",
         "ex:unsigned",
         "turn:11"
+      ]
+    },
+    {
+      "id": "g-trust-blind",
+      "kind": "instruction",
+      "items": [
+        "turn:13",
+        "turn:14"
       ]
     }
   ]

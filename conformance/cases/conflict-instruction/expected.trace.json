@@ -9,8 +9,8 @@
     "reserved_output": 1024
   },
   "result": {
-    "input_tokens": 218,
-    "hash": "d92c08e24675f9e651a469eeda72c306042d69c74fd858e795aab774e5aa1f20"
+    "input_tokens": 227,
+    "hash": "e0d6a047c19ef93538d53ebc817e5da95750e78e8df33ea75e775f2d76a0644e"
   },
   "included": [
     {
@@ -148,6 +148,13 @@
     },
     {
       "slot": "interaction.history",
+      "item_id": "turn:13",
+      "tokens": 6,
+      "source_version": "1",
+      "eligibility": "route-policy"
+    },
+    {
+      "slot": "interaction.history",
       "item_id": "turn:9",
       "tokens": 4,
       "source_version": "1",
@@ -189,6 +196,12 @@
     },
     {
       "item_id": "turn:12",
+      "reason": "conflict_deferred",
+      "stage": "assembler",
+      "slot": "interaction.history"
+    },
+    {
+      "item_id": "turn:14",
       "reason": "conflict_deferred",
       "stage": "assembler",
       "slot": "interaction.history"
@@ -303,6 +316,17 @@
       "resolution": "surfaced"
     },
     {
+      "group_id": "g-trust-blind",
+      "kind": "instruction",
+      "items": [
+        "turn:13",
+        "turn:14"
+      ],
+      "decided_by": "policy",
+      "resolution": "resolved",
+      "winner": "turn:13"
+    },
+    {
       "group_id": "g-two-govern",
       "kind": "instruction",
       "items": [
@@ -334,7 +358,7 @@
     "route_policy_version": "conflict-instruction/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "71aa64b91b6478cb4534610376a639706ed38716e6151bb14140b1085eaefc7e"
+    "snapshot_digest": "eb17c1911d40a43cdbf6d43f4682d69ce3c8efa5b18094e8a1e9c212c830d183"
   },
   "defaults_filled": []
 }

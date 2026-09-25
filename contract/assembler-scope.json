@@ -27,7 +27,7 @@
   {
     "id": "R-6",
     "scope": "assembler",
-    "note": "Classifies each declared group as instruction or fact and resolves it by authority or route policy; state, evidence, memory and untrusted content never render as instructions."
+    "note": "Classifies each declared group as instruction or fact and resolves it by authority or route policy; only governing and user items are instruction peers, and trust and the injection marker never change that."
   },
   {
     "id": "R-7",

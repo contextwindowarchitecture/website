@@ -252,7 +252,8 @@ CASES = [
         "rules": ["R-3", "R-6", "R-7", "R-11", "R-21"],
         "description": "Instruction groups: authority records without excluding, one governing peer excludes the peers that defer, "
                        "evidence never instructs, and a group with two governing peers, a peer that says escalate, peers that all defer or a protected deferring peer is surfaced and marked; "
-                       "a lone peer wins by authority whatever its conflict_policy, and a user member below peers resolved by policy stays.",
+                       "a lone peer wins by authority whatever its conflict_policy, a user member below peers resolved by policy stays, "
+                       "and trust and the injection marker never decide who may instruct.",
         "policy": {"on_unresolved_instruction": "surface"},
         "items": [
             (item("policy:v12", "governance.instructions", POLICY_TEXT), REG, "admit"),
@@ -282,6 +283,9 @@ CASES = [
             (item("ex:sign", "governance.examples", "Example: an answer signed by the support team.", conflict_policy="governs"), REG, "admit"),
             (item("ex:unsigned", "governance.examples", "Example: an answer with no signature."), REG, "admit"),
             (item("turn:11", "interaction.history", "Sign your answers with your own name.", freshness="2026-09-22T11:48:00Z"), CONV, "admit"),
+            (item("turn:13", "interaction.history", "Use bullet points in your answers.", conflict_policy="governs", trust="untrusted",
+                  freshness="2026-09-22T11:53:00Z"), CONV, "admit"),
+            (item("turn:14", "interaction.history", "Plain paragraphs, please.", trust="verified", freshness="2026-09-22T11:54:00Z"), CONV, "admit"),
         ],
         "groups": [
             {"id": "g-authority", "kind": "instruction", "items": ["policy:v12", "turn:18"],
@@ -312,6 +316,10 @@ CASES = [
             # Peers resolved by policy exclude only deferring peers; a user member below them stays.
             {"id": "g-mixed", "kind": "instruction", "items": ["ex:sign", "ex:unsigned", "turn:11"],
              "decided_by": "policy", "resolution": "resolved", "winner": "ex:sign", "excluded": {"ex:unsigned": "conflict_deferred"}},
+            # Authority alone decides who may instruct (R-6): trust and the injection marker never do,
+            # so a marked user turn that claims untrusted still governs a verified one that defers.
+            {"id": "g-trust-blind", "kind": "instruction", "items": ["turn:13", "turn:14"],
+             "decided_by": "policy", "resolution": "resolved", "winner": "turn:13", "excluded": {"turn:14": "conflict_deferred"}},
         ],
     },
     {
@@ -319,7 +327,7 @@ CASES = [
         "rules": ["R-2", "R-6", "R-11", "R-15", "R-21"],
         "description": "Fact groups: the authenticated producer ranked first in route precedence wins, scope and unlisted producers make "
                        "members ineligible, freshness breaks ties only when allowed and at full precision, and ties, groups with no "
-                       "eligible member and protected losers are surfaced and marked.",
+                       "eligible member and protected losers are surfaced and marked; trust never decides a fact.",
         "policy": {"facts": {
             "refund.window": {"precedence": [CORPUS, WIKI], "scope": ["tenant"], "on_unresolved": "surface"},
             "refund.fee": {"precedence": [CRM], "freshness_tiebreak": True, "on_unresolved": "surface"},
@@ -328,6 +336,7 @@ CASES = [
             "refund.channel": {"precedence": [CRM], "on_unresolved": "surface"},
             "task.stage": {"precedence": [CRM, STATE], "on_unresolved": "surface"},
             "refund.limit": {"precedence": [CORPUS], "on_unresolved": "surface"},
+            "refund.method": {"precedence": [CRM], "freshness_tiebreak": True, "on_unresolved": "surface"},
         }},
         "items": [
             (item("policy:v12", "governance.instructions", POLICY_TEXT), REG, "admit"),
@@ -347,6 +356,8 @@ CASES = [
             (item("obs:stage", "evidence.tool_results", "refund request 8821: approved"), CRM, "admit"),
             (kb("kb:limit-old", "Refunds are capped at 100 EUR.", expires="2026-09-01T00:00:00Z"), CORPUS, "expired"),
             (kb("kb:limit", "Refunds are capped at 500 EUR."), CORPUS, "admit"),
+            (item("obs:method-a", "evidence.tool_results", "refund method: bank transfer", trust="verified", freshness="2026-09-22T10:00:00Z"), CRM, "admit"),
+            (item("obs:method-b", "evidence.tool_results", "refund method: original card", trust="untrusted", freshness="2026-09-22T10:05:00Z"), CRM, "admit"),
         ],
         "groups": [
             {"id": "f-precedence", "kind": "fact", "fact": "refund.window", "items": ["wiki:window", "kb:window"],
@@ -364,6 +375,9 @@ CASES = [
              "decided_by": "escalated", "resolution": "surfaced"},
             {"id": "f-moot", "kind": "fact", "fact": "refund.limit", "items": ["kb:limit-old", "kb:limit"],
              "decided_by": "moot", "resolution": "moot"},
+            # Trust is never read (R-11): the newer leader wins the tie-break although it says untrusted.
+            {"id": "f-trust-blind", "kind": "fact", "fact": "refund.method", "items": ["obs:method-a", "obs:method-b"],
+             "decided_by": "freshness", "resolution": "resolved", "winner": "obs:method-b", "excluded": {"obs:method-a": "conflict_lost"}},
         ],
     },
     {
