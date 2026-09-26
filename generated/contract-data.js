@@ -1148,7 +1148,7 @@ export const REASONS = [
     "code": "authority_not_allowed",
     "kind": "exclusion",
     "rule": "R-1",
-    "text": "The authority value is not allowed for this slot or authenticated producer. Each slot takes its own role, a prior model turn in history takes untrusted, and only other items in tool results, memory and history may carry untrusted instead (R-1): never governance, knowledge, state or the query. These roles are not a factual ranking."
+    "text": "The authority value is not allowed for this slot. Each slot takes its own role, a prior model turn in history takes untrusted, and only other items in tool results, memory and history may carry untrusted instead (R-1): never governance, knowledge, state or the query. These roles are not a factual ranking."
   },
   {
     "code": "capability_not_allowed",

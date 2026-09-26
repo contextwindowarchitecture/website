@@ -69,7 +69,7 @@ function checkAuthority(item) {
     return [failure('authority_not_allowed', 'Prior model turns in history carry untrusted authority.', 1)];
   }
   if (governing && (item.injection_risk !== 'none' || item.trust !== 'verified')) {
-    return [failure('untrusted_in_governance', 'Governance requires verified, trusted content.', 10)];
+    return [failure('untrusted_in_governance', 'Governance items need trust: verified and injection_risk: none (R-10).', 10)];
   }
   return [];
 }
@@ -129,7 +129,7 @@ export function checkItem(candidate, context = {}) {
   const findings = [...checkAuthority(item), ...checkLifetime(item, context.assemblyTime, context.clockSkewSeconds), ...checkProducer(item, context)];
   const verifiedMcp = context.producer?.authenticated && context.producer.kind === 'mcp' && context.verifiedServer === true;
   if (SLOT_DEFAULTS[item.slot].injection_risk === 'untrusted_content' && item.injection_risk !== 'untrusted_content' && !verifiedMcp) {
-    findings.push(failure('untrusted_content_unmarked', 'User-controlled and retrieved content must remain marked as untrusted content.', 10));
+    findings.push(failure('untrusted_content_unmarked', 'Items in this slot must be marked injection_risk: untrusted_content unless a verified MCP server produced them (R-10, R-15).', 10));
   }
   if (item.variants.some(variant => variant.id === item.id) || new Set(item.variants.map(v => v.id)).size !== item.variants.length) {
     findings.push(failure('duplicate_variant_id', 'Variants need distinct IDs, different from the item ID.', 18));

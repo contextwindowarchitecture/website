@@ -84,7 +84,7 @@ A refused trace has `result: null`, `included: []` and `compressed: []` (R-17). 
 
 Conflict resolution runs right after admission (R-6, R-11). It acts only on the groups the application declared, and it never reads a body. A group's *members* are the items it names that admission admitted. The trace's `items` lists every id the group names, in `id` order.
 
-**Moot.** A group with fewer than two members changes nothing: `decided_by: moot`, `resolution: moot`.
+**Moot.** A group with fewer than two members changes nothing: `decided_by: moot`, `resolution: moot`. The steps below decide only groups that are not moot (R-11).
 
 **Instruction groups.**
 
