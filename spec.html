@@ -376,6 +376,7 @@
             <li>R-2: the sentence about normalizing legacy names is gone. No legacy name was ever defined, and every schema is closed.</li>
             <li>R-12: an evidence item is omitted for budget when its row says over_budget, whether for the payload, its token_budget or its slot's max_tokens. The evidence-cap-omitted case pins it.</li>
             <li>Wording only: R-1 names unknown_slot and unknown_authority, R-2 missing_field and invalid_structure, R-4 required_slot_missing, R-8 stale_state, R-9 expired and revoked, R-17 protected_content_over_budget and R-18 duplicate_variant_id, so every code in contract/reasons.json is named by the rule it cites. R-2 says plainly that an item is expired when expires is at or before assembly_time. R-10 says marked items render inside their slot's wrapper and never in a platform role, where it said "as reference material". R-16 no longer says a profile can lower a tier, since profiles carry none. R-24 runs after supersession, as the README always said.</li>
+            <li>conformance/check.py checks the contract's own consistency: schemas, digests, hashes, rejections, reason-code traceability and the generated copies of the requirements.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">

@@ -13,6 +13,8 @@ Each directory under `rejections/` holds a `case.json` and a `snapshot.json` tha
 
 Some cases have a generator in `generators/`. It holds a table of each candidate's intended outcome, and it derives the expected trace and payload from that table rather than from any assembler's logic. Regenerate a case with `python3 conformance/generators/<case>.py`, and review the diff.
 
+`check.py` checks the contract's own consistency: every case and rejection against the schemas, digests and hashes against their definitions here, each rejection against exactly one Snapshot check, reason codes against the requirements that cite them, and `SPEC.md` and the spec page against `contract/requirements.json`. Run `python3 conformance/check.py` after editing any of them, or `python3 conformance/check.py --write` to regenerate the derived copies; it needs the `jsonschema` package.
+
 ## Running a case
 
 1. Validate `snapshot.json` and load it. A snapshot that fails its schemas or any check in Snapshot checks is rejected before assembly and has no trace (R-17). Resolve `tokenizer` and `renderer` by ID; an implementation that does not provide one skips the case and reports it as skipped, not passed.
