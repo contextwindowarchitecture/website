@@ -667,7 +667,7 @@ test('each published rejection case breaks exactly one snapshot check (R-17)', a
 });
 
 test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
-  const { source, cases_at_run: _atRun, ...report } = await read('contract/assembler-conformance.json');
+  const { report } = await read('contract/assembler-conformance.json');
   for (const [row, valid] of [
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'rejected' }, true],
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'failed', detail: 'assembled a payload' }, true],

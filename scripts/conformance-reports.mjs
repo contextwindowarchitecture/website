@@ -65,8 +65,10 @@ export function remoteOf(checkout) {
   }
 }
 
-/** A report as the website stores it: its source, the digests of the cases it ran, and the report itself. */
+/** A report as the website stores it: { source, cases_at_run, report }. source names the implementation's checkout,
+ * cases_at_run holds the digests of the cases as they were at the website commit it ran against, and report is the
+ * implementation's conformance-report.json untouched, so it validates against conformance_report.schema.json on its own. */
 export function imported(source, report, root = '.') {
   const atRun = report.contract.dirty ? null : caseDigestsAt(report.contract.website_commit, root);
-  return { source, cases_at_run: atRun, ...report };
+  return { source, cases_at_run: atRun, report };
 }

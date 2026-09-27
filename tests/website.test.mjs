@@ -105,7 +105,7 @@ test('the status matrix counts, per implementation, the published cases each imp
   const { caseLines } = (await component('assembler.html')).renderVals();
   assert.equal(caseLines.length, IMPORTED.length);
   for (const [n, [label, file]] of IMPORTED.entries()) {
-    const { source, cases_at_run: atRun, ...report } = await readJson(file);
+    const { source, cases_at_run: atRun, report } = await readJson(file);
     assert.match(source.commit, /^[0-9a-f]{40}$/, file);
     const outcomes = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
     const passing = new Set(published.filter(c => outcomes.get(c.id) && atRun?.[c.id] === c.digest).map(c => c.id));
@@ -120,6 +120,17 @@ test('the status matrix counts, per implementation, the published cases each imp
     assert.ok(line.includes(`assembler ${source.commit.slice(0, 7)}`), line);
     assert.ok(line.includes(`cases at ${report.contract.website_commit.slice(0, 7)}`), line);
     assert.equal(line.includes('changed since its run'), stale > 0, line);
+  }
+});
+
+test('an imported report is stored whole, valid against its schema, beside its source and the digests of the cases it ran', async () => {
+  const { validateConformanceReportSchema } = await import('../generated/schema-validators.js');
+  for (const [, file] of IMPORTED) {
+    const { source, cases_at_run: atRun, report, ...rest } = await readJson(file);
+    assert.deepEqual(Object.keys(rest), [], `${file} carries only source, cases_at_run and report`);
+    assert.match(source.commit, /^[0-9a-f]{40}$/, file);
+    assert.ok(atRun === null || typeof atRun === 'object', file);
+    assert.equal(validateConformanceReportSchema(report), true, `${file}: ${JSON.stringify(validateConformanceReportSchema.errors)}`);
   }
 });
 

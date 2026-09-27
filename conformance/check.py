@@ -278,8 +278,10 @@ disk_cases = {os.path.basename(d.rstrip("/")) for d in case_dirs}
 disk_rejections = {os.path.basename(d.rstrip("/")) for d in rejection_dirs}
 for path in sorted(glob.glob(os.path.join(ROOT, "contract", "assembler*-conformance.json"))):
     rel = os.path.relpath(path, ROOT)
-    report = json.load(open(path, encoding="utf-8"))
-    if (e := first_error(V_REPORT, report)): warn(f"{rel}: not valid against conformance_report.schema.json: {e}")
+    stored = json.load(open(path, encoding="utf-8"))  # {source, cases_at_run, report}: scripts/conformance-reports.mjs
+    report = stored.get("report") if isinstance(stored, dict) else None
+    if not isinstance(report, dict): warn(f"{rel}: holds no report; import it again with scripts/import-conformance-report.mjs"); continue
+    if (e := first_error(V_REPORT, report)): warn(f"{rel}: report not valid against conformance_report.schema.json: {e}")
     ran = {c["id"] for c in report.get("cases", [])}
     ran_rej = {c["id"] for c in report.get("rejections", [])}
     if disk_cases - ran: warn(f"{rel}: cases not in the report: {sorted(disk_cases - ran)}")

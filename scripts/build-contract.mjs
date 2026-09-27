@@ -99,9 +99,9 @@ const published = (await Promise.all([...await caseFiles('conformance/cases'), .
 const casesFor = id => published.filter(c => c.rules.includes(id));
 const validateReport = ajv.getSchema(conformanceReportSchema.$id);
 const runs = await Promise.all(IMPLEMENTATIONS.map(async ({ label, file }) => {
-  const { source, cases_at_run: atRun, ...report } = await read(file);
+  const { source, cases_at_run: atRun, report } = await read(file);
+  if (report === undefined || atRun === undefined) throw new Error(`${file} has no report or cases_at_run; import it with scripts/import-conformance-report.mjs`);
   if (!validateReport(report)) throw new Error(`${file}: ` + JSON.stringify(validateReport.errors));
-  if (atRun === undefined) throw new Error(`${file} has no cases_at_run; import it with scripts/import-conformance-report.mjs`);
   return { label, source, report, outcomes: tally(report, atRun, published) };
 }));
 const conformance = runs.map(({ label, source, report, outcomes }) => ({

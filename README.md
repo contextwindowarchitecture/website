@@ -25,7 +25,7 @@ npm test
 | `conformance/rejections/` | Snapshots that break exactly one snapshot check; an assembler must reject each before assembly, with no trace (R-17) |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
 | `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |
-| `contract/assembler-status.json`, `contract/assembler-conformance.json` | The Python reference assembler's claimed status per requirement and its conformance report, imported from its `status.json` and `conformance-report.json` with `node scripts/import-assembler-status.mjs ../cwa-assembler` |
+| `contract/assembler-status.json`, `contract/assembler-conformance.json` | The Python reference assembler's claimed status per requirement and its conformance report, imported from its `status.json` and `conformance-report.json` with `node scripts/import-assembler-status.mjs ../cwa-assembler`. An imported report file holds `source`, `cases_at_run` and, untouched under `report`, the implementation's own report |
 | `contract/assembler-ts-conformance.json` | The TypeScript assembler's conformance report, imported with `node scripts/import-conformance-report.mjs ../cwa-assembler-ts contract/assembler-ts-conformance.json` |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
 | `examples/` | Concrete item, producer batch, profiles, payload and matching trace |
