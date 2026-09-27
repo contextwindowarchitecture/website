@@ -106,7 +106,7 @@ const runs = await Promise.all(IMPLEMENTATIONS.map(async ({ label, file }) => {
 }));
 const conformance = runs.map(({ label, source, report, outcomes }) => ({
   label, name: report.implementation.name, version: report.implementation.version, repository: source.repository,
-  commit: source.commit.slice(0, 7), website: report.contract.website_commit.slice(0, 7), total: published.length,
+  sha: source.commit, websiteSha: report.contract.website_commit, total: published.length,
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
 for (const page of ['spec.html', 'assembler.html']) {

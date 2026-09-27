@@ -69,9 +69,9 @@
           <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
             <span role="cell" style="font-size: 14px; font-weight: 600;">{{ i.language }}</span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.scope }}<wbr>{{ i.pkg }}</span><span style="color: var(--muted);">{{ i.version }}</span></span>
-            <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.owner }}<wbr>{{ i.repo }}</span><span style="color: var(--muted);">{{ i.commit }}</span></span>
+            <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><a href="{{ i.repoHref }}" target="_blank" rel="noopener" style="overflow-wrap: anywhere;">{{ i.repo }}</a><a href="{{ i.commitHref }}" target="_blank" rel="noopener">{{ i.commit }}</a></span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="color: {{ i.casesColor }};">{{ i.cases }}</span><span style="color: var(--muted);">{{ i.caseNote }}</span></span>
-            <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">website {{ i.website }}</span>
+            <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">website <a href="{{ i.websiteHref }}" target="_blank" rel="noopener">{{ i.website }}</a></span>
           </div>
         </sc-for>
       </div>
@@ -463,7 +463,11 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","commit":"6ce7260","website":"591f7eb","total":74,"passed":74,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","commit":"a7d6b82","website":"591f7eb","total":74,"passed":74,"stale":0}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0}];
+// Where the published cases live; the table links each implementation's run to the commit its cases came from.
+const WEBSITE = "https://github.com/contextwindowarchitecture/website";
+// scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
+const GITHUB = /^[\w.-]+\/[\w.-]+$/;
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
@@ -492,14 +496,21 @@ class Component extends DCLogic {
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       matrix,
       counts: met.length + " of " + checkable.length + " checkable requirements implemented.",
-      implementations: CONFORMANCE.map(c => ({
-        language: c.label, name: c.name, version: c.version, repository: c.repository, commit: c.commit, website: c.website,
-        // Long names wrap after their slash (a scoped package, an owner/repo) rather than mid-word.
-        scope: c.name.slice(0, c.name.lastIndexOf("/") + 1), pkg: c.name.slice(c.name.lastIndexOf("/") + 1),
-        owner: c.repository.slice(0, c.repository.indexOf("/") + 1), repo: c.repository.slice(c.repository.indexOf("/") + 1),
-        cases: c.passed + " of " + c.total + " published cases pass", casesColor: c.passed === c.total ? "var(--p-evid)" : "var(--accent)",
-        caseNote: c.stale ? c.stale + " changed since its run" : ""
-      }))
+      implementations: CONFORMANCE.map(c => {
+        const github = GITHUB.test(c.repository);
+        const repoHref = github ? "https://github.com/" + c.repository : c.repository;
+        return {
+          language: c.label, name: c.name, version: c.version,
+          // A scoped package name wraps after its slash rather than mid-word.
+          scope: c.name.slice(0, c.name.lastIndexOf("/") + 1), pkg: c.name.slice(c.name.lastIndexOf("/") + 1),
+          // The repository by name, and its commit; a host other than GitHub gets its URL and no commit link.
+          repo: github ? c.repository.split("/")[1] : c.repository, repoHref,
+          commit: c.sha.slice(0, 7), commitHref: github ? repoHref + "/commit/" + c.sha : repoHref,
+          website: c.websiteSha.slice(0, 7), websiteHref: WEBSITE + "/commit/" + c.websiteSha,
+          cases: c.passed + " of " + c.total + " published cases pass", casesColor: c.passed === c.total ? "var(--p-evid)" : "var(--accent)",
+          caseNote: c.stale ? c.stale + " changed since its run" : ""
+        };
+      })
     };
   }
 }

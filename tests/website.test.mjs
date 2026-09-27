@@ -104,6 +104,8 @@ test('the implementations table and status matrix count, per implementation, the
   assert.equal(new Set(published.map(c => c.id)).size, published.length, 'case and rejection ids are distinct');
   const { implementations } = (await component('assembler.html')).renderVals();
   assert.equal(implementations.length, IMPORTED.length);
+  const website = await component('assembler.html', 'WEBSITE');
+  assert.match(website, /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/);
   for (const [n, [label, file]] of IMPORTED.entries()) {
     const { source, cases_at_run: atRun, report } = await readJson(file);
     assert.match(source.commit, /^[0-9a-f]{40}$/, file);
@@ -119,9 +121,12 @@ test('the implementations table and status matrix count, per implementation, the
     assert.equal(row.language, label);
     assert.equal(row.name, report.implementation.name, file);
     assert.equal(row.version, report.implementation.version, file);
-    assert.equal(row.repository, source.repository, file);
+    assert.equal(row.repo, source.repository.split('/')[1], file);
+    assert.equal(row.repoHref, `https://github.com/${source.repository}`, file);
     assert.equal(row.commit, source.commit.slice(0, 7), file);
+    assert.equal(row.commitHref, `https://github.com/${source.repository}/commit/${source.commit}`, file);
     assert.equal(row.website, report.contract.website_commit.slice(0, 7), file);
+    assert.equal(row.websiteHref, `${website}/commit/${report.contract.website_commit}`, file);
     assert.equal(row.cases, `${passing.size} of ${published.length} published cases pass`, file);
     assert.equal(row.caseNote, stale ? `${stale} changed since its run` : '', file);
   }
