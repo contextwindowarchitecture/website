@@ -601,6 +601,20 @@ CASES = [
         "refuse": "evidence_required", "recovery": "retrieve_narrower",
     },
     {
+        "id": "evidence-cap-omitted",
+        "rules": ["R-12", "R-16", "R-17", "R-21", "R-22"],
+        "description": "An evidence item omitted for exceeding its own token_budget counts as omitted for budget: the route requires evidence, the only knowledge item has no variant within its cap, so the cap step omits it although the payload fits, and the refusal recommends precompute_summary and keeps the over_budget row.",
+        "budget": 4096,
+        "policy": {"requires_evidence": True},
+        "items": [
+            (item("policy:v12", "governance.instructions", POLICY_TEXT), "admit"),
+            (item("kb:a", "evidence.knowledge", "Pro plans refund in full within thirty days of purchase for new customers.", relevance=0.9, token_budget=4), "admit"),
+            (item("turn:18", "interaction.query", QUERY), "admit"),
+        ],
+        "caps": [("omit", "kb:a")],
+        "refuse": "evidence_required", "recovery": "precompute_summary",
+    },
+    {
         "id": "placement-unplaced-slot",
         "rules": ["R-20", "R-21", "R-22"],
         "description": "Items in slots the profile does not place are excluded with slot_unplaced after every other admission check, "

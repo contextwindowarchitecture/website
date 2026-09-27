@@ -373,6 +373,7 @@
             <li>A review from an implementer's side found three requirements that could not be met as written and eight reason codes that no requirement named. No rule contradicted another, and the README already settled every ordering. The changes below close the gaps; the conformance cases pin the two that change behaviour.</li>
             <li>R-13: a retrieval producer's candidates go in evidence.knowledge or evidence.tool_results, with the authority R-1 gives that slot. R-13 used to demand reference_only, which R-1 forbids in tool results. A producer of kind retrieval is now gated to the evidence slots, as memory and mcp producers are, whatever the route lists; anything else is excluded with producer_slot_not_allowed. This is new behaviour. admission-reasons gains a retrieval item admitted in tool results, one there with reference_only authority, and one sent to governance.examples.</li>
             <li>R-3: the slot-level eligibility rules, min_relevance, max_age_seconds, required_scope and source_prefix, are the complete eligibility predicate. R-3 used to say the route owns an executable predicate, with nowhere in the route policy to put one, so two assemblers could disagree and both claim R-23. Every other admission check still applies. A future version may add rules or an extension mechanism, as Future work says.</li>
+            <li>R-12: an evidence item is omitted for budget when its row says over_budget, whether for the payload, its token_budget or its slot's max_tokens. The evidence-cap-omitted case pins it.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
@@ -647,7 +648,7 @@ const RULES = [
     "fit",
     "MUST NOT",
     "Never answer from nothing",
-    "When admission and fitting leave no valid evidence, or fewer items in an evidence slot than that slot's versioned min_included, for a route that requires evidence, an assembler MUST NOT render a payload as though sufficient evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action: request_context when no evidence item was omitted for budget, precompute_summary when one that was had no variants, and retrieve_narrower otherwise. Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot."
+    "When admission and fitting leave no valid evidence, or fewer items in an evidence slot than that slot's versioned min_included, for a route that requires evidence, an assembler MUST NOT render a payload as though sufficient evidence were present. It MUST emit a refusal with reason evidence_required and record recovery.action: request_context when no evidence item was omitted for budget, precompute_summary when one that was had no variants, and retrieve_narrower otherwise. An evidence item was omitted for budget when its exclusion is recorded with reason over_budget, whether for the payload budget, its own token_budget or its slot's max_tokens (R-16). Retrieval or model-based summarization MUST occur outside assembly; any retry MUST create a new immutable snapshot."
   ],
   [
     "fit",
