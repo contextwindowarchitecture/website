@@ -54,7 +54,7 @@
 
   <section style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-09-25</div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-09-27</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page is the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
@@ -368,6 +368,13 @@
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-09-27 · closed predicate, retrieval gate, code traceability</div>
+          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
+            <li>A review from an implementer's side found three requirements that could not be met as written and eight reason codes that no requirement named. No rule contradicted another, and the README already settled every ordering. The changes below close the gaps; the conformance cases pin the two that change behaviour.</li>
+            <li>R-13: a retrieval producer's candidates go in evidence.knowledge or evidence.tool_results, with the authority R-1 gives that slot. R-13 used to demand reference_only, which R-1 forbids in tool results. A producer of kind retrieval is now gated to the evidence slots, as memory and mcp producers are, whatever the route lists; anything else is excluded with producer_slot_not_allowed. This is new behaviour. admission-reasons gains a retrieval item admitted in tool results, one there with reference_only authority, and one sent to governance.examples.</li>
+          </ul>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-09-25 · one field, one decision</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>Two conflict checks left five questions about authority, trust and the injection marker that only the README, the cases or a careful reading could answer. The requirements now answer them, and each field decides one thing.</li>
@@ -510,7 +517,7 @@ const SLOTS = [
   ["interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries past expires at assembly_time, or carrying revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it."],
   ["interaction.history", 3, "A verbatim transcript of the most recent turns, bounded by turn count and tokens.", "Before assembly, overflow gets summarised into memory rather than cut mid-thought. Under budget pressure, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the turns carry relevance scores or the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message."],
   ["governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Permission is decided outside the model."],
-  ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act."],
+  ["evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop, and any retrieved chunks a route sends here.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act."],
   ["governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format, ranked by task similarity.", "Examples are admitted only when the route needs steering. They defer to instructions and the output contract. They're droppable, so under budget pressure they go before anything compressible."],
   ["governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates."],
   ["interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it."]
@@ -537,7 +544,7 @@ const STAGES = [
   ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
   ["Retrieve", "Pull candidate chunks from sources whose provenance you can name."],
   ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."],
   ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
   ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
   ["Fit", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
@@ -644,7 +651,7 @@ const RULES = [
     "fit",
     "MUST NOT",
     "Retrievers emit one scored item per chunk, never a blob",
-    "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item carrying authority: reference_only and its rerank score. An assembler MUST exclude with below_threshold an item scoring below its slot's min_relevance, or carrying no score in a slot that sets one; a score equal to the threshold passes. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch."
+    "A retrieval producer MUST NOT emit a merged blob. Each candidate MUST be a separate item in evidence.knowledge or evidence.tool_results, carrying the authority R-1 permits in that slot and its rerank score; an assembler MUST exclude with producer_slot_not_allowed any item a producer of kind retrieval sends to any other slot, whatever the route lists. An assembler MUST exclude with below_threshold an item scoring below its slot's min_relevance, or carrying no score in a slot that sets one; a score equal to the threshold passes. A retrieval producer that drops a candidate as a near-duplicate of another MUST report it in its batch's excluded list with reason duplicate_content, stage producer and duplicate_of naming the candidate it kept, which MUST be a candidate in the same batch."
   ],
   [
     "fit",

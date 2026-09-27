@@ -9,8 +9,8 @@
     "reserved_output": 1200
   },
   "result": {
-    "input_tokens": 139,
-    "hash": "5f30634d7a9eb27cdea7ecf6446fefca4d2546a1ad6f4010e22bb432773369b5"
+    "input_tokens": 149,
+    "hash": "e4d155cd1c95bf4433e3da230f8029beb7ae20d59ecd01a643db27dc3639cc13"
   },
   "included": [
     {
@@ -66,6 +66,13 @@
       "slot": "evidence.knowledge",
       "item_id": "kb:sub-ms",
       "tokens": 6,
+      "source_version": "1",
+      "eligibility": "route-policy"
+    },
+    {
+      "slot": "evidence.tool_results",
+      "item_id": "kb:obs",
+      "tokens": 7,
       "source_version": "1",
       "eligibility": "route-policy"
     },
@@ -288,6 +295,12 @@
       "slot": "evidence.knowledge"
     },
     {
+      "item_id": "kb:example",
+      "reason": "producer_slot_not_allowed",
+      "stage": "assembler",
+      "slot": "governance.examples"
+    },
+    {
       "item_id": "kb:expired",
       "reason": "expired",
       "stage": "assembler",
@@ -333,6 +346,12 @@
       "item_id": "kb:no-slot",
       "reason": "missing_field:slot",
       "stage": "assembler"
+    },
+    {
+      "item_id": "kb:obs-ref",
+      "reason": "authority_not_allowed",
+      "stage": "assembler",
+      "slot": "evidence.tool_results"
     },
     {
       "item_id": "kb:old",
@@ -484,7 +503,7 @@
     "route_policy_version": "admission/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "b05ac031f06550b90520c1dfee1f9c4ac5d10d8095d173524e2d43403926ab60"
+    "snapshot_digest": "c0412feeba4a5375980f3479d6305676f5238ce344f1315348c8b3154ff6b408"
   },
   "defaults_filled": [
     {

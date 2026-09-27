@@ -112,7 +112,9 @@
       "policy-corpus": {
         "kind": "retrieval",
         "slots": [
-          "evidence.knowledge"
+          "evidence.knowledge",
+          "evidence.tool_results",
+          "governance.examples"
         ]
       },
       "policy-registry": {
@@ -1205,6 +1207,56 @@
           "scope": {
             "tenant": "acme"
           }
+        },
+        {
+          "id": "kb:obs",
+          "slot": "evidence.tool_results",
+          "source": "src:kb:obs",
+          "source_version": "1",
+          "authority": "observation",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "Observed: the refund window is 30 days.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
+          "relevance": 0.9
+        },
+        {
+          "id": "kb:obs-ref",
+          "slot": "evidence.tool_results",
+          "source": "src:kb:obs-ref",
+          "source_version": "1",
+          "authority": "reference_only",
+          "trust": "unverified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "Retrieved into the wrong role.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "governs",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "untrusted_content",
+          "relevance": 0.9
+        },
+        {
+          "id": "kb:example",
+          "slot": "governance.examples",
+          "source": "src:kb:example",
+          "source_version": "1",
+          "authority": "governing",
+          "trust": "verified",
+          "freshness": "2026-09-22T11:59:30Z",
+          "body": "Q: Can I get a refund? A: Within 30 days.",
+          "token_budget": null,
+          "variants": [],
+          "conflict_policy": "defers",
+          "lineage": "verbatim",
+          "eligibility": "route-policy",
+          "injection_risk": "none"
         }
       ],
       "excluded": []

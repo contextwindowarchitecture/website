@@ -290,7 +290,7 @@ const RULES = [
     "MUST NOT",
     "Retrievers emit one scored item per chunk, never a blob",
     "boundary",
-    "Requires relevance and reference_only, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
+    "Gates retrieval producers to the evidence slots, requires the slot's authority and a score wherever the route sets a threshold, and requires that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
     "boundary-checked",
     4,
     [

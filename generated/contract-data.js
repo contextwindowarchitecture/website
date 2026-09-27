@@ -1112,7 +1112,7 @@ export const REASONS = [
     "code": "missing_field:<name>",
     "kind": "exclusion",
     "rule": "R-2",
-    "text": "A required field of the item itself is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for retrieval. A variant missing one of its fields is invalid_structure. Fix the producer; the assembler will not guess."
+    "text": "A required field of the item itself is absent: one of the eight minimum fields, or a slot-specific one such as expires for memory or relevance for knowledge. A variant missing one of its fields is invalid_structure. Fix the producer; the assembler will not guess."
   },
   {
     "code": "unknown_slot",
@@ -1142,7 +1142,7 @@ export const REASONS = [
     "code": "producer_slot_not_allowed",
     "kind": "exclusion",
     "rule": "R-15",
-    "text": "The authenticated producer is not permitted to emit into this slot: the route does not list the slot for it, or its kind rules the slot out whatever the route lists. State slots take only kind state (R-8), a memory producer only interaction.memory (R-14), and an mcp producer only the evidence slots, plus governance.capabilities, where capability_not_allowed applies (R-15)."
+    "text": "The authenticated producer is not permitted to emit into this slot: the route does not list the slot for it, or its kind rules the slot out whatever the route lists. State slots take only kind state (R-8), a memory producer only interaction.memory (R-14), a retrieval producer only the evidence slots (R-13), and an mcp producer only the evidence slots, plus governance.capabilities, where capability_not_allowed applies (R-15)."
   },
   {
     "code": "authority_not_allowed",

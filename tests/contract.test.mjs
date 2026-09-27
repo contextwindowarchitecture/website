@@ -140,6 +140,22 @@ test('memory and MCP producers emit only their own slots, whatever the route lis
   assert.deepEqual(checkItem(turn, { ...context, producer: { ...producer, kind: 'memory' } }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
 });
 
+test('retrieval producers emit only the evidence slots, whatever the route lists (R-13)', () => {
+  const producer = { id: 'policy-corpus', kind: 'retrieval', authenticated: true, slots: ['evidence.knowledge', 'evidence.tool_results', 'governance.examples', 'interaction.history'] };
+  assert.equal(checkItem(item, { ...context, producer }).valid, true);
+  const observation = { ...item, id: 'kb:obs', slot: 'evidence.tool_results', authority: 'observation' };
+  assert.equal(checkItem(observation, { ...context, producer }).valid, true);
+  const example = { ...item, id: 'kb:example', slot: 'governance.examples', authority: 'governing', trust: 'verified', injection_risk: 'none' };
+  delete example.relevance;
+  delete example.scope;
+  delete example.tier;
+  assert.equal(checkItem(example, { ...context, producer: { ...producer, kind: 'policy' } }).valid, true);
+  assert.deepEqual(checkItem(example, { ...context, producer }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
+  const turn = { ...example, id: 'turn:3', slot: 'interaction.history', authority: 'user', trust: 'unverified', injection_risk: 'untrusted_content' };
+  assert.equal(checkItem(turn, { ...context, producer: { ...producer, kind: 'interaction' } }).valid, true);
+  assert.deepEqual(checkItem(turn, { ...context, producer }).findings.map(f => f.reason), ['producer_slot_not_allowed']);
+});
+
 const traceMutations = {
   'wrong collection type': t => t.included = {},
   'null collection entry': t => t.excluded = [null],

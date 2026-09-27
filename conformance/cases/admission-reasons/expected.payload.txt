@@ -22,6 +22,9 @@ Annual plans refund pro rata.
 <evidence.knowledge id="kb:sub-ms">
 Refunds return to the original card.
 </evidence.knowledge>
+<evidence.tool_results id="kb:obs">
+Observed: the refund window is 30 days.
+</evidence.tool_results>
 <evidence.tool_results id="obs:docs">
 Refund window: 30 days.
 </evidence.tool_results>

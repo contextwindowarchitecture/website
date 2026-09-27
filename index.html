@@ -1104,7 +1104,7 @@ const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
   ["Retrieve", "Pull candidate chunks from sources whose provenance you can name."],
   ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and reference_only authority. Never one merged blob (R-13)."],
+  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."],
   ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
   ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
   ["Fit", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
@@ -1122,7 +1122,7 @@ const ITEM_FIELDS = [
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
   ["trust", "Verified, unverified, or untrusted: the producer's own claim about its source, so it proves nothing (R-15). Only the governance gate reads it, which admits verified items alone (R-10). It never decides who can instruct or which fact wins."],
   ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
-  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
+  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A knowledge chunk is reference_only and still untrusted_content (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
 ];
 
 
