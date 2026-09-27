@@ -209,7 +209,7 @@ class Component extends DCLogic {
   state = { theme: "light", src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
   componentDidMount() {
     let t = "light";
-    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
     import("./scaffolds.js").then(m => this.setState({ scaffolds: m.SCAFFOLDS })).catch(() => this.setState({ scaffoldError: "Downloads could not load. Reload the page to retry." }));
   }

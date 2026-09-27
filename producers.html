@@ -587,7 +587,7 @@ class Component extends DCLogic {
   componentDidMount() {
     import("./contract.js").then(contract => this.setState({ contract, sampleTrace: contract.TRACE_EXAMPLE, traceSrc: JSON.stringify(contract.TRACE_EXAMPLE, null, 2) })).catch(() => this.setState({ contractError: "Validators could not load. Reload to retry." }));
     let t = "light";
-    try { t = localStorage.getItem("cwa-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"); } catch (e) {}
+    try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
   }
   applyTheme(t) {
