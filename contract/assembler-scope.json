@@ -12,7 +12,7 @@
   {
     "id": "R-3",
     "scope": "assembler",
-    "note": "Fills slot defaults and versioned route overrides, and records defaults_filled."
+    "note": "Fills slot defaults and versioned route overrides, records defaults_filled, and applies the four slot-level eligibility rules as the complete predicate."
   },
   {
     "id": "R-4",

@@ -1232,7 +1232,7 @@ export const REASONS = [
     "code": "not_eligible",
     "kind": "exclusion",
     "rule": "R-3",
-    "text": "The route's eligibility predicate excluded the item, for example because it was observed longer ago than its slot's max_age_seconds."
+    "text": "The item was observed longer ago than its slot's max_age_seconds, in a slot other than a state slot, where the code is stale_state. The slot-level eligibility rules are the complete predicate (R-3); no other rule excludes an item this way."
   },
   {
     "code": "slot_unplaced",
