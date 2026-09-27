@@ -28,7 +28,7 @@ npm test
 | `contract/assembler-status.json`, `contract/assembler-conformance.json` | The Python reference assembler's claimed status per requirement and its conformance report, imported from its `status.json` and `conformance-report.json` with `node scripts/import-assembler-status.mjs ../cwa-assembler`. An imported report file holds `source`, `cases_at_run` and, untouched under `report`, the implementation's own report |
 | `contract/assembler-ts-conformance.json` | The TypeScript assembler's conformance report, imported with `node scripts/import-conformance-report.mjs ../cwa-assembler-ts contract/assembler-ts-conformance.json` |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
-| `examples/` | Concrete item, producer batch, profiles, payload and matching trace |
+| `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |
 | `contract/*.txt`, `contract/cwa.md` | Downloadable integration guidance and rendering template |
 | `contract/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |

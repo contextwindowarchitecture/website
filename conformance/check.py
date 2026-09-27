@@ -214,7 +214,7 @@ for kind, key in (("profiles", lambda l: (l["id"], l["version"])), ("route_polic
     if len(keys) != len(set(keys)): problem(f"lock.json lists a {kind[:-1]} identity twice")
 have = {(r["route"], r["version"]) for r in policies}
 for p in profiles:
-    if (p["route"], p["route_policy_version"]) not in have: warn(f"profile {p['id']} names route policy {p['route']}/{p['route_policy_version']}, which the registry does not hold, so no valid snapshot can carry it")
+    if (p["route"], p["route_policy_version"]) not in have: problem(f"profile {p['id']} names route policy {p['route']}/{p['route_policy_version']}, which the registry does not hold, so no valid snapshot can carry it")
 
 
 # ---------------------------------------------------------------------------------------------- reasons and requirements

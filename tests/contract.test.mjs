@@ -809,12 +809,33 @@ const snapshotDigest = snapshot => {
   return sha256(s);
 };
 
-test('the registry lock pins the published profiles and conformance route policies by digest (R-20)', async () => {
+test('every published profile names a route policy the registry holds, whose producers cover the slots it places (R-15, R-20)', async () => {
+  const pinned = await read('conformance/registry/profiles.json');
+  const policies = await read('conformance/registry/route-policies.json');
+  // A producer's kind limits its slots, whatever the route lists (R-8, R-13, R-14, R-15).
+  const KIND_SLOTS = { retrieval: s => s.startsWith('evidence.'), memory: s => s === 'interaction.memory', mcp: s => s.startsWith('evidence.') || s === 'governance.capabilities' };
+  for (const profile of pinned) {
+    const policy = policies.find(p => p.route === profile.route && p.version === profile.route_policy_version);
+    assert.ok(policy, `${profile.id} names ${profile.route}/${profile.route_policy_version}, which the registry does not hold`);
+    const emitted = new Set(Object.values(policy.producers).flatMap(p => p.slots));
+    for (const { slot } of profile.placement) assert.ok(emitted.has(slot), `${profile.id} places ${slot}, which no producer of ${policy.route}/${policy.version} emits`);
+    for (const [id, producer] of Object.entries(policy.producers)) {
+      for (const slot of producer.slots) {
+        if (slot.startsWith('state.')) assert.equal(producer.kind, 'state', `${policy.route}: ${id} emits ${slot}`);
+        assert.ok(KIND_SLOTS[producer.kind]?.(slot) ?? true, `${policy.route}: ${id} of kind ${producer.kind} lists ${slot}, which its kind rules out`);
+      }
+    }
+  }
+});
+
+test('the registry lock pins the published profiles and route policies by digest (R-20)', async () => {
   const lock = await read('conformance/registry/lock.json');
   const pinned = await read('conformance/registry/profiles.json');
   const policies = await read('conformance/registry/route-policies.json');
   assert.equal(validateRegistryLockSchema(lock), true, JSON.stringify(validateRegistryLockSchema.errors));
   assert.deepEqual(pinned, [...profiles, await read('examples/fixture-profile.json')]);
+  const illustrative = await read('examples/route-policies.json');
+  assert.deepEqual(policies.slice(-illustrative.length), illustrative, 'the example route policies are pinned after the conformance ones');
   assert.deepEqual(lock.profiles, pinned.map(({ evaluation, ...rest }) => ({ id: rest.id, version: rest.version, sha256: sha256(rest) })));
   assert.deepEqual(lock.route_policies, policies.map(p => ({ route: p.route, version: p.version, sha256: sha256(p) })));
   for (const policy of policies) assert.equal(validateRoutePolicySchema(policy), true);
