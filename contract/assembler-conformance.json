@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-python",
-    "commit": "a25c3043e429064d89069365fe20a92c46b04228",
+    "commit": "6ce72605bff7337d9699ed36a4fb9740d301a803",
     "dirty": false
   },
   "cases_at_run": {
@@ -21,6 +21,7 @@
     "budget-slot-floor": "771403858795667ef616a968ab7884d397836b4b8c1d6c707f06885ed04370ed",
     "budget-token-caps": "836b180f4be516d7919ce74bbe443e119e9e23761eef677f492c2136c196e814",
     "budget-variant-choice": "3f2d27ac9fd239de77efefcd5fe72855b18ca3d92d7c1a6751facb7d4afa9c4f",
+    "capability-policy-kind": "f0a78b0e3610801f71fced2f29c7dfb929dc2923882de0a1a57e42c9a9173733",
     "conflict-fact": "724e15d8bcc3ad0b750a6827dfc244253edc78cb3a8d5288e988d5e2280b71e5",
     "conflict-instruction": "57097b117197fa65f7b6abc26093924a7a909d7f8a7accef872ab87e44865662",
     "conflict-refused": "381a4fcd18f63823b4b3ea82ee696dd738d2a35e4382f5d2761f67eaf3e79099",
@@ -54,6 +55,7 @@
     "supersede-evidence-required": "9be37f9cef428a9955986b314e363ca85ed9c34cabacc3fd3b255a07ff7ff205",
     "supersede-exemptions": "39350df299e704530062189604d97494829d8a63faafa14691352f8cb81fa546",
     "supersede-observations": "e1a4150f2a1f310130a492027a739ee05a72683ad27ed23d2d4f190d353707ab",
+    "threshold-beyond-2-53": "2f05f21b38a98cba3e5753dbf78d134553c6eb15c1a09faa6ae0f50c7dad32a8",
     "tokenizer-estimate-utf8": "bfcecc7e59ce2104f97918f2df1b3c2213bf9ef98d238e36577fdc2132046c3f",
     "conflict-group-overlap": "1a370ded33977703530420c17717c1bb082cef71c62a19baf5d31a3247e187d0",
     "conflict-group-repeated-id": "b7191c79ae28f55db473faa87c8673d07c27ddfb8498d47b1c14e705bc36ffd6",
@@ -85,7 +87,7 @@
       "language": "python"
     },
     "contract": {
-      "website_commit": "84807a5948d8b43b01f7ec2924b76a57106df25b",
+      "website_commit": "591f7eb2ee904acf79aa1a4f846253dd785a4423",
       "dirty": false
     },
     "cases": [
@@ -244,6 +246,15 @@
           "R-16",
           "R-18",
           "R-21"
+        ],
+        "outcome": "passed"
+      },
+      {
+        "id": "capability-policy-kind",
+        "rules": [
+          "R-15",
+          "R-21",
+          "R-22"
         ],
         "outcome": "passed"
       },
@@ -578,6 +589,17 @@
           "R-21",
           "R-22",
           "R-25"
+        ],
+        "outcome": "passed"
+      },
+      {
+        "id": "threshold-beyond-2-53",
+        "rules": [
+          "R-2",
+          "R-13",
+          "R-16",
+          "R-21",
+          "R-22"
         ],
         "outcome": "passed"
       },
