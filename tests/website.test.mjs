@@ -94,7 +94,7 @@ async function caseDigest(dir) {
   return createHash('sha256').update(JSON.stringify(files)).digest('hex');
 }
 
-test('the status matrix counts, per implementation, the published cases each imported report passes and has run as they are now', async () => {
+test('the implementations table and status matrix count, per implementation, the published cases each imported report passes and has run as they are now', async () => {
   const statuses = await component('assembler.html', 'RULES');
   const published = [];
   for (const dir of ['cases', 'rejections']) {
@@ -102,8 +102,8 @@ test('the status matrix counts, per implementation, the published cases each imp
     for (const name of await fs.readdir(root)) published.push({ ...await readJson(`conformance/${dir}/${name}/case.json`), digest: await caseDigest(`${dir}/${name}`) });
   }
   assert.equal(new Set(published.map(c => c.id)).size, published.length, 'case and rejection ids are distinct');
-  const { caseLines } = (await component('assembler.html')).renderVals();
-  assert.equal(caseLines.length, IMPORTED.length);
+  const { implementations } = (await component('assembler.html')).renderVals();
+  assert.equal(implementations.length, IMPORTED.length);
   for (const [n, [label, file]] of IMPORTED.entries()) {
     const { source, cases_at_run: atRun, report } = await readJson(file);
     assert.match(source.commit, /^[0-9a-f]{40}$/, file);
@@ -115,11 +115,15 @@ test('the status matrix counts, per implementation, the published cases each imp
       assert.equal(row[5], tagged.length, `R-${i + 1} total`);
       assert.equal(row[6][n], tagged.filter(c => passing.has(c.id)).length, `${label} R-${i + 1}`);
     });
-    const line = caseLines[n].text;
-    assert.ok(line.startsWith(`${label} · ${passing.size} of ${published.length} published conformance cases pass`), line);
-    assert.ok(line.includes(`assembler ${source.commit.slice(0, 7)}`), line);
-    assert.ok(line.includes(`cases at ${report.contract.website_commit.slice(0, 7)}`), line);
-    assert.equal(line.includes('changed since its run'), stale > 0, line);
+    const row = implementations[n];
+    assert.equal(row.language, label);
+    assert.equal(row.name, report.implementation.name, file);
+    assert.equal(row.version, report.implementation.version, file);
+    assert.equal(row.repository, source.repository, file);
+    assert.equal(row.commit, source.commit.slice(0, 7), file);
+    assert.equal(row.website, report.contract.website_commit.slice(0, 7), file);
+    assert.equal(row.cases, `${passing.size} of ${published.length} published cases pass`, file);
+    assert.equal(row.caseNote, stale ? `${stale} changed since its run` : '', file);
   }
 });
 

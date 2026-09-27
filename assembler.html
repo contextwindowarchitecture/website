@@ -24,6 +24,7 @@
   ::selection { background: var(--accent); color: var(--bg); }
   @media (max-width: 1200px) { #sitenav { display: none !important; } }
   @media (max-width: 720px) { .mx { grid-template-columns: 44px minmax(0, 1fr) !important; row-gap: 6px !important; } .mx-kw, .mx-hide-sm { display: none; } .mx-ss { grid-column: 2; flex-direction: row !important; flex-wrap: wrap; gap: 3px 12px !important; } }
+  @media (max-width: 720px) { .im { grid-template-columns: 84px minmax(0, 1.2fr) minmax(0, 1fr) !important; gap: 8px 10px !important; padding-left: 14px !important; padding-right: 14px !important; } .im-hide-sm { display: none; } }
 </style>
 </helmet>
 
@@ -59,8 +60,20 @@
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
         <span>Spec target: <span style="color: var(--fg);">draft</span></span>
-        <span>Language: <span style="color: var(--fg);">Python and TypeScript</span>, two independent implementations</span>
         <span>Updated: 2026-09-27</span>
+      </div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 12px;">Reference implementations</div>
+      <div role="table" aria-label="Reference implementations by language" style="border: 1px solid var(--line); background: var(--surface);">
+        <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span role="columnheader">language</span><span role="columnheader">implementation · version</span><span role="columnheader" class="im-hide-sm">repository · commit</span><span role="columnheader">conformance</span><span role="columnheader" class="im-hide-sm">cases at</span></div>
+        <sc-for list="{{ implementations }}" as="i" hint-placeholder-count="2">
+          <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <span role="cell" style="font-size: 14px; font-weight: 600;">{{ i.language }}</span>
+            <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.scope }}<wbr>{{ i.pkg }}</span><span style="color: var(--muted);">{{ i.version }}</span></span>
+            <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.owner }}<wbr>{{ i.repo }}</span><span style="color: var(--muted);">{{ i.commit }}</span></span>
+            <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="color: {{ i.casesColor }};">{{ i.cases }}</span><span style="color: var(--muted);">{{ i.caseNote }}</span></span>
+            <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">website {{ i.website }}</span>
+          </div>
+        </sc-for>
       </div>
     </div>
   </section>
@@ -68,13 +81,9 @@
   <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
-      <h2 style="margin: 0 0 12px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
-      <sc-for list="{{ caseLines }}" as="l" hint-placeholder-count="2">
-        <p style="margin: 0 0 6px; font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em; color: var(--p-evid);">{{ l.text }}</p>
-      </sc-for>
-      <div style="height: 12px;"></div>
+      <h2 style="margin: 0 0 24px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
       <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
-      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python and TypeScript, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the line above says how many have changed.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python and TypeScript, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
         <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
@@ -454,7 +463,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","commit":"6ce7260","website":"591f7eb","total":74,"passed":74,"stale":0},{"label":"TypeScript","commit":"a7d6b82","website":"591f7eb","total":74,"passed":74,"stale":0}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","commit":"6ce7260","website":"591f7eb","total":74,"passed":74,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","commit":"a7d6b82","website":"591f7eb","total":74,"passed":74,"stale":0}];
 class Component extends DCLogic {
   state = { theme: "light" };
   componentDidMount() {
@@ -483,8 +492,14 @@ class Component extends DCLogic {
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       matrix,
       counts: met.length + " of " + checkable.length + " checkable requirements implemented.",
-      caseLines: CONFORMANCE.map(c => ({ text: c.label + " · " + c.passed + " of " + c.total + " published conformance cases pass · assembler " + c.commit +
-        " · cases at " + c.website + (c.stale ? " · " + c.stale + " changed since its run" : "") }))
+      implementations: CONFORMANCE.map(c => ({
+        language: c.label, name: c.name, version: c.version, repository: c.repository, commit: c.commit, website: c.website,
+        // Long names wrap after their slash (a scoped package, an owner/repo) rather than mid-word.
+        scope: c.name.slice(0, c.name.lastIndexOf("/") + 1), pkg: c.name.slice(c.name.lastIndexOf("/") + 1),
+        owner: c.repository.slice(0, c.repository.indexOf("/") + 1), repo: c.repository.slice(c.repository.indexOf("/") + 1),
+        cases: c.passed + " of " + c.total + " published cases pass", casesColor: c.passed === c.total ? "var(--p-evid)" : "var(--accent)",
+        caseNote: c.stale ? c.stale + " changed since its run" : ""
+      }))
     };
   }
 }
