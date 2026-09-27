@@ -106,9 +106,11 @@ test('defaults are deterministic, schema-valid, and do not mutate candidates', (
 
 test('a forged capability-policy prefix cannot authenticate a producer', () => {
   const capability = { ...item, slot: 'governance.capabilities', authority: 'governing', injection_risk: 'none', tier: 'protected', source: 'capability-policy:forged', id: 'tool:refund' };
-  const allowed = { ...context, producer: { id: 'actual-policy', authenticated: true, slots: ['governance.capabilities'] }, capabilityPolicyId: 'actual-policy', allowedCapabilityIds: ['tool:refund'] };
+  const allowed = { ...context, producer: { id: 'actual-policy', kind: 'capability_policy', authenticated: true, slots: ['governance.capabilities'] }, capabilityPolicyId: 'actual-policy', allowedCapabilityIds: ['tool:refund'] };
   assert.equal(checkItem(capability, allowed).valid, true);
   assert.equal(checkItem(capability, { ...allowed, producer: { ...allowed.producer, id: 'mcp-adapter' } }).valid, false);
+  // The grant's producer must be listed with kind capability_policy (R-15).
+  assert.deepEqual(checkItem(capability, { ...allowed, producer: { ...allowed.producer, kind: 'policy' } }).findings.map(f => f.reason), ['capability_not_allowed']);
   assert.equal(checkItem(capability, { ...allowed, allowedCapabilityIds: [] }).valid, false);
   assert.equal(checkItem({ ...capability, trust: 'untrusted' }, allowed).valid, false);
   assert.equal(checkItem({ ...capability, tier: 'droppable' }, allowed).valid, false);

@@ -120,8 +120,9 @@ function checkProducer(item, context) {
   if (producer.kind === 'mcp' && !item.slot.startsWith('evidence.') && item.slot !== 'governance.capabilities') {
     return [failure('producer_slot_not_allowed', 'A producer of kind mcp may emit only evidence slots.', 15)];
   }
+  // The route capability policy is the grant's producer, listed with kind capability_policy (R-15).
   if (item.slot === 'governance.capabilities' &&
-      (producer.id !== context.capabilityPolicyId || !context.allowedCapabilityIds?.includes(item.id))) {
+      (producer.kind !== 'capability_policy' || producer.id !== context.capabilityPolicyId || !context.allowedCapabilityIds?.includes(item.id))) {
     return [failure('capability_not_allowed', 'The authenticated capability policy must admit this tool for this route and user.', 15)];
   }
   return [];
