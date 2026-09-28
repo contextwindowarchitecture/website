@@ -6,11 +6,18 @@ import { createHash } from 'node:crypto';
 import * as contract from '../contract.js';
 import { SCAFFOLDS } from '../scaffolds.js';
 
-async function component(page, expression = 'new Component()') {
+/** The slice of the DOM a page component touches while rendering: the inline custom properties on <html>. */
+function documentStub() {
+  const inline = new Map();
+  const style = { setProperty: (k, v) => inline.set(k, v), removeProperty: k => inline.delete(k), getPropertyValue: k => inline.get(k) || '' };
+  return { inline, documentElement: { style } };
+}
+
+async function component(page, expression = 'new Component()', globals = {}) {
   const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const source = html.match(/<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/)[1];
   class DCLogic { props = {}; setState(patch) { Object.assign(this.state, typeof patch === 'function' ? patch(this.state) : patch); } }
-  return vm.runInNewContext(source + '\n' + expression, { DCLogic, console, Date, setTimeout, clearTimeout, structuredClone });
+  return vm.runInNewContext(source + '\n' + expression, { DCLogic, console, Date, setTimeout, clearTimeout, structuredClone, document: documentStub(), ...globals });
 }
 
 const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
@@ -42,6 +49,28 @@ test('where the header hides the nav row, every page offers a menu button that o
     view.renderVals().toggleMenu();
     assert.equal(view.renderVals().menuOpen, 'false');
   }
+});
+
+test('the landing page pins --accent inline only when the Claude Design accent prop is overridden, so the dark token applies otherwise', async () => {
+  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const meta = JSON.parse(html.match(/<script type="text\/x-dc"[^>]*data-props="([^"]*)"/)[1].replaceAll('&quot;', '"'));
+  const light = html.match(/:root \{[^}]*--accent: ([^;]+);/)[1];
+  const dark = html.match(/html\[data-theme="dark"\] \{[^}]*--accent: ([^;]+);/)[1];
+  assert.notEqual(dark, light, 'the dark theme has its own accent token');
+  assert.equal(meta.accent.default, light, 'the prop default is the light :root token');
+  assert.ok(/const ACCENT_DEFAULT = "([^"]+)"/.test(html) && html.match(/const ACCENT_DEFAULT = "([^"]+)"/)[1] === light, 'the component knows the same default');
+  const document = documentStub();
+  const view = await component('index.html', 'new Component()', { document });
+  view.props.accent = meta.accent.default; // what the standalone runtime passes when nothing was overridden
+  view.renderVals();
+  assert.equal(document.inline.has('--accent'), false, 'the default leaves the stylesheet, and its dark rule, in charge');
+  const override = meta.accent.options.find(o => o !== meta.accent.default);
+  view.props.accent = override;
+  view.renderVals();
+  assert.equal(document.inline.get('--accent'), override, 'an override still pins the accent');
+  view.props.accent = meta.accent.default;
+  view.renderVals();
+  assert.equal(document.inline.has('--accent'), false, 'returning to the default releases the pin');
 });
 
 test('browser item and trace tools use the shared contract without crashing on valid non-object JSON', async () => {

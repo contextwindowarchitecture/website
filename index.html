@@ -855,6 +855,9 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;oklch(0.60 0.20 38)&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;oklch(0.60 0.20 38)&quot;, &quot;oklch(0.55 0.17 250)&quot;, &quot;oklch(0.55 0.14 155)&quot;, &quot;oklch(0.50 0.20 310)&quot;], &quot;section&quot;: &quot;Theme&quot;}}">
+/* The Claude Design "accent" prop's default. It must match the data-props default above and the :root --accent token, so the standalone runtime, which passes the default when nothing was overridden, can be told apart from a real override. */
+const ACCENT_DEFAULT = "oklch(0.60 0.20 38)";
+
 const PLANES = [
   { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
   { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
@@ -1486,8 +1489,12 @@ class Component extends DCLogic {
   }
 
   renderVals() {
+    // Only an overridden accent is pinned inline on <html>. Pinning the default would beat the
+    // html[data-theme="dark"] rule, so the stylesheet keeps the theme's --accent otherwise.
     const accent = this.props.accent || null;
-    if (accent) document.documentElement.style.setProperty("--accent", accent);
+    const rootStyle = document.documentElement.style;
+    if (accent && accent !== ACCENT_DEFAULT) rootStyle.setProperty("--accent", accent);
+    else rootStyle.removeProperty("--accent");
     const mode = this.state.mode;
     const fmt = n => n.toLocaleString("en-US");
     const layers = SLOTS.map((l, i) => {
