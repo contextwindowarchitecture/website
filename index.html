@@ -56,7 +56,15 @@
     --p-inter: oklch(0.76 0.13 310);
   }
   html { background: var(--bg); scroll-behavior: smooth; overflow-x: hidden; }
-  @media (max-width: 1200px) { #sitenav { display: none !important; } }
+  @media (max-width: 1200px) {
+    #hdrmenu { display: inline-block !important; }
+    #sitenav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0 !important; margin: 0 !important; padding: 6px 32px 14px; font-size: 16px !important; background: var(--bg); border-bottom: 1px solid var(--line); }
+    #sitenav[data-open="true"] { display: flex !important; }
+    #sitenav a { padding: 13px 0 !important; border-bottom: 1px solid var(--line) !important; }
+    #sitenav a:last-child { border-bottom: 0 !important; }
+    #sitenav a[aria-current="page"] { border-left: 3px solid var(--accent); padding-left: 12px !important; }
+  }
+  @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 620px) { #hdrtour { display: none !important; } }
   body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
   * { box-sizing: border-box; }
@@ -70,14 +78,14 @@
 <div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
 
   <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+    <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
       <a href="#top" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
         <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
           <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
         </span>
         <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
       </a>
-      <nav id="sitenav" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+      <nav id="sitenav" data-open="{{ menuOpen }}" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
         <a href="./start.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Start</a>
         <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
         <a href="./evidence.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Evidence</a>
@@ -87,6 +95,7 @@
       </nav>
       <div style="flex: 1;"></div>
       <button id="hdrtour" onClick="{{ startTour }}" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 9px 18px; border: 0; cursor: pointer; font-family: inherit; white-space: nowrap;" style-hover="background: var(--fg);">Take the tour</button>
+      <button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}" style="display: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ menuLabel }}</button>
       <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
       <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
     </div>
@@ -1124,7 +1133,7 @@ const ITEM_FIELDS = [
 
 
 class Component extends DCLogic {
-  state = { mode: "planes", spec: 0, open: { 0: true }, theme: "light", uc: 0, step: 0, hold: 0, playing: true };
+  state = { mode: "planes", spec: 0, open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true };
 
   componentWillUnmount() {
     clearInterval(this._t); clearInterval(this._m); clearInterval(this._track);
@@ -1583,7 +1592,10 @@ class Component extends DCLogic {
       fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
       fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 }),
       themeLabel: this.state.theme === "dark" ? "Light" : "Dark",
-      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark")
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      menuOpen: this.state.menu ? "true" : "false",
+      menuLabel: this.state.menu ? "Close" : "Menu",
+      toggleMenu: () => this.setState(s => ({ menu: !s.menu }))
     };
 
     const mu = UCS[this.state.mUc || 0];

@@ -13,12 +13,36 @@ async function component(page, expression = 'new Component()') {
   return vm.runInNewContext(source + '\n' + expression, { DCLogic, console, Date, setTimeout, clearTimeout, structuredClone });
 }
 
-for (const page of ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html']) {
+const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+
+for (const page of PAGES) {
   test(`${page}: embedded component compiles and renders`, async () => {
     const view = await component(page);
     assert.equal(typeof view.renderVals(), 'object');
   });
 }
+
+test('where the header hides the nav row, every page offers a menu button that opens the same links', async () => {
+  for (const page of PAGES) {
+    const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
+    const header = html.match(/<header[\s\S]*?<\/header>/)[0];
+    assert.ok(header.includes('<nav id="sitenav" data-open="{{ menuOpen }}"'), `${page}: the nav opens from component state`);
+    assert.ok(header.includes('<button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}"'), `${page}: the menu button controls the nav`);
+    assert.ok(html.includes('#hdrmenu { display: inline-block !important; }'), `${page}: the menu button shows where the nav row is hidden`);
+    assert.ok(html.includes('#sitenav[data-open="true"] { display: flex !important; }'), `${page}: the open nav is shown`);
+    const links = [...header.matchAll(/<a href="\.\/([a-z]+\.html)"( aria-current="page")?/g)];
+    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(['start.html', 'spec.html', 'evidence.html', 'producers.html', 'assembler.html', 'about.html']), `${page}: the home link and the nav list every page`);
+    assert.deepEqual(links.filter(m => m[2]).map(m => m[1]), page === 'index.html' ? [] : [page], `${page}: only its own link is current`);
+    const view = await component(page);
+    assert.equal(view.renderVals().menuOpen, 'false');
+    assert.equal(view.renderVals().menuLabel.toLowerCase(), 'menu');
+    view.renderVals().toggleMenu();
+    assert.equal(view.renderVals().menuOpen, 'true');
+    assert.equal(view.renderVals().menuLabel.toLowerCase(), 'close');
+    view.renderVals().toggleMenu();
+    assert.equal(view.renderVals().menuOpen, 'false');
+  }
+});
 
 test('browser item and trace tools use the shared contract without crashing on valid non-object JSON', async () => {
   const view = await component('producers.html');
