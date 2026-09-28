@@ -44,6 +44,26 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
+test('the landing page stacks its fixed multi-column grids on narrow viewports', async () => {
+  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
+  assert.ok(style.includes('@media (max-width: 860px) {\n    #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }'), 'the hero, two-column sections and three-column cards stack below 860px');
+  assert.ok(style.includes('@media (max-width: 620px) {\n    .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
+  assert.ok(style.includes('@media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }'), 'four-column grids halve below 1000px');
+  assert.ok(style.includes('#unitrow > div, #wirerow > div { position: static !important; }'), 'stacked columns stop sticking');
+  const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
+  const hooks = ['id="hero"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
+  for (const hook of hooks) {
+    const selector = hook.replace(/^id="/, '#').replace(/^class="/, '.').replace(/"$/, '');
+    assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);
+  }
+  const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
+    .map(m => ({ tag: m[1], tracks: m[2] }))
+    .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[2-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
+  assert.ok(fixed.length >= 20, `found ${fixed.length} fixed multi-column grids`);
+  for (const g of fixed) assert.ok(hooks.some(h => g.tag.includes(h)), `a "${g.tracks}" grid stacks on narrow viewports: ${g.tag.slice(0, 80)}`);
+});
+
 test('browser item and trace tools use the shared contract without crashing on valid non-object JSON', async () => {
   const view = await component('producers.html');
   view.state.contract = contract;
