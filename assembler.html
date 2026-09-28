@@ -65,7 +65,7 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 12px;">Reference implementations</div>
       <div role="table" aria-label="Reference implementations by language" style="border: 1px solid var(--line); background: var(--surface);">
         <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span role="columnheader">language</span><span role="columnheader">implementation · version</span><span role="columnheader" class="im-hide-sm">repository · commit</span><span role="columnheader">conformance</span><span role="columnheader" class="im-hide-sm">cases at</span></div>
-        <sc-for list="{{ implementations }}" as="i" hint-placeholder-count="2">
+        <sc-for list="{{ implementations }}" as="i" hint-placeholder-count="3">
           <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
             <span role="cell" style="font-size: 14px; font-weight: 600;">{{ i.language }}</span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.scope }}<wbr>{{ i.pkg }}</span><span style="color: var(--muted);">{{ i.version }}</span></span>
@@ -83,7 +83,7 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
       <h2 style="margin: 0 0 24px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
       <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
-      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python and TypeScript, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python, TypeScript and Go, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
         <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
@@ -159,6 +159,7 @@ const RULES = [
     1,
     [
       1,
+      1,
       1
     ]
   ],
@@ -170,6 +171,7 @@ const RULES = [
     "implemented",
     4,
     [
+      4,
       4,
       4
     ]
@@ -183,6 +185,7 @@ const RULES = [
     5,
     [
       5,
+      5,
       5
     ]
   ],
@@ -194,6 +197,7 @@ const RULES = [
     "implemented",
     8,
     [
+      8,
       8,
       8
     ]
@@ -207,6 +211,7 @@ const RULES = [
     0,
     [
       0,
+      0,
       0
     ]
   ],
@@ -218,6 +223,7 @@ const RULES = [
     "implemented",
     6,
     [
+      6,
       6,
       6
     ]
@@ -231,6 +237,7 @@ const RULES = [
     6,
     [
       6,
+      6,
       6
     ]
   ],
@@ -242,6 +249,7 @@ const RULES = [
     "boundary-checked",
     1,
     [
+      1,
       1,
       1
     ]
@@ -255,6 +263,7 @@ const RULES = [
     4,
     [
       4,
+      4,
       4
     ]
   ],
@@ -266,6 +275,7 @@ const RULES = [
     "implemented",
     3,
     [
+      3,
       3,
       3
     ]
@@ -279,6 +289,7 @@ const RULES = [
     15,
     [
       15,
+      15,
       15
     ]
   ],
@@ -290,6 +301,7 @@ const RULES = [
     "implemented",
     9,
     [
+      9,
       9,
       9
     ]
@@ -303,6 +315,7 @@ const RULES = [
     5,
     [
       5,
+      5,
       5
     ]
   ],
@@ -314,6 +327,7 @@ const RULES = [
     "boundary-checked",
     1,
     [
+      1,
       1,
       1
     ]
@@ -327,6 +341,7 @@ const RULES = [
     6,
     [
       6,
+      6,
       6
     ]
   ],
@@ -338,6 +353,7 @@ const RULES = [
     "implemented",
     31,
     [
+      31,
       31,
       31
     ]
@@ -351,6 +367,7 @@ const RULES = [
     38,
     [
       38,
+      38,
       38
     ]
   ],
@@ -362,6 +379,7 @@ const RULES = [
     "boundary-checked",
     10,
     [
+      10,
       10,
       10
     ]
@@ -375,6 +393,7 @@ const RULES = [
     1,
     [
       1,
+      1,
       1
     ]
   ],
@@ -386,6 +405,7 @@ const RULES = [
     "implemented",
     13,
     [
+      13,
       13,
       13
     ]
@@ -399,6 +419,7 @@ const RULES = [
     53,
     [
       53,
+      53,
       53
     ]
   ],
@@ -410,6 +431,7 @@ const RULES = [
     "implemented",
     20,
     [
+      20,
       20,
       20
     ]
@@ -423,6 +445,7 @@ const RULES = [
     4,
     [
       4,
+      4,
       4
     ]
   ],
@@ -434,6 +457,7 @@ const RULES = [
     "implemented",
     7,
     [
+      7,
       7,
       7
     ]
@@ -447,6 +471,7 @@ const RULES = [
     4,
     [
       4,
+      4,
       4
     ]
   ],
@@ -459,11 +484,12 @@ const RULES = [
     3,
     [
       3,
+      3,
       3
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":74,"passed":74,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4ab7e764e77cf8940b6c059a10d503f8da55edb6","websiteSha":"804e351ec0a7b586c8aeaf3832febc90bd6adb78","total":74,"passed":74,"stale":0}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.

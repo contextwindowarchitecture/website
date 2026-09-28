@@ -8,6 +8,7 @@ import path from 'node:path';
 export const IMPLEMENTATIONS = [
   { label: 'Python', file: 'contract/assembler-conformance.json' },
   { label: 'TypeScript', file: 'contract/assembler-ts-conformance.json' },
+  { label: 'Go', file: 'contract/assembler-go-conformance.json' },
 ];
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
