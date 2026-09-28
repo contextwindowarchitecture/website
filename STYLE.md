@@ -119,7 +119,7 @@ Do not use a plane colour for a status, a category or a chart series that is not
 
 ### Dark mode
 
-The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each page reads `localStorage["cwa-theme"]` on load, defaults to `light`, and writes the choice back when the header toggle is pressed. The toggle's label names the theme you would switch to ("Dark" while light). Everything else follows from the token override, so a component that only uses tokens needs no dark-mode work. The header's translucent background uses `color-mix(in oklab, var(--bg) 88%, transparent)` so it adapts too.
+The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each page reads `localStorage["cwa-theme"]` on load, defaults to `light`, and writes the choice back when the header toggle is pressed. The toggle's label names the theme you would switch to ("Dark" while light). Everything else follows from the token override, so a component that only uses tokens needs no dark-mode work. The header's translucent background uses `color-mix(in oklab, var(--bg) 88%, transparent)` so it adapts too. The landing page's canvas `accent` prop is pinned inline on `<html>` only when it differs from the default `oklch(0.60 0.20 38)`, so the theme token stays in charge unless the canvas overrides it.
 
 ## 4. Typography
 
@@ -224,15 +224,17 @@ Common pairs: card interiors `24px 22px`, `22px 24px` or `26px 28px`; panel head
 
 ### Breakpoints
 
-Inline styles cannot respond to width, so each page keeps a short list of `@media` rules in its `<style>` that target ids and win with `!important`.
+Inline styles cannot respond to width, so each page keeps a short list of `@media` rules in its `<style>` that target ids or hook classes and win with `!important`.
 
 | Max width | Rule |
 |---|---|
 | `1200px` | Hide the nav row (`#sitenav`), show the `#hdrmenu` button; the nav opens as a full-width panel under the header |
-| `1000px` | Docs `#layout` collapses to one column; `#toc` hidden |
-| `860px` | Tool panels (`#tool`) and the evidence `#diff` collapse to one column |
+| `1000px` | Docs `#layout` collapses to one column; `#toc` hidden. Landing four-column grids (`.g4`) halve |
+| `860px` | Tool panels (`#tool`) and the evidence `#diff` collapse to one column. Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
 | `720px` | Assembler matrix (`.im`, `.mx`) drops secondary columns |
-| `620px` | Header gutter to `20px`, header gap to `14px`, "Take the tour" hidden |
+| `620px` | Header gutter to `20px`, header gap to `14px`, "Take the tour" hidden. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
+
+On the landing page every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid there has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
 Layers: the header sits at `z-index: 50`, the guided tour overlay at `90`. Nothing else is layered.
 
@@ -374,9 +376,9 @@ Selection is `--accent` on `--bg`. Interactive elements set `cursor: pointer`. T
 The pages are exports from a Claude Design canvas and are rendered by `support.js`. Editing them means editing the export, so follow its shape.
 
 - **Structure:** `<body>` wraps everything in `<x-dc>`; the `<helmet>` holds the title, meta description, font links and the `<style>` block; the page content follows as ordinary elements.
-- **Inline styles only.** Elements carry `style="…"` with token references. There are no class-based styles, apart from the assembler matrix helpers (`.im`, `.mx` and their `-hide-sm` variants) that exist so a media query can reach many rows at once.
+- **Inline styles only.** Elements carry `style="…"` with token references. There are no class-based styles, apart from responsive hooks: the assembler matrix helpers (`.im`, `.mx` and their `-hide-sm` variants) and the landing page's grid hooks (`.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd`, `.rm`), which exist only so a media query can reach many elements at once. A class never carries a style of its own outside a media rule.
 - **Hover** is the `style-hover="…"` attribute, which the runtime turns into a hover rule. There is no `style-focus` or `style-active` in use.
-- **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ tourCard }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`.
+- **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ tourCard }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`. The runtime passes every prop's default, so the component pins `--accent` inline only when the value differs from `ACCENT_DEFAULT`; a test keeps that constant equal to the `data-props` default and the `:root` token.
 - **Responsive rules** go in the page's `<style>` as `@media (max-width: …)` blocks that select by id and end declarations with `!important`, because an inline style would otherwise win.
 - **Tour targets** are marked `data-tour="name"` on the section or panel.
 - **Generated content:** `generated/`, `SPEC.md`, the requirement arrays in the Spec and Assembler pages, the slot defaults in Producers and the profile examples come from `npm run build:contract`. Edit the source under `contract/`, `schema/` and `examples/`, then rebuild; `npm test` fails if a generated file is stale.
@@ -396,8 +398,6 @@ Left to right is the cascade order a value passes through; a later stage wins ov
 
 These are how the site behaves today. They are recorded so that a matching page is not mistaken for a correct one.
 
-- **Landing-page accent in dark mode.** The `accent` canvas prop in `index.html` is written inline onto `<html>` on render, which beats the dark override, so the landing page keeps the light accent (`#dd4300`) in dark mode while every other page switches to `oklch(0.74 0.17 45)`. Treat the token as the intent.
-- **Landing hero at phone width.** The hero grid (`minmax(0, 1.06fr) minmax(0, 0.94fr)`) has no narrow-width rule, so below roughly 860px the headline and the preview card share the width and the headline clips. Other fixed multi-column grids on the landing page have the same gap. New two-column layouts should add a collapse rule like the docs pages do.
 - **Focus visibility.** No custom focus styles, and textareas suppress the default ring.
 - **Small mono.** Labels run down to `10.5px` and `11px`. Do not go smaller.
 - **Duplicated tokens.** Because each page repeats the token block, a token change is a seven-file change. Change all seven in one commit.
@@ -411,5 +411,5 @@ These are how the site behaves today. They are recorded so that a matching page 
 5. Put one accent kicker above each h2; use muted mono labels for everything inside.
 6. Prefer a hairline grid to separate cards; keep cells square, filled with `--bg`, and hover clickable ones to `--accent-soft`.
 7. Use only tokens, only the two typefaces, only the pill radius, and no shadows, gradients or transitions.
-8. Give any fixed multi-column grid an id and a collapse rule in the page's `<style>`.
+8. Give any fixed multi-column grid a hook (an id, or on the landing page one of the `.g2`, `.g3`, `.g4` classes) and a collapse rule in the page's `<style>`; the landing page's test enforces this.
 9. Serve the folder, check light and dark, check 375px and 1024px, and run `npm test`.
