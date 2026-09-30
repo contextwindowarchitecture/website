@@ -145,7 +145,7 @@
       "propertyNames": {
         "$ref": "context_item.schema.json#/properties/slot"
       },
-      "description": "Tiers this route raises above the slot default. Only raising is meaningful; items cannot raise their own (R-16).",
+      "description": "Tiers this route raises above the slot default; items cannot raise their own (R-16). A value at or below the default changes nothing: the effective tier is the higher of the two.",
       "additionalProperties": {
         "type": "string",
         "enum": [

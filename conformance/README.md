@@ -39,7 +39,7 @@ When an item fails several admission checks, the trace records the earliest appl
 
 `duplicate_item_id` compares a candidate's id with the non-blank string id of every other candidate, in any batch and whatever that candidate's own outcome, and with the `item_id` of every producer exclusion, in any batch. Each candidate sharing an id is excluded with the earliest code that applies to it, so a schema-invalid copy keeps its schema code and an unauthenticated producer's copy keeps `producer_not_authenticated`.
 
-`protected_tier_changed` applies in the slots whose default tier in `contract/slot-defaults.json` is `protected`. In a slot that only the route's `tier_upgrades` raised, an item may set a lower tier of its own, and it is then not protected.
+`protected_tier_changed` applies in the slots whose default tier in `contract/slot-defaults.json` is `protected`. In a slot that only the route's `tier_upgrades` raised, an item may set a lower tier of its own, and it is then not protected. A `tier_upgrades` value at or below its slot's default tier changes nothing: a slot's tier is the higher of its default and the route's value, since the slot defaults set the minimum protection (R-16).
 
 `missing_field:<name>` names a field of the item itself: one of the eight minimum fields, or one its slot requires: `expires` for memory (R-9) and `relevance` for knowledge (R-13). An item without a slot requires no slot-specific field, so it is `missing_field:slot`. A variant missing one of its own fields is `invalid_structure`. A batch entry that is not a JSON object is not an item at all: the snapshot fails its schema and is rejected (R-2, R-17).
 

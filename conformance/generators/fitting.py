@@ -552,6 +552,22 @@ CASES = [
         "refuse": "protected_content_over_budget",
     },
     {
+        "id": "budget-tier-lowering-ignored",
+        "rules": ["R-16", "R-17", "R-21"],
+        "description": "The route's tier_upgrades names compressible for state.task, whose default is protected. A value at or below "
+                       "the default changes nothing, so the task stays protected; the protected items alone exceed budget.input, and "
+                       "assembly refuses rather than omitting the task.",
+        "budget": 25,
+        "policy": {"tier_upgrades": {"state.task": "compressible"}},
+        "items": [
+            (item("policy:v12", "governance.instructions", POLICY_TEXT), "admit"),
+            (item("task:8821", "state.task", "refund_request: verify_eligibility=done, collect_reason=pending, issue_refund=pending"), "admit"),
+            (item("ex:1", "governance.examples", "Example: refunds within thirty days are approved."), "admit"),
+            (item("turn:18", "interaction.query", QUERY), "admit"),
+        ],
+        "refuse": "protected_content_over_budget",
+    },
+    {
         "id": "evidence-request-context",
         "rules": ["R-12", "R-17", "R-21", "R-22"],
         "description": "A route that requires evidence refuses with recovery request_context when admission leaves no evidence, although everything else fits.",
