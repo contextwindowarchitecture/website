@@ -167,9 +167,9 @@ const RULES = [
     "implemented",
     1,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -180,9 +180,9 @@ const RULES = [
     "implemented",
     5,
     [
-      2,
-      2,
-      2
+      1,
+      1,
+      1
     ]
   ],
   [
@@ -193,9 +193,9 @@ const RULES = [
     "implemented",
     5,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -230,7 +230,7 @@ const RULES = [
     "assembler",
     "Classifies each declared group as instruction or fact and resolves it by authority or route policy; only governing and user items are instruction peers, and trust and the injection marker never change that.",
     "implemented",
-    6,
+    7,
     [
       0,
       0,
@@ -258,9 +258,9 @@ const RULES = [
     "boundary-checked",
     1,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -271,9 +271,9 @@ const RULES = [
     "boundary-checked",
     4,
     [
-      4,
-      4,
-      4
+      3,
+      3,
+      3
     ]
   ],
   [
@@ -284,9 +284,9 @@ const RULES = [
     "boundary-checked",
     3,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -295,7 +295,7 @@ const RULES = [
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
-    15,
+    16,
     [
       4,
       4,
@@ -323,9 +323,9 @@ const RULES = [
     "boundary-checked",
     5,
     [
-      3,
-      3,
-      3
+      2,
+      2,
+      2
     ]
   ],
   [
@@ -336,9 +336,9 @@ const RULES = [
     "boundary-checked",
     1,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -349,9 +349,9 @@ const RULES = [
     "boundary-checked",
     7,
     [
-      3,
-      3,
-      3
+      2,
+      2,
+      2
     ]
   ],
   [
@@ -362,9 +362,9 @@ const RULES = [
     "boundary-checked",
     32,
     [
-      2,
-      2,
-      2
+      1,
+      1,
+      1
     ]
   ],
   [
@@ -373,7 +373,7 @@ const RULES = [
     "assembler",
     "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
-    41,
+    42,
     [
       12,
       12,
@@ -388,9 +388,9 @@ const RULES = [
     "boundary-checked",
     10,
     [
-      1,
-      1,
-      1
+      0,
+      0,
+      0
     ]
   ],
   [
@@ -425,11 +425,11 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    55,
+    56,
     [
-      5,
-      5,
-      5
+      4,
+      4,
+      4
     ]
   ],
   [
@@ -440,9 +440,9 @@ const RULES = [
     "implemented",
     21,
     [
-      4,
-      4,
-      4
+      3,
+      3,
+      3
     ]
   ],
   [
@@ -498,7 +498,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":78,"passed":16,"stale":58},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":78,"passed":16,"stale":58},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4ab7e764e77cf8940b6c059a10d503f8da55edb6","websiteSha":"804e351ec0a7b586c8aeaf3832febc90bd6adb78","total":78,"passed":16,"stale":58}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":79,"passed":15,"stale":59},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":79,"passed":15,"stale":59},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4ab7e764e77cf8940b6c059a10d503f8da55edb6","websiteSha":"804e351ec0a7b586c8aeaf3832febc90bd6adb78","total":79,"passed":15,"stale":59}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.

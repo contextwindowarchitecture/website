@@ -427,6 +427,22 @@ CASES = [
         "refuse": "conflict_unresolved", "recovery": "request_context",
     },
     {
+        "id": "conflict-instruction-request-context",
+        "rules": ["R-6", "R-11", "R-17", "R-21"],
+        "description": "Two governing instructions both govern, so their group escalates, and the route's on_unresolved_instruction asks for "
+                       "more context: assembly refuses with conflict_unresolved and recovery.action request_context.",
+        "policy": {"on_unresolved_instruction": "request_context"},
+        "items": [
+            (item("policy:v12", "governance.instructions", POLICY_TEXT), REG, "admit"),
+            (item("policy:nocite", "governance.instructions", "Never mention internal document ids."), REG, "admit"),
+            (item("turn:18", "interaction.query", QUERY), CONV, "admit"),
+        ],
+        "groups": [
+            {"id": "g-cite", "kind": "instruction", "items": ["policy:v12", "policy:nocite"], "decided_by": "escalated", "resolution": "context_requested"},
+        ],
+        "refuse": "conflict_unresolved", "recovery": "request_context",
+    },
+    {
         "id": "render-attribute-escaping",
         "rules": ["R-11", "R-21"],
         "description": "fixture-xml/v1 escapes &, < and > everywhere and \" as well in attribute values: an item id and a surfaced group id "
