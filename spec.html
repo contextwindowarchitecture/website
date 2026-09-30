@@ -383,6 +383,7 @@
             <li>Before the draft release, the requirements, schemas, reason codes, conformance cases and pages were checked against each other for rules one of them stated and another contradicted or left out. The entries below settle what that found.</li>
             <li>R-15: an item in a slot the route does not list for its producer is excluded with producer_slot_not_allowed. Only contract/reasons.json and the site's checker said so, and R-15 read as if an mcp producer's tool specification in governance.capabilities were capability_not_allowed whatever the route listed. It is, only where the route lists that slot for the producer; otherwise producer_slot_not_allowed comes first, as the reason-code order already had it. The admission-route-slots case pins both.</li>
             <li>R-13: every evidence.knowledge item, from any producer, carries its rerank score as relevance, and one without it is missing_field:relevance. The item schema always required it and the missing_field reason said so, but R-13 asked only retrievers for a score and called an unscored item below_threshold, a code the earlier missing_field always preempts in knowledge. Nothing behaves differently; the admission-reasons case already pins it.</li>
+            <li>§3.1 and §2.2: a retrieved chunk is reference_only in knowledge and observation in tool results. Both said every retrieved chunk is reference_only, which R-1 forbids in tool results, so a producer following them there got authority_not_allowed. The 2026-09-27 fix to R-13 had not reached them, and the Producers page's retriever card now names both slots too.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
@@ -561,8 +562,8 @@ const AUTHORITY = [
   ["Governing instruction", "governing", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
   ["User intent / preference", "user", "What the user asks for and how they want it. It cannot lift a constraint set above it."],
   ["Canonical state", "state", "Application-owned facts about the task and session. The route defines the facts for which this source is canonical."],
-  ["Reference evidence", "reference_only", "Retrieved chunks, which inform the answer but never direct behaviour."],
-  ["Tool observation", "observation", "What a tool returned: evidence about the world, not permission to act on it."],
+  ["Reference evidence", "reference_only", "Retrieved chunks in knowledge, which inform the answer but never direct behaviour."],
+  ["Tool observation", "observation", "What a tool returned, and any retrieved chunk a route sends to tool results: evidence about the world, not permission to act on it."],
   ["Generated memory", "generated", "Summaries and inferences the system wrote. They are fallible, they expire, and they can be revoked."],
   ["Untrusted (least privilege)", "untrusted", "Prior model turns in history, which must carry it, and any other item in tool results, memory or history whose producer wants it handled with the least privilege. It keeps the item out of an instruction group's peers and changes nothing else. Governance, knowledge, state and the query never carry it. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
 ];
@@ -596,7 +597,7 @@ const ITEM_FIELDS = [
   ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
   ["trust", "Verified, unverified, or untrusted: the producer's own claim about its source, so it proves nothing (R-15). Only the governance gate reads it, which admits verified items alone (R-10). It never decides who can instruct or which fact wins."],
   ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
-  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only and still untrusted_content (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
+  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only in knowledge and observation in tool results, and untrusted_content in both (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
 ];
 const TESTS = [
   ["Assembly snapshot", "Identical immutable assembly snapshots produce identical rendered bytes and hashes.", 23],
