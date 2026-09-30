@@ -1,36 +1,38 @@
-<!-- profile: policy-first-chat/v1 -->
+<!-- profile: policy-first-chat/v1, rendered by cwa-messages/v1 (conformance/README.md, Tokenizers and renderers) -->
+<!-- These comments are notes for you; the renderer emits none of them. A rendered item is <tag id="…">, its -->
+<!-- escaped body on a line of its own, then </tag>. The placeholders below are empty. -->
 
-<!-- governance.instructions · authority=governing · protected -->
-<instructions version=""></instructions>
+<!-- system role · governance.instructions · governing · protected -->
+<!-- one system entry per item: {"id": …, "text": …}, the body unescaped -->
 
-<!-- state.user · authority=state · scope=user,session -->
-<user_facts></user_facts>
+<!-- The one user message holds every xml: placement, in this order. -->
 
-<!-- evidence.knowledge · authority=reference_only · one <evidence> per evidence item -->
-<evidence id="" source="" version="" trust="" freshness=""></evidence>
+<!-- state.user · state · droppable unless the route raises it · scoped to the tenant and user -->
+<user_profile id=""></user_profile>
 
-<!-- state.task · authority=state · app-owned, canonical -->
-<task></task>
+<!-- evidence.knowledge · reference_only · compressible · one per chunk, each with its relevance -->
+<evidence id=""></evidence>
 
-<!-- interaction.memory · authority=generated · lineage=summary · ttl -->
-<memory></memory>
+<!-- state.task · state · protected · written by the application -->
+<task id=""></task>
 
-<!-- interaction.history · authority=user; model turns untrusted + lineage=generated · transcript, bounded -->
-<history></history>
+<!-- interaction.memory · generated · compressible · lineage summarised, with an expires deadline -->
+<memory id=""></memory>
 
-<!-- governance.capabilities · authority=governing · source=capability-policy -->
-<tools></tools>
+<!-- interaction.history · user, or untrusted with lineage generated for a model turn · a transcript, never messages -->
+<history id="" speaker="user"></history>
 
-<!-- evidence.tool_results · authority=observation · one <observation> per call -->
-<observation call="" age=""></observation>
+<!-- tools role · governance.capabilities · governing · protected -->
+<!-- one tools entry per granted tool: {"id": …, "text": …}, the specification unescaped -->
 
-<!-- governance.examples · authority=governing · droppable -->
-<examples></examples>
+<!-- evidence.tool_results · observation · compressible · one per call -->
+<observation id=""></observation>
 
-<!-- governance.output_contract · authority=governing · protected -->
-<format></format>
+<!-- governance.examples · governing · droppable -->
+<examples id=""></examples>
 
-<!-- interaction.query · authority=user · protected -->
-<query></query>
+<!-- governance.output_contract · governing · protected -->
+<format id=""></format>
 
-<!-- trace: <id> · included/compressed/excluded counts · conflicts -->
+<!-- interaction.query · user · protected · the only live user turn -->
+<query id=""></query>

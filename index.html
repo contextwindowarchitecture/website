@@ -571,7 +571,7 @@
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Producer contract</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">What your tool has to emit.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to check its structure and local invariants; the application owns admission.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to check its structure and local invariants; the assembler admits it against the route.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the contract →</span>
         </a>
         <a href="./evidence.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
@@ -602,7 +602,7 @@
         <div style="background: var(--bg); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">When nothing valid is retrieved</div>
           <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">The assembler refuses with evidence_required and a recovery action. The application retrieves narrower, precomputes a summary, or requests context before constructing a new snapshot.</div>
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">When admission yields no valid evidence, an assembler <span style="color: var(--accent); font-weight: 600;">MUST NOT</span> answer from nothing. It <span style="color: var(--accent); font-weight: 600;">MUST</span> refuse and record a recovery action for the application, and the trace <span style="color: var(--accent); font-weight: 600;">MUST</span> record which.</div>
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);">When admission and fitting leave no valid evidence on a route that requires it, an assembler <span style="color: var(--accent); font-weight: 600;">MUST NOT</span> answer from nothing. It <span style="color: var(--accent); font-weight: 600;">MUST</span> refuse and record a recovery action for the application, and the trace <span style="color: var(--accent); font-weight: 600;">MUST</span> record which.</div>
         </div>
         <div style="background: var(--bg); padding: 24px 22px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Factual precedence is route policy</div>
@@ -1079,13 +1079,13 @@ const UCS = [
     picks: [
       [0, "Patient tutor. Correct one thing, then keep the conversation moving."],
       [1, "level B1 · 34-day streak · shaky on the subjunctive"],
-      [4, "Earlier sessions: preterite mastered, avoids the formal register. · ttl 90d"],
+      [4, "Earlier sessions: preterite mastered, avoids the formal register. · expires 2026-12-20"],
       [5, "learner: si tuviera tiempo, iría contigo"],
       [8, "Two past corrections written in the tone we want."],
       [9, "Reply in Spanish. One correction maximum."],
       [10, "Is that right?"]
     ],
-    note: "No tools and nothing retrieved — but memory and user facts carry the whole experience. Completely different system, same schema. Memory entries carry a TTL, which is what stops old corrections from outliving their usefulness.",
+    note: "No tools and nothing retrieved — but memory and user facts carry the whole experience. Completely different system, same schema. Memory entries carry an expires deadline, which is what stops old corrections from outliving their usefulness.",
     questions: ["What earns a place in memory versus a disposable session log — and who can revoke it?", "Is proficiency a stored fact in state.user, or inferred fresh each turn from history?"]
   }
 ];
@@ -1098,7 +1098,7 @@ const OMITTABLE = [4, 5];
 const BUDGETS = [8192, 4096, 2048, 1024];
 
 const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v1", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default renderer for this site's examples." },
+  { name: "Policy-first chat", id: "policy-first-chat/v1", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default profile for this site's examples." },
   { name: "Document analysis", id: "document-analysis/v1", route: "document-qa", uses: "Long reports, contracts, corpora", order: [0, 2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Instructions open the system text; documents follow, clearly delimited; the instructions repeat after them with the examples and the question, near the end." },
   { name: "Tool-using agent", id: "tool-agent/v1", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
   { name: "Structured extraction", id: "extraction/v1", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
@@ -1294,7 +1294,7 @@ class Component extends DCLogic {
         owns: ["The full agentic loop and subagents", "MCP servers and tool permissions", "Automatic compaction", "File and shell access"],
         blank: ["What goes in the system prompt vs CLAUDE.md", "How much each tool returns, and in what shape", "What survives a compaction pass", "Where task state is written down"],
         cost: ["CLAUDE.md becomes a junk drawer of unowned rules", "One chatty tool floods the window mid-task", "Compaction drops the half you needed, silently"],
-        verdict: "Yes — most of all here. Compaction decides what survives; CWA's tiers decide what it is choosing between. Items that know their own tier and TTL compact predictably."
+        verdict: "Yes — most of all here. Compaction decides what survives; CWA's tiers decide what it is choosing between. Items that know their own tier and expiry compact predictably."
       },
       {
         label: "Vercel AI SDK", name: "the AI SDK", stage: "Build system + messages",
@@ -1592,7 +1592,7 @@ class Component extends DCLogic {
     const evBase = "font-family: var(--mono); font-size: 11px; line-height: 1.5; margin-top: 10px; color: ";
     let evictionLabel, evictionStyle = evBase + "var(--muted);";
     if (refused) {
-      evictionLabel = "Refused: even after dropping " + (evictedNames.join(", ") || "nothing") + " and compressing " + (compressedNames.join(", ") || "nothing") + ", essential evidence does not fit. The assembler does not answer — it retrieves narrower, summarises with traceability, or routes for more context.";
+      evictionLabel = "Refused: even after dropping " + (evictedNames.join(", ") || "nothing") + " and compressing " + (compressedNames.join(", ") || "nothing") + ", essential evidence does not fit. The assembler does not answer: it refuses and records a recovery action, and the application retrieves narrower, precomputes a summary or asks for more context before building a new snapshot.";
       evictionStyle = evBase + "var(--accent);";
     } else if (evictedNames.length || compressedNames.length) {
       evictionLabel = (evictedNames.length ? "Dropped: " + evictedNames.join(", ") + ". " : "") + (compressedNames.length ? "Compressed with source links: " + compressedNames.join(", ") + ". " : "") + "Protected slots untouched.";
