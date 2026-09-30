@@ -17,7 +17,7 @@ Some cases have a generator in `generators/`. It holds a table of each candidate
 
 ## Running a case
 
-1. Validate `snapshot.json` and load it. A snapshot that fails its schemas or any check in Snapshot checks is rejected before assembly and has no trace (R-17). Resolve `tokenizer` and `renderer` by ID; an implementation that does not provide one skips the case and reports it as skipped, not passed.
+1. Validate `snapshot.json` and load it. A snapshot that fails its schemas or any check in Snapshot checks is rejected before assembly and has no trace (R-17). Resolve `tokenizer` and `renderer` by ID. Every implementation provides the ones Tokenizers and renderers requires; a case that uses an optional one the implementation does not provide is skipped, not passed (Reporting results).
 2. Assemble.
 3. Compare the payload byte for byte with `expected.payload.txt`, or confirm no payload when that file is absent.
 4. Compare the trace with `expected.trace.json` after removing `trace_id` and `timings`, which may differ (R-23). `context.snapshot_digest` is compared like every other field; Snapshot digest defines it.
@@ -188,9 +188,11 @@ A snapshot is *valid* when it satisfies `snapshot.schema.json`, and the schemas 
 - **Producer exclusions (R-9, R-13).** An exclusion's `duplicate_of` or `superseded_by` is the id of a candidate in the same batch. Its `reason` is an exclusion code, which the batch schema checks.
 - **Profile (R-19, R-20).** Its `spec` is `cwa/draft`, which the profile schema fixes and the trace repeats as `context.spec` (R-21). Its `route` and `route_policy_version` equal the route policy's `route` and `version`. It places `governance.instructions` and `interaction.query`, and `governance.output_contract` when the route sets `parser: true`. The snapshot's renderer can realize it (Tokenizers and renderers).
 
-A tokenizer or renderer the implementation does not provide is not a problem with the snapshot: the case is skipped (Reporting results).
+A tokenizer or renderer the implementation does not provide is not a problem with the snapshot, so the snapshot is not rejected for it. A case that uses an optional one is skipped, and one that uses a required one has failed (Reporting results).
 
 ## Tokenizers and renderers
+
+Every implementation provides the tokenizers and renderers below, and every published case uses them. Without the two fixtures an assembler's report could back its claim (§1 on the spec page) with few cases or none, without `estimate-utf8/v1` the only published tokenizer meant for a model would go untested, and without `cwa-messages/v1` so would the platform roles R-7 keeps with the application. A tokenizer or renderer published after these is optional unless it is added to them, and a case that uses an optional one the implementation does not provide is skipped (Reporting results).
 
 - `fixture-whitespace/v1` counts maximal runs of characters outside the ECMAScript whitespace and line-terminator set: U+0009–U+000D, U+0020, U+00A0, U+1680, U+2000–U+200A, U+2028, U+2029, U+202F, U+205F, U+3000 and U+FEFF. This is what JavaScript's `/\S+/gu` matches. Other languages must use this set explicitly; Python's `\S`, for example, differs at U+001C–U+001F and U+FEFF. It is a test fixture, not a model tokenizer.
 - `estimate-utf8/v1` counts a text as the number of bytes in its UTF-8 encoding divided by 4, rounded up: `(bytes + 3)` divided by 4, discarding the remainder, so an empty text counts 0. It is a portable estimate for models whose provider offers no local tokenizer, close to English text on common BPE vocabularies and low for scripts that take several bytes a character but about one token each, such as Chinese and Japanese. Pair it with a `budget.margin_percent` that covers the error for the route's text (R-16). A snapshot is already free of unpaired surrogates, so every text has one UTF-8 encoding.
@@ -221,13 +223,13 @@ An implementation reports a run as `conformance-report.json`, valid against `sch
 
 - `passed`: the payload and trace match, as Running a case describes;
 - `failed`: anything else, including an exception or a trace the schema rejects. `detail` says what differed;
-- `skipped`: the implementation does not provide the case's tokenizer or renderer. `detail` names it.
+- `skipped`: the case uses an optional tokenizer or renderer the implementation does not provide. `detail` names it. A case that uses only required ones is never skipped: an implementation that lacks one reports the case as `failed`.
 
 It also holds one entry per directory under `rejections/`, ordered by id, in `rejections`, with the case's `rules` and one outcome:
 
 - `rejected`: the implementation rejected the snapshot before assembly, with no payload and no trace;
 - `failed`: anything else: it assembled a payload, refused, or raised something other than a rejection. `detail` says what happened;
-- `skipped`: it does not provide the case's renderer, and the check the case breaks is the renderer's (`profile-unrealizable`, `profile-invalid-tag` and the `messages-*` cases). `detail` names it. Every other check runs before a renderer is needed, so its case is never skipped.
+- `skipped`: the case uses an optional renderer the implementation does not provide, and the check the case breaks is that renderer's, as it is in `profile-unrealizable`, `profile-invalid-tag` and the `messages-*` cases. `detail` names it. Every other check runs before a renderer is needed and no check needs a tokenizer, so no other rejection case is skipped, and neither is one whose renderer is required.
 
 Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of both implementations, the Python reference assembler (beside its `status.json`), the TypeScript assembler and the Go assembler. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.website_commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
 

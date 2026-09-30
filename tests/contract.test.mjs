@@ -584,6 +584,24 @@ test('conformance cases are complete, schema-valid, and agree with the published
   assert.deepEqual(await fs.readFile(new URL('expected.payload.txt', fixture)), await fs.readFile(new URL('../examples/payload.txt', import.meta.url)));
 });
 
+// conformance/README.md, Tokenizers and renderers: every implementation provides the ones listed there, so a
+// conformant assembler may skip no published case (§1). One published later as optional needs its own list here.
+test('every published case and rejection uses a tokenizer and renderer every implementation provides', async () => {
+  const readme = await fs.readFile(new URL('../conformance/README.md', import.meta.url), 'utf8');
+  const section = readme.split('\n## Tokenizers and renderers\n')[1].split('\n## ')[0];
+  assert.match(section, /^Every implementation provides the tokenizers and renderers below\b/m);
+  const required = [...section.matchAll(/^- `([^`]+)`/gm)].map(m => m[1]).sort();
+  assert.deepEqual(required, ['cwa-messages/v1', 'estimate-utf8/v1', 'fixture-whitespace/v1', 'fixture-xml/v1']);
+  for (const dir of ['cases', 'rejections']) {
+    const root = new URL(`../conformance/${dir}/`, import.meta.url);
+    for (const name of await fs.readdir(root)) {
+      const { tokenizer, renderer } = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
+      assert.ok(required.includes(tokenizer), `${dir}/${name}: tokenizer ${tokenizer}`);
+      assert.ok(required.includes(renderer), `${dir}/${name}: renderer ${renderer}`);
+    }
+  }
+});
+
 test('a budget may reserve an integer margin percent of at most 100, and the trace repeats it (R-16)', async () => {
   const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
   for (const [margin, valid] of [[0, true], [15, true], [100, true], [-1, false], [101, false], [7.5, false], ['10', false]]) {
@@ -854,7 +872,7 @@ test('the registry lock pins the published profiles and route policies by digest
 
 test('a conformance report records one outcome per case, and why any case did not pass (R-21)', () => {
   const report = { implementation: { name: 'cwa-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
-    cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'skipped', detail: 'no cwa-messages/v1 renderer' }] };
+    cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'failed', detail: 'no cwa-messages/v1 renderer' }] };
   assert.equal(validateConformanceReportSchema(report), true, JSON.stringify(validateConformanceReportSchema.errors));
   for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = [`R-${requirementIds.length + 1}`],
     r => r.cases[0].rules = ['R-1\n'], r => r.cases[0].rules = [], r => r.contract.website_commit = 'abc1234', r => r.contract.website_commit += '\n',
