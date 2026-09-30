@@ -63,7 +63,7 @@
 
   <section style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-09-29</div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-09-30</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page is the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
@@ -378,7 +378,7 @@
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
-          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-09-29 · rules stated where they apply</div>
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-09-30 · rules stated where they apply</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>Before the draft release, the requirements, schemas, reason codes, conformance cases and pages were checked against each other for rules one of them stated and another contradicted or left out. The entries below settle what that found.</li>
             <li>R-15: an item in a slot the route does not list for its producer is excluded with producer_slot_not_allowed. Only contract/reasons.json and the site's checker said so, and R-15 read as if an mcp producer's tool specification in governance.capabilities were capability_not_allowed whatever the route listed. It is, only where the route lists that slot for the producer; otherwise producer_slot_not_allowed comes first, as the reason-code order already had it. The admission-route-slots case pins both.</li>
