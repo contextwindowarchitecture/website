@@ -527,7 +527,7 @@ const FAILURES = [
   ],
   [
     "below_threshold",
-    "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes.",
+    "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes. An evidence.knowledge item always needs a score, so one without it is missing_field:relevance instead (R-13).",
     13
   ],
   [

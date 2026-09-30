@@ -213,7 +213,7 @@ export const ITEM_SCHEMA = {
     },
     "relevance": {
       "type": "number",
-      "description": "Finite rerank score; the scale and threshold belong to versioned route policy."
+      "description": "Finite rerank score; the scale and threshold belong to versioned route policy. Required in evidence.knowledge (R-13)."
     },
     "revoked_by": {
       "type": "string",
@@ -265,7 +265,7 @@ export const ITEM_SCHEMA = {
         "properties": {
           "relevance": {
             "type": "number",
-            "description": "Finite rerank score; the scale and threshold belong to versioned route policy."
+            "description": "Finite rerank score; the scale and threshold belong to versioned route policy. Required in evidence.knowledge (R-13)."
           }
         }
       }
@@ -1226,7 +1226,7 @@ export const REASONS = [
     "code": "below_threshold",
     "kind": "exclusion",
     "rule": "R-13",
-    "text": "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes."
+    "text": "The rerank score is under its slot's min_relevance, or the item has no score in a slot that sets one. A score equal to the threshold passes. An evidence.knowledge item always needs a score, so one without it is missing_field:relevance instead (R-13)."
   },
   {
     "code": "not_eligible",

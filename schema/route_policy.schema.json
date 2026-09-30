@@ -300,7 +300,7 @@
       "properties": {
         "min_relevance": {
           "type": "number",
-          "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way. A score equal to the threshold passes."
+          "description": "Items scoring below this rerank threshold are excluded as below_threshold (R-13). An item with no relevance cannot clear a threshold and is excluded the same way, except in evidence.knowledge, where relevance is required and an item without it is missing_field:relevance (R-13). A score equal to the threshold passes."
         },
         "max_age_seconds": {
           "type": "integer",
