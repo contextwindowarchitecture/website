@@ -116,6 +116,21 @@ test('the migrator preserves long bodies and handles malformed message entries',
   assert.equal(turns.items[1].meta.startsWith('authority: untrusted'), true);
 });
 
+// LICENSE and NOTICE put the specification, schemas, cases, scaffolds and site under Apache-2.0: anyone may use, copy,
+// modify and implement them, and a copy they distribute keeps the licence and NOTICE. No page may waive that.
+test('every page that speaks of the licence names Apache-2.0 and links it, and none waives its terms', async () => {
+  const root = new URL('../', import.meta.url);
+  const pages = (await fs.readdir(root)).filter(f => f.endsWith('.html'));
+  assert.match(await fs.readFile(new URL('LICENSE', root), 'utf8'), /Apache License\s+Version 2\.0/);
+  for (const page of pages) {
+    const html = await fs.readFile(new URL(page, root), 'utf8');
+    // The spec page's changelog records what pages used to say, so it may quote a waiver it removed.
+    const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<section id="changelog"[\s\S]*?<\/section>/g, '').replace(/<[^>]+>/g, ' ');
+    assert.doesNotMatch(text, /without attribution|no attribution|no licen[cs]e|public domain/i, page);
+    if (/\blicen[cs]e\b|Apache/i.test(text)) assert.ok(html.includes('href="./LICENSE"'), `${page} speaks of the licence without linking it`);
+  }
+});
+
 // R-7: an item never gains authority from imperative wording in its body. The migrator may split text the application
 // wrote by what it says, but user and assistant turns keep their speaker's slot, whatever they say.
 test('the migrator places what a user or model turn says by its speaker, never by its wording', async () => {
