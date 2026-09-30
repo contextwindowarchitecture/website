@@ -615,8 +615,15 @@ class Component extends DCLogic {
       verdict: result.valid ? "local checks passed" : "checks failed", verdictColor: result.valid ? ok : bad,
       findings: [...result.findings.map(f => ({ mark: "✕", color: bad, text: f.text, rule: "R-" + f.rule, href: "./spec.html#R-" + f.rule })), { mark: "·", color: warn, text: this.state.contract.CONTRACT_SCOPE, rule: "R-5", href: "./spec.html#R-5" }],
       filled: result.filled.map(field => field + ": " + JSON.stringify(result.item[field])), filledNote: result.filled.length ? "" : "nothing to fill",
-      traceLine: result.valid ? "No admission trace: route policy and producer identity have not been checked." : "would be excluded: " + result.findings.map(f => f.reason).join(", ")
+      traceLine: result.valid ? "No admission trace: route policy and producer identity have not been checked." : this.excludedAs(result.findings.map(f => f.reason))
     };
+  }
+  // A trace records the earliest applicable code in contract/reasons.json's order, and among missing fields the first
+  // name alphabetically (R-21), so that code leads whatever order the local checks found them in.
+  excludedAs(reasons) {
+    const rank = r => this.state.contract.REASONS.findIndex(x => x.code === (r.startsWith("missing_field:") ? "missing_field:<name>" : r));
+    const [first, ...rest] = [...new Set(reasons)].sort((a, b) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0));
+    return "would be excluded as " + first + (rest.length ? "; it also fails " + rest.join(", ") : "");
   }
   validateTrace(src) {
     const ok = "var(--p-evid)", bad = "var(--accent)", warn = "var(--muted)";

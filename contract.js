@@ -154,7 +154,7 @@ function checkRenderedBudget(trace, context) {
   const findings = [];
   if (!trace.refused.bool) {
     for (const slot of ['governance.instructions', 'interaction.query']) {
-      if (!trace.included.some(item => item.slot === slot)) findings.push(failure('missing_required_slot', `Missing ${slot}.`, 4));
+      if (!trace.included.some(item => item.slot === slot)) findings.push(failure('required_slot_not_included', `A trace that was not refused includes nothing in ${slot}.`, 4));
     }
     const includedTokens = trace.included.reduce((sum, item) => sum + item.tokens, 0);
     // The payload fits when its count, charged with budget.margin_percent and rounded up, is within budget.input (R-16).

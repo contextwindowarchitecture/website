@@ -105,6 +105,22 @@ test('browser item and trace tools use the shared contract without crashing on v
   assert.equal(view.validateTrace(JSON.stringify(contract.TRACE_EXAMPLE)).verdict, 'structure and local invariants valid');
 });
 
+// R-21 records the earliest applicable code in contract/reasons.json's order, and among missing fields the first
+// name alphabetically, so the linter names that code first whatever order its checks found them in.
+test('the item linter names first the code a trace would record for an item (R-21)', async () => {
+  const view = await component('producers.html');
+  view.state.contract = contract;
+  view.state.validationTime = '2026-09-22T12:00:00Z';
+  const { source, body, ...unsourced } = contract.ITEM_EXAMPLE;
+  const variant = id => ({ id, body: 'x', method: 'extract', lineage: 'extracted' });
+  for (const [item, line] of [
+    [{ ...contract.ITEM_EXAMPLE, expires: '2026-09-01T00:00:00Z', injection_risk: 'none' }, 'would be excluded as untrusted_content_unmarked; it also fails expired'],
+    [unsourced, 'would be excluded as missing_field:body; it also fails missing_field:source'],
+    [{ ...contract.ITEM_EXAMPLE, slot: 'state.task', authority: 'state', injection_risk: 'none', tier: 'droppable', variants: [variant('v'), variant('v')] },
+      'would be excluded as protected_tier_changed; it also fails duplicate_variant_id'],
+  ]) assert.equal(view.lint(JSON.stringify(item)).traceLine, line);
+});
+
 test('the migrator preserves long bodies and handles malformed message entries', async () => {
   const view = await component('start.html');
   const body = 'Please explain this technical passage. '.repeat(30);
