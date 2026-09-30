@@ -126,7 +126,7 @@
 
       <section id="format">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile format</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The exports below use JSON syntax, which is valid YAML. It carries an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The exports below use JSON syntax, which is valid YAML. It carries the spec it was written for, an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
           <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
@@ -528,7 +528,7 @@ const PROFILES = [
       9,
       10
     ],
-    "principle": "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default renderer for this site's examples.",
+    "principle": "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default profile for this site's examples.",
     "evalNote": "unevaluated · illustrative profile; no reproducible run published"
   },
   {

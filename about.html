@@ -74,7 +74,7 @@
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">CWA is</div>
           <div style="display: flex; flex-direction: column; gap: 8px; font-size: 15px; line-height: 1.5;">
             <span>A vocabulary: four planes, eleven slots, one item shape.</span>
-            <span>Twenty-six numbered requirements an assembler can be tested against.</span>
+            <span>Twenty-six numbered requirements, and published cases that test what an assembler decides.</span>
             <span>A contract producers can build to without knowing the assembler.</span>
             <span>A trace format that makes assembly decisions comparable across implementations.</span>
           </div>
@@ -136,7 +136,7 @@
       </div>
       <div>
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7; margin-bottom: 12px;">Contact</div>
-        <p style="margin: 0 0 20px; font-size: 17px; line-height: 1.55; text-wrap: pretty;">Issues and proposals on GitHub. For anything that should not be public, the repository README lists a maintainer address.</p>
+        <p style="margin: 0 0 20px; font-size: 17px; line-height: 1.55; text-wrap: pretty;">Issues and proposals on GitHub.</p>
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="display: inline-block; font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">Open GitHub</a>
       </div>
     </div>
@@ -172,8 +172,8 @@ class Component extends DCLogic {
       ways: [
         { kicker: "Most useful", color: "var(--accent)", title: "Report a route the spec cannot express", text: "A real system where a rule blocks something legitimate, or where two rules conflict. Include the trace if you have one." },
         { kicker: "Profiles", color: "var(--p-inter)", title: "Contribute an evaluated placement profile", text: "A profile.yaml with a filled evaluation block. Unevaluated profiles are accepted as hypotheses and labelled so." },
-        { kicker: "Producers", color: "var(--p-evid)", title: "Build a conformant producer", text: "A retriever, memory store or MCP adapter that meets the MUSTs the Spec page's Conformance section sets for its kind. The item linter checks its structure, not the rest. Listed on the Producers page once its items are admitted by the reference assembler." },
-        { kicker: "Assembler", color: "var(--p-state)", title: "Implement a requirement", text: "Pick a planned row in the conformance matrix, write the test first, then the code. One rule per pull request." }
+        { kicker: "Producers", color: "var(--p-evid)", title: "Build a conformant producer", text: "A retriever, memory store or MCP adapter that meets the MUSTs the Spec page's Conformance section sets for its kind. The item linter checks its structure, not the rest." },
+        { kicker: "Assembler", color: "var(--p-state)", title: "Implement a requirement", text: "Pick a clause of a requirement that no conformance case covers yet, write the case or test first, then the code. One rule per pull request." }
       ]
     };
   }

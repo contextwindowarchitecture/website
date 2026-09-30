@@ -206,7 +206,7 @@ export function checkTrace(trace, context = {}) {
   return { valid: findings.length === 0, findings };
 }
 
-export const CONTRACT_SCOPE = 'Local checks only. The application must authenticate provenance, enforce scope and eligibility, authorize tools, and verify the rendered payload.';
+export const CONTRACT_SCOPE = 'Local checks only. The assembler admits items against the route, its scope and eligibility rules included; the application must authenticate provenance, authorize tools, and verify the rendered payload.';
 export const ITEM_FIELDS = ITEM_SCHEMA.required;
 
 export function checkProfile(profile, { parser = false, protectedSlots = [] } = {}) {

@@ -268,7 +268,7 @@
               </sc-for>
             </div>
             <div style="padding: 14px 18px; border-bottom: 1px solid var(--line);">
-              <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">R-22 recommended</div>
+              <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">R-22 should</div>
               <div style="display: flex; flex-wrap: wrap; gap: 6px;">
                 <sc-for list="{{ tv.recommended }}" as="f" hint-placeholder-count="3"><span style="font-family: var(--mono); font-size: 11.5px; padding: 4px 8px; border: 1px solid var(--line); color: {{ f.color }};">{{ f.mark }} {{ f.name }}</span></sc-for>
               </div>
@@ -628,6 +628,8 @@ class Component extends DCLogic {
     return {
       ...base, verdict: result.valid ? "structure and local invariants valid" : "checks failed", verdictColor: result.valid ? ok : bad,
       required: result.valid ? [{ name: "Published trace schema and local invariants", mark: "✓", color: ok }] : result.findings.map(f => ({ name: f.text, mark: "✕", color: bad })),
+      // R-22's MUSTs are in the schema; its one SHOULD is admission-stage timings.
+      recommended: result.valid ? [{ name: trace.timings ? "admission-stage timings reported" : "no admission-stage timings", mark: trace.timings ? "✓" : "–" }] : [],
       evidenced: [{ rule: "R-21", href: "./spec.html#R-21", text: "This checks reported structure, not the truth of the trace, its hash, or assembler conformance. Without the route policy it judges each slot at its default tier, so a trace from a route that raises tiers may be flagged." }]
     };
   }
