@@ -60,7 +60,9 @@ def render(placement, kept, marks):
             conflict = {"conflict": marks[it["id"]]} if it["id"] in marks else {}
             if wrap in ("system", "tools"):
                 body = it["body"]
-                (system if wrap == "system" else tools).append({"id": it["id"], "text": body, **conflict})
+                # The handoff passes only text, so a surfaced member's mark goes in its text (R-11).
+                text = f'<conflict group="{attr(conflict["conflict"])}">\n{body}\n</conflict>' if conflict else body
+                (system if wrap == "system" else tools).append({"id": it["id"], "text": text, **conflict})
             else:
                 body = esc(it["body"])
                 attrs = f' id="{attr(it["id"])}"'
@@ -153,7 +155,8 @@ CASES = [
         "rules": ["R-7", "R-10", "R-11", "R-21"],
         "description": "cwa-messages/v1 puts governing instructions in system and the granted tool in tools, unescaped; everything else, "
                        "including every prior turn marked with its speaker, renders escaped inside the one user message, so no history turn "
-                       "becomes a platform message and an injected closing tag stays material. Surfaced members are marked in system.",
+                       "becomes a platform message and an injected closing tag stays material. Surfaced members in system are marked in their text, "
+                       "which is all the model receives.",
         "budget": 4096,
         "placement": CHAT,
         "policy": {"on_unresolved_instruction": "surface"},

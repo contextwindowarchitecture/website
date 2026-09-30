@@ -9,8 +9,8 @@
     "reserved_output": 1024
   },
   "result": {
-    "input_tokens": 71,
-    "hash": "381383c084fa16087b4c6180785dced309b5cceb79daada5e872bedfd3de8fd4"
+    "input_tokens": 77,
+    "hash": "d811e085cbe59f90cd30a502feb0a4d3d5e76f6e97e23c330edbcdb1fb19ce81"
   },
   "included": [
     {
