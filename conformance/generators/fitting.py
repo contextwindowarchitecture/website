@@ -584,6 +584,21 @@ CASES = [
         "actions": [("compress", "kb:a", "kb:a~short")],
     },
     {
+        "id": "evidence-min-included-items",
+        "rules": ["R-12", "R-17", "R-21"],
+        "description": "The profile places evidence.knowledge twice and the route asks for at least two knowledge items. One chunk is admitted "
+                       "and would render twice, but min_included counts items, not occurrences, so the route refuses with recovery request_context.",
+        "budget": 4096,
+        "placement": ["governance.instructions", "evidence.knowledge", "interaction.query", "evidence.knowledge"],
+        "policy": {"requires_evidence": True, "slots": {"evidence.knowledge": {"min_included": 2}}},
+        "items": [
+            (item("policy:v12", "governance.instructions", POLICY_TEXT), "admit"),
+            (item("kb:a", "evidence.knowledge", "Pro plans refund in full within 30 days.", relevance=0.9), "admit"),
+            (item("turn:18", "interaction.query", QUERY), "admit"),
+        ],
+        "refuse": "evidence_required", "recovery": "request_context",
+    },
+    {
         "id": "evidence-request-context",
         "rules": ["R-12", "R-17", "R-21", "R-22"],
         "description": "A route that requires evidence refuses with recovery request_context when admission leaves no evidence, although everything else fits.",

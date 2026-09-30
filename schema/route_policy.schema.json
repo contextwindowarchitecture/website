@@ -348,7 +348,7 @@
         "min_included": {
           "type": "integer",
           "minimum": 1,
-          "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12)."
+          "description": "Evidence slots only, on a route with requires_evidence: assembly refuses with evidence_required when fitting leaves fewer items than this in the slot (R-12). An item the profile places twice counts once."
         },
         "max_tokens": {
           "type": "integer",

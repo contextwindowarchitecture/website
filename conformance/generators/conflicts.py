@@ -410,7 +410,7 @@ CASES = [
     },
     {
         "id": "conflict-request-context",
-        "rules": ["R-11", "R-12", "R-17", "R-21"],
+        "rules": ["R-11", "R-17", "R-21"],
         "description": "The only unresolved group asks for more context, so assembly refuses with conflict_unresolved and recovery.action request_context.",
         "policy": {"facts": {"refund.window": {"precedence": [CORPUS, WIKI], "on_unresolved": "request_context"}}},
         "items": [

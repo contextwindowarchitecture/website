@@ -83,7 +83,7 @@ A refused trace has `result: null`, `included: []` and `compressed: []` (R-17). 
 3. `conflict_unresolved`: a conflict group escalated, and its action is `request_context` or `refuse` (R-11). `recovery.action` is `request_context` when every such group's action is `request_context`, and the trace has no `recovery` otherwise.
 4. `protected_content_over_budget`: a protected item's rendered body exceeds its `token_budget`, the protected items in a slot exceed the slot's `max_tokens`, or the payload rendered from the protected items alone does not fit (R-17). Nothing is shed first, so the trace has no `over_budget` rows.
 5. `slot_floor_over_budget`: after fitting, the payload still does not fit because a slot's `min_tokens` withheld a reduction (R-17). It has no `recovery`.
-6. `evidence_required`: after fitting, a route with `requires_evidence: true` includes no `evidence.knowledge` or `evidence.tool_results` item, or fewer items in an evidence slot than that slot's `min_included` (R-12). `recovery.action` is:
+6. `evidence_required`: after fitting, a route with `requires_evidence: true` includes no `evidence.knowledge` or `evidence.tool_results` item, or fewer items in an evidence slot than that slot's `min_included` (R-12). It counts items, so an item the profile places twice counts once. `recovery.action` is:
    - `request_context` when no evidence item was omitted for budget, so the shortfall came from producers or admission;
    - `precompute_summary` when an evidence item omitted for budget had no variants;
    - `retrieve_narrower` otherwise: every evidence item omitted for budget had variants, and they did not fit.
