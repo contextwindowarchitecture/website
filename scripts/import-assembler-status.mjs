@@ -1,14 +1,15 @@
 // Copies the reference assembler's claims (its status.json) into contract/assembler-status.json, and
 // its conformance run (conformance-report.json) into contract/assembler-conformance.json.
 //   node scripts/import-assembler-status.mjs ../cwa-assembler
-// Each claim there cites tests and is checked against its scope; the report records every case's
+// Each claim there cites tests and is checked against its scope, and a claim made before this site narrowed a row's
+// scope is read under the narrower one (claimsUnder); the report records every case's
 // outcome, and the import records each case's digest at the website commit the run used (scripts/conformance-reports.mjs). These files record the result and the assembler commit it came from. The build validates
 // them again and renders the Assembler matrix.
 import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { imported, remoteOf } from './conformance-reports.mjs';
+import { claimsUnder, imported, remoteOf } from './conformance-reports.mjs';
 
 const assembler = process.argv[2];
 if (!assembler) throw new Error('usage: node scripts/import-assembler-status.mjs <path to cwa-assembler>');
@@ -17,8 +18,9 @@ const read = async name => JSON.parse(await fs.readFile(path.join(assembler, nam
 const source = { repository: remoteOf(assembler), commit: git('rev-parse', 'HEAD'),
   dirty: git('status', '--porcelain', '--', 'status.json', 'conformance-report.json', 'src', 'tests') !== '' };
 const { requirements } = await read('status.json');
+const scopes = JSON.parse(await fs.readFile('contract/assembler-scope.json', 'utf8'));
 await fs.writeFile('contract/assembler-status.json', JSON.stringify({
-  source, requirements: requirements.map(({ id, status, evidence }) => ({ id, status, tests: evidence.length }))
+  source, requirements: claimsUnder(scopes, requirements).map(({ id, status, evidence }) => ({ id, status, tests: evidence.length }))
 }, null, 2) + '\n');
 const report = await read('conformance-report.json');
 if (!validateConformanceReportSchema(report)) throw new Error('conformance-report.json: ' + JSON.stringify(validateConformanceReportSchema.errors));

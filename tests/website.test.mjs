@@ -157,6 +157,28 @@ test('specification, generated requirement reference, and status matrix share ev
   for (const { id } of requirements) assert.ok(markdown.includes(`## ${id}:`));
 });
 
+// §1 lists the MUSTs aimed at producers and the ones no component can meet for the application. Assembly cannot
+// check all of any of them, so none is an assembler row, which the Assembler page calls fully testable in assembly.
+test('every requirement §1 lists as a producer or application duty is a boundary or application row', async () => {
+  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
+  const cited = (from, to) => [...html.split(from)[1].split(to)[0].matchAll(/href="#(R-\d+)"/g)].map(m => m[1]);
+  const producers = cited('plus the ones aimed at producers of its kind:', 'A <strong>conformant application</strong>');
+  const application = cited('meets the MUSTs no component can meet for it:', '. It renders with');
+  assert.ok(producers.length > 0 && application.length > 0);
+  const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
+  const scope = Object.fromEntries(scopes.map(s => [s.id, s.scope]));
+  for (const id of new Set([...producers, ...application])) assert.notEqual(scope[id], 'assembler', `§1 gives part of ${id} to a producer or the application`);
+});
+
+test('an implemented claim imports as boundary-checked on a row the site scopes boundary, and nothing is widened', async () => {
+  const { claimsUnder } = await import('../scripts/conformance-reports.mjs');
+  const scopes = ['assembler', 'boundary', 'boundary', 'boundary', 'assembler'].map((scope, i) => ({ id: `R-${i + 1}`, scope }));
+  const claims = ['implemented', 'implemented', 'boundary-checked', 'in progress', 'boundary-checked'].map((status, i) => ({ id: `R-${i + 1}`, status, evidence: ['t'] }));
+  const under = claimsUnder(scopes, claims);
+  assert.deepEqual(under.map(c => c.status), ['implemented', 'boundary-checked', 'boundary-checked', 'in progress', 'boundary-checked']);
+  assert.deepEqual(under.map(c => c.evidence), claims.map(c => c.evidence));
+});
+
 const IMPORTED = [['Python', 'contract/assembler-conformance.json'], ['TypeScript', 'contract/assembler-ts-conformance.json'], ['Go', 'contract/assembler-go-conformance.json']];
 const readJson = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
 // A case's digest, computed here independently of scripts/conformance-reports.mjs: SHA-256 over its files' paths and SHA-256s.

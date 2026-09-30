@@ -91,7 +91,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
       <h2 style="margin: 0 0 24px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
-      <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
+      <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where the snapshot and its items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
       <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python, TypeScript and Go, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
@@ -201,9 +201,9 @@ const RULES = [
   [
     "MUST",
     "Slots that are never omitted",
-    "assembler",
-    "Refuses with required_slot_missing.",
-    "implemented",
+    "boundary",
+    "Refuses with required_slot_missing. Declaring parser: true on every route whose response a parser consumes is the application's.",
+    "boundary-checked",
     8,
     [
       8,
@@ -279,9 +279,9 @@ const RULES = [
   [
     "MUST",
     "User and fetched content is marked, never elevated, kept out of governance",
-    "assembler",
-    "Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole; delimiting material pasted into a body is the application's job.",
-    "implemented",
+    "boundary",
+    "Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole. Marking user-controlled and fetched content is the producer's duty, and delimiting material pasted into a body is the application's job.",
+    "boundary-checked",
     3,
     [
       2,
@@ -305,9 +305,9 @@ const RULES = [
   [
     "MUST NOT",
     "Never answer from nothing",
-    "assembler",
-    "Refuses with evidence_required and a recovery action.",
-    "implemented",
+    "boundary",
+    "Refuses with evidence_required and a recovery action. Retrieving and summarizing before the snapshot is frozen, and freezing a new one for any retry, are the application's.",
+    "boundary-checked",
     9,
     [
       9,
@@ -357,9 +357,9 @@ const RULES = [
   [
     "MUST",
     "Account for rendered tokens; shed in tier order",
-    "assembler",
-    "Counts rendered tokens and sheds in tier order.",
-    "implemented",
+    "boundary",
+    "Counts rendered tokens and sheds in tier order. Setting budget.input from the model's context limit, with a tokenizer that counts or estimates the model's tokens, is the application's.",
+    "boundary-checked",
     31,
     [
       31,
@@ -409,9 +409,9 @@ const RULES = [
   [
     "MUST",
     "Profile version and mandatory-slot validation",
-    "assembler",
-    "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement.",
-    "implemented",
+    "boundary",
+    "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement. Raising the version for every change is the application's.",
+    "boundary-checked",
     13,
     [
       13,
@@ -448,9 +448,9 @@ const RULES = [
   [
     "MUST",
     "Determinism includes the clock and policy snapshot",
-    "assembler",
-    "Snapshot replay across processes, hash seeds, time zones and locales, with ordering, blank strings, timestamps and the digest pinned for every language.",
-    "implemented",
+    "boundary",
+    "Snapshot replay across processes, hash seeds, time zones and locales, with ordering, blank strings, timestamps and the digest pinned for every language. Making every external read and model call before the snapshot is frozen is the application's.",
+    "boundary-checked",
     4,
     [
       4,

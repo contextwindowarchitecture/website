@@ -50,6 +50,17 @@ export function tally(report, atRun, published) {
     !outcomes.has(c.id) ? 'not run' : atRun?.[c.id] !== c.digest ? 'stale' : outcomes.get(c.id) ? 'passed' : 'failed']));
 }
 
+/**
+ * A reference assembler's status claims under this site's scopes (contract/assembler-scope.json). implemented means
+ * tests exercise every clause of an assembler row, so on a row the site has since scoped boundary, a narrower scope,
+ * the same tests prove boundary-checked. Nothing is widened: boundary-checked on an assembler row stays, and the
+ * build rejects it.
+ */
+export function claimsUnder(scopes, claims) {
+  const scope = new Map(scopes.map(s => [s.id, s.scope]));
+  return claims.map(c => c.status === 'implemented' && scope.get(c.id) === 'boundary' ? { ...c, status: 'boundary-checked' } : c);
+}
+
 /** A remote URL as owner/repo when it is on GitHub, over HTTPS or SSH; any other URL as given; null for none. */
 export function repositoryOf(url) {
   if (!url) return null;

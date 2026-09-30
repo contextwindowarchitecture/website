@@ -22,7 +22,7 @@
     },
     {
       "id": "R-4",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 5
     },
     {
@@ -52,7 +52,7 @@
     },
     {
       "id": "R-10",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 7
     },
     {
@@ -62,7 +62,7 @@
     },
     {
       "id": "R-12",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 10
     },
     {
@@ -82,7 +82,7 @@
     },
     {
       "id": "R-16",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 52
     },
     {
@@ -102,7 +102,7 @@
     },
     {
       "id": "R-20",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 15
     },
     {
@@ -117,7 +117,7 @@
     },
     {
       "id": "R-23",
-      "status": "implemented",
+      "status": "boundary-checked",
       "tests": 18
     },
     {
