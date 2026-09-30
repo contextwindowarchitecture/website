@@ -97,7 +97,8 @@ def build(case):
                 policy["slots"].setdefault(slot, {}).update(rules)
         else:
             policy[key] = value
-    profile = {"spec": "cwa/draft", "id": "messages-fixture", "version": 1, "route": "support-chat", "model_family": None, "route_policy_version": policy["version"],
+    # R-20: one profile id and version name one profile, so each case's profile carries the case's own id.
+    profile = {"spec": "cwa/draft", "id": name, "version": 1, "route": "support-chat", "model_family": None, "route_policy_version": policy["version"],
                "placement": [{"slot": s, "wrap": w} for s, w in placement],
                "evaluation": {"status": "unevaluated", "suite": None, "date": None, "result": None, "artifact": None}}
     batches = {}

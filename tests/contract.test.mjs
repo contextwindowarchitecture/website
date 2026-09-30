@@ -686,6 +686,23 @@ test('each published rejection case breaks exactly one snapshot check (R-17)', a
   }
 });
 
+// R-20: any change to a profile's placement, wrappers, model target or route policy raises its version, so one id and
+// version name one profile. The corpus and the published example profiles hold themselves to that.
+test('every profile id and version in the corpus and the examples names one profile (R-20)', async () => {
+  const seen = new Map();
+  const note = (profile, where) => {
+    const key = `${profile.id} v${profile.version}`;
+    if (seen.has(key)) assert.equal(canonical(profile), seen.get(key).content, `${where} and ${seen.get(key).where} both use ${key}`);
+    else seen.set(key, { content: canonical(profile), where });
+  };
+  profiles.forEach(p => note(p, 'examples/profiles.json'));
+  note(await read('examples/fixture-profile.json'), 'examples/fixture-profile.json');
+  for (const dir of ['cases', 'rejections']) {
+    const root = new URL(`../conformance/${dir}/`, import.meta.url);
+    for (const name of await fs.readdir(root)) note(JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8')).profile, `${dir}/${name}`);
+  }
+});
+
 test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
   const { report } = await read('contract/assembler-conformance.json');
   for (const [row, valid] of [

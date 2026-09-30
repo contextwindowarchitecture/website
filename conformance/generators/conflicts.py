@@ -84,7 +84,8 @@ def build(case):
               "producers": {p: {"kind": k, "slots": slots_of[p]} for p, k in kinds.items()},
               "slots": {"evidence.knowledge": {"min_relevance": 0.5, "required_scope": ["tenant"]}}}
     policy.update(copy.deepcopy(case.get("policy", {})))
-    profile = {"spec": "cwa/draft", "id": "conflict-fixture", "version": 1, "route": "support-chat", "model_family": None, "route_policy_version": policy["version"],
+    # R-20: one profile id and version name one profile, so each case's profile carries the case's own id.
+    profile = {"spec": "cwa/draft", "id": name, "version": 1, "route": "support-chat", "model_family": None, "route_policy_version": policy["version"],
                "placement": [{"slot": s, "wrap": "xml:" + s} for s in PLACEMENT],
                "evaluation": {"status": "unevaluated", "suite": None, "date": None, "result": None, "artifact": None}}
     batches = {}

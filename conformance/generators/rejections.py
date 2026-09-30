@@ -83,6 +83,8 @@ if __name__ == "__main__":
     for name, rules, description, mutate, *base in CASES:
         snapshot = copy.deepcopy(base[0] if base else BASE)
         mutate(snapshot)
+        if snapshot["profile"] != (base[0] if base else BASE)["profile"]:
+            snapshot["profile"]["id"] = name  # R-20: a changed profile is another profile, so it takes another id
         out = os.path.join(root, name)
         os.makedirs(out)
         text = json.dumps(snapshot, indent=2, ensure_ascii=False).replace(LONE, "\\ud800").replace(f'"{HUGE}"', "1e400") + "\n"

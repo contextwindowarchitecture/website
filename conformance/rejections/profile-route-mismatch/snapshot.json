@@ -10,7 +10,7 @@
   },
   "profile": {
     "spec": "cwa/draft",
-    "id": "fixture-three-slot",
+    "id": "profile-route-mismatch",
     "version": 1,
     "route": "another-route",
     "model_family": null,
