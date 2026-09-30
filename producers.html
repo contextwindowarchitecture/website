@@ -421,7 +421,7 @@ const STAGES = [
   ["Package", "producer", "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."],
   ["Admit", "assembler", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
   ["Resolve", "assembler", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
-  ["Fit", "assembler", "Apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If protected content can't fit, or too little evidence is left, refuse instead (R-17, R-12)."],
+  ["Fit", "assembler", "Refuse before any reduction if protected content can't fit (R-16, R-17). Otherwise apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If too little evidence is left, refuse instead (R-12)."],
   ["Render & trace", "assembler", "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."]
 ];
 const FAILURES = [
