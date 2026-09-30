@@ -157,7 +157,7 @@
     "fitting_order": {
       "type": "array",
       "uniqueItems": true,
-      "description": "The order in which compressible items are reduced under budget pressure, once every droppable item is gone (R-16). Item token_budget caps and slot max_tokens caps apply before it, whether or not the payload fits. Each step compresses (selects supplied variants for) or omits one slot's compressible items, lowest-ranked first, until the payload fits. Steps the route does not list follow in the default order: compress each slot, then omit each slot, both in shedding order. With no steps, variants always come before omission.",
+      "description": "The order in which compressible items are reduced: under budget pressure, once every droppable item a slot floor does not hold is gone, and, for the steps that name a slot, while that slot's max_tokens cap is enforced (R-16). Item token_budget caps apply first, whether or not the payload fits. Each step compresses (selects supplied variants for) or omits one slot's compressible items, lowest-ranked first, until the payload fits or the slot is within its cap; under budget pressure a slot floor can withhold a reduction (conformance/README.md, Fitting). Steps the route does not list follow in the default order: compress each slot, then omit each slot, both in shedding order. With no steps, variants always come before omission.",
       "items": {
         "type": "object",
         "additionalProperties": false,
@@ -370,7 +370,7 @@
           "enum": [
             "exact"
           ],
-          "description": "exact: after conflict resolution, exclude each item whose body equals a kept item's body in this slot once whitespace runs are collapsed and the ends trimmed, with reason duplicate_content (R-24). Protected items and items a conflict group names are never excluded. Absent, the slot keeps equal bodies."
+          "description": "exact: after conflict resolution and any supersession (R-25), exclude each item whose body equals a kept item's body in this slot once whitespace runs are collapsed and the ends trimmed, with reason duplicate_content (R-24). Protected items and items a conflict group names are never excluded. Absent, the slot keeps equal bodies."
         },
         "max_per_source": {
           "type": "integer",
