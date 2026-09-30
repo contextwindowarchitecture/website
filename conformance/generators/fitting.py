@@ -568,6 +568,22 @@ CASES = [
         "refuse": "protected_content_over_budget",
     },
     {
+        "id": "budget-repeated-compress",
+        "rules": ["R-16", "R-18", "R-21"],
+        "description": "The profile places evidence.knowledge twice. Fitting decides per item, so compressing the chunk replaces both "
+                       "occurrences at once: one occurrence alone would already fit (54 of 55), but the chunk's two occurrences take the variant "
+                       "together (44), and included[] and compressed[] each hold one row per occurrence.",
+        "budget": 55,
+        "placement": ["governance.instructions", "evidence.knowledge", "interaction.query", "evidence.knowledge"],
+        "items": [
+            (item("policy:v12", "governance.instructions", POLICY_TEXT), "admit"),
+            (item("kb:a", "evidence.knowledge", "Pro plans refund in full within 30 days of purchase, to the original payment method, with no fee.",
+                  relevance=0.9, variants=[variant("kb:a~short", "Pro plans refund in full within 30 days.")]), "admit"),
+            (item("turn:18", "interaction.query", QUERY), "admit"),
+        ],
+        "actions": [("compress", "kb:a", "kb:a~short")],
+    },
+    {
         "id": "evidence-request-context",
         "rules": ["R-12", "R-17", "R-21", "R-22"],
         "description": "A route that requires evidence refuses with recovery request_context when admission leaves no evidence, although everything else fits.",

@@ -243,7 +243,7 @@ const RULES = [
     "assembler",
     "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside wrappers.",
     "implemented",
-    6,
+    7,
     [
       0,
       0,
@@ -360,7 +360,7 @@ const RULES = [
     "boundary",
     "Counts rendered tokens and sheds in tier order. Setting budget.input from the model's context limit, with a tokenizer that counts or estimates the model's tokens, is the application's.",
     "boundary-checked",
-    32,
+    34,
     [
       1,
       1,
@@ -386,7 +386,7 @@ const RULES = [
     "boundary",
     "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
     "boundary-checked",
-    10,
+    12,
     [
       0,
       0,
@@ -425,7 +425,7 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    56,
+    58,
     [
       4,
       4,
@@ -498,7 +498,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":79,"passed":15,"stale":59},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":79,"passed":15,"stale":59},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4ab7e764e77cf8940b6c059a10d503f8da55edb6","websiteSha":"804e351ec0a7b586c8aeaf3832febc90bd6adb78","total":79,"passed":15,"stale":59}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6ce72605bff7337d9699ed36a4fb9740d301a803","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":81,"passed":15,"stale":59},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"a7d6b8223308d05d9a1dbd0381eff39947a25a19","websiteSha":"591f7eb2ee904acf79aa1a4f846253dd785a4423","total":81,"passed":15,"stale":59},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4ab7e764e77cf8940b6c059a10d503f8da55edb6","websiteSha":"804e351ec0a7b586c8aeaf3832febc90bd6adb78","total":81,"passed":15,"stale":59}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
