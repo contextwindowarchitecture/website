@@ -620,44 +620,55 @@
         <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">The profile picks each slot's tag and order, and a renderer the spec publishes writes the request. Message roles are not a style choice: only governance takes the system and tool roles, prior turns stay a transcript inside their tag, and the query is the only live user turn. Every item names its slot and authority, evidence arrives as separate items with provenance, and the trace records the profile that ordered them.</p>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
-        <div style="display: flex; justify-content: space-between; gap: 8px; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>payload.txt</span><span>profile · policy-first-chat/v1</span></div>
-        <div style="padding: 20px 18px; display: flex; flex-direction: column;">
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-gov);">&lt;!-- governance.instructions · authority=governing · v12 --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;system&gt;</span>You are Ada, a support agent for Northwind.</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;">Never quote prices you cannot verify with a tool.<span style="color: var(--accent);">&lt;/system&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-state);">&lt;!-- state.user · authority=state · scope=session --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;user_profile&gt;</span>plan=pro; region=EU; tone=concise<span style="color: var(--accent);">&lt;/user_profile&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-evid);">&lt;!-- evidence.knowledge · authority=reference_only · 2 of 12 candidates --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="refunds-eu:v17#p4" trust="verified" freshness="2026-09-10"&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;">  Pro plans refund in full within 30 days of purchase.</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;/evidence&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;evidence id="billing-faq:v3#p1" trust="verified" freshness="2026-08-02"&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;">  Refunds return to the original payment method.</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;/evidence&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-state);">&lt;!-- state.task · authority=state · canonical, app-owned --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;task&gt;</span>refund_request: verify_eligibility=done, issue=pending<span style="color: var(--accent);">&lt;/task&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-inter);">&lt;!-- interaction.memory · authority=generated · lineage=summary --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;memory&gt;</span>User bought Pro in March, EU billing.<span style="color: var(--accent);">&lt;/memory&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-inter);">&lt;!-- interaction.history · authority=user · verbatim, last 6 --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;history&gt;</span>user: is my order refundable?<span style="color: var(--accent);">&lt;/history&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-gov);">&lt;!-- governance.capabilities · authority=governing · source=capability-policy:support-chat@v3 --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;tools&gt;</span>lookup_order(id), issue_refund(id, amount)<span style="color: var(--accent);">&lt;/tools&gt;</span></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-evid);">&lt;!-- evidence.tool_results · authority=observation · age=0.4s --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;observation call="lookup_order(8821)"&gt;</span>{"total": 240, "days": 12}<span style="color: var(--accent);">&lt;/observation&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-gov);">&lt;!-- governance.output_contract · authority=governing --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;format&gt;</span>Max 3 sentences. No bullet lists.<span style="color: var(--accent);">&lt;/format&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--p-inter);">&lt;!-- interaction.query · authority=user · the trigger --&gt;</div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--accent);">&lt;query&gt;</span>Can you just process it now?<span style="color: var(--accent);">&lt;/query&gt;</span></div>
-          <div style="height: 1.85em;"></div>
-          <div style="white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muted);">&lt;!-- trace ctx_01J9K · 3 items excluded · 0 conflicts · policy-first-chat/v1 --&gt;</div>
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 18px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--line);"><span>cwa-messages/v1 request</span><span>profile · policy-first-chat/v1</span></div>
+        <div style="padding: 20px 18px; display: flex; flex-direction: column; gap: 18px;">
+          <p style="margin: 0; font-family: var(--sans); font-size: 12.5px; line-height: 1.6; color: var(--muted);">Each member's text as the model receives it. On the wire the request is one RFC 8785 JSON object, and each system and tools entry also carries its item's id.</p>
+          <div>
+            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">system · <span style="color: var(--p-gov);">governance.instructions</span></div>
+            <div data-member="system/0" style="white-space: pre-wrap; overflow-wrap: anywhere;">You are Ada, a support agent for Northwind.
+Never quote prices you cannot verify with a tool.</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0;">tools · <span style="color: var(--p-gov);">governance.capabilities</span></div>
+            <div data-member="tools/0" style="white-space: pre-wrap; overflow-wrap: anywhere;">{"name": "issue_refund", "parameters": {"order_id": "string", "amount": "number"}}</div>
+            <div data-member="tools/1" style="white-space: pre-wrap; overflow-wrap: anywhere;">{"name": "lookup_order", "parameters": {"order_id": "string"}}</div>
+          </div>
+          <div>
+            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">messages[0] · role user</div>
+            <div data-member="messages/0/content" style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--p-state);">&lt;user_profile id="user:profile"&gt;
+</span>plan=pro; region=EU; tone=concise
+<span style="color: var(--p-state);">&lt;/user_profile&gt;
+</span><span style="color: var(--p-evid);">&lt;evidence id="billing-faq:v3#p1"&gt;
+</span>Refunds return to the original payment method.
+<span style="color: var(--p-evid);">&lt;/evidence&gt;
+</span><span style="color: var(--p-evid);">&lt;evidence id="refunds-eu:v17#p4"&gt;
+</span>Pro plans refund in full within 30 days of purchase.
+<span style="color: var(--p-evid);">&lt;/evidence&gt;
+</span><span style="color: var(--p-state);">&lt;task id="task:refund_request"&gt;
+</span>refund_request: verify_eligibility=done, issue=pending
+<span style="color: var(--p-state);">&lt;/task&gt;
+</span><span style="color: var(--p-inter);">&lt;memory id="mem:plan-purchase"&gt;
+</span>User bought Pro in March, EU billing.
+<span style="color: var(--p-inter);">&lt;/memory&gt;
+</span><span style="color: var(--p-inter);">&lt;history id="turn:16" speaker="user"&gt;
+</span>Is my order refundable?
+<span style="color: var(--p-inter);">&lt;/history&gt;
+</span><span style="color: var(--p-inter);">&lt;history id="turn:17" speaker="assistant"&gt;
+</span>Let me check order 8821.
+<span style="color: var(--p-inter);">&lt;/history&gt;
+</span><span style="color: var(--p-evid);">&lt;observation id="obs:order-8821"&gt;
+</span>{"order_id": "8821", "total": 240, "days_since_purchase": 12}
+<span style="color: var(--p-evid);">&lt;/observation&gt;
+</span><span style="color: var(--p-gov);">&lt;format id="format:chat"&gt;
+</span>Max 3 sentences. No bullet lists.
+<span style="color: var(--p-gov);">&lt;/format&gt;
+</span><span style="color: var(--p-inter);">&lt;query id="turn:18"&gt;
+</span>Can you just process it now?
+<span style="color: var(--p-inter);">&lt;/query&gt;
+</span></div>
+          </div>
         </div>
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 18px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-top: 1px solid var(--line);"><span>estimate-utf8/v1 · 272 input tokens</span><span style="text-transform: none;">sha256 · b8e42c7b290b…</span></div>
       </div>
     </div>
   </section>

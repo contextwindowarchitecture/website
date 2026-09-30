@@ -29,7 +29,7 @@ npm test
 | `contract/assembler-ts-conformance.json` | The TypeScript assembler's conformance report, imported with `node scripts/import-conformance-report.mjs ../cwa-assembler-ts contract/assembler-ts-conformance.json` |
 | `contract/assembler-go-conformance.json` | The Go assembler's conformance report, imported from a clean Go assembler checkout with `node scripts/import-conformance-report.mjs <checkout> contract/assembler-go-conformance.json` |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
-| `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace |
+| `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace, and the landing page's message request with its snapshot |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |
 | `contract/*.txt`, `contract/cwa.md` | Downloadable integration guidance and rendering template |
 | `contract/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
@@ -45,6 +45,8 @@ The suite checks field types and enums, timestamps, required fields, defaults, p
 `checkItem()` and `checkTrace()` returning `valid: true` means their documented **local checks** pass. It is not authorization to send a request or execute a tool. Authenticate the producer in application code; never construct trusted context by spreading an item's fields into it. The website has no authenticated route context and deliberately reports only local checks.
 
 The concrete trace uses `examples/fixture-profile.json`, separate from the five illustrative route profiles, and its hash matches `examples/payload.txt`. Its `fixture-whitespace/v1` tokenizer counts non-whitespace runs only and is a test fixture, not a model tokenizer. Real assembly must use the target model's accounting, including wrappers and repeated content. Hash the exact rendered UTF-8 bytes; preserve the immutable snapshot separately for replay.
+
+The landing page's sample request is `examples/messages-payload.json`, the exact `cwa-messages/v1` payload that the Python and TypeScript assemblers produce from `examples/messages-snapshot.json` under `policy-first-chat/v1`, its `support-chat` route policy and `estimate-utf8/v1`. The suite recomputes it from the snapshot and checks that the page shows each member's text, token count and hash as the payload holds them.
 
 The suite does **not** implement or certify an assembler, detect semantic contradictions in prose, establish factual truth, authenticate remote sources, prove compression fidelity, or benchmark model outcomes. All five example profiles are unevaluated. A production conformance suite must exercise the actual implementation's admission, conflict resolution, fitting, rendering and replay behavior.
 

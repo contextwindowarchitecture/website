@@ -829,6 +829,31 @@ const snapshotDigest = snapshot => {
   return sha256(s);
 };
 
+// The landing page's request (index.html #payload) is examples/messages-snapshot.json assembled under the published
+// policy-first-chat/v1 profile and support-chat route policy. The Python and TypeScript assemblers admit and fit every
+// item, so the payload is every item rendered as conformance/README.md defines cwa-messages/v1, recomputed here
+// independently of both.
+test('the landing page request is the cwa-messages/v1 rendering of every item in its snapshot', async () => {
+  const snapshot = await read('examples/messages-snapshot.json');
+  assert.equal(validateSnapshotSchema(snapshot), true, JSON.stringify(validateSnapshotSchema.errors));
+  assert.deepEqual(checkSnapshot(snapshot).findings, []);
+  assert.deepEqual(snapshot.profile, profiles.find(p => p.id === 'policy-first-chat'));
+  assert.deepEqual(snapshot.route_policy, (await read('examples/route-policies.json')).find(r => r.route === 'support-chat'));
+  assert.equal(snapshot.renderer, 'cwa-messages/v1');
+  const items = snapshot.batches.flatMap(b => b.items);
+  const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  const request = { system: [], tools: [], messages: [{ role: 'user', content: '' }] };
+  for (const { slot, wrap } of snapshot.profile.placement) {
+    for (const item of items.filter(i => i.slot === slot).sort((a, b) => units(a.id, b.id))) {
+      if (wrap === 'system' || wrap === 'tools') { request[wrap].push({ id: item.id, text: item.body }); continue; }
+      const speaker = slot === 'interaction.history' ? ` speaker="${item.lineage === 'generated' ? 'assistant' : 'user'}"` : '';
+      const tag = wrap.slice('xml:'.length);
+      request.messages[0].content += `<${tag} id="${escape(item.id).replaceAll('"', '&quot;')}"${speaker}>\n${escape(item.body)}\n</${tag}>\n`;
+    }
+  }
+  assert.equal(await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url), 'utf8'), canonical(request));
+});
+
 test('every published profile names a route policy the registry holds, whose producers cover the slots it places (R-15, R-20)', async () => {
   const pinned = await read('conformance/registry/profiles.json');
   const policies = await read('conformance/registry/route-policies.json');

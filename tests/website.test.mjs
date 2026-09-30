@@ -170,6 +170,32 @@ test('every requirement §1 lists as a producer or application duty is a boundar
   for (const id of new Set([...producers, ...application])) assert.notEqual(scope[id], 'assembler', `§1 gives part of ${id} to a producer or the application`);
 });
 
+// index.html #payload shows examples/messages-payload.json one member at a time, each text as the model receives it,
+// with the request's own token count and hash. tests/contract.test.mjs derives that payload from its snapshot.
+test('the landing page shows its sample request exactly as the payload holds it', async () => {
+  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const bytes = await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url));
+  const { tokenizer } = JSON.parse(await fs.readFile(new URL('../examples/messages-snapshot.json', import.meta.url), 'utf8'));
+  const request = JSON.parse(bytes.toString('utf8'));
+  const text = markup => markup.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+  const members = [...html.matchAll(/<div data-member="([^"]+)"[^>]*>([\s\S]*?)<\/div>/g)];
+  // The page's template engine drops whitespace-only text between two elements, which would lose a newline.
+  for (const [, member, inner] of members) assert.doesNotMatch(inner, />\s+</, member);
+  const shown = Object.fromEntries(members.map(([, member, inner]) => [member, text(inner)]));
+  assert.deepEqual(request.messages.map(m => m.role), ['user']);
+  assert.deepEqual(shown, Object.fromEntries([
+    ...request.system.map((entry, i) => [`system/${i}`, entry.text]),
+    ...request.tools.map((entry, i) => [`tools/${i}`, entry.text]),
+    ['messages/0/content', request.messages[0].content],
+  ]));
+  // conformance/README.md: input_tokens counts every system and tools text and the message content.
+  assert.equal(tokenizer, 'estimate-utf8/v1');
+  const tokens = [...request.system, ...request.tools].map(e => e.text).concat(request.messages[0].content)
+    .reduce((sum, t) => sum + Math.floor((Buffer.byteLength(t, 'utf8') + 3) / 4), 0);
+  assert.ok(html.includes(`${tokenizer} · ${tokens} input tokens`), `${tokens} input tokens`);
+  assert.ok(html.includes(`sha256 · ${createHash('sha256').update(bytes).digest('hex').slice(0, 12)}`));
+});
+
 test('an implemented claim imports as boundary-checked on a row the site scopes boundary, and nothing is widened', async () => {
   const { claimsUnder } = await import('../scripts/conformance-reports.mjs');
   const scopes = ['assembler', 'boundary', 'boundary', 'boundary', 'assembler'].map((scope, i) => ({ id: `R-${i + 1}`, scope }));
