@@ -98,7 +98,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Tool · steps 1 and 3</div>
       <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Prompt → slots migrator</h2>
-      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each piece, assigns the slot's default authority, and reports what an assembler would still be missing. It is a heuristic, deliberately conservative: anything it cannot place is left unassigned rather than guessed. Nothing leaves your browser.</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each piece, assigns the slot's default authority, and reports what an assembler would still be missing. Only text your application wrote is split by what it says: a user or assistant message, or a paragraph that starts "User:", keeps its speaker's slot however it is worded, because wording never earns authority. It is a heuristic, deliberately conservative: anything it cannot place is left unassigned rather than guessed. Nothing leaves your browser.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
         <button onClick="{{ loadPrompt }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · system prompt</button>
         <button onClick="{{ loadMessages }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · message array</button>
@@ -232,6 +232,9 @@ class Component extends DCLogic {
     const t = text.toLowerCase();
     if (role === "tool" || role === "function") return "evidence.tool_results";
     if (role === "assistant") return "interaction.history";
+    // A turn keeps its speaker's slot whatever it says: wording never earns authority (R-7). Only text the
+    // application wrote, a system message or a pasted prompt, is split by what it says.
+    if (role === "user" || /^(user|customer|q):/.test(t)) return "interaction.query";
     if (/^(example|e\.g\.)|—\s*user:|user:\s*".*assistant:/i.test(text)) return "governance.examples";
     if (/(respond|answer|reply|output|format|return) (in|as|with|json|at most|max)|json:|no bullet|schema|sentences?\b.*(max|at most)|max \d+ (sentences|words)/.test(t)) return "governance.output_contract";
     if (/you (can|may) call|tools?:|functions?:|\w+\([\w, ]*\)/.test(t) && /call|tool|function/.test(t)) return "governance.capabilities";
@@ -239,8 +242,6 @@ class Component extends DCLogic {
     if (/^(customer|user) profile|plan=|region=|locale|entitlement|tenant/.test(t)) return "state.user";
     if (/earlier in this conversation|previously|prior (conversation|discussion)|the user (mentioned|said|prefers)|remember(ed)? that/.test(t)) return "interaction.memory";
     if (/policy \(|\bv\d+\)|retrieved|according to|source:|passage|chunk|document|<doc|faq|knowledge base|refunds? (return|in full)/.test(t)) return "evidence.knowledge";
-    if (role === "user") return "interaction.query";
-    if (/^user:|^customer:|^q:/.test(t)) return "interaction.query";
     if (/^you are|\byou are an?\b|never |always |do not |don't |must |be (warm|brief|concise|polite)|refuse/.test(t)) return "governance.instructions";
     if (role === "system") return "governance.instructions";
     return "unassigned";
