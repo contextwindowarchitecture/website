@@ -602,6 +602,26 @@ test('every published case and rejection uses a tokenizer and renderer every imp
   }
 });
 
+// conformance/README.md, Timestamps: format checkers disagree, and some validators never assert format at all, so every
+// format in the published schemas is paired with a pattern that holds the shape on its own.
+test('every format in the published schemas has a pattern beside it', async () => {
+  const root = new URL('../schema/', import.meta.url);
+  const unpaired = [];
+  const walk = (node, path) => {
+    if (Array.isArray(node)) node.forEach((v, i) => walk(v, `${path}/${i}`));
+    else if (node && typeof node === 'object') {
+      if ('format' in node && !('pattern' in node)) unpaired.push(path);
+      for (const [key, value] of Object.entries(node)) walk(value, `${path}/${key}`);
+    }
+  };
+  for (const file of (await fs.readdir(root)).filter(f => f.endsWith('.json'))) walk(JSON.parse(await fs.readFile(new URL(file, root), 'utf8')), file);
+  assert.deepEqual(unpaired, []);
+  const date = new RegExp((await read('schema/profile.schema.json')).properties.evaluation.properties.date.anyOf[0].pattern, 'u');
+  for (const [value, ok] of [['2026-09-22', true], ['yesterday', false], ['2026-9-22', false], ['2026-09-22T00:00:00Z', false], ['2026-09-22\n', false], ['２０２６-09-22', false]]) {
+    assert.equal(date.test(value), ok, JSON.stringify(value));
+  }
+});
+
 test('a budget may reserve an integer margin percent of at most 100, and the trace repeats it (R-16)', async () => {
   const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
   for (const [margin, valid] of [[0, true], [15, true], [100, true], [-1, false], [101, false], [7.5, false], ['10', false]]) {
