@@ -666,7 +666,7 @@ const REJECTION_CHECKS = {
   'profile-route-policy-mismatch': 'profile_route_policy_mismatch', 'profile-unrealizable': 'unrealizable_profile',
   'profile-invalid-tag': 'unrealizable_profile', 'messages-system-on-evidence': 'unrealizable_profile',
   'messages-tools-on-instructions': 'unrealizable_profile', 'messages-system-after-xml': 'unrealizable_profile',
-  'schema-missing-budget': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'not_i_json', 'number-out-of-range': 'not_i_json',
+  'schema-missing-budget': 'invalid_structure', 'batch-entry-not-object': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'not_i_json', 'number-out-of-range': 'not_i_json',
 };
 
 test('each published rejection case breaks exactly one snapshot check (R-17)', async () => {

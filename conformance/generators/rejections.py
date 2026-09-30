@@ -54,6 +54,8 @@ CASES = [
          {"item_id": "memory:old", "reason": "superseded", "stage": "producer", "superseded_by": "memory:gone"})),
     ("producer-reason-unknown", ["R-9", "R-17", "R-21"], "A producer exclusion's reason, rate_limited, is not an exclusion code in contract/reasons.json.",
      lambda s: batch("memory-svc")(s)["excluded"].append({"item_id": "memory:late", "reason": "rate_limited", "stage": "producer"})),
+    ("batch-entry-not-object", ["R-2", "R-17"], "A batch holds null beside its items. An entry that is not a JSON object is not an item, so the snapshot fails its schema rather than admission excluding it.",
+     lambda s: batch("policy-corpus")(s)["items"].append(None)),
     ("profile-route-mismatch", ["R-17", "R-20"], "The profile is for route another-route, and the route policy for contract-fixture.",
      lambda s: s["profile"].update(route="another-route")),
     ("profile-route-policy-mismatch", ["R-17", "R-20"], "The profile expects route policy fixture/v2, and the snapshot carries fixture/v1.",
