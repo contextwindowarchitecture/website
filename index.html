@@ -1273,12 +1273,12 @@ class Component extends DCLogic {
   frameworks() {
     return [
       {
-        label: "OpenAI Agents SDK", name: "the Agents SDK", stage: "Build instructions + input",
-        seam: "Agent(instructions=lambda ctx, agent: assemble_context(ctx).payload)",
+        label: "OpenAI Agents SDK", name: "the Agents SDK", stage: "Build each model call's input",
+        seam: "RunConfig(call_model_input_filter=lambda call: ModelInputData(input=[*system, *messages], instructions=None))  # both from assemble_context(call)",
         owns: ["The agent loop, tool calls and retries", "Handoffs between agents", "Sessions, tracing and guardrails", "Structured output parsing"],
         blank: ["What the instructions callable returns", "The input list you pass to Runner.run()", "What your context object carries", "What tool results look like coming back"],
         cost: ["Instructions grow into one 900-line string nobody edits", "Session history replays raw and crowds out evidence", "A bad handoff is unattributable — you can't tell which item caused it"],
-        verdict: "Yes. The dynamic instructions callable is already a context assembler without a spec. CWA gives it typed slots, a fitting policy, and a trace, at the cost of refactoring one function."
+        verdict: "Yes, through RunConfig's call_model_input_filter rather than the instructions callable. Whatever instructions returns takes the system role, which only governance may take, so the filter replaces each model call's input with the system entries as system items and the one user message, and leaves instructions empty. Give the agent only the tools the grant lists. The dynamic instructions callable was already a context assembler without a spec; CWA moves it to the hook that runs before every model call and gives it typed slots, a fitting policy and a trace."
       },
       {
         label: "LangChain / LangGraph", name: "LangGraph", stage: "Build state[\"messages\"]",
