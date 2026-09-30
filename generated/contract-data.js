@@ -852,7 +852,8 @@ export const TRACE_SCHEMA = {
           ]
         },
         "detail": {
-          "type": "string"
+          "type": "string",
+          "description": "Free text for people about the recovery. No requirement defines it, and conformance never compares it (conformance/README.md, Running a case)."
         }
       },
       "required": [

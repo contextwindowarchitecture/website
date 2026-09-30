@@ -22,7 +22,7 @@ Some cases have a generator in `generators/`. It holds a table of each candidate
 1. Validate `snapshot.json` and load it. A snapshot that fails its schemas or any check in Snapshot checks is rejected before assembly and has no trace (R-17). Resolve `tokenizer` and `renderer` by ID. Every implementation provides the ones Tokenizers and renderers requires; a case that uses an optional one the implementation does not provide is skipped, not passed (Reporting results).
 2. Assemble.
 3. Compare the payload byte for byte with `expected.payload.txt`, or confirm no payload when that file is absent.
-4. Compare the trace with `expected.trace.json` after removing `trace_id` and `timings`, which may differ (R-23). `context.snapshot_digest` is compared like every other field; Snapshot digest defines it.
+4. Compare the trace with `expected.trace.json` after removing `trace_id`, `timings` and `recovery.detail`, which may differ (R-23). `recovery.detail` is free text for people, and no requirement defines its content. `context.snapshot_digest` is compared like every other field; Snapshot digest defines it.
 
 Array order in the trace is part of the expectation:
 
