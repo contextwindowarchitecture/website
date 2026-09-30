@@ -184,7 +184,7 @@ Fitting decides per item. A slot the profile places twice sheds or compresses bo
 
 A snapshot is *valid* when it satisfies `snapshot.schema.json`, and the schemas it references, and passes every check below. An invalid snapshot is rejected before assembly, with no payload and no trace, because its profile, budget or context may be missing or contradictory (R-17). Rejection reports the application's error in building the snapshot. An implementation lists the problems in its own words, since no reason code names them; the codes in `contract/reasons.json` describe assemblies of valid snapshots, refusals included.
 
-- **I-JSON (R-17).** No string holds an unpaired surrogate, and every number is within the IEEE 754 double range, so the snapshot has an RFC 8785 serialization (Snapshot digest).
+- **I-JSON (R-17).** No string holds an unpaired surrogate, and every number, an integer literal of any length included, rounds to a finite IEEE 754 double, so the snapshot has an RFC 8785 serialization (Snapshot digest).
 - **One batch per producer (R-15).** No producer id heads more than one batch. A batch is one authenticated producer's output for the call (R-15), and rows, ranks, supersession and source diversity all key on that producer.
 - **Conflict groups (R-11).** Group ids are unique, every item id a group names is the id of a candidate or a producer exclusion in the snapshot, no item belongs to two groups, and a fact group's `fact` is a key of the route's `facts`.
 - **Producer exclusions (R-9, R-13).** An exclusion's `duplicate_of` or `superseded_by` is the id of a candidate in the same batch. Its `reason` is an exclusion code, which the batch schema checks.

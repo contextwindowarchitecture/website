@@ -12,6 +12,7 @@ BASE = json.load(open(os.path.join(WEB, "conformance/cases/fixture-three-slot/sn
 LONE = "LONE"  # stands in for an unpaired surrogate, which UTF-8 cannot encode; written as the escape \ud800
 
 HUGE = "\ue000HUGE\ue000"  # stands in for 1e400, which Python's json writes as Infinity
+HUGE_INT = "\ue000HUGE_INT\ue000"  # stands in for 1 followed by 400 zeros, an integer literal no double can hold
 MESSAGES = json.load(open(os.path.join(WEB, "conformance/cases/messages-render/snapshot.json")))
 
 
@@ -36,6 +37,9 @@ CASES = [
      lambda s: batch("policy-registry")(s)["items"][0].update(body=batch("policy-registry")(s)["items"][0]["body"] + LONE)),
     ("number-out-of-range", ["R-17", "R-23"], "An item's relevance is 1e400, beyond the IEEE 754 double range, so the snapshot is not I-JSON and has no digest.",
      lambda s: batch("policy-corpus")(s)["items"][0].update(relevance=HUGE)),
+    ("integer-out-of-range", ["R-17", "R-23"], "An item's relevance is the integer literal 1 followed by 400 zeros. Like 1e400 it is beyond the IEEE 754 double range, "
+     "though a language with big integers reads it exactly, so the snapshot is not I-JSON and has no digest.",
+     lambda s: batch("policy-corpus")(s)["items"][0].update(relevance=HUGE_INT)),
     ("producer-in-two-batches", ["R-15", "R-17"], "Two batches name the same producer, policy-registry; a batch is one authenticated producer's output for the call.",
      lambda s: batch("conversation")(s).update(producer=copy.deepcopy(batch("policy-registry")(s)["producer"]))),
     ("conflict-group-unknown-item", ["R-11", "R-17"], "A conflict group names an item id that is neither a candidate nor a producer exclusion in the snapshot.",
@@ -89,7 +93,7 @@ if __name__ == "__main__":
             snapshot["profile"]["id"] = name  # R-20: a changed profile is another profile, so it takes another id
         out = os.path.join(root, name)
         os.makedirs(out)
-        text = json.dumps(snapshot, indent=2, ensure_ascii=False).replace(LONE, "\\ud800").replace(f'"{HUGE}"', "1e400") + "\n"
+        text = json.dumps(snapshot, indent=2, ensure_ascii=False).replace(LONE, "\\ud800").replace(f'"{HUGE}"', "1e400").replace(f'"{HUGE_INT}"', "1" + "0" * 400) + "\n"
         open(os.path.join(out, "snapshot.json"), "w", encoding="utf-8").write(text)
         open(os.path.join(out, "case.json"), "w", encoding="utf-8").write(
             json.dumps({"id": name, "rules": rules, "description": description}, indent=2, ensure_ascii=False) + "\n")
