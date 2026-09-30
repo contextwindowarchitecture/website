@@ -67,6 +67,7 @@
           },
           "slots": {
             "type": "array",
+            "description": "Slots this producer may send. An item in any other slot is excluded with producer_slot_not_allowed (R-15). The producer's kind limits its slots further, whatever this list holds (R-8, R-13, R-14, R-15).",
             "items": {
               "$ref": "context_item.schema.json#/properties/slot"
             },
