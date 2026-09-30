@@ -194,7 +194,7 @@ test('specification, generated requirement reference, and status matrix share ev
 test('every requirement §1 lists as a producer or application duty is a boundary or application row', async () => {
   const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
   const cited = (from, to) => [...html.split(from)[1].split(to)[0].matchAll(/href="#(R-\d+)"/g)].map(m => m[1]);
-  const producers = cited('plus the ones aimed at producers of its kind:', 'A <strong>conformant application</strong>');
+  const producers = cited('plus the MUSTs aimed at producers:', 'A <strong>conformant application</strong>');
   const application = cited('meets the MUSTs no component can meet for it:', '. It renders with');
   assert.ok(producers.length > 0 && application.length > 0);
   const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
