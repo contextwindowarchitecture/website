@@ -1334,7 +1334,7 @@ export const ITEM_EXAMPLE = {
   "conflict_policy": "defers",
   "injection_risk": "untrusted_content",
   "lineage": "verbatim",
-  "eligibility": "support-chat/v1: tenant acme; rerank at least 0.82",
+  "eligibility": "support-chat/illustrative/v1: tenant acme; rerank at least 0.5",
   "body": "Pro plans refund in full within 30 days of purchase."
 };
 export const TRACE_EXAMPLE = {
@@ -1364,7 +1364,7 @@ export const TRACE_EXAMPLE = {
       "item_id": "refunds-eu:v17#p4",
       "tokens": 10,
       "source_version": "2026-09-10",
-      "eligibility": "support-chat/v1: tenant acme; rerank at least 0.82"
+      "eligibility": "support-chat/illustrative/v1: tenant acme; rerank at least 0.5"
     },
     {
       "slot": "interaction.query",
@@ -1393,7 +1393,7 @@ export const TRACE_EXAMPLE = {
     "route_policy_version": "fixture/v1",
     "tokenizer": "fixture-whitespace/v1",
     "renderer": "fixture-xml/v1",
-    "snapshot_digest": "cae64f87d7560b2e19b6e64cd2b36cdfd29761eef38cb98164e1679726b17414"
+    "snapshot_digest": "7d71a873c4b6baafcf26f7ae8f74b75bedf27a2e77a859ff5729e6b658776cb6"
   },
   "defaults_filled": []
 };
