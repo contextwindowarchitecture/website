@@ -295,6 +295,7 @@
           <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Tokens are finite, so when every item is measured and tiered the assembler knows what to protect, what to compress, what to drop, and when to stop and report that the evidence did not fit.</p>
         </div>
       </div>
+      <p style="margin: 40px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Rule zero (R-5): a governance item may state a rule, but the application enforces it outside the model. No assembler relies on context to keep an invariant.</p>
     </div>
   </section>
 
@@ -303,7 +304,7 @@
       <div data-tour="intro">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
-      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget in tier order, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
 
       <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
@@ -513,7 +514,7 @@
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">A slot holds items, not a paragraph.</h2>
         <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved chunks, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
         <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line);">
-          <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="9">
+          <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="11">
             <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line);">
               <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ f.key }}</span>
               <span style="font-size: 14.5px; line-height: 1.5; color: var(--fg); text-wrap: pretty;">{{ f.text }}</span>
@@ -523,8 +524,8 @@
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.8; position: sticky; top: 100px;">
         <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">
-          <span>context_item.yaml</span>
-          <span style="color: var(--p-evid);">evidence.knowledge · 1 of 3</span>
+          <span>context_item.yaml · JSON syntax, valid YAML</span>
+          <span style="color: var(--p-evid);">evidence.knowledge</span>
         </div>
         <!-- CONTRACT_ITEM_START -->
 <pre style="padding: 20px 18px; overflow: auto; margin: 0;">{
@@ -565,7 +566,7 @@
         <a href="./spec.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Specification · draft</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">26 numbered requirements.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">They cover conformance language, instruction authority and route-specific factual precedence, budget tiers, the profile shape, and the required trace fields. Pure text, permalinked per rule and mirrored to the repo.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">They cover conformance language, instruction authority and route-specific factual precedence, budget tiers, deduplication, supersession, source diversity, refusal, determinism, the profile shape, and the required trace fields. Pure text, permalinked per rule and mirrored to the repo.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the spec →</span>
         </a>
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
@@ -628,7 +629,7 @@
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 18px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--line);"><span>cwa-messages/v1 request</span><span>profile · policy-first-chat/v1</span></div>
         <div style="padding: 20px 18px; display: flex; flex-direction: column; gap: 18px;">
-          <p style="margin: 0; font-family: var(--sans); font-size: 12.5px; line-height: 1.6; color: var(--muted);">Each member's text as the model receives it. On the wire the request is one RFC 8785 JSON object, and each system and tools entry also carries its item's id.</p>
+          <p style="margin: 0; font-family: var(--sans); font-size: 12.5px; line-height: 1.6; color: var(--muted);">Each member's text as the model receives it. On the wire the request is one RFC 8785 JSON object, and each system and tools entry also carries its item's id. The token count covers each entry's text and the message content; roles, ids and JSON punctuation are left to the route's budget.margin_percent, 15 here (R-16).</p>
           <div>
             <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">system · <span style="color: var(--p-gov);">governance.instructions</span></div>
             <div data-member="system/0" style="white-space: pre-wrap; overflow-wrap: anywhere;">You are Ada, a support agent for Northwind.
@@ -860,7 +861,7 @@ Never quote prices you cannot verify with a tool.</div>
         <div style="font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 10px; text-wrap: pretty;">{{ tourTitle }}</div>
         <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ tourBody }}</div>
         <div style="display: flex; gap: 2px; margin: 18px 0 16px;">
-          <sc-for list="{{ tourDots }}" as="d" hint-placeholder-count="15">
+          <sc-for list="{{ tourDots }}" as="d" hint-placeholder-count="17">
             <div style="{{ d.style }}"></div>
           </sc-for>
         </div>
@@ -984,7 +985,7 @@ const UCS = [
     picks: [
       [0, "Triage assistant. Never diagnose. Escalate red-flag symptoms immediately."],
       [1, "age 61 · known hypertension · EU patient record"],
-      [2, "[protocol:chest-pain:v9 · binding] triage decision steps"],
+      [2, "[protocol:chest-pain:v9 · verified] triage decision steps"],
       [4, "Two BP checks this year; last visit March, no acute findings."],
       [5, "patient: pressure in my chest since this morning"],
       [9, "Return risk tier and next step only. No reassurance."],
@@ -1336,11 +1337,11 @@ class Component extends DCLogic {
         body: "A plane says why context exists. A slot is a typed collection inside it. Newcomers learn four words; implementers use eleven identifiers.",
         act: () => this.setState({ bad: false, off: {}, playing: true, step: 0, hold: 0, budget: 0, mode: "planes" }) },
       { key: "items", kicker: "The unit", title: "Items carry their own metadata",
-        body: "Provenance, authority, freshness, scope, eligibility, budget, conflict policy, lineage, trust. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
+        body: "Eleven fields: provenance, authority, freshness, scope, eligibility, budget, conflict policy, lineage, trust, variants and injection risk. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
       { key: "deeper", kicker: "Go deeper", title: "The spec and the contract have their own pages",
         body: "Twenty-six numbered requirements on the Spec page; what a retriever, memory store or MCP server has to emit on the Producers page, with a linter. This page keeps the argument.", act: () => {} },
       { key: "evidence", kicker: "Evidence", title: "Retrieval is a pipeline",
-        body: "Eight admission decisions sit between the vector store and the payload. Each is a rule the trace can cite — including what happens when nothing valid comes back.", act: () => {} },
+        body: "Eight steps sit between the vector store and the payload, four the retriever's and four the assembler's. Each is a rule the trace can cite — including what happens when nothing valid comes back.", act: () => {} },
       { key: "harness", kicker: "Where it fits", title: "You don't replace your framework",
         body: "Your harness runs the loop; stage 04 is the blank it hands you. Pick your stack and the seam is named in your own API — plus an honest list of when to skip CWA entirely.", act: () => {} },
       { key: "scaffold", kicker: "Take it with you", title: "Six steps and five files",
