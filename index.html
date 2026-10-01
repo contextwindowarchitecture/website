@@ -262,7 +262,7 @@
           <span style="display: block; min-width: 0;">
             <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Missing trigger</span>
             <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">The query is buried or absent, so the turn returns a summary, or nothing.</span>
-            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Support agent, query removed →</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">See the refusal · Support agent, query removed →</span>
           </span>
         </a>
         <div style="background: var(--fg); color: var(--bg); padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
@@ -303,7 +303,7 @@
       <div data-tour="intro">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
-      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; removing protected slots deliberately shows a nonconformant case. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget by priority, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
 
       <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
@@ -385,7 +385,7 @@
             </sc-for>
           </div>
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
-            <span>↓ rendered by {{ profileName }}</span>
+            <span>{{ renderedLabel }}</span>
             <span>trace {{ traceId }}</span>
           </div>
         </div>
@@ -917,7 +917,7 @@ const UCS = [
     label: "Support agent",
     symptom: "Ada follows the refund document instead of her own price rule — and by turn thirty the \u201cnever quote unverified prices\u201d line has been pushed out of the window altogether.",
     drops: {
-      0: "Ada loses her identity and her price rule — tone drifts and she quotes numbers she cannot verify.",
+      0: "Refused with required_slot_missing. Sent anyway, Ada would lose her identity and her price rule, and quote numbers she cannot verify.",
       1: "EU refund terms stop applying automatically; the answer turns generic.",
       2: "The 30-day policy is gone, so the model invents a refund window.",
       3: "It forgets eligibility was already checked and restarts the interrogation.",
@@ -925,7 +925,7 @@ const UCS = [
       6: "No tools to call — it can describe a refund it has no way to issue.",
       7: "The order amount is unknown, so the agent guesses the total or asks again.",
       9: "The reply arrives as six paragraphs inside a chat bubble built for two lines.",
-      10: "Nothing to answer. The turn produces a summary of the conversation instead."
+      10: "Refused with required_slot_missing. Sent anyway, there is nothing to answer, and the turn would produce a summary of the conversation instead."
     },
     name: "Refund request · live chat",
     picks: [
@@ -946,13 +946,13 @@ const UCS = [
     label: "Code review bot",
     symptom: "The lint config reads as an instruction, so the bot starts rewriting the repo's style instead of reviewing the diff it was given.",
     drops: {
-      0: "It reviews the whole file instead of the diff and the PR fills with noise.",
+      0: "Refused with required_slot_missing. Sent anyway, it would review the whole file instead of the diff and fill the PR with noise.",
       2: "House conventions vanish; it flags style the repo deliberately allows.",
       6: "It can describe problems but cannot post a single comment.",
       7: "No diff in the window — it reviews a pull request it has never seen.",
       8: "Comment tone slides from specific to generic \u201cconsider refactoring\u201d.",
       9: "Free-form prose comes back and the CI job fails to parse it.",
-      10: "No trigger. The job runs and returns nothing."
+      10: "Refused with required_slot_missing. Sent anyway, the job would run with no trigger and return nothing."
     },
     name: "Pull request #482 · CI job",
     picks: [
@@ -971,13 +971,13 @@ const UCS = [
     label: "Clinical triage",
     symptom: "The protocol text outranks the never-diagnose rule and the assistant confidently names a condition.",
     drops: {
-      0: "The escalation rule is gone and the assistant offers a diagnosis instead.",
+      0: "Refused with required_slot_missing. Sent anyway, the escalation rule would be gone and the assistant would offer a diagnosis instead.",
       1: "Age and hypertension disappear, so chest pain reads as low risk.",
       2: "The triage protocol is missing and the advice becomes improvised.",
       4: "Prior BP history is lost; the pattern across visits goes unnoticed.",
       5: "The symptom described this morning never reaches the model.",
       9: "A reassuring essay comes back where a risk tier was required.",
-      10: "There is no question left to triage."
+      10: "Refused with required_slot_missing: there is no question left to triage."
     },
     name: "Intake triage · patient portal",
     picks: [
@@ -996,12 +996,12 @@ const UCS = [
     label: "Weekly brief",
     symptom: "Last week's brief is indistinguishable from this week's data, so last week's numbers get reported as current.",
     drops: {
-      0: "Citations stop and numbers appear with no traceable source row.",
+      0: "Refused with required_slot_missing. Sent anyway, citations would stop and numbers would appear with no traceable source row.",
       2: "No pipeline data — the brief gets written out of thin air.",
       3: "It restarts at section one and rewrites what was already approved.",
       8: "Voice drifts away from the house style established last week.",
       9: "Length and structure wander and the newsletter template breaks.",
-      10: "No instruction to generate. The batch job returns an empty brief."
+      10: "Refused with required_slot_missing. Sent anyway, with no instruction to generate, the batch job would return an empty brief."
     },
     name: "Monday sales brief · scheduled batch",
     picks: [
@@ -1019,14 +1019,14 @@ const UCS = [
     label: "Voice ordering",
     symptom: "The entire menu is re-read into the window on every turn; the reply lands two seconds late and the customer starts repeating themselves.",
     drops: {
-      0: "Confirmation discipline is gone and items get added twice.",
+      0: "Refused with required_slot_missing. Sent anyway, confirmation discipline would be gone and items would get added twice.",
       1: "The usual order is forgotten and a regular is treated as a stranger.",
       3: "It loses the cart and asks the customer to start over.",
       5: "The correction \u201cmake that iced\u201d is never heard.",
       6: "It agrees to the order but nothing reaches the kitchen.",
       7: "It cannot state the total, so the lane stalls at the window.",
       9: "The reply comes back with bullet symbols the speech engine reads aloud.",
-      10: "Silence. There is nothing to respond to."
+      10: "Refused with required_slot_missing: there is nothing to respond to."
     },
     name: "Drive-thru lane 3 · realtime voice",
     picks: [
@@ -1046,14 +1046,14 @@ const UCS = [
     label: "Incident copilot",
     symptom: "The runbook reads as a command rather than a reference, and the copilot proposes a failover step as though it had been told to run one.",
     drops: {
-      0: "The confirmation gate disappears and it proposes running failover unprompted.",
+      0: "Refused with required_slot_missing. Sent anyway, the confirmation gate would disappear and it would propose running failover unprompted.",
       2: "The runbook is gone and the copilot improvises during a sev-1.",
       3: "It forgets mitigation was proposed and loops back to diagnosis.",
       4: "The first forty minutes are lost; it re-suggests what already failed.",
       6: "It can advise but cannot page anyone or read a single metric.",
       7: "p99 latency is unknown, so severity becomes guesswork.",
       9: "A wall of prose lands in the incident channel with no owners.",
-      10: "No question. The copilot waits."
+      10: "Refused with required_slot_missing: there is no question to answer."
     },
     name: "INC-2291 · production sev-1",
     picks: [
@@ -1073,13 +1073,13 @@ const UCS = [
     label: "Language tutor",
     symptom: "Old corrections become live instructions, so the tutor keeps correcting things the learner fixed weeks ago.",
     drops: {
-      0: "Corrections pile up and the learner is buried in red ink.",
+      0: "Refused with required_slot_missing. Sent anyway, corrections would pile up and bury the learner in red ink.",
       1: "B1 level unknown, so replies swing to native-speed Spanish.",
       4: "Past sessions vanish and the same subjunctive lesson repeats forever.",
       5: "The sentence being corrected is not in the window.",
       8: "Correction style turns clinical instead of encouraging.",
       9: "It answers in English and corrects five things at once.",
-      10: "There is nothing to check."
+      10: "Refused with required_slot_missing: there is nothing to check."
     },
     name: "Spanish B1 · session 27",
     picks: [
@@ -1097,10 +1097,13 @@ const UCS = [
 ];
 
 const SLOT_TOKENS = [240, 90, 1500, 160, 320, 850, 400, 600, 450, 70, 40];
+/* Slot indexes in shedding order (README Fitting): no route priorities, so by slot name. */
 const DROPPABLE = [8, 1];
-const COMPRESSIBLE = [4, 5, 2, 7];
+const COMPRESSIBLE = [2, 7, 5, 4];
+const PROTECTED = [0, 3, 6, 9, 10];
+const REQUIRED = [0, 10];
+const EVIDENCE = [2, 7];
 const COMPRESS = 0.4;
-const OMITTABLE = [4, 5];
 const BUDGETS = [8192, 4096, 2048, 1024];
 const HERO_BUDGET = 4096;
 
@@ -1500,15 +1503,26 @@ class Component extends DCLogic {
     const evicted = {}, compressed = {};
     const tok = i => compressed[i] ? Math.round(SLOT_TOKENS[i] * COMPRESS) : SLOT_TOKENS[i];
     const has = i => picks.some(p => p[0] === i);
+    // Refusals in reasons.json order (README Refusals). Each system's route is taken to require evidence when the
+    // system uses an evidence slot, and every compressible item to carry one summary variant.
     let planned = picks.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0);
-    for (const li of DROPPABLE) { if (planned <= budget) break; if (has(li)) { evicted[li] = true; planned -= SLOT_TOKENS[li]; } }
-    for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { compressed[li] = true; planned -= SLOT_TOKENS[li] - Math.round(SLOT_TOKENS[li] * COMPRESS); } }
-    // R-16: compressible items may then be omitted. Memory and history go whole; omitting all evidence would refuse under R-12 instead.
-    for (const li of OMITTABLE) { if (planned <= budget) break; if (has(li)) { planned -= tok(li); delete compressed[li]; evicted[li] = true; } }
-    const refused = planned > budget;
-    const evictedNames = Object.keys(evicted).map(i => SLOTS[+i][1]);
-    const compressedNames = Object.keys(compressed).map(i => SLOTS[+i][1]);
-    const shown = picks.slice(0, step).filter(p => !evicted[p[0]]);
+    const missing = REQUIRED.filter(i => !has(i));
+    let refusal = null;
+    const shed = [];
+    if (missing.length) refusal = "required_slot_missing";
+    else if (picks.filter(p => PROTECTED.includes(p[0])).reduce((t, p) => t + SLOT_TOKENS[p[0]], 0) > budget) refusal = "protected_content_over_budget";
+    else {
+      // R-16 and README Fitting steps 4 and 5: omit droppable items, then compress each compressible slot, then omit each one.
+      for (const li of DROPPABLE) { if (planned <= budget) break; if (has(li)) { evicted[li] = true; shed.push(li); planned -= SLOT_TOKENS[li]; } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { compressed[li] = true; planned -= SLOT_TOKENS[li] - Math.round(SLOT_TOKENS[li] * COMPRESS); } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { planned -= tok(li); delete compressed[li]; evicted[li] = true; shed.push(li); } }
+      if (allPicks.some(p => EVIDENCE.includes(p[0])) && !EVIDENCE.some(i => has(i) && !evicted[i])) refusal = "evidence_required";
+    }
+    const refused = refusal !== null;
+    const evictedNames = shed.map(i => SLOTS[i][1]);
+    const compressedNames = COMPRESSIBLE.filter(i => compressed[i]).map(i => SLOTS[i][1]);
+    // R-17: a refused assembly renders no payload.
+    const shown = refused ? [] : picks.slice(0, step).filter(p => !evicted[p[0]]);
     const usedTokens = shown.reduce((t, p) => t + tok(p[0]), 0);
     const segments = shown.map(p => ({
       style: "flex: 0 0 " + Math.min(100, (tok(p[0]) / budget) * 100) + "%; min-width: 2px; transition: flex-basis 320ms ease; background: " + this.color(p[0]) + (compressed[p[0]] ? "; opacity: 0.5" : "") + ";",
@@ -1523,6 +1537,7 @@ class Component extends DCLogic {
       let rowStyle, tag, tagColor;
       if (inCase && off[i]) { rowStyle = rowBase + "var(--accent); border-style: dashed; background: transparent; opacity: 0.7; transition: all 300ms ease;"; tag = "removed by you"; tagColor = "var(--accent)"; }
       else if (used && evicted[i]) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; text-decoration: line-through; transition: all 300ms ease;"; tag = "dropped · budget"; tagColor = "var(--fg)"; }
+      else if (used && refused) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; transition: all 300ms ease;"; tag = "not rendered"; tagColor = "var(--muted)"; }
       else if (on && compressed[i]) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 8%, transparent); transition: all 300ms ease;"; tag = "compressed"; tagColor = "var(--fg)"; }
       else if (on) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 12%, transparent); transition: all 300ms ease;"; tag = "in payload"; tagColor = this.color(i); }
       else if (used) { rowStyle = rowBase + "var(--line); background: transparent; transition: all 300ms ease;"; tag = "queued"; tagColor = "var(--muted)"; }
@@ -1536,7 +1551,15 @@ class Component extends DCLogic {
         tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: " + tagColor + ";"
       };
     });
-    const payload = shown.map(p => ({
+    const refusalText = {
+      required_slot_missing: missing.map(i => SLOTS[i][1]).join(" and ") + " has no admitted item, and the assembler never omits it (R-4). No payload is rendered, and the trace keeps every admission decision (R-17).",
+      protected_content_over_budget: "The protected items alone do not fit the budget, so nothing is shed and no payload is rendered (R-17).",
+      evidence_required: "Fitting left no evidence item, on a route that requires evidence (R-12). No payload is rendered, and the trace keeps every fitting decision (R-17)."
+    };
+    const payload = refused ? [{
+      tag: "refused · " + refusal, tagStyle: "color: var(--accent);", tokens: "no payload", text: refusalText[refusal],
+      style: "border: 1px solid var(--accent); border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both;"
+    }] : shown.map(p => ({
       tag: SLOTS[p[0]][1] + (compressed[p[0]] ? " · compressed" : ""),
       tagStyle: "color: " + this.color(p[0]) + ";",
       tokens: "~" + fmt(tok(p[0])) + " tok",
@@ -1545,8 +1568,14 @@ class Component extends DCLogic {
     }));
     const evBase = "font-family: var(--mono); font-size: 11px; line-height: 1.5; margin-top: 10px; color: ";
     let evictionLabel, evictionStyle = evBase + "var(--muted);";
-    if (refused) {
-      evictionLabel = "Refused: even after dropping " + (evictedNames.join(", ") || "nothing") + " and compressing " + (compressedNames.join(", ") || "nothing") + ", essential evidence does not fit. The assembler does not answer: it refuses and records a recovery action, and the application retrieves narrower, precomputes a summary or asks for more context before building a new snapshot.";
+    if (refusal === "evidence_required") {
+      const omittedEvidence = EVIDENCE.some(i => evicted[i]);
+      evictionLabel = "Refused · evidence_required: " + (evictedNames.length ? "after dropping " + evictedNames.join(", ") + " for budget, " : "") + "no evidence item is left. " +
+        (omittedEvidence ? "The omitted evidence had shorter variants that still did not fit, so the recovery action is retrieve_narrower: the application retrieves narrower before building a new snapshot (R-12)."
+          : "No evidence item was omitted for budget, so the recovery action is request_context: the application asks for more context before building a new snapshot (R-12).");
+      evictionStyle = evBase + "var(--accent);";
+    } else if (refused) {
+      evictionLabel = "Refused · " + refusal + ", before fitting, so nothing was dropped or compressed (README Refusals).";
       evictionStyle = evBase + "var(--accent);";
     } else if (evictedNames.length || compressedNames.length) {
       evictionLabel = (evictedNames.length ? "Dropped: " + evictedNames.join(", ") + ". " : "") + (compressedNames.length ? "Compressed with source links: " + compressedNames.join(", ") + ". " : "") + "Protected slots untouched.";
@@ -1559,11 +1588,11 @@ class Component extends DCLogic {
       usedLabel: picks.length + " of 11 admitted",
       removed, hasRemoved: removed.length > 0,
       restoreAll: () => this.restoreSlots(),
-      progress: shown.length + " / " + (picks.length - evictedNames.length) + " items",
+      progress: refused ? "refused · no payload" : shown.length + " / " + (picks.length - evictedNames.length) + " items",
       segments,
-      tokenLabel: "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
+      tokenLabel: refused ? "no payload · budget " + fmt(budget) + " tokens" : "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
       evictionLabel, evictionStyle,
-      profileName: "policy-first-chat/v1",
+      renderedLabel: refused ? "no payload · refused" : "↓ rendered by policy-first-chat/v1",
       traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
       budgets: BUDGETS.map((b, i) => ({ label: b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k", style: this.ucTabStyle(i === (this.state.budget || 0)), select: () => this.setState({ budget: i }) })),
       playLabel: this.state.playing ? "Pause" : "Play",
@@ -1631,7 +1660,7 @@ class Component extends DCLogic {
       out.evictionLabel = badTotal > budget ? "Over budget by " + fmt(badTotal - budget) + " tokens, and nothing can be dropped or compressed cleanly — the items are fused together." : "It fits, but nothing in here can be measured, tiered, traced, or swapped independently.";
       out.usedLabel = "structure lost";
       out.hasRemoved = false;
-      out.profileName = "none"; out.traceId = "none";
+      out.renderedLabel = "↓ rendered by none"; out.traceId = "none";
       out.slots = SLOTS.map((l, i) => {
         const inCase = allPicks.some(p => p[0] === i);
         let tag, style;
