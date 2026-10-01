@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Producer contract — Context Window Architecture</title>
-<meta name="description" content="How to build a retriever, memory store, state service or MCP server that a CWA assembler can admit. The minimum item, slot defaults, per-producer rules, and an item linter." />
+<meta name="description" content="How to build a producer a CWA assembler can admit, of any of the seven kinds: retrieval, memory, mcp, state, capability_policy, policy and interaction. The minimum item, the batch, slot defaults, per-kind rules, and an item and batch linter." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -66,7 +66,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The producer contract</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Building a tool an assembler can consume.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A producer is anything that emits candidate items into a slot: a retriever, a memory store, an MCP server, a state service, a policy loader, a capability policy. The assembler does not know how a producer works. It knows only what the producer hands over, and that handover is the contract. This page is a guide; the rules it cites are normative in the <a href="./spec.html">Spec</a>.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A producer is anything that emits candidate items into a slot: a retriever, a memory store, an MCP server, a state service, a capability policy, the application's policy loader, its conversation. The route lists each as one of seven kinds: <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">retrieval</span>, <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">memory</span>, <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">mcp</span>, <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">state</span>, <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">capability_policy</span>, <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">policy</span> and <span style="font-family: var(--mono); font-size: 15px; color: var(--fg);">interaction</span>. The assembler does not know how a producer works. It knows only what the producer hands over, and that handover is the contract. This page is a guide; the rules it cites are normative in the <a href="./spec.html">Spec</a>.</p>
     </div>
   </section>
 
@@ -101,22 +101,32 @@
           </sc-for>
         </div>
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
-          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>item.yaml</span><span>a minimum-plus-policy item from a retriever</span></div>
-          <div style="padding: 18px; white-space: pre; overflow: auto;"><span style="color: var(--muted);">id:</span>              refunds-eu:v17#p4
-<span style="color: var(--muted);">slot:</span>            evidence.knowledge
-<span style="color: var(--muted);">source:</span>          policy-corpus/refunds-eu
-<span style="color: var(--muted);">source_version:</span>  "2026-09-10"
-<span style="color: var(--muted);">authority:</span>       reference_only
-<span style="color: var(--muted);">trust:</span>           verified
-<span style="color: var(--muted);">freshness:</span>       "2026-09-12T15:30:00Z"
-<span style="color: var(--muted);">body:</span>            "Pro plans refund in full within 30 days of purchase."
-<span style="color: var(--muted);"># required in evidence.knowledge</span>
-<span style="color: var(--muted);">relevance:</span>       0.91
-<span style="color: var(--muted);"># policy fields · SHOULD</span>
-<span style="color: var(--muted);">token_budget:</span>    120
-<span style="color: var(--muted);">lineage:</span>         verbatim
-<span style="color: var(--muted);">injection_risk:</span>  untrusted_content
-<span style="color: var(--muted);">eligibility:</span>     "rerank ≥ 0.82 · tenant=acme · fresh ≤ 90d"</div>
+          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>examples/context-item.json</span><span>the published example item</span></div>
+          <!-- CONTRACT_ITEM_START -->
+<pre style="padding: 18px; overflow: auto; margin: 0;">{
+  "id": "refunds-eu:v17#p4",
+  "slot": "evidence.knowledge",
+  "source": "policy-corpus",
+  "source_version": "2026-09-10",
+  "authority": "reference_only",
+  "trust": "verified",
+  "freshness": "2026-09-12T15:30:00Z",
+  "expires": "2026-12-12T15:30:00Z",
+  "scope": {
+    "tenant": "acme",
+    "task": "refund_request"
+  },
+  "relevance": 0.91,
+  "token_budget": 420,
+  "tier": "compressible",
+  "variants": [],
+  "conflict_policy": "defers",
+  "injection_risk": "untrusted_content",
+  "lineage": "verbatim",
+  "eligibility": "support-chat/illustrative/v1: tenant acme; rerank at least 0.5",
+  "body": "Pro plans refund in full within 30 days of purchase."
+}</pre>
+<!-- CONTRACT_ITEM_END -->
         </div>
       </section>
 
@@ -205,7 +215,7 @@
         </div>
         <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 20px 24px; margin-top: 24px; display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 20px; align-items: start;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Precomputed variants</div>
-          <div style="font-size: 15.5px; line-height: 1.55; text-wrap: pretty;">Compression variants and reranker scores are the producer's job, computed before assembly and cached by content hash. The assembly step never calls a model (<a href="./spec.html#R-18">R-18</a>). If your producer can offer a shorter form of an item, emit it as a variant on the item, not as a second item. Each variant has its own id, distinct from its parent's and its siblings' (or the item is excluded with duplicate_variant_id), a body, a method and a lineage. It inherits the parent's provenance, scope and authority, and must not add an instruction or a fact the parent doesn't support.</div>
+          <div style="font-size: 15.5px; line-height: 1.55; text-wrap: pretty;">Compression variants and reranker scores are the producer's job, computed before assembly, and they should be cached by content hash. The assembly step never calls a model (<a href="./spec.html#R-18">R-18</a>). If your producer can offer a shorter form of an item, emit it as a variant on the item, not as a second item. Each variant has its own id, distinct from its parent's and its siblings' (or the item is excluded with duplicate_variant_id), a body, a method and a lineage. It inherits the parent's provenance, scope and authority, and must not add an instruction or a fact the parent doesn't support. The assembler picks a variant only when its rendered body is shorter than the item's current one. An item over its token_budget takes its longest variant within the cap, and a compressible item with none is omitted (<a href="./spec.html#R-16">R-16</a>; <a href="./conformance/README.md">conformance README</a>, Fitting).</div>
         </div>
       </section>
 
@@ -607,9 +617,9 @@ const FAILURES = [
   ]
 ];
 const SAMPLES = [
-  { label: "retrieval · valid structure", src: {
-    id: "refunds-eu:v17#p4", slot: "evidence.knowledge", source: "policy-corpus/refunds-eu", source_version: "2026-09-10", authority: "reference_only", trust: "verified", freshness: "2026-09-12T15:30:00Z",
-    body: "Pro plans refund in full within 30 days of purchase.", relevance: 0.91, lineage: "verbatim", injection_risk: "untrusted_content" } },
+  // The published example item (examples/context-item.json), resolved once contract.js loads. expires is dropped,
+  // as a knowledge item may, so the sample stays valid after the example's deadline passes.
+  { label: "retrieval · valid structure", fromExample: true },
   { label: "memory · authority too high", src: {
     id: "m_482", slot: "interaction.memory", source: "turn:2026-06-02#14", source_version: "1", authority: "state", trust: "unverified", freshness: "2026-06-02T09:00:00Z", expires: "2099-12-31T00:00:00Z",
     body: "User prefers EU billing and concise answers.", lineage: "summarised" } },
@@ -627,9 +637,9 @@ const SAMPLES = [
 ];
 
 class Component extends DCLogic {
-  state = { theme: "light", menu: false, mode: "item", validationTime: new Date().toISOString(), itemSrc: JSON.stringify(SAMPLES[0].src, null, 2), batchSrc: "", traceSrc: "" };
+  state = { theme: "light", menu: false, mode: "item", validationTime: new Date().toISOString(), itemSrc: "", batchSrc: "", traceSrc: "" };
   componentDidMount() {
-    import("./contract.js").then(contract => this.setState({ contract, sampleTrace: contract.TRACE_EXAMPLE, traceSrc: JSON.stringify(contract.TRACE_EXAMPLE, null, 2) })).catch(() => this.setState({ contractError: "Validators could not load. Reload to retry." }));
+    import("./contract.js").then(contract => this.setState(s => ({ contract, itemSrc: s.itemSrc || JSON.stringify(this.sampleItem(SAMPLES[0], contract), null, 2), sampleTrace: contract.TRACE_EXAMPLE, traceSrc: JSON.stringify(contract.TRACE_EXAMPLE, null, 2) }))).catch(() => this.setState({ contractError: "Validators could not load. Reload to retry." }));
     fetch("./examples/producer-batch.json").then(r => r.json()).then(batchExample => this.setState(s => ({ batchExample, batchSrc: s.batchSrc || JSON.stringify(batchExample, null, 2) }))).catch(() => {});
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
@@ -679,6 +689,11 @@ class Component extends DCLogic {
     return { ...base, verdict: "checks failed", verdictColor: bad, findings,
       traceLine: result.findings.every(inItem) ? "not rejected: admission excludes each item these findings concern (R-2)" : "the snapshot holding this batch is rejected before assembly, with no trace (R-17)" };
   }
+  sampleItem(sample, contract = this.state.contract) {
+    if (!sample.fromExample) return sample.src;
+    const { expires, ...item } = contract ? contract.ITEM_EXAMPLE : {};
+    return item;
+  }
   // Built from examples/producer-batch.json, so they cannot drift from it.
   batchSamples() {
     const b = this.state.batchExample;
@@ -726,7 +741,7 @@ class Component extends DCLogic {
       setItemMode: () => this.setState({ mode: "item" }),
       setBatchMode: () => this.setState(s => ({ mode: "batch", batchSrc: s.batchSrc || (s.batchExample ? JSON.stringify(s.batchExample, null, 2) : "") })),
       srcLabel: batch ? "producer batch · JSON" : "candidate item · JSON",
-      samples: (batch ? this.batchSamples() : SAMPLES).map(s => ({ label: s.label, load: () => this.setState({ [batch ? "batchSrc" : "itemSrc"]: JSON.stringify(s.src, null, 2) }) })),
+      samples: (batch ? this.batchSamples() : SAMPLES).map(s => ({ label: s.label, load: () => this.setState({ [batch ? "batchSrc" : "itemSrc"]: JSON.stringify(batch ? s.src : this.sampleItem(s), null, 2) }) })),
       src: batch ? this.state.batchSrc : this.state.itemSrc,
       setSrc: e => this.setState({ [batch ? "batchSrc" : "itemSrc"]: e.target.value }),
       lint: batch ? this.lintBatch(this.state.batchSrc) : this.lint(this.state.itemSrc),
