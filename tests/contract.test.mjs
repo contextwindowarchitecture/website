@@ -723,6 +723,23 @@ test('every profile id and version in the corpus and the examples names one prof
   }
 });
 
+// conformance/README.md, Registry: a route policy loads only under a lock entry with the same route, version and digest, so
+// one route and version name one policy wherever a snapshot, an example or the registry carries it.
+test('every route policy route and version in the corpus, the examples and the registry names one policy', async () => {
+  const seen = new Map();
+  const note = (policy, where) => {
+    const key = `${policy.route} ${policy.version}`;
+    if (seen.has(key)) assert.equal(canonical(policy), seen.get(key).content, `${where} and ${seen.get(key).where} both use ${key}`);
+    else seen.set(key, { content: canonical(policy), where });
+  };
+  (await read('examples/route-policies.json')).forEach(p => note(p, 'examples/route-policies.json'));
+  (await read('conformance/registry/route-policies.json')).forEach(p => note(p, 'conformance/registry/route-policies.json'));
+  for (const dir of ['cases', 'rejections']) {
+    const root = new URL(`../conformance/${dir}/`, import.meta.url);
+    for (const name of await fs.readdir(root)) note(JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8')).route_policy, `${dir}/${name}`);
+  }
+});
+
 test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
   const { report } = await read('contract/assembler-conformance.json');
   for (const [row, valid] of [

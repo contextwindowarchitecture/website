@@ -11,7 +11,7 @@ Language-neutral test cases for assemblers. Each directory under `cases/` holds:
 
 Each directory under `rejections/` holds a `case.json` and a `snapshot.json` that breaks exactly one of the Snapshot checks or its schemas. A conformant assembler rejects it before assembly, so there is no expected trace or payload (R-17).
 
-One profile id and version name one profile across the corpus, as R-20 requires of any change: a case's profile takes the case's id or an id no other case uses, and a rejection that changes its profile takes the rejection's.
+One profile id and version name one profile across the corpus, as R-20 requires of any change, and one route and version name one route policy, as Registry requires: a case's profile takes the case's id or an id no other case uses, a rejection that changes its profile takes the rejection's, and a rejection that changes its route policy gives it a version of its own.
 
 Some cases have a generator in `generators/`. It holds a table of each candidate's intended outcome, and it derives the expected trace and payload from that table rather than from any assembler's logic. Regenerate a case with `python3 conformance/generators/<case>.py`, and review the diff.
 
