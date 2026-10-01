@@ -622,6 +622,25 @@ test('every format in the published schemas has a pattern beside it', async () =
   }
 });
 
+// conformance/README.md, Timestamps: the pattern pins the shape, and whether a date exists is RFC 3339's rule, carried by
+// format: date-time, which a validator must assert. The site's validators do, and the admission-reasons case pins the outcome.
+test('a date-time whose date does not exist passes the pattern and fails the asserted format', async () => {
+  const schema = await read('schema/context_item.schema.json');
+  const shape = new RegExp(schema.properties.freshness.pattern, 'u');
+  for (const date of ['2026-02-30', '2026-13-01', '2026-01-00', '2023-02-29']) {
+    const freshness = `${date}T12:00:00Z`;
+    assert.ok(shape.test(freshness), `${freshness} has the shape`);
+    assert.equal(validateItemSchema({ ...item, freshness }), false, `${freshness} fails format: date-time`);
+    assert.ok(validateItemSchema.errors.some(e => e.instancePath === '/freshness' && e.keyword === 'format'), freshness);
+  }
+  assert.ok(validateItemSchema({ ...item, freshness: '2024-02-29T12:00:00Z' }), 'a leap day exists');
+  const snapshot = await read('conformance/cases/admission-reasons/snapshot.json');
+  const bad = snapshot.batches.flatMap(b => b.items).find(i => i.id === 'kb:bad-date');
+  assert.equal(bad.freshness, '2026-02-30T12:00:00Z');
+  const expected = await read('conformance/cases/admission-reasons/expected.trace.json');
+  assert.equal(expected.excluded.find(r => r.item_id === 'kb:bad-date').reason, 'invalid_structure');
+});
+
 test('a budget may reserve an integer margin percent of at most 100, and the trace repeats it (R-16)', async () => {
   const snapshot = JSON.parse(await fs.readFile(new URL('../conformance/cases/fixture-three-slot/snapshot.json', import.meta.url), 'utf8'));
   for (const [margin, valid] of [[0, true], [15, true], [100, true], [-1, false], [101, false], [7.5, false], ['10', false]]) {
