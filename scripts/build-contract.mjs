@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
@@ -38,9 +39,40 @@ outputs.set('producers.html', producers.replace(/const SLOT_DEFAULTS = \{[\s\S]*
   `const SLOT_DEFAULTS = ${JSON.stringify(data.SLOT_DEFAULTS, null, 2)};`)
   .replace(/const FAILURES = \[[\s\S]*?\n\];/, `const FAILURES = ${JSON.stringify(failures, null, 2)};`));
 const index = await fs.readFile('index.html', 'utf8');
-const itemPreview = JSON.stringify(data.ITEM_EXAMPLE, null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+const escapeHtml = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+const itemPreview = escapeHtml(JSON.stringify(data.ITEM_EXAMPLE, null, 2));
+// The landing page's sample request shows examples/messages-payload.json one member at a time, each text as the model
+// receives it, coloured by the plane of the slot the snapshot's profile placed it from.
+const payloadBytes = await fs.readFile('examples/messages-payload.json');
+const payload = JSON.parse(payloadBytes.toString('utf8'));
+const payloadSnapshot = await read('examples/messages-snapshot.json');
+if (payloadSnapshot.tokenizer !== 'estimate-utf8/v1') throw new Error('The landing-page payload count supports estimate-utf8/v1 only.');
+const planeColor = slot => `var(--p-${{ governance: 'gov', state: 'state', evidence: 'evid', interaction: 'inter' }[slot.split('.')[0]]})`;
+const placedBy = wrap => payloadSnapshot.profile.placement.filter(p => p.wrap === wrap).map(p => p.slot);
+const memberText = 'style="white-space: pre-wrap; overflow-wrap: anywhere;"';
+const memberLabel = (label, margin) => `<div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: ${margin};">${label}</div>`;
+const roleGroup = role => {
+  const entries = payload[role];
+  const slots = placedBy(role).map(slot => `<span style="color: ${planeColor(slot)};">${slot}</span>`).join(', ');
+  const open = entries.length > 1 ? '          <div style="display: flex; flex-direction: column; gap: 6px;">\n' : '          <div>\n';
+  return open + `            ${memberLabel(`${role} · ${slots}`, entries.length > 1 ? '0' : '6px')}\n` +
+    entries.map((entry, i) => `            <div data-member="${role}/${i}" ${memberText}>${escapeHtml(entry.text)}</div>\n`).join('') + '          </div>\n';
+};
+// Each tag line is wrapped in a span that also holds its newline: the page's template engine drops
+// whitespace-only text between two elements.
+const content = escapeHtml(payload.messages[0].content).replace(/^&lt;\/?([A-Za-z_][A-Za-z0-9_.-]*)[^\n]*&gt;\n/gm,
+  (line, tag) => `<span style="color: ${planeColor(placedBy('xml:' + tag)[0])};">${line}</span>`);
+const messagesGroup = '          <div>\n' + `            ${memberLabel(`messages[0] · role ${payload.messages[0].role}`, '6px')}\n` +
+  `            <div data-member="messages/0/content" ${memberText}>${content}</div>\n          </div>\n`;
+const payloadTokens = [...payload.system, ...payload.tools].map(e => e.text).concat(payload.messages[0].content)
+  .reduce((sum, text) => sum + Math.floor((Buffer.byteLength(text, 'utf8') + 3) / 4), 0);
+const payloadHash = createHash('sha256').update(payloadBytes).digest('hex').slice(0, 12);
 outputs.set('index.html', index.replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
-  `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 20px 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`));
+  `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 20px 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`)
+  .replace(/<!-- CONTRACT_PAYLOAD_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_END -->/,
+    `<!-- CONTRACT_PAYLOAD_START -->\n${roleGroup('system')}${roleGroup('tools')}${messagesGroup}<!-- CONTRACT_PAYLOAD_END -->`)
+  .replace(/<!-- CONTRACT_PAYLOAD_COUNT_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_COUNT_END -->/,
+    `<!-- CONTRACT_PAYLOAD_COUNT_START --><span>${payloadSnapshot.tokenizer} · ${payloadTokens} input tokens</span><span style="text-transform: none;">sha256 · ${payloadHash}…</span><!-- CONTRACT_PAYLOAD_COUNT_END -->`));
 
 const ajv = new Ajv({ allErrors: true, strict: true, code: { source: true, esm: true } });
 addFormats(ajv);

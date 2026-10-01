@@ -34,7 +34,7 @@ npm test
 | `contract/*.txt`, `contract/cwa.md` | Downloadable integration guidance and rendering template |
 | `contract/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
 
-The build generates `generated/`, `SPEC.md`, requirement arrays in the Spec and Assembler pages, slot defaults in Producers, and the profile examples in Evidence and Spec. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example. Unused duplicate landing-page scaffold logic has been removed.
+The build generates `generated/`, `SPEC.md`, requirement arrays in the Spec and Assembler pages, slot defaults in Producers, and the profile examples in Evidence and Spec. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 
