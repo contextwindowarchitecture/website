@@ -114,11 +114,40 @@ test('the item linter names first the code a trace would record for an item (R-2
   const { source, body, ...unsourced } = contract.ITEM_EXAMPLE;
   const variant = id => ({ id, body: 'x', method: 'extract', lineage: 'extracted' });
   for (const [item, line] of [
-    [{ ...contract.ITEM_EXAMPLE, expires: '2026-09-01T00:00:00Z', injection_risk: 'none' }, 'would be excluded as untrusted_content_unmarked; it also fails expired'],
-    [unsourced, 'would be excluded as missing_field:body; it also fails missing_field:source'],
+    [{ ...contract.ITEM_EXAMPLE, expires: '2026-09-01T00:00:00Z', injection_risk: 'none' }, 'among the checks run here, would be excluded as untrusted_content_unmarked; it also fails expired'],
+    [unsourced, 'among the checks run here, would be excluded as missing_field:body; it also fails missing_field:source'],
     [{ ...contract.ITEM_EXAMPLE, slot: 'state.task', authority: 'state', injection_risk: 'none', tier: 'droppable', variants: [variant('v'), variant('v')] },
-      'would be excluded as protected_tier_changed; it also fails duplicate_variant_id'],
+      'among the checks run here, would be excluded as protected_tier_changed; it also fails duplicate_variant_id'],
   ]) assert.equal(view.lint(JSON.stringify(item)).traceLine, line);
+});
+
+// R-9, R-13, R-15, README Snapshot checks: batch mode checks what a producer hands over, against the producer-batch
+// schema, and tells a problem that rejects the snapshot from one that excludes an item.
+test('the item linter checks a producer batch in batch mode', async () => {
+  const view = await component('producers.html');
+  view.state.contract = contract;
+  view.state.batchExample = JSON.parse(await fs.readFile(new URL('../examples/producer-batch.json', import.meta.url), 'utf8'));
+  view.renderVals().setBatchMode();
+  const vals = view.renderVals();
+  assert.equal(vals.isItemMode, false);
+  assert.deepEqual([...vals.samples].map(s => s.label), ['batch · valid', 'batch · unknown duplicate_of', 'batch · id reused']);
+  vals.samples[0].load();
+  assert.equal(view.renderVals().lint.verdict, 'batch checks passed');
+  assert.equal(view.renderVals().lint.traceLine, 'producer rows, as reported: memory:expired expired');
+  for (const value of ['null', '[]', 'true', '42', '{}']) assert.equal(view.lintBatch(value).verdict, 'checks failed');
+  const rejected = 'the snapshot holding this batch is rejected before assembly, with no trace (R-17)';
+  vals.samples[1].load();
+  assert.equal(view.renderVals().lint.verdict, 'checks failed');
+  assert.equal(view.renderVals().lint.traceLine, rejected);
+  const { items, excluded } = view.state.batchExample;
+  assert.equal(view.lintBatch(JSON.stringify({ items: [1], excluded })).traceLine, rejected, 'an entry that is not an object (R-2)');
+  assert.equal(view.lintBatch(JSON.stringify({ items, excluded: [{ ...excluded[0], reason: 'gone' }] })).traceLine, rejected, 'an unknown reason');
+  vals.samples[2].load();
+  assert.equal(view.renderVals().lint.verdict, 'checks failed');
+  assert.equal(view.renderVals().lint.traceLine, 'not rejected: admission excludes each item these findings concern (R-2)');
+  view.renderVals().setItemMode();
+  assert.equal(view.renderVals().isItemMode, true);
+  assert.equal(view.renderVals().samples[0].label, 'retrieval · valid structure');
 });
 
 test('the migrator preserves long bodies and handles malformed message entries', async () => {

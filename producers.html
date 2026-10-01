@@ -227,7 +227,7 @@
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Admission failures</h2>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Every exclusion lands in the trace as <span style="font-family: var(--mono); font-size: 14px;">excluded[] { item_id, reason, stage }</span>, plus duplicate_of or superseded_by when the reason calls for it. The stage says who decided. Producer rows are the ones a batch reported, copied as reported with no slot, listed first and taken from every batch, admitted or not (<a href="./spec.html#R-9">R-9</a>). Assembler rows are the assembler's own decisions, and carry the item's slot when it names one of the eleven (<a href="./spec.html#R-22">R-22</a>). When an item fails several checks, the assembler records the earliest code in this list, and among several missing fields the alphabetically first (<a href="./spec.html#R-21">R-21</a>). These are the reasons a producer will see, and what they mean. The list is generated from <a href="./contract/reasons.json">contract/reasons.json</a>, which also holds the assembly-level refusal reasons.</p>
         <div style="border: 1px solid var(--line);">
-          <sc-for list="{{ failures }}" as="f" hint-placeholder-count="29">
+          <sc-for list="{{ failures }}" as="f" hint-placeholder-count="28">
             <div style="display: grid; grid-template-columns: 210px minmax(0, 1fr) 60px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">{{ f.reason }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ f.text }}</span>
@@ -241,16 +241,20 @@
         <p><a href="./schema/context_item.schema.json">Item schema</a> · <a href="./schema/producer_batch.schema.json">Producer-batch schema</a> · <a href="./examples/producer-batch.json">Batch example</a></p>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Tool</div>
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Item linter</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste one candidate item as JSON. Expiration is checked at page-load time: {{ validationTime }}. Reload to capture a new time. The linter checks item structure and selected local rules. It cannot authenticate producers, verify provenance, enforce tenant scope, or decide route eligibility. Passing these checks is not admission or assembler conformance. Nothing leaves your browser. The linter cannot authenticate a capability source from its name; tool authorization requires trusted application context.</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste one candidate item as JSON, or switch to batch and paste what a producer hands over, <span style="font-family: var(--mono); font-size: 14px;">{ items, excluded }</span>, without the producer the application adds. Expiry and future freshness are checked against page-load time, {{ validationTime }}, with no clock skew; reload to capture a new time. The item checks are its structure and the rules it can judge without a route: authority, governance trust, the untrusted marking, revocation, expiry, freshness, variant ids, and tiers at their slot defaults. It cannot authenticate producers or apply the route, so producer kinds and their slots, the capability grant, the verified flag, scope, max_age_seconds, min_relevance, source_prefix, placement and ids across a snapshot go unchecked, and a trace may record an earlier code than the one named here. Every code it names would be an assembler row, at stage: assembler; the batch checks cover the rows a producer reports at stage: producer (<a href="./spec.html#R-9">R-9</a>). Passing these checks is not admission or assembler conformance. Nothing leaves your browser.</p>
+        <div style="display: inline-flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface); margin-bottom: 14px;">
+          <button onClick="{{ setItemMode }}" aria-pressed="{{ itemPressed }}" style="{{ tabItem }}">Item</button>
+          <button onClick="{{ setBatchMode }}" aria-pressed="{{ batchPressed }}" style="{{ tabBatch }}">Batch</button>
+        </div>
         <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
-          <sc-for list="{{ samples }}" as="s" hint-placeholder-count="4">
+          <sc-for list="{{ samples }}" as="s" hint-placeholder-count="6">
             <button onClick="{{ s.load }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ s.label }}</button>
           </sc-for>
         </div>
         <div id="tool" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
           <div style="background: var(--bg); display: flex; flex-direction: column;">
-            <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">candidate item · JSON</div>
-            <textarea value="{{ itemSrc }}" onChange="{{ setItemSrc }}" spellcheck="false" style="flex: 1; min-height: 360px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
+            <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">{{ srcLabel }}</div>
+            <textarea value="{{ src }}" onChange="{{ setSrc }}" spellcheck="false" style="flex: 1; min-height: 360px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
           </div>
           <div style="background: var(--surface); display: flex; flex-direction: column;">
             <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);"><span>local checks</span><span style="color: {{ lint.verdictColor }}; font-weight: 600;">{{ lint.verdict }}</span></div>
@@ -263,13 +267,15 @@
                 </div>
               </sc-for>
             </div>
-            <div style="padding: 14px 18px; border-bottom: 1px solid var(--line);">
-              <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">defaults filled · R-3</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-                <sc-for list="{{ lint.filled }}" as="d" hint-placeholder-count="3"><span style="font-family: var(--mono); font-size: 11.5px; padding: 4px 8px; border: 1px solid var(--line); color: var(--fg);">{{ d }}</span></sc-for>
-                <span style="font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding: 4px 0;">{{ lint.filledNote }}</span>
+            <sc-if value="{{ isItemMode }}" hint-placeholder-val="{{ true }}">
+              <div style="padding: 14px 18px; border-bottom: 1px solid var(--line);">
+                <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">defaults filled · R-3</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                  <sc-for list="{{ lint.filled }}" as="d" hint-placeholder-count="3"><span style="font-family: var(--mono); font-size: 11.5px; padding: 4px 8px; border: 1px solid var(--line); color: var(--fg);">{{ d }}</span></sc-for>
+                  <span style="font-family: var(--mono); font-size: 11.5px; color: var(--muted); padding: 4px 0;">{{ lint.filledNote }}</span>
+                </div>
               </div>
-            </div>
+            </sc-if>
             <div style="padding: 14px 18px; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--fg);"><span style="color: var(--muted);">trace › </span>{{ lint.traceLine }}</div>
           </div>
         </div>
@@ -605,7 +611,7 @@ const SAMPLES = [
     id: "refunds-eu:v17#p4", slot: "evidence.knowledge", source: "policy-corpus/refunds-eu", source_version: "2026-09-10", authority: "reference_only", trust: "verified", freshness: "2026-09-12T15:30:00Z",
     body: "Pro plans refund in full within 30 days of purchase.", relevance: 0.91, lineage: "verbatim", injection_risk: "untrusted_content" } },
   { label: "memory · authority too high", src: {
-    id: "m_482", slot: "interaction.memory", source: "turn:2026-06-02#14", source_version: "1", authority: "state", trust: "unverified", freshness: "2026-06-02T09:00:00Z", expires: "2026-08-31T00:00:00Z",
+    id: "m_482", slot: "interaction.memory", source: "turn:2026-06-02#14", source_version: "1", authority: "state", trust: "unverified", freshness: "2026-06-02T09:00:00Z", expires: "2099-12-31T00:00:00Z",
     body: "User prefers EU billing and concise answers.", lineage: "summarised" } },
   { label: "MCP resource → governance", src: {
     id: "mcp:docs-server/README", slot: "governance.instructions", source: "mcp:docs-server", source_version: "sha:4f1c", authority: "governing", trust: "untrusted", freshness: "2026-09-15T08:00:00Z",
@@ -621,9 +627,10 @@ const SAMPLES = [
 ];
 
 class Component extends DCLogic {
-  state = { theme: "light", menu: false, validationTime: new Date().toISOString(), itemSrc: JSON.stringify(SAMPLES[0].src, null, 2), traceSrc: "" };
+  state = { theme: "light", menu: false, mode: "item", validationTime: new Date().toISOString(), itemSrc: JSON.stringify(SAMPLES[0].src, null, 2), batchSrc: "", traceSrc: "" };
   componentDidMount() {
     import("./contract.js").then(contract => this.setState({ contract, sampleTrace: contract.TRACE_EXAMPLE, traceSrc: JSON.stringify(contract.TRACE_EXAMPLE, null, 2) })).catch(() => this.setState({ contractError: "Validators could not load. Reload to retry." }));
+    fetch("./examples/producer-batch.json").then(r => r.json()).then(batchExample => this.setState(s => ({ batchExample, batchSrc: s.batchSrc || JSON.stringify(batchExample, null, 2) }))).catch(() => {});
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
@@ -652,7 +659,40 @@ class Component extends DCLogic {
   excludedAs(reasons) {
     const rank = r => this.state.contract.REASONS.findIndex(x => x.code === (r.startsWith("missing_field:") ? "missing_field:<name>" : r));
     const [first, ...rest] = [...new Set(reasons)].sort((a, b) => rank(a) - rank(b) || (a < b ? -1 : a > b ? 1 : 0));
-    return "would be excluded as " + first + (rest.length ? "; it also fails " + rest.join(", ") : "");
+    return "among the checks run here, would be excluded as " + first + (rest.length ? "; it also fails " + rest.join(", ") : "");
+  }
+  // What a producer hands over, checked against the producer-batch schema (R-9, R-13). A row naming no candidate, an
+  // unknown reason, an entry that is not an object or a malformed batch rejects the snapshot (README Snapshot checks;
+  // R-2, R-17); a finding inside one item excludes that item only.
+  lintBatch(src) {
+    const ok = "var(--p-evid)", bad = "var(--accent)", warn = "var(--muted)";
+    const base = { filled: [], filledNote: "—", traceLine: "—", findings: [], verdictColor: warn };
+    if (!this.state.contract) return { ...base, verdict: this.state.contractError || "Loading validators…" };
+    let batch;
+    try { batch = JSON.parse(src); } catch (error) { return { ...base, verdict: "invalid JSON", verdictColor: bad, findings: [{ mark: "✕", color: bad, text: error.message, rule: "", href: "#linter" }] }; }
+    const result = this.state.contract.checkProducerBatch(batch);
+    const scope = { mark: "·", color: warn, text: this.state.contract.CONTRACT_SCOPE, rule: "R-5", href: "./spec.html#R-5" };
+    const findings = [...result.findings.map(f => ({ mark: "✕", color: bad, text: f.text, rule: "R-" + f.rule, href: "./spec.html#R-" + f.rule })), scope];
+    if (result.valid) return { ...base, verdict: "batch checks passed", verdictColor: ok, findings,
+      traceLine: batch.excluded.length ? "producer rows, as reported: " + batch.excluded.map(row => row.item_id + " " + row.reason).join(", ") : "no producer rows" };
+    const inItem = f => f.reason === "duplicate_item_id" || (f.reason === "invalid_structure" && /^\/items\/\d+[\/ ]/.test(f.text) && !/^\/items\/\d+ must be object$/.test(f.text));
+    return { ...base, verdict: "checks failed", verdictColor: bad, findings,
+      traceLine: result.findings.every(inItem) ? "not rejected: admission excludes each item these findings concern (R-2)" : "the snapshot holding this batch is rejected before assembly, with no trace (R-17)" };
+  }
+  // Built from examples/producer-batch.json, so they cannot drift from it.
+  batchSamples() {
+    const b = this.state.batchExample;
+    if (!b) return [];
+    const kept = b.items[0].id;
+    return [
+      { label: "batch · valid", src: b },
+      { label: "batch · unknown duplicate_of", src: { ...b, excluded: [...b.excluded, { item_id: kept + "-near", reason: "duplicate_content", stage: "producer", duplicate_of: "not-in-this-batch" }] } },
+      { label: "batch · id reused", src: { ...b, excluded: [...b.excluded, { item_id: kept, reason: "expired", stage: "producer" }] } }
+    ];
+  }
+  tab(active) {
+    return "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; background: " +
+      (active ? "var(--fg)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
   }
   validateTrace(src) {
     const ok = "var(--p-evid)", bad = "var(--accent)", warn = "var(--muted)";
@@ -670,6 +710,7 @@ class Component extends DCLogic {
     };
   }
   renderVals() {
+    const batch = this.state.mode === "batch";
     return {
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
@@ -680,10 +721,15 @@ class Component extends DCLogic {
       defaults: Object.keys(SLOT_DEFAULTS).map(k => { const d = SLOT_DEFAULTS[k]; return { slot: k, color: PLANE_COLOR[d.plane], authority: d.authority, tier: d.tier, lineage: d.lineage, rest: d.injection_risk + " · " + d.conflict_policy }; }),
       stages: STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s[0], owner: s[1], ownerColor: s[1] === "producer" ? "var(--accent)" : "var(--muted)", text: s[2] })),
       failures: FAILURES.map(f => ({ reason: f[0], text: f[1], rule: "R-" + f[2], href: "./spec.html#R-" + f[2] })),
-      samples: SAMPLES.map(s => ({ label: s.label, load: () => this.setState({ itemSrc: JSON.stringify(s.src, null, 2) }) })),
-      itemSrc: this.state.itemSrc,
-      setItemSrc: e => this.setState({ itemSrc: e.target.value }),
-      lint: this.lint(this.state.itemSrc),
+      isItemMode: !batch, itemPressed: String(!batch), batchPressed: String(batch),
+      tabItem: this.tab(!batch), tabBatch: this.tab(batch),
+      setItemMode: () => this.setState({ mode: "item" }),
+      setBatchMode: () => this.setState(s => ({ mode: "batch", batchSrc: s.batchSrc || (s.batchExample ? JSON.stringify(s.batchExample, null, 2) : "") })),
+      srcLabel: batch ? "producer batch · JSON" : "candidate item · JSON",
+      samples: (batch ? this.batchSamples() : SAMPLES).map(s => ({ label: s.label, load: () => this.setState({ [batch ? "batchSrc" : "itemSrc"]: JSON.stringify(s.src, null, 2) }) })),
+      src: batch ? this.state.batchSrc : this.state.itemSrc,
+      setSrc: e => this.setState({ [batch ? "batchSrc" : "itemSrc"]: e.target.value }),
+      lint: batch ? this.lintBatch(this.state.batchSrc) : this.lint(this.state.itemSrc),
       validationTime: this.state.validationTime,
       traceSrc: this.state.traceSrc,
       setTraceSrc: e => this.setState({ traceSrc: e.target.value }),
