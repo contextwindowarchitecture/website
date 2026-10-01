@@ -1132,7 +1132,7 @@ const TESTS = [
   ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
   ["Freshness", "Expired memory is excluded using assembly_time and the producer's exclusion is traced."],
   ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it."],
-  ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is excluded with capability_not_allowed."]
+  ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is excluded: as producer_slot_not_allowed, or as capability_not_allowed where the route lists that slot for the adapter."]
 ];
 
 const EVIDENCE_STAGES = [
