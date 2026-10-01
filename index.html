@@ -270,7 +270,7 @@
           <div style="font-size: 14.5px; line-height: 1.5; opacity: 0.72; text-wrap: pretty;">Each card opens the demo on the system that reproduces it, shown as the unassembled blob.</div>
         </div>
       </div>
-      <p style="margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Where an item sits in the window matters too, and that question has evidence of its own: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</p>
+      <p style="margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Where an item sits in the window matters too, and that question has evidence of its own: <a href="./evidence.html">Why placement is a profile, not a rule</a>.</p>
     </div>
   </section>
 
@@ -551,7 +551,7 @@
   "body": "Pro plans refund in full within 30 days of purchase."
 }</pre>
 <!-- CONTRACT_ITEM_END -->
-        <div style="padding: 12px 18px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.55; color: var(--muted); white-space: normal;">The item schema defines metadata; the route profile defines placement. Where items go is a profile decision with evidence behind it: <a href="#spec/profiles" onClick="{{ openProfiles }}">Why placement is a profile, not a rule</a>.</div>
+        <div style="padding: 12px 18px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.55; color: var(--muted); white-space: normal;">The item schema defines metadata; the route profile defines placement. Where items go is a profile decision with evidence behind it: <a href="./evidence.html">Why placement is a profile, not a rule</a>.</div>
       </div>
     </div>
   </section>
@@ -831,7 +831,7 @@ Never quote prices you cannot verify with a tool.</div>
   <section id="adopt" data-tour="adopt" style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
       <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Adopt the spec. Three assemblers already pass it.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. Three assemblers, in Python, TypeScript and Go, implement this spec, covering admission, fitting, profiles and traces, and pass every published conformance case; none is released yet, and we want to hear what they must do. A future revision will describe request intent as a typed tree that items bind to.</p>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. Three assemblers, in Python, TypeScript and Go, implement this spec, covering admission, fitting, profiles and traces, and pass every published conformance case; none is released yet, and we want to hear what they must do.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 12px;">
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">View on GitHub</a>
         <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">Read the docs</a>
@@ -1096,44 +1096,7 @@ const COMPRESSIBLE = [4, 5, 2, 7];
 const COMPRESS = 0.4;
 const OMITTABLE = [4, 5];
 const BUDGETS = [8192, 4096, 2048, 1024];
-
-const PROFILES = [
-  { name: "Policy-first chat", id: "policy-first-chat/v1", route: "support-chat", uses: "Support, assistants, workflows", order: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], principle: "Stable governing instructions early; live query and fresh task evidence late. The default profile for this site's examples." },
-  { name: "Document analysis", id: "document-analysis/v1", route: "document-qa", uses: "Long reports, contracts, corpora", order: [0, 2, 0, 1, 3, 4, 5, 8, 9, 10], principle: "Instructions open the system text; documents follow, clearly delimited; the instructions repeat after them with the examples and the question, near the end." },
-  { name: "Tool-using agent", id: "tool-agent/v1", route: "agent-loop", uses: "Multi-step work", order: [0, 6, 1, 2, 4, 5, 3, 7, 9, 10], principle: "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn." },
-  { name: "Structured extraction", id: "extraction/v1", route: "extract", uses: "Parsing and classification", order: [0, 9, 1, 2, 8, 9, 10], principle: "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task." }
-];
-
-const AUTHORITY = [
-  ["Governing instruction", "System and developer policy, safety constraints, the output contract, admitted capabilities, and steering examples."],
-  ["User intent / preference", "What the user asks for and how they want it. Cannot lift a constraint above it."],
-  ["Canonical state", "Application-owned facts about the task and session. Precedence is defined by the route for the facts it owns."],
-  ["Reference evidence", "Retrieved chunks. Informs the answer; never directs behaviour."],
-  ["Tool observation", "What a tool returned. Evidence about the world, not permission to act on it."],
-  ["Generated memory", "Summaries and inferences the system wrote. Fallible, expiring, revocable."],
-  ["Untrusted (least privilege)", "Prior model turns in history, which must carry it, and any other item in tool results, memory or history whose producer wants it handled with the least privilege. It keeps the item out of an instruction group's peers and changes nothing else. Governance, knowledge, state and the query never carry it. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection."]
-];
-
-const CONFLICTS = [
-  ["System or developer policy vs user request", "Higher-authority policy governs."],
-  ["Fresh verified tool output vs retrieved document", "Route policy may prefer a verified observation for the same current fact by listing its producer first; trust is never read, and unresolved conflicts escalate."],
-  ["Canonical task state vs conversational recollection", "Route policy identifies canonical application state for its owned facts; the model does not write that state."],
-  ["User correction vs inferred memory", "The application explicitly revokes affected memory and reports the exclusion."],
-  ["Conflicting retrieved sources", "The route's fact policy picks by producer precedence, and the loser shows up as conflict_lost. If it can't pick, the conflict is surfaced, more context is requested, or the assembly is refused."],
-  ["Format constraint vs required safety disclosure", "Both are governing and protected, so if you group them the conflict escalates. Write the disclosure into the contract so they never collide."],
-  ["Steering example vs instruction or output contract", "The instruction or contract governs. Examples defer to other governing items."]
-];
-
-const TESTS = [
-  ["Assembly snapshot", "Identical immutable snapshots produce identical rendered bytes and hashes."],
-  ["Golden task", "The right evidence item appears in the final context for a known request."],
-  ["Counterfactual ablation", "Remove evidence, task state, or tool results and confirm what fails, and that the trace explains it."],
-  ["Conflict", "A malicious retrieved chunk with imperative text does not alter governing instructions."],
-  ["Budget pressure", "At half the window, protected slots survive intact and shedding follows tier order: droppable first, then compressible."],
-  ["Freshness", "Expired memory is excluded using assembly_time and the producer's exclusion is traced."],
-  ["Refusal", "When the evidence a route needs doesn't survive fitting, the assembler refuses with evidence_required instead of answering without it."],
-  ["Capability source", "A tool specification emitted directly by an MCP adapter into governance.capabilities is excluded: as producer_slot_not_allowed, or as capability_not_allowed where the route lists that slot for the adapter."]
-];
+const HERO_BUDGET = 4096;
 
 const EVIDENCE_STAGES = [
   ["Rewrite", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
@@ -1162,7 +1125,7 @@ const ITEM_FIELDS = [
 
 
 class Component extends DCLogic {
-  state = { mode: "planes", spec: 0, open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true };
+  state = { mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true };
 
   componentWillUnmount() {
     clearInterval(this._t); clearInterval(this._m); clearInterval(this._track);
@@ -1236,9 +1199,6 @@ class Component extends DCLogic {
       if (uc >= 0) {
         patch = { uc, budget: 0, hold: 0, playing: false, step: 99, bad: parts[2] === "blob", off: parts[2] === "no-query" ? { [uc]: { 10: true } } : {} };
       }
-    } else if (parts[0] === "spec") {
-      const k = ["governance", "profiles", "trace"].indexOf(parts[1]);
-      if (k >= 0) patch = { spec: k };
     }
     if (!patch) return;
     this.setState(patch, () => {
@@ -1492,19 +1452,7 @@ class Component extends DCLogic {
     out.tourBackStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 10px 18px; cursor: pointer; visibility: " + (i === 0 ? "hidden" : "visible") + ";";
   }
 
-  specVals(out) {
-    const si = this.state.spec || 0;
-    const labels = ["Governance & conflicts", "Placement profiles", "Trace & tests"];
-    out.specTabs = labels.map((l, k) => ({ label: l, style: this.ucTabStyle(k === si), select: () => this.setState({ spec: k }) }));
-    out.specGov = si === 0; out.specProf = si === 1; out.specTrace = si === 2;
-    out.authority = AUTHORITY.map((a, k) => ({ n: String(k + 1).padStart(2, "0"), name: a[0], text: a[1] }));
-    out.conflicts = CONFLICTS.map(c => ({ when: c[0], then: c[1] }));
-    out.tests = TESTS.map(t => ({ name: t[0], text: t[1] }));
-    out.profiles = PROFILES.map(p => ({
-      name: p.name, id: p.id, uses: p.uses, principle: p.principle,
-      meta: "route: " + p.route + " · model_family: per deployment · evaluation: required before promotion",
-      order: p.order.map((i, k) => ({ label: SLOTS[i][1].split(".")[1] + (k > 0 && p.order.indexOf(i) < k ? " ↺" : ""), style: this.chip(i, " font-size: 10.5px; padding: 5px 8px;") }))
-    }));
+  schemaVals(out) {
     out.evidenceStages = EVIDENCE_STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s[0], text: s[1] }));
     out.itemFields = ITEM_FIELDS.map(f => ({ key: f[0], text: f[1] }));
     out.planes = PLANES.map((pl, k) => ({
@@ -1619,8 +1567,6 @@ class Component extends DCLogic {
       tabPlanes: this.tab(mode === "planes"), tabSlots: this.tab(mode === "slots"),
       setPlanesMode: () => this.setState({ mode: "planes" }),
       setSlotsMode: () => this.setState({ mode: "slots" }),
-      openProfiles: () => this.setState({ spec: 1 }),
-      openTrace: () => this.setState({ spec: 2 }),
       fmOpen0: () => this.openFailure(0), fmOpen1: () => this.openFailure(1), fmOpen2: () => this.openFailure(2), fmOpen3: () => this.openFailure(3),
       fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
       fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 }),
@@ -1642,8 +1588,8 @@ class Component extends DCLogic {
     }));
     out.mUcName = mu.name;
     out.mProgress = mstep + " of 11 slots";
-    out.mTokens = "~" + fmt(mTok) + " tokens";
-    out.mFill = "height: 100%; width: " + Math.min(100, (mTok / 4096) * 100) + "%; background: var(--accent); transition: width 400ms ease;";
+    out.mTokens = "~" + fmt(mTok) + " / " + fmt(HERO_BUDGET) + " tokens";
+    out.mFill = "height: 100%; width: " + Math.min(100, (mTok / HERO_BUDGET) * 100) + "%; background: var(--accent); transition: width 400ms ease;";
 
     out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
     out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
@@ -1689,7 +1635,7 @@ class Component extends DCLogic {
         return { id: l[1], name: l[0], tag, rowStyle: style + " cursor: default;", dotStyle: this.dot(i, " opacity: 0.4;"), title: "Structure is lost without an assembler", click: () => {}, tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: var(--muted);" };
       });
     }
-    this.specVals(out);
+    this.schemaVals(out);
     this.fwVals(out);
     this.tourVals(out);
     return out;
