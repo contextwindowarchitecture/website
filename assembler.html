@@ -206,9 +206,9 @@ const RULES = [
     "boundary-checked",
     8,
     [
-      7,
-      7,
-      7
+      5,
+      5,
+      5
     ]
   ],
   [
@@ -241,7 +241,7 @@ const RULES = [
     "MUST NOT",
     "No slot overrides platform roles; no authority from wording",
     "assembler",
-    "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside wrappers.",
+    "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside xml: wrappers; cwa-messages/v1 hands system and tools text over unescaped.",
     "implemented",
     7,
     [
@@ -297,9 +297,9 @@ const RULES = [
     "boundary-checked",
     16,
     [
-      16,
-      16,
-      16
+      15,
+      15,
+      15
     ]
   ],
   [
@@ -319,7 +319,7 @@ const RULES = [
     "MUST NOT",
     "Retrievers emit one scored item per chunk, never a blob",
     "boundary",
-    "Gates retrieval producers to the evidence slots, requires the slot's authority and a score wherever the route sets a threshold, and requires that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
+    "Gates retrieval producers to the evidence slots, requires the slot's authority, a score on every knowledge item and wherever the route sets a threshold, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
     "boundary-checked",
     5,
     [
@@ -362,9 +362,9 @@ const RULES = [
     "boundary-checked",
     34,
     [
-      34,
-      34,
-      34
+      33,
+      33,
+      33
     ]
   ],
   [
@@ -373,7 +373,7 @@ const RULES = [
     "assembler",
     "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
-    43,
+    46,
     [
       42,
       42,
@@ -397,7 +397,7 @@ const RULES = [
     "MUST",
     "Draft profiles versus evaluated profiles",
     "boundary",
-    "Rejects a profile written for another spec, and in deployment mode an unevaluated one. Evaluation itself happens outside assembly.",
+    "Rejects a profile written for another spec. Evaluation and promotion happen outside assembly: the Python assembler's registry hands a deployment only an evaluated profile, which no case covers.",
     "boundary-checked",
     1,
     [
@@ -410,13 +410,13 @@ const RULES = [
     "MUST",
     "Profile version and mandatory-slot validation",
     "boundary",
-    "Pins profile content by hash, rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement. Raising the version for every change is the application's.",
+    "Rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement. Raising the version for every change is the application's; the Python assembler's registry pins content by digest, outside assembly and the cases.",
     "boundary-checked",
     13,
     [
-      12,
-      12,
-      12
+      10,
+      10,
+      10
     ]
   ],
   [
@@ -427,9 +427,9 @@ const RULES = [
     "implemented",
     59,
     [
-      59,
-      59,
-      59
+      56,
+      56,
+      56
     ]
   ],
   [
@@ -440,9 +440,9 @@ const RULES = [
     "implemented",
     21,
     [
-      21,
-      21,
-      21
+      20,
+      20,
+      20
     ]
   ],
   [
@@ -498,7 +498,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"d5d467faaabae7ef420bf68189d710788d6e6284","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":81,"stale":1},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"c71cc07cf24d566fc20db8b8cfdd63b4bc8cea61","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":81,"stale":1},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"7e4da8bb9c5814df7e1276b5550283f863d6ce5f","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":81,"stale":1}];
+const CONFORMANCE = [{"label":"Python","name":"cwa-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"d5d467faaabae7ef420bf68189d710788d6e6284","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":78,"stale":4},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"c71cc07cf24d566fc20db8b8cfdd63b4bc8cea61","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":78,"stale":4},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"7e4da8bb9c5814df7e1276b5550283f863d6ce5f","websiteSha":"d38f2186bbed3fe92d38f1296529f97c307d89ab","total":82,"passed":78,"stale":4}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
