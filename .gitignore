@@ -2,3 +2,9 @@ node_modules/
 __pycache__/
 .claude/
 .idea/
+
+.codex/
+.mcp.json
+.serena/
+.taskmaster/
+docs/plans/
