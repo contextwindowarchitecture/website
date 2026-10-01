@@ -132,6 +132,31 @@ test('the migrator preserves long bodies and handles malformed message entries',
   assert.equal(turns.items[1].meta.startsWith('authority: untrusted'), true);
 });
 
+// R-9, R-10, R-13: the migrator cannot know a memory deadline or a rerank score, but its YAML shows every field
+// admission will ask for, and marks the slots whose published injection_risk default is untrusted_content.
+test('the migrator writes every field admission asks for, after the pinned keys', async () => {
+  const view = await component('start.html');
+  const result = view.migrate(view.renderVals().src);
+  const rows = result.yaml.split('\n  - ').slice(1);
+  const row = slot => rows.find(r => r.includes(`slot: ${slot}\n`));
+  const keys = r => [...r.matchAll(/^ {4}(\w+):/gm)].map(m => m[1]);
+  const marked = ['evidence.knowledge', 'evidence.tool_results', 'interaction.memory', 'interaction.history', 'interaction.query'];
+  for (const r of rows) {
+    const slot = r.match(/slot: (\S+)/)[1];
+    assert.equal(/\n    injection_risk: untrusted_content\b/.test(r), marked.includes(slot), slot);
+    assert.deepEqual(keys(r).slice(0, 2), ['slot', 'authority'], slot);
+    assert.equal(keys(r).at(-1), 'body', slot);
+  }
+  assert.deepEqual(keys(row('interaction.memory')), ['slot', 'authority', 'source', 'source_version', 'freshness', 'expires', 'trust', 'injection_risk', 'body']);
+  assert.deepEqual(keys(row('evidence.knowledge')), ['slot', 'authority', 'source', 'source_version', 'freshness', 'relevance', 'trust', 'injection_risk', 'body']);
+  assert.match(row('governance.instructions'), /\n    trust: verified\n/);
+  assert.ok([...result.items].every(i => i.slot === 'unassigned' || /source_version/.test(i.flag) || /R-5/.test(i.flag)));
+  assert.match([...result.items].find(i => i.slot === 'interaction.memory').flag, /expires/);
+  assert.match([...result.items].find(i => i.slot === 'evidence.knowledge').flag, /relevance/);
+  const developer = view.migrate(JSON.stringify([{ role: 'developer', content: 'Answer only questions about billing.' }, { role: 'user', content: 'Hi' }]));
+  assert.deepEqual([developer.items[0].slot, developer.items[0].meta.split(' · ')[0]], ['governance.instructions', 'authority: governing']);
+});
+
 // LICENSE and NOTICE put the specification, schemas, cases, scaffolds and site under Apache-2.0: anyone may use, copy,
 // modify and implement them, and a copy they distribute keeps the licence and NOTICE. No page may waive that.
 test('every page that speaks of the licence names Apache-2.0 and links it, and none waives its terms', async () => {
