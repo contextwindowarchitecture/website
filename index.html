@@ -830,8 +830,8 @@ Never quote prices you cannot verify with a tool.</div>
 
   <section id="adopt" data-tour="adopt" style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
-      <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Adopt the spec. The assembler comes next.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. A reference assembler that implements this spec, covering admission, fitting, profiles, and traces, is in progress, and we want to hear what it must do. A future revision will describe request intent as a typed tree that items bind to.</p>
+      <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Adopt the spec. Three assemblers already pass it.</h2>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. Three assemblers, in Python, TypeScript and Go, implement this spec, covering admission, fitting, profiles and traces, and pass every published conformance case; none is released yet, and we want to hear what they must do. A future revision will describe request intent as a typed tree that items bind to.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 12px;">
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">View on GitHub</a>
         <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">Read the docs</a>
@@ -1376,7 +1376,7 @@ class Component extends DCLogic {
       { key: "scaffold", kicker: "Take it with you", title: "Six steps and five files",
         body: "The Getting started page walks from your current prompt to a payload with owners, with a migrator that proposes slots and the scaffold files to copy.", act: () => {} },
       { key: "adopt", kicker: "Last step", title: "Start with one slot",
-        body: "Name the slots you already send, give each item an authority and a source, and the rest follows. The reference assembler is next.", act: () => {}, last: true }
+        body: "Name the slots you already send, give each item an authority and a source, and the rest follows. Three assemblers already pass the published cases.", act: () => {}, last: true }
     ];
   }
 
