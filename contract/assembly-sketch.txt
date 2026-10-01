@@ -1,5 +1,7 @@
 # CWA integration sketch — not runnable or a reference implementation.
-# Implement these application-owned helpers; producers run before assembly.
+# prepare_request is your application's: producers run before assembly, and it freezes the snapshot.
+# assemble_snapshot is what a conformant assembler does with that snapshot. Use one of the
+# implementations on the Assembler page rather than writing it; it is outlined here so you know what it checks.
 def prepare_request(req):
     # Keep each batch whole: its items and exclusions stay bound to the producer identity
     # your application authenticated. Never flatten items away from that identity or
@@ -14,17 +16,21 @@ def prepare_request(req):
         route_policy=load_versioned_policy(req.route),
         profile=load_profile('policy-first-chat/v1'),
         tokenizer=req.tokenizer,
-        renderer=req.renderer,
+        renderer=req.renderer,  # A published renderer, such as cwa-messages/v1.
         budget=req.budget,  # input is already net of reserved_output.
     )
-    return assemble_snapshot(snapshot)
+    return conformant_assembler.assemble(snapshot)
 
 
 def assemble_snapshot(snapshot):
     # No model calls, external reads, or ambient clock reads from this point.
+    reject_if_invalid(snapshot)  # Schemas and Snapshot checks; no payload and no trace (R-17).
     admitted = admit(snapshot)
-    resolved = resolve_declared_conflicts(admitted, snapshot)
-    fitted = fit_with_rendered_token_counts(resolved, snapshot)
+    resolved = resolve_declared_conflicts(admitted, snapshot)  # R-11
+    current = supersede_stale_observations(resolved, snapshot)  # R-25
+    unique = drop_exact_duplicates(current, snapshot)  # R-24
+    capped = cap_items_per_source(unique, snapshot)  # R-26
+    fitted = fit_with_rendered_token_counts(capped, snapshot)  # Refusal checks in contract/reasons.json order.
     if fitted.refused:
         return refused_result(fitted.reason, snapshot)  # No payload; trace.result = null.
     payload = render_profile(fitted, snapshot)
