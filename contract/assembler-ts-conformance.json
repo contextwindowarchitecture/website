@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-typescript",
-    "commit": "c71cc07cf24d566fc20db8b8cfdd63b4bc8cea61",
+    "commit": "6fb6a16f54534b4d606f316e5dfe91b93c5dc51e",
     "dirty": false
   },
   "cases_at_run": {
@@ -30,7 +30,7 @@
     "conflict-instruction": "9e544e4cc07e32333a26b964236ed284d41bf400bcab6d0eee440e32a021c6f7",
     "conflict-refused": "bce2db3ad4a65bfe333a6c69ee75165bb2e314c644e39fa95b28df03fe0b87a8",
     "conflict-request-context": "353e3fd79746339f2d9472c6cd37f7bcaa99d6a98872df8fbed136015881c104",
-    "conflict-required-slot-first": "82034d5392f4f0ea32fa0164122c34d1188cfbe126199cf923ce601841c9800c",
+    "conflict-required-slot-first": "0bb11c82faf5c02f2e65757260993b2dae95a16e455dce0bfc80aa54cfee1ee2",
     "conflict-surfaced-shed": "4e43346751604e7c9efa014a9e853412d099721544a5977e4d6edc04758a488f",
     "dedupe-evidence-required": "e846d71b43e967460b4dfa2241b8af1ef441a85d132b0eb77c15ad81659bb0ad",
     "dedupe-exact": "d5929f6d5d4b187d959c40541f13641e18c530c37733ec5f7d4666d298ceb34f",
@@ -49,8 +49,8 @@
     "messages-render": "137c0b6f024d9694e889c18a58b820012f161e41937230671466cc87124d9aed",
     "messages-repeated-slot": "f913b30648e0cde677f84d826fd878548acc82c9851ee58a4af8e8a1cb7d2509",
     "ordering-astral-ids": "013d872cb4405b1e1aefb161b98f9c401a6a986d43c9216bec7a83e24e36b6af",
-    "placement-protected-unplaced": "262cb1326fb7eb84b1a2014ef24e8ab72e8eae7f3defa15de5b1497048831d52",
-    "placement-required-slot-first": "ec526ea407e5d341f2f44a0adc3f49de127d932e447b9935ddfac1db48b06d40",
+    "placement-protected-unplaced": "abad1925c49f50fd255c54c4c9bc4fd36d70d1bd51f037f6a381ecdb55abeb67",
+    "placement-required-slot-first": "67de4dbc486e1c0757d6319fdb773a5a9c4f6aa248e27bc269a5d85d937635c1",
     "placement-unplaced-slot": "e9b8c9577cf3554a9beddf8d5747556dd00b4a2ea69370673f68977fc255def3",
     "protected-over-budget": "e8639bba116b1d52b726b8e73d9bad9e3be098a8fe676c2cb7be082f78d34c6e",
     "protected-over-cap": "d4ef1c3912f6870b9504157be8ac01e971cdcaf57d6cef8b07aa114ce324d178",
@@ -78,7 +78,7 @@
     "producer-reason-unknown": "75465726840bdff2fa721d15ec7c27365770cd9493e3a672f88a9607dd05eb40",
     "profile-invalid-tag": "c72841fc24efbaa60c8f98258d5f264b35614e6b973ce9819d21ab71e84d84cd",
     "profile-missing-instructions": "eb5922577a2348614d1cb692fe7bb2fbcc6ec6b28ce39082b3069ae226ae5941",
-    "profile-missing-output-contract": "ffee5574e5bde391887249745cbf2afb52978b881e8719297ca637dced10c667",
+    "profile-missing-output-contract": "6cefd5cde0bcfa1b4b15096e595ab529634fde06189024db2c8d07fac68fed01",
     "profile-missing-query": "71e642b4e94c4bc75f048b985f7789a5a25b009c55fc7418022624e82bbe22e0",
     "profile-route-mismatch": "e9d47d61f71c1f22da10e64731078b6718016e7d57a3d4af6519336f44a138ab",
     "profile-route-policy-mismatch": "e23c2a967c6fd0c2cd10cb77eafdebb2d4277813cdb947042c07bdf6c3387a11",
@@ -95,7 +95,7 @@
       "language": "TypeScript"
     },
     "contract": {
-      "website_commit": "d38f2186bbed3fe92d38f1296529f97c307d89ab",
+      "website_commit": "d229b740bac68c4c5ea7ffc9ed20315ac2fccff9",
       "dirty": false
     },
     "cases": [
@@ -349,6 +349,7 @@
         "rules": [
           "R-4",
           "R-11",
+          "R-17",
           "R-21"
         ],
         "outcome": "passed"
@@ -543,6 +544,7 @@
         "id": "placement-protected-unplaced",
         "rules": [
           "R-16",
+          "R-17",
           "R-20",
           "R-21",
           "R-22"
@@ -553,6 +555,7 @@
         "id": "placement-required-slot-first",
         "rules": [
           "R-4",
+          "R-17",
           "R-20",
           "R-21"
         ],

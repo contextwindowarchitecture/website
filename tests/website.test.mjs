@@ -301,6 +301,16 @@ test('the implementations table and status matrix count, per implementation, the
   }
 });
 
+// README.md promises each report was imported from a clean checkout, and conformance-reports.mjs counts no case from a run
+// whose contract was dirty, so an imported report records both its source and the contract it ran against as clean.
+test('every imported report comes from a clean checkout and ran against a clean contract', async () => {
+  for (const [, file] of IMPORTED) {
+    const { source, report } = await readJson(file);
+    assert.equal(source.dirty, false, `${file}: source`);
+    assert.equal(report.contract.dirty, false, `${file}: contract`);
+  }
+});
+
 test('an imported report is stored whole, valid against its schema, beside its source and the digests of the cases it ran', async () => {
   const { validateConformanceReportSchema } = await import('../generated/schema-validators.js');
   for (const [, file] of IMPORTED) {
