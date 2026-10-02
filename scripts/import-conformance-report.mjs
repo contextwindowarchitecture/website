@@ -1,6 +1,6 @@
 // Copies an implementation's conformance run (its conformance-report.json) into the website, with the digests of
 // the cases as they were at the website commit it ran against, so the build can tell which have changed since.
-//   node scripts/import-conformance-report.mjs ../cwa-assembler-ts contract/assembler-ts-conformance.json
+//   node scripts/import-conformance-report.mjs ../assembler-typescript contract/assembler-ts-conformance.json
 // The Python reference assembler's report comes in with its statuses: scripts/import-assembler-status.mjs.
 import fs from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
