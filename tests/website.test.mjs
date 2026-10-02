@@ -1,7 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import vm from 'node:vm';
+import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import * as contract from '../contract.js';
 import { SCAFFOLDS } from '../scaffolds.js';
@@ -348,6 +351,7 @@ test('the implementations table and status matrix count, per implementation, the
     assert.equal(row.repoHref, `https://github.com/${source.repository}`, file);
     assert.equal(row.commit, source.commit.slice(0, 7), file);
     assert.equal(row.commitHref, `https://github.com/${source.repository}/commit/${source.commit}`, file);
+    assert.deepEqual(JSON.parse(JSON.stringify(row.tags)), source.tags.map(name => ({ name, href: `https://github.com/${source.repository}/releases/tag/${encodeURIComponent(name)}` })), file);
     assert.equal(row.website, report.contract.website_commit.slice(0, 7), file);
     assert.equal(row.websiteHref, `${website}/commit/${report.contract.website_commit}`, file);
     assert.equal(row.cases, `${passing.size} of ${published.length} published cases pass`, file);
@@ -371,8 +375,37 @@ test('an imported report is stored whole, valid against its schema, beside its s
     const { source, cases_at_run: atRun, report, ...rest } = await readJson(file);
     assert.deepEqual(Object.keys(rest), [], `${file} carries only source, cases_at_run and report`);
     assert.match(source.commit, /^[0-9a-f]{40}$/, file);
+    assert.ok(Array.isArray(source.tags) && source.tags.every(tag => typeof tag === 'string' && tag !== ''), `${file}: source.tags`);
+    assert.deepEqual(source.tags, [...new Set(source.tags)].sort(), `${file}: source.tags sorted and distinct`);
     assert.ok(atRun === null || typeof atRun === 'object', file);
     assert.equal(validateConformanceReportSchema(report), true, `${file}: ${JSON.stringify(validateConformanceReportSchema.errors)}`);
+  }
+});
+
+test('an import records the checkout\'s repository and commit, whether the given paths are dirty, and every tag on that commit', async () => {
+  const { sourceOf } = await import('../scripts/conformance-reports.mjs');
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'cwa-source-'));
+  const git = (...args) => execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@example.invalid', '-c', 'core.hooksPath=/dev/null',
+    '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-c', 'tag.forceSignAnnotated=false', ...args], { encoding: 'utf8' }).trim();
+  try {
+    git('init', '-q');
+    await fs.writeFile(path.join(dir, 'a.txt'), '1');
+    git('add', 'a.txt');
+    git('commit', '-q', '-m', 'one');
+    git('tag', 'earlier');
+    await fs.writeFile(path.join(dir, 'a.txt'), '2');
+    git('commit', '-q', '-a', '-m', 'two');
+    git('tag', '-a', '-m', 'annotated', 'v0.1.0');
+    git('tag', 'draft-release');
+    git('remote', 'add', 'origin', 'git@github.com:example/assembler-x.git');
+    assert.deepEqual(sourceOf(dir), { repository: 'example/assembler-x', commit: git('rev-parse', 'HEAD'), dirty: false, tags: ['draft-release', 'v0.1.0'] });
+    await fs.writeFile(path.join(dir, 'b.txt'), 'untracked');
+    assert.equal(sourceOf(dir).dirty, true);
+    assert.equal(sourceOf(dir, 'a.txt').dirty, false);
+    git('checkout', '-q', 'earlier');
+    assert.deepEqual(sourceOf(dir).tags, ['earlier']);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
   }
 });
 

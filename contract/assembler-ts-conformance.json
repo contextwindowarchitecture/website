@@ -2,7 +2,10 @@
   "source": {
     "repository": "contextwindowarchitecture/assembler-typescript",
     "commit": "5e1223fbcd76a25f9395e7cddfa863e3270e8aa7",
-    "dirty": false
+    "dirty": false,
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "4e15f74942312728a036f8ed2080788e32bdbc5efccc297b2cde66dab31085f7",

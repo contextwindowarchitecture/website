@@ -77,6 +77,15 @@ export function remoteOf(checkout) {
   }
 }
 
+/** An implementation checkout as an import records it: its repository (remoteOf), its commit, whether it was dirty
+ * (in paths, when given, else anywhere) and every tag on that commit, in name order, which the Assembler page shows
+ * beside the commit. */
+export function sourceOf(checkout, ...paths) {
+  const git = (...args) => execFileSync('git', ['-C', checkout, ...args], { encoding: 'utf8' }).trim();
+  return { repository: remoteOf(checkout), commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain', '--', ...paths) !== '',
+    tags: git('tag', '--points-at', 'HEAD').split('\n').filter(Boolean).sort() };
+}
+
 /** A report as the website stores it: { source, cases_at_run, report }. source names the implementation's checkout,
  * cases_at_run holds the digests of the cases as they were at the website commit it ran against, and report is the
  * implementation's conformance-report.json untouched, so it validates against conformance_report.schema.json on its own. */

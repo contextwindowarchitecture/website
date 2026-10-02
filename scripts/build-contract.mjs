@@ -135,12 +135,13 @@ const validateReport = ajv.getSchema(conformanceReportSchema.$id);
 const runs = await Promise.all(IMPLEMENTATIONS.map(async ({ label, file }) => {
   const { source, cases_at_run: atRun, report } = await read(file);
   if (report === undefined || atRun === undefined) throw new Error(`${file} has no report or cases_at_run; import it with scripts/import-conformance-report.mjs`);
+  if (!Array.isArray(source.tags)) throw new Error(`${file} has no source.tags; import it again with scripts/import-conformance-report.mjs`);
   if (!validateReport(report)) throw new Error(`${file}: ` + JSON.stringify(validateReport.errors));
   return { label, source, report, outcomes: tally(report, atRun, published) };
 }));
 const conformance = runs.map(({ label, source, report, outcomes }) => ({
   label, name: report.implementation.name, version: report.implementation.version, repository: source.repository,
-  sha: source.commit, websiteSha: report.contract.website_commit, total: published.length,
+  sha: source.commit, tags: source.tags, websiteSha: report.contract.website_commit, total: published.length,
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
 for (const page of ['spec.html', 'assembler.html']) {

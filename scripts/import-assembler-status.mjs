@@ -3,20 +3,17 @@
 //   node scripts/import-assembler-status.mjs ../assembler-python
 // Each claim there cites tests and is checked against its scope, and a claim made before this site narrowed a row's
 // scope is read under the narrower one (claimsUnder); the report records every case's
-// outcome, and the import records each case's digest at the website commit the run used (scripts/conformance-reports.mjs). These files record the result and the assembler commit it came from. The build validates
+// outcome, and the import records each case's digest at the website commit the run used (scripts/conformance-reports.mjs). These files record the result and the assembler commit it came from, with that commit's tags. The build validates
 // them again and renders the Assembler matrix.
 import fs from 'node:fs/promises';
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { claimsUnder, imported, remoteOf } from './conformance-reports.mjs';
+import { claimsUnder, imported, sourceOf } from './conformance-reports.mjs';
 
 const assembler = process.argv[2];
 if (!assembler) throw new Error('usage: node scripts/import-assembler-status.mjs <path to assembler-python>');
-const git = (...args) => execFileSync('git', ['-C', assembler, ...args], { encoding: 'utf8' }).trim();
 const read = async name => JSON.parse(await fs.readFile(path.join(assembler, name), 'utf8'));
-const source = { repository: remoteOf(assembler), commit: git('rev-parse', 'HEAD'),
-  dirty: git('status', '--porcelain', '--', 'status.json', 'conformance-report.json', 'src', 'tests') !== '' };
+const source = sourceOf(assembler, 'status.json', 'conformance-report.json', 'src', 'tests');
 const { requirements } = await read('status.json');
 const scopes = JSON.parse(await fs.readFile('contract/assembler-scope.json', 'utf8'));
 await fs.writeFile('contract/assembler-status.json', JSON.stringify({

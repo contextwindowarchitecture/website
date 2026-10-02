@@ -3,15 +3,13 @@
 //   node scripts/import-conformance-report.mjs ../assembler-typescript contract/assembler-ts-conformance.json
 // The Python reference assembler's report comes in with its statuses: scripts/import-assembler-status.mjs.
 import fs from 'node:fs/promises';
-import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { imported, remoteOf } from './conformance-reports.mjs';
+import { imported, sourceOf } from './conformance-reports.mjs';
 
 const [checkout, out] = process.argv.slice(2);
 if (!checkout || !out) throw new Error('usage: node scripts/import-conformance-report.mjs <implementation checkout> <output file>');
-const git = (...args) => execFileSync('git', ['-C', checkout, ...args], { encoding: 'utf8' }).trim();
-const source = { repository: remoteOf(checkout), commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain') !== '' };
+const source = sourceOf(checkout);
 const report = JSON.parse(await fs.readFile(path.join(checkout, 'conformance-report.json'), 'utf8'));
 if (!validateConformanceReportSchema(report)) throw new Error('conformance-report.json: ' + JSON.stringify(validateConformanceReportSchema.errors));
 await fs.writeFile(out, JSON.stringify(imported(source, report), null, 2) + '\n');

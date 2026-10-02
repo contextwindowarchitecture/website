@@ -69,7 +69,7 @@
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--accent);">in progress</span></span>
         <span>Spec target: <span style="color: var(--fg);">draft</span></span>
-        <span>Updated: 2026-10-01</span>
+        <span>Updated: 2026-10-02</span>
       </div>
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin: 40px 0 12px;">Reference implementations</div>
       <div role="table" aria-label="Reference implementations by language" style="border: 1px solid var(--line); background: var(--surface);">
@@ -78,7 +78,7 @@
           <div role="row" class="im" style="display: grid; grid-template-columns: 110px minmax(0, 1.4fr) minmax(0, 1.4fr) minmax(0, 1fr) 132px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
             <span role="cell" style="font-size: 14px; font-weight: 600;">{{ i.language }}</span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.scope }}<wbr>{{ i.pkg }}</span><span style="color: var(--muted);">{{ i.version }}</span></span>
-            <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><a href="{{ i.repoHref }}" target="_blank" rel="noopener" style="overflow-wrap: anywhere;">{{ i.repo }}</a><a href="{{ i.commitHref }}" target="_blank" rel="noopener">{{ i.commit }}</a></span>
+            <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><a href="{{ i.repoHref }}" target="_blank" rel="noopener" style="overflow-wrap: anywhere;">{{ i.repo }}</a><span><sc-for list="{{ i.tags }}" as="t"><a href="{{ t.href }}" target="_blank" rel="noopener">{{ t.name }}</a><span style="color: var(--muted);"> · </span></sc-for><a href="{{ i.commitHref }}" target="_blank" rel="noopener">{{ i.commit }}</a></span></span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="color: {{ i.casesColor }};">{{ i.cases }}</span><span style="color: var(--muted);">{{ i.caseNote }}</span></span>
             <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">website <a href="{{ i.websiteHref }}" target="_blank" rel="noopener">{{ i.website }}</a></span>
           </div>
@@ -498,7 +498,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"49b321e4f525d8c879934f28e1c316bb8fc33f6f","websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"5e1223fbcd76a25f9395e7cddfa863e3270e8aa7","websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"001daddce57518ec0addbea2df689f5f7aae6e67","websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0}];
+const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"49b321e4f525d8c879934f28e1c316bb8fc33f6f","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"5e1223fbcd76a25f9395e7cddfa863e3270e8aa7","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"001daddce57518ec0addbea2df689f5f7aae6e67","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":82,"passed":82,"stale":0}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
@@ -544,6 +544,8 @@ class Component extends DCLogic {
           // The repository by name, and its commit; a host other than GitHub gets its URL and no commit link.
           repo: github ? c.repository.split("/")[1] : c.repository, repoHref,
           commit: c.sha.slice(0, 7), commitHref: github ? repoHref + "/commit/" + c.sha : repoHref,
+          // The tags on that commit when it was imported, each before the commit and linked to its page.
+          tags: c.tags.map(name => ({ name, href: github ? repoHref + "/releases/tag/" + encodeURIComponent(name) : repoHref })),
           website: c.websiteSha.slice(0, 7), websiteHref: WEBSITE + "/commit/" + c.websiteSha,
           cases: c.passed + " of " + c.total + " published cases pass", casesColor: c.passed === c.total ? "var(--p-evid)" : "var(--accent)",
           caseNote: c.stale ? c.stale + " changed since its run" : ""
