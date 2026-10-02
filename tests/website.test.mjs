@@ -433,3 +433,48 @@ test('an imported report names its GitHub repository as owner/repo, from the che
     assert.match(source.repository ?? '', /^[\w.-]+\/[\w.-]+$/, file);
   }
 });
+
+// llms.txt indexes the site for language models in the llms.txt format (https://llmstxt.org/): a title, a one-paragraph
+// summary, then sections that each list links. The guides it links to, and llms-full.txt, link to the site and the
+// website repository, so every such link must name a file or directory this repository publishes, and a fragment
+// an id on that page.
+const LLMS = ['llms.txt', 'llms-producers.txt', 'llms-assemblers.txt'];
+const repoFile = file => fs.readFile(new URL('../' + file, import.meta.url), 'utf8');
+
+test('llms.txt is an llms.txt index, the landing page links it, and every llms link names a published file', async () => {
+  const index = await repoFile('llms.txt');
+  const lines = index.split('\n');
+  assert.match(lines[0], /^# \S/);
+  assert.equal(lines[1], '');
+  assert.match(lines[2], /^> \S/);
+  const sections = index.split(/^## /m).slice(1);
+  assert.ok(sections.length > 0, 'llms.txt has no link sections');
+  for (const section of sections) {
+    for (const line of section.split('\n').slice(1).filter(l => l.trim())) assert.match(line, /^- \[[^\]]+\]\(https:\/\/[^)\s]+\)/, line);
+  }
+  assert.ok((await repoFile('index.html')).includes('<a href="./llms.txt">llms.txt</a>'), 'the landing-page footer links llms.txt');
+  const local = /https:\/\/(?:contextwindowarchitecture\.io|github\.com\/contextwindowarchitecture\/website\/tree\/main)\/([^\s)`>]*)/g;
+  for (const file of [...LLMS, 'llms-full.txt']) {
+    for (const [url, target] of (await repoFile(file)).matchAll(local)) {
+      const [path, fragment] = target.replace(/[.,;:]+$/, '').split('#');
+      const stat = await fs.stat(new URL('../' + (path || 'index.html'), import.meta.url)).catch(() => null);
+      assert.ok(stat, `${file} links ${url}, which this repository does not publish`);
+      if (fragment) assert.ok((await repoFile(path)).includes(`id="${fragment}"`), `${file} links ${url}, which has no such anchor`);
+    }
+  }
+});
+
+// The guides are written by hand, so a test holds them to the contract's spelling: every requirement they cite exists,
+// and every snake_case identifier they name, a reason code, field or route rule, appears in a schema, the reason
+// registry, the slot defaults, the requirements or the conformance README.
+test('the llms guides cite only requirements and identifiers the contract defines', async () => {
+  const requirements = JSON.parse(await repoFile('contract/requirements.json'));
+  const schemas = await Promise.all((await fs.readdir(new URL('../schema/', import.meta.url))).map(f => repoFile('schema/' + f)));
+  const defined = [...schemas, ...await Promise.all(['contract/reasons.json', 'contract/slot-defaults.json', 'contract/requirements.json',
+    'conformance/README.md'].map(repoFile))].join('\n');
+  for (const file of LLMS) {
+    const text = await repoFile(file);
+    for (const [cited, n] of text.matchAll(/\bR-(\d+)\b/g)) assert.ok(Number(n) >= 1 && Number(n) <= requirements.length, `${file} cites ${cited}`);
+    for (const [, name] of text.matchAll(/`([a-z]+(?:_[a-z0-9]+)+)`/g)) assert.ok(defined.includes(name), `${file} names ${name}, which the contract does not define`);
+  }
+});

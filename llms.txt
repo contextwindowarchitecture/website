@@ -1,0 +1,72 @@
+# Context Window Architecture
+
+> Context Window Architecture (CWA) is a draft specification for assembling every model call from typed slots. Producers emit candidate items, the application authenticates them and freezes a snapshot, and an assembler turns that snapshot into a rendered payload and a trace, deterministically and without calling a model. It is a specification, not a library: three assemblers, in Python, TypeScript and Go, implement it, and none is released.
+
+The model is four planes (governance, state, evidence, interaction), eleven slots and one item shape. Every item names one slot and one authority and carries its source, version and freshness. The assembler admits it or excludes it with a reason code, resolves the conflict groups the application declared, fits what is left to the token budget in tier order, and renders it in the order a versioned placement profile gives. The trace records every one of those decisions. Requirements are numbered R-1 onward; a number is permanent and never reused.
+
+Which source holds: the Spec page is the normative text, and anything on another page that disagrees with it is wrong. Requirement text is authored in contract/requirements.json and JSON shapes in schema/, and conformance/README.md is normative wherever the requirements leave an ordering, tie-break, boundary or algorithm step open (R-21). Everything here is a draft: profiles carry `spec: "cwa/draft"`, every example profile is unevaluated, and nothing is released. The specification, schemas, cases and site are licensed Apache-2.0.
+
+The specification defines three conformance claims, and no others (spec §1):
+
+- A conformant producer emits items that meet section 2's rules for an item (R-1, R-2), reports each entry it suppresses (R-9), computes its scores and variants before assembly (R-18), and meets the rules for its kind. Its claim rests on its word.
+- A conformant assembler meets every MUST an assembler can meet by itself, provides the four published tokenizers and renderers, and emits the trace R-21 lists. Its claim rests on a conformance report that passes every published case and rejects every published rejection.
+- A conformant application, an agent loop included, uses a conformant assembler and only conformant producers, and meets the MUSTs only it can: it authenticates each producer, writes state, declares conflict groups, makes every read, retrieval and model call before it freezes the snapshot, enforces invariants and tool permissions outside the model, renders with a published renderer, and hands the payload to the model with each text in the role its renderer assigns and no text of its own. Its claim rests on its word, except for its assembler's part.
+
+## Guides
+
+- [Producers](https://contextwindowarchitecture.io/llms-producers.txt): build a retriever, memory store, MCP adapter, state service, capability policy or other producer whose items an assembler admits
+- [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the three assemblers, or build one in a new language and prove it with the conformance cases
+- [Full contract](https://contextwindowarchitecture.io/llms-full.txt): this file, spec §1, the slots and authority values, both guides, every requirement and the conformance README, in one file
+- [Implementation guide for coding agents](https://contextwindowarchitecture.io/contract/cwa.md): what an application integrating CWA does, one rule per line
+
+## Applications and agents
+
+- [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a prompt-to-slots migrator
+- [Integration sketch](https://contextwindowarchitecture.io/contract/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
+- [Payload template](https://contextwindowarchitecture.io/contract/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
+- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all three assemblers render from it, byte for byte
+- [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
+
+## Specification
+
+- [Spec](https://contextwindowarchitecture.io/spec.html): the normative text: conformance, planes, slots and items, governance, admission and fitting, placement profiles, the trace, and the changelog
+- [SPEC.md](https://contextwindowarchitecture.io/SPEC.md): every numbered requirement as Markdown
+- [contract/requirements.json](https://contextwindowarchitecture.io/contract/requirements.json): requirement IDs and text, the source SPEC.md and the Spec page are generated from
+- [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json): every exclusion and refusal code, in the order a trace ranks them (R-21)
+- [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json): each slot's plane, default authority, tier and policy fields (R-3)
+- [contract/assembler-scope.json](https://contextwindowarchitecture.io/contract/assembler-scope.json): which part of each requirement an assembler can check, and which belongs to producers or the application
+
+## Schemas
+
+- [context_item](https://contextwindowarchitecture.io/schema/context_item.schema.json): one candidate item
+- [producer_batch](https://contextwindowarchitecture.io/schema/producer_batch.schema.json): what a producer hands over, `{ items, excluded }`
+- [snapshot](https://contextwindowarchitecture.io/schema/snapshot.schema.json): the frozen input to one assembly
+- [trace](https://contextwindowarchitecture.io/schema/trace.schema.json): what every assembly emits, refused or not
+- [profile](https://contextwindowarchitecture.io/schema/profile.schema.json): a versioned placement profile
+- [route_policy](https://contextwindowarchitecture.io/schema/route_policy.schema.json): producers, slot rules, fitting order and fact precedence for one route
+- [conflict_group](https://contextwindowarchitecture.io/schema/conflict_group.schema.json): a conflict the application declares
+- [registry_lock](https://contextwindowarchitecture.io/schema/registry_lock.schema.json): profiles and route policies pinned by digest
+- [conformance_report](https://contextwindowarchitecture.io/schema/conformance_report.schema.json): an implementation's run of the published cases
+
+## Conformance
+
+- [conformance/README.md](https://contextwindowarchitecture.io/conformance/README.md): how to run a case, and the algorithm: trace order, timestamps, numbers, ordering, the snapshot digest, refusals, conflicts, supersession, deduplication, source diversity, fitting, snapshot checks, tokenizers and renderers, registry and reporting
+- [Cases](https://github.com/contextwindowarchitecture/website/tree/main/conformance/cases): one directory per case, holding a snapshot, the expected trace and, unless the case expects a refusal, the expected payload bytes
+- [Rejections](https://github.com/contextwindowarchitecture/website/tree/main/conformance/rejections): snapshots that each break one snapshot check, which an assembler rejects before assembly
+- [Assembler page](https://contextwindowarchitecture.io/assembler.html): each implementation's imported report, and a matrix of every requirement's scope and status
+
+## Implementations
+
+- [assembler-python](https://github.com/contextwindowarchitecture/assembler-python): the Python reference assembler, distribution contextwindowarchitecture-assembler, module `cwa`
+- [assembler-typescript](https://github.com/contextwindowarchitecture/assembler-typescript): the TypeScript assembler, package @contextwindowarchitecture/assembler
+- [assembler-go](https://github.com/contextwindowarchitecture/assembler-go): the Go assembler, module github.com/contextwindowarchitecture/assembler-go
+- [assembler-template](https://github.com/contextwindowarchitecture/assembler-template): the starting point for a port to another language: porting guide, adapter protocol and conformance scripts
+
+## Optional
+
+- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with an item and batch linter and a trace validator that run local checks in the browser
+- [Placement evidence](https://contextwindowarchitecture.io/evidence.html): why placement is a profile and not a rule, the five example profiles, and how to evaluate one
+- [Example item](https://contextwindowarchitecture.io/examples/context-item.json), [producer batch](https://contextwindowarchitecture.io/examples/producer-batch.json), [profiles](https://contextwindowarchitecture.io/examples/profiles.json), [route policies](https://contextwindowarchitecture.io/examples/route-policies.json) and [trace](https://contextwindowarchitecture.io/examples/trace.json)
+- [contract.js](https://contextwindowarchitecture.io/contract.js): the browser module behind the page tools: checkItem, checkProducerBatch, checkSnapshot, checkTrace and checkProfile, local checks only
+- [About](https://contextwindowarchitecture.io/about.html): what CWA is and is not, how the specification changes, and how to contribute
+- [Landing page](https://contextwindowarchitecture.io/index.html): the problem CWA addresses, a live assembly demo and the sample request

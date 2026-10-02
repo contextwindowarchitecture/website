@@ -33,8 +33,9 @@ npm test
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |
 | `contract/*.txt`, `contract/cwa.md` | Downloadable integration guidance and rendering template |
 | `contract/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
+| `llms.txt`, `llms-producers.txt`, `llms-assemblers.txt` | Guides for language models and coding agents: `llms.txt` indexes the site in the [llms.txt](https://llmstxt.org/) format, and the producer and assembler guides are written by hand around tables the build fills in between their `CONTRACT_*` markers |
 
-The build generates `generated/`, `SPEC.md`, requirement arrays in the Spec and Assembler pages, slot defaults in Producers, and the profile examples in Evidence and Spec. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
+The build generates `generated/`, `SPEC.md`, requirement arrays in the Spec and Assembler pages, slot defaults in Producers, the profile examples in Evidence and Spec, the tables in the two llms guides, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 
