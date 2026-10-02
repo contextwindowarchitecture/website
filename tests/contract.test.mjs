@@ -969,7 +969,7 @@ test('the registry lock pins the published profiles and route policies by digest
 });
 
 test('a conformance report records one outcome per case, and why any case did not pass (R-21)', () => {
-  const report = { implementation: { name: 'cwa-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
+  const report = { implementation: { name: 'contextwindowarchitecture-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
     cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'failed', detail: 'no cwa-messages/v1 renderer' }] };
   assert.equal(validateConformanceReportSchema(report), true, JSON.stringify(validateConformanceReportSchema.errors));
   for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = [`R-${requirementIds.length + 1}`],
