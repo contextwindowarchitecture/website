@@ -1,9 +1,17 @@
-# Generated artifacts are current, and the contract and site tests pass, on each supported Node.
+# Generated artifacts are current, and the contract and site tests pass, on each supported Node. A tag runs it
+# through release.yml, on the tagged commit.
 name: ci
 
 on:
   push:
+    branches: ["**"]
   pull_request:
+  workflow_call:
+    inputs:
+      ref:
+        description: The commit to test; release.yml passes the tag
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -18,6 +26,8 @@ jobs:
         node: ["22", "24"]
     steps:
       - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
