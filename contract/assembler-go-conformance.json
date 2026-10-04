@@ -3,7 +3,9 @@
     "repository": "contextwindowarchitecture/assembler-go",
     "commit": "a279677e100969c47aa73d9bbddb441f125e1455",
     "dirty": false,
-    "tags": []
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "4e15f74942312728a036f8ed2080788e32bdbc5efccc297b2cde66dab31085f7",

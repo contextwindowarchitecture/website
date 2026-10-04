@@ -3,7 +3,9 @@
     "repository": "contextwindowarchitecture/assembler-typescript",
     "commit": "17e5e998336f4254afa6ffe77e262350b53dc20b",
     "dirty": false,
-    "tags": []
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "4e15f74942312728a036f8ed2080788e32bdbc5efccc297b2cde66dab31085f7",
