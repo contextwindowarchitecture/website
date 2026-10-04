@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Profiles &amp; placement evidence — Context Window Architecture</title>
-<meta name="description" content="Why CWA makes placement a versioned, per-route profile rather than a rule: the serial-position research, provider guidance by model generation, the profile format, and an explorer to diff profiles." />
+<meta name="description" content="Why CWA makes placement a versioned, per-route profile rather than a rule: the serial-position research, provider guidance by model generation, what placement does to prompt caches, the profile format, and an explorer to diff profiles." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -65,7 +65,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Profiles &amp; placement evidence</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Why placement is a profile, not a rule.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA fixes what the slots mean and refuses to fix where they go. This page is the justification: what the research measures, how provider guidance differs, what a profile has to carry, and how to evaluate one. Normative text is in <a href="./spec.html#s5">Spec §5</a>.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA fixes what the slots mean and refuses to fix where they go. This page is the justification: what the research measures, how provider guidance differs, what placement does to prompt caches, what a profile has to carry, and how to evaluate one. Normative text is in <a href="./spec.html#s5">Spec §5</a>.</p>
     </div>
   </section>
 
@@ -76,6 +76,7 @@
       <a href="#position" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">The position</a>
       <a href="#research" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">What the research measures</a>
       <a href="#providers" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Provider guidance</a>
+      <a href="#caching" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Prompt caches</a>
       <a href="#format" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile format</a>
       <a href="#explorer" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile explorer</a>
       <a href="#evaluate" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Evaluating a profile</a>
@@ -124,6 +125,34 @@
         </div>
       </section>
 
+      <section id="caching">
+        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Placement and prompt caches</h2>
+        <div style="display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">
+          <p style="margin: 0;">Placement decides a second thing: how much of one call's payload the next call repeats byte for byte. Provider prompt caches reuse a request's leading part only up to the first byte that changed. <a href="#cite-6">[6]</a> <a href="#cite-7">[7]</a> A slot whose content changes every turn, placed early, makes everything after it full price on every call.</p>
+          <p style="margin: 0;">CWA's part is to make the repeat exact and its boundaries visible. An identical snapshot renders identical bytes (<a href="./spec.html#R-23">R-23</a>). History renders in the order turns were said, so a new turn lands after the earlier ones (<a href="./spec.html#R-7">R-7</a>). The optional <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cwa-message-blocks/v1</span> renderer hands each placed item over as its own content entry, so a breakpoint can follow any item. The application's part is the request: which entry carries a breakpoint, which cache lifetime to pay for, and any cache key. None of it is text, so the count and hash the trace records still describe what the model reads (<a href="./spec.html#s1">§1</a>).</p>
+          <p style="margin: 0;">Attention and caching mostly agree: stable governance goes early and the live query goes last. They disagree in the middle. Long-context guidance puts documents near the top <a href="#cite-4">[4]</a>, while a cache wants per-turn retrieval below the history. <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cache-first-chat/v1</span> is the cache-ordered example; compare it with <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">policy-first-chat/v1</span> in the <a href="#explorer">explorer</a>. Which order wins for a route is an evaluation question, like every other placement choice.</p>
+          <p style="margin: 0;">Some things break reuse even in a stable order: budget pressure that sheds the oldest turn on every call (<a href="./spec.html#R-16">R-16</a>), a different variant chosen for an early item (<a href="./spec.html#R-18">R-18</a>), a governance item at a new <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">source_version</span>, and a surfaced conflict's mark (<a href="./spec.html#R-11">R-11</a>). A history producer that compacts old turns in blocks, rather than dropping one per call, keeps the history's leading part unchanged between compactions.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · assembler</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Identical bytes for an identical snapshot (<a href="./spec.html#R-23">R-23</a>), and history in the order turns were said (<a href="./spec.html#R-7">R-7</a>).</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · profile</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Slot order: what changes least comes first.</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · renderer</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Where content entries begin: one per placed item under <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cwa-message-blocks/v1</span>.</div></div>
+          <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · application</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Breakpoints, cache lifetime and cache key, added to the request outside its text (<a href="./spec.html#s1">§1</a>).</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
+          <div style="background: var(--bg); padding: 22px 24px;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Anthropic · prompt caching <a href="#cite-6">[6]</a></div>
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Hits only at content-block boundaries.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Up to four breakpoints on blocks of tools, system and messages, or one automatic breakpoint on the last block. The prefix runs tools, then system, then messages, so the provider, not the profile, decides where system and tool entries sit. A hit is found only at a block boundary within 20 positions of a breakpoint, which is why <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cwa-message-blocks/v1</span> gives each item an entry of its own.</p>
+          </div>
+          <div style="background: var(--bg); padding: 22px 24px;">
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">OpenAI · prompt caching <a href="#cite-7">[7]</a></div>
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 8px;">Automatic, on the whole leading part.</div>
+            <p style="margin: 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">On by default from 1,024 input tokens on GPT-5.6 and later, and the entire rendered prefix must match. The guide puts stable instructions and shared material first and dynamic content last, the order <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cache-first-chat/v1</span> follows. No entry boundary is needed.</p>
+          </div>
+        </div>
+      </section>
+
       <section id="format">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile format</h2>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The exports below use JSON syntax, which is valid YAML. It carries the spec it was written for, an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
@@ -142,7 +171,7 @@
           <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile A</div>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <sc-for list="{{ tabsA }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+              <sc-for list="{{ tabsA }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
             </div>
             <div>
               <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ a.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ a.id }}</span></div>
@@ -164,7 +193,7 @@
           <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
             <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile B</div>
             <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <sc-for list="{{ tabsB }}" as="t" hint-placeholder-count="5"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
+              <sc-for list="{{ tabsB }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
             </div>
             <div>
               <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ b.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ b.id }}</span></div>
@@ -199,7 +228,7 @@
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Evaluating a profile</h2>
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is promoted by evidence from its own route, not by argument. The protocol is short and the trace makes it cheap: freeze the assembly snapshot, model configuration, and scoring protocol. Inspect changes in inclusion, repetition, wrappers and token counts as well as order. Deterministic requests do not make model responses deterministic or isolate placement as the sole cause of an outcome difference.</p>
         <div style="border: 1px solid var(--line);">
-          <sc-for list="{{ protocol }}" as="p" hint-placeholder-count="5">
+          <sc-for list="{{ protocol }}" as="p" hint-placeholder-count="6">
             <div style="display: grid; grid-template-columns: 32px 200px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ p.n }}</span>
               <span style="font-size: 15px; font-weight: 600;">{{ p.name }}</span>
@@ -218,6 +247,8 @@
           <li id="cite-3">Modarressi et al. “NoLiMa: Long-Context Evaluation Beyond Literal Matching.” arXiv 2502.05167 (2025). <a href="https://arxiv.org/abs/2502.05167" target="_blank" rel="noopener">arxiv.org/abs/2502.05167</a></li>
           <li id="cite-4">Anthropic. “Long context prompting tips.” <a href="https://docs.anthropic.com/en/docs/long-context-window-tips" target="_blank" rel="noopener">docs.anthropic.com</a></li>
           <li id="cite-5">OpenAI. “GPT-4.1 Prompting Guide.” <a href="https://developers.openai.com/cookbook/examples/gpt4-1_prompting_guide" target="_blank" rel="noopener">developers.openai.com</a></li>
+          <li id="cite-6">Anthropic. “Prompt caching.” Accessed 2026-10-03. <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-caching" target="_blank" rel="noopener">platform.claude.com</a></li>
+          <li id="cite-7">OpenAI. “Prompt caching.” Accessed 2026-10-03. <a href="https://developers.openai.com/api/docs/guides/prompt-caching" target="_blank" rel="noopener">developers.openai.com</a></li>
         </ol>
       </section>
 
@@ -762,7 +793,8 @@ class Component extends DCLogic {
         { n: "02", name: "Name the metric", text: "Choose one outcome metric the route already tracks, such as groundedness, task success, tool-call correctness, or schema validity. Placement is judged on that metric, not on preference." },
         { n: "03", name: "Render with each profile", text: "Assemble every sample with the incumbent profile and the candidate. Use traces to inspect changes in order, inclusion, repetition, wrappers and token counts." },
         { n: "04", name: "Compare on the target model", text: "Run both payload sets against the model family the profile names. A profile evaluated on one family says nothing about another." },
-        { n: "05", name: "Record and version", text: "Publish suite, model version, date, results and a reproducible artifact in the evaluation block. Version any payload configuration change; the trace of every later request names it." }
+        { n: "05", name: "Measure reuse", text: "Over consecutive turns of a frozen conversation, count how many leading entries, or bytes, of each payload repeat the previous one: what a provider's prompt cache could serve instead of reading it again. Judge reuse beside the outcome metric, never instead of it." },
+        { n: "06", name: "Record and version", text: "Publish suite, model version, date, results and a reproducible artifact in the evaluation block. Version any payload configuration change; the trace of every later request names it." }
       ]
     };
   }

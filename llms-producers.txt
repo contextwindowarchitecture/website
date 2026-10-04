@@ -187,6 +187,9 @@ These two kinds have no slot rule of their own. They may send whatever slots the
 - Governance items carry `authority: governing`, `trust: verified` and `injection_risk: none`. One that is not verified, or is marked `untrusted_content`, is excluded with `untrusted_in_governance` (R-10).
 - The query carries `user` authority, keeps it although it is marked `untrusted_content`, and is the only live user turn (R-1, R-7, R-10).
 - Prior turns go to `interaction.history` and render as a transcript inside the profile's history wrapper, never as platform messages (R-7). A user turn carries `user`; a prior model turn carries `lineage: generated` and `authority: untrusted` (R-1).
+- Turns render in the order they were said: by `freshness`, then `id` (R-7). Give each turn the instant it was said, not the time you read it from the conversation store; turns stamped alike fall back to id order.
+- Compact old turns in blocks, one summary standing for many turns and unchanged until the next compaction, rather than dropping one turn per call, so the history's leading part repeats from call to call and a provider's prompt cache can reuse it.
+- A route that sets `supersede: source` or `dedupe: exact` on `interaction.history` drops turns: supersession keeps only the latest turn per source (R-25), and deduplication drops a reply that repeats an earlier one (R-24). Give each turn a source of its own, and leave deduplication off there unless dropping repeats is intended.
 
 ## Untrusted content
 
