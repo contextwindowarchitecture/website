@@ -120,9 +120,9 @@ None is released, so work from a checkout. The table names the commit each impor
 <!-- CONTRACT_IMPLEMENTATIONS_START -->
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `bb3e0fa` (draft-release) | 86 of 86 pass | website `b7b0d5c` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `17e5e99` (draft-release) | 86 of 86 pass | website `b7b0d5c` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `a279677` (draft-release) | 86 of 86 pass | website `b7b0d5c` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `c017507` (draft-release) | 86 of 86 pass | website `fc51bf8` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `fc45d82` (draft-release) | 86 of 86 pass | website `fc51bf8` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `8992cbe` (draft-release) | 86 of 86 pass | website `fc51bf8` |
 <!-- CONTRACT_IMPLEMENTATIONS_END -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
