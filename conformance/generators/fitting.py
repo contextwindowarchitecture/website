@@ -683,7 +683,7 @@ CASES = [
     },
     {
         "id": "placement-protected-unplaced",
-        "rules": ["R-16", "R-20", "R-21", "R-22"],
+        "rules": ["R-16", "R-17", "R-20", "R-21", "R-22"],
         "description": "An admitted protected item whose slot the profile does not place refuses with protected_slot_unplaced, whether its slot is "
                        "protected by default or raised by the route; unprotected unplaced items keep their slot_unplaced rows.",
         "budget": 4096,
@@ -764,7 +764,7 @@ CASES = [
     },
     {
         "id": "placement-required-slot-first",
-        "rules": ["R-4", "R-20", "R-21"],
+        "rules": ["R-4", "R-17", "R-20", "R-21"],
         "description": "A missing query is reported before a protected item the profile does not place: required_slot_missing comes first in contract/reasons.json.",
         "budget": 4096,
         "placement": [s for s in PLACEMENT if s != "state.task"],

@@ -461,7 +461,7 @@ CASES = [
     },
     {
         "id": "conflict-required-slot-first",
-        "rules": ["R-4", "R-11", "R-21"],
+        "rules": ["R-4", "R-11", "R-17", "R-21"],
         "description": "Conflicts are resolved before refusal checks, so a trace refused for a missing query still records the unresolved group.",
         "policy": {"facts": {"refund.window": {"precedence": [CORPUS], "on_unresolved": "refuse"}}},
         "items": [
