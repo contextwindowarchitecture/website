@@ -86,12 +86,14 @@ What an assembler can check of each requirement (contract/assembler-scope.json).
 
 ## Tokenizers and renderers
 
-Every implementation provides these four, exactly as conformance/README.md defines them, and every published case uses them:
+Every implementation provides these four, exactly as conformance/README.md defines them, and every published case uses them or the optional renderer after them:
 
 - `fixture-whitespace/v1` counts maximal runs of characters outside the ECMAScript whitespace and line-terminator set. It is a test fixture, not a model tokenizer.
 - `estimate-utf8/v1` counts `(UTF-8 bytes + 3)` divided by 4, discarding the remainder: a portable estimate for a model with no local tokenizer, to pair with a `budget.margin_percent` that covers its error.
 - `fixture-xml/v1` renders each placed item as `<{tag} id="{id}">`, its escaped body on a line of its own, then `</{tag}>`, in placement order and by id within a placement, except history turns, which go in the order they were said: by freshness, then id (R-7). It supports only `xml:` wraps.
 - `cwa-messages/v1` renders a message request, the RFC 8785 serialization of `{ system, tools, messages }`: governance placed with wrap `system` or `tools` becomes those entries, and every `xml:` placement goes into exactly one user message, rendered as `fixture-xml/v1` renders it, with prior turns marked by `speaker` as part of the transcript (R-7). The query is the only live user turn.
+
+`cwa-message-blocks/v1` was published later as optional. It renders the `cwa-messages/v1` request with the user message as one `{id, text}` entry per placed item, so an application can put a provider's cache breakpoint between any two items. Its count sums every entry's text, so an estimating tokenizer can fit fewer items than under `cwa-messages/v1`. An implementation that leaves it out skips the cases that use it, and still stops on an application renderer under its ID (R-16).
 
 The payload *fits* when its count, times `(100 + margin_percent) / 100` rounded up in integer arithmetic, is at most `budget.input`; only that test takes the margin, and caps, floors and traced counts stay unscaled (R-16). An application may count with a tokenizer of its own under an ID no published tokenizer uses; an assembler stops before assembly on an application tokenizer or renderer that takes a published ID (R-16).
 
@@ -118,9 +120,9 @@ None is released, so work from a checkout. The table names the commit each impor
 <!-- CONTRACT_IMPLEMENTATIONS_START -->
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `49b321e` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `5e1223f` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `001dadd` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `49b321e` (draft-release) | 81 of 86 pass; 1 changed since its run | website `d229b74` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `5e1223f` (draft-release) | 81 of 86 pass; 1 changed since its run | website `d229b74` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `001dadd` (draft-release) | 81 of 86 pass; 1 changed since its run | website `d229b74` |
 <!-- CONTRACT_IMPLEMENTATIONS_END -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):

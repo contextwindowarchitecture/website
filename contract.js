@@ -258,7 +258,7 @@ export function checkConflictGroups(groups, options = {}) {
 }
 
 // Placements a renderer can realize (conformance/README.md, Tokenizers and renderers). An unknown renderer is
-// skipped by the caller, not judged here.
+// skipped by the caller, not judged here. cwa-message-blocks/v1 realizes exactly what cwa-messages/v1 does.
 const XML_WRAP = /^xml:[A-Za-z_][A-Za-z0-9_.-]*$/;
 const REALIZE = {
   'fixture-xml/v1': placement => placement.flatMap(({ wrap }, i) => XML_WRAP.test(wrap) ? [] : [`placement[${i}] wrap ${wrap} is not an xml:<name> wrap`]),
@@ -275,6 +275,7 @@ const REALIZE = {
     });
   },
 };
+REALIZE['cwa-message-blocks/v1'] = REALIZE['cwa-messages/v1'];
 
 // I-JSON (RFC 7493): well-formed strings and numbers a double can hold, so RFC 8785 can serialize the snapshot.
 // JSON.parse reads a number beyond the double range, such as 1e400, as Infinity.

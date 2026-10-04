@@ -131,7 +131,7 @@ snapshot = Snapshot.freeze(       <span style="color: var(--muted);"># JSON-shap
     route_policy=reg.route_policy(<span style="color: var(--p-evid);">"support-chat"</span>, <span style="color: var(--p-evid);">"illustrative/v1"</span>),
     profile=reg.profile(<span style="color: var(--p-evid);">"policy-first-chat"</span>, 1),  <span style="color: var(--muted);"># draft use; deployment=True returns evaluated profiles only</span>
     tokenizer=<span style="color: var(--p-evid);">"estimate-utf8/v1"</span>,    <span style="color: var(--muted);"># or your own: Snapshot.freeze(..., tokenizers={...})</span>
-    renderer=<span style="color: var(--p-evid);">"cwa-messages/v1"</span>,  <span style="color: var(--muted);"># render IR for a provider adapter</span>
+    renderer=<span style="color: var(--p-evid);">"cwa-messages/v1"</span>,  <span style="color: var(--muted);"># render IR for a provider adapter; cwa-message-blocks/v1 splits the user message per item</span>
     budget={<span style="color: var(--p-evid);">"input"</span>: 8192, <span style="color: var(--p-evid);">"reserved_output"</span>: 1200, <span style="color: var(--p-evid);">"margin_percent"</span>: 15},  <span style="color: var(--muted);"># headroom for an estimate</span>
 )
 
@@ -243,7 +243,7 @@ const RULES = [
     "assembler",
     "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript in the order turns were said, and item bodies are escaped inside xml: wrappers; cwa-messages/v1 hands system and tools text over unescaped.",
     "implemented",
-    8,
+    11,
     [
       6,
       6,
@@ -282,7 +282,7 @@ const RULES = [
     "boundary",
     "Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole. Marking user-controlled and fetched content is the producer's duty, and delimiting material pasted into a body is the application's job.",
     "boundary-checked",
-    3,
+    4,
     [
       3,
       3,
@@ -295,7 +295,7 @@ const RULES = [
     "boundary",
     "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
     "boundary-checked",
-    16,
+    17,
     [
       15,
       15,
@@ -360,7 +360,7 @@ const RULES = [
     "boundary",
     "Counts rendered tokens and sheds in tier order. Setting budget.input from the model's context limit, with a tokenizer that counts or estimates the model's tokens, is the application's.",
     "boundary-checked",
-    34,
+    35,
     [
       34,
       34,
@@ -373,7 +373,7 @@ const RULES = [
     "assembler",
     "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
     "implemented",
-    46,
+    47,
     [
       46,
       46,
@@ -412,7 +412,7 @@ const RULES = [
     "boundary",
     "Rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement. Raising the version for every change is the application's; the Python assembler's registry pins content by digest, outside assembly and the cases.",
     "boundary-checked",
-    13,
+    14,
     [
       13,
       13,
@@ -425,7 +425,7 @@ const RULES = [
     "assembler",
     "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
     "implemented",
-    59,
+    61,
     [
       58,
       58,
@@ -498,7 +498,7 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"49b321e4f525d8c879934f28e1c316bb8fc33f6f","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":83,"passed":81,"stale":1},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"5e1223fbcd76a25f9395e7cddfa863e3270e8aa7","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":83,"passed":81,"stale":1},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"001daddce57518ec0addbea2df689f5f7aae6e67","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":83,"passed":81,"stale":1}];
+const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"49b321e4f525d8c879934f28e1c316bb8fc33f6f","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":86,"passed":81,"stale":1},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"5e1223fbcd76a25f9395e7cddfa863e3270e8aa7","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":86,"passed":81,"stale":1},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"001daddce57518ec0addbea2df689f5f7aae6e67","tags":["draft-release"],"websiteSha":"d229b740bac68c4c5ea7ffc9ed20315ac2fccff9","total":86,"passed":81,"stale":1}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.

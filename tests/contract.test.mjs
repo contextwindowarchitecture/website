@@ -608,22 +608,29 @@ test('every published case renders interaction.history in the order turns were s
   assert.notDeepEqual(turns.toSorted(said).map(t => t.id), turns.map(t => t.id).toSorted(units));
 });
 
-// conformance/README.md, Tokenizers and renderers: every implementation provides the ones listed there, so a
-// conformant assembler may skip no published case (§1). One published later as optional needs its own list here.
-test('every published case and rejection uses a tokenizer and renderer every implementation provides', async () => {
+// conformance/README.md, Tokenizers and renderers: every implementation provides the ones listed before Optional, so a
+// conformant assembler may skip no case that uses only those (§1). A case may use one listed under Optional instead,
+// which an implementation that leaves it out skips.
+test('every published case and rejection uses a required tokenizer and renderer, or an optional one', async () => {
   const readme = await fs.readFile(new URL('../conformance/README.md', import.meta.url), 'utf8');
   const section = readme.split('\n## Tokenizers and renderers\n')[1].split('\n## ')[0];
-  assert.match(section, /^Every implementation provides the tokenizers and renderers below\b/m);
-  const required = [...section.matchAll(/^- `([^`]+)`/gm)].map(m => m[1]).sort();
+  assert.match(section, /^Every implementation provides the tokenizers and renderers below, before Optional\b/m);
+  const [before, after] = section.split('\n### Optional\n');
+  const listed = text => [...text.matchAll(/^- `([^`]+)`/gm)].map(m => m[1]).sort();
+  const required = listed(before), optional = listed(after);
   assert.deepEqual(required, ['cwa-messages/v1', 'estimate-utf8/v1', 'fixture-whitespace/v1', 'fixture-xml/v1']);
+  assert.deepEqual(optional, ['cwa-message-blocks/v1']);
+  const used = new Set();
   for (const dir of ['cases', 'rejections']) {
     const root = new URL(`../conformance/${dir}/`, import.meta.url);
     for (const name of await fs.readdir(root)) {
       const { tokenizer, renderer } = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
-      assert.ok(required.includes(tokenizer), `${dir}/${name}: tokenizer ${tokenizer}`);
-      assert.ok(required.includes(renderer), `${dir}/${name}: renderer ${renderer}`);
+      assert.ok(required.includes(tokenizer) || optional.includes(tokenizer), `${dir}/${name}: tokenizer ${tokenizer}`);
+      assert.ok(required.includes(renderer) || optional.includes(renderer), `${dir}/${name}: renderer ${renderer}`);
+      used.add(tokenizer).add(renderer);
     }
   }
+  for (const component of optional) assert.ok(used.has(component), `no published case uses ${component}`);
 });
 
 // conformance/README.md, Timestamps: format checkers disagree, and some validators never assert format at all, so every
@@ -729,6 +736,7 @@ const REJECTION_CHECKS = {
   'profile-route-policy-mismatch': 'profile_route_policy_mismatch', 'profile-unrealizable': 'unrealizable_profile',
   'profile-invalid-tag': 'unrealizable_profile', 'messages-system-on-evidence': 'unrealizable_profile',
   'messages-tools-on-instructions': 'unrealizable_profile', 'messages-system-after-xml': 'unrealizable_profile',
+  'blocks-system-after-xml': 'unrealizable_profile',
   'schema-missing-budget': 'invalid_structure', 'batch-entry-not-object': 'invalid_structure', 'schema-profile-spec': 'invalid_structure', 'unpaired-surrogate': 'not_i_json', 'number-out-of-range': 'not_i_json', 'integer-out-of-range': 'not_i_json',
 };
 
@@ -951,6 +959,53 @@ test('the landing page request is the cwa-messages/v1 rendering of every item in
     }
   }
   assert.equal(await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url), 'utf8'), canonical(request));
+});
+
+// conformance/README.md, Tokenizers and renderers: every cwa-messages/v1 and cwa-message-blocks/v1 case's payload and
+// count, rebuilt here from its snapshot and the items its trace includes, independently of generators/messages.py. One
+// set of entries serves both renderers: cwa-messages/v1 joins their texts into its content, and cwa-message-blocks/v1
+// hands them over as they are, so matching both kinds of case also shows the joined entries are that content.
+test('every message-request case matches an independent rendering of its snapshot', async () => {
+  const root = new URL('../conformance/cases/', import.meta.url);
+  const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  const attr = text => escape(text).replaceAll('"', '&quot;');
+  const said = (a, b) => compareInstants(a.freshness, b.freshness) || units(a.id, b.id);
+  const rendered = { 'cwa-messages/v1': 0, 'cwa-message-blocks/v1': 0 };
+  for (const name of await fs.readdir(root)) {
+    const snapshot = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
+    const payload = await fs.readFile(new URL(`${name}/expected.payload.txt`, root), 'utf8').catch(() => null);
+    if (!(snapshot.renderer in rendered) || payload === null) continue;
+    rendered[snapshot.renderer] += 1;
+    const trace = JSON.parse(await fs.readFile(new URL(`${name}/expected.trace.json`, root), 'utf8'));
+    const items = new Map(snapshot.batches.flatMap(b => b.items).map(i => [i.id, i]));
+    const included = [...new Set(trace.included.map(r => r.item_id))].map(id => items.get(id));
+    const chosen = new Map(trace.compressed.map(r => [r.item_id, r.variant_id]));
+    const body = item => chosen.has(item.id) ? item.variants.find(v => v.id === chosen.get(item.id)).body : item.body;
+    const marks = new Map(trace.conflicts.filter(c => c.resolution === 'surfaced').flatMap(c => c.items.map(i => [i, c.group_id])));
+    const system = [], tools = [], entries = [];
+    for (const { slot, wrap } of snapshot.profile.placement) {
+      for (const item of included.filter(i => i.slot === slot).sort(slot === 'interaction.history' ? said : (a, b) => units(a.id, b.id))) {
+        const conflict = marks.has(item.id) ? { conflict: marks.get(item.id) } : {};
+        if (wrap === 'system' || wrap === 'tools') {
+          const text = conflict.conflict ? `<conflict group="${attr(conflict.conflict)}">\n${body(item)}\n</conflict>` : body(item);
+          (wrap === 'system' ? system : tools).push({ id: item.id, text, ...conflict });
+          continue;
+        }
+        const tag = wrap.slice('xml:'.length);
+        const speaker = slot === 'interaction.history' ? ` speaker="${item.lineage === 'generated' ? 'assistant' : 'user'}"` : '';
+        const mark = conflict.conflict ? ` conflict="${attr(conflict.conflict)}"` : '';
+        entries.push({ id: item.id, text: `<${tag} id="${attr(item.id)}"${speaker}${mark}>\n${escape(body(item))}\n</${tag}>\n`, ...conflict });
+      }
+    }
+    const blocks = snapshot.renderer === 'cwa-message-blocks/v1';
+    const joined = entries.map(e => e.text).join('');
+    assert.equal(payload, canonical({ messages: [{ role: 'user', content: blocks ? entries : joined }], system, tools }), `${name}: payload`);
+    // The count sums each text the renderer emits: every entry's under the blocks renderer, the one content string otherwise.
+    const texts = [...system, ...tools].map(e => e.text).concat(blocks ? entries.map(e => e.text) : [joined]);
+    const count = TOKENIZERS[snapshot.tokenizer];
+    assert.equal(trace.result.input_tokens, texts.reduce((n, text) => n + count(text), 0), `${name}: input_tokens`);
+  }
+  assert.ok(rendered['cwa-messages/v1'] >= 3 && rendered['cwa-message-blocks/v1'] >= 2, JSON.stringify(rendered));
 });
 
 test('every published profile names a route policy the registry holds, whose producers cover the slots it places (R-15, R-20)', async () => {

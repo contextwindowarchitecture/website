@@ -9,7 +9,7 @@ Which source holds: the Spec page is the normative text, and anything on another
 The specification defines three conformance claims, and no others (spec §1):
 
 - A conformant producer emits items that meet section 2's rules for an item (R-1, R-2), reports each entry it suppresses (R-9), computes its scores and variants before assembly (R-18), and meets the rules for its kind. Its claim rests on its word.
-- A conformant assembler meets every MUST an assembler can meet by itself, provides the four published tokenizers and renderers, and emits the trace R-21 lists. Its claim rests on a conformance report that passes every published case and rejects every published rejection.
+- A conformant assembler meets every MUST an assembler can meet by itself, provides the four required tokenizers and renderers (the optional `cwa-message-blocks/v1` may be left out), and emits the trace R-21 lists. Its claim rests on a conformance report that passes every published case, except those that use an optional component it leaves out, and rejects every published rejection.
 - A conformant application, an agent loop included, uses a conformant assembler and only conformant producers, and meets the MUSTs only it can: it authenticates each producer, writes state, declares conflict groups, makes every read, retrieval and model call before it freezes the snapshot, enforces invariants and tool permissions outside the model, renders with a published renderer, and hands the payload to the model with each text in the role its renderer assigns and no text of its own. Its claim rests on its word, except for its assembler's part.
 
 ## Guides
