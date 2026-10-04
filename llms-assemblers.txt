@@ -120,9 +120,9 @@ None is released, so work from a checkout. The table names the commit each impor
 <!-- CONTRACT_IMPLEMENTATIONS_START -->
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `a6d88ea` | 86 of 86 pass | website `b7b0d5c` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `266075b` | 86 of 86 pass | website `b7b0d5c` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `b901f6c` | 86 of 86 pass | website `b7b0d5c` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `bb3e0fa` | 86 of 86 pass | website `b7b0d5c` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `17e5e99` | 86 of 86 pass | website `b7b0d5c` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `a279677` | 86 of 86 pass | website `b7b0d5c` |
 <!-- CONTRACT_IMPLEMENTATIONS_END -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
