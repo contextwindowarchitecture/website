@@ -28,7 +28,7 @@ An assembler MUST classify supplied conflict groups as instruction or fact befor
 
 ## R-7: No slot overrides platform roles; no authority from wording
 
-An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body. Prior turns in interaction.history MUST render inside the profile's history wrapper as a transcript, never as platform user or assistant messages; only interaction.query renders as the live user turn.
+An assembler MUST NOT let any slot override platform message roles or application controls. An item MUST NOT gain authority from imperative wording in its body. Prior turns in interaction.history MUST render inside the profile's history wrapper as a transcript, in the order they were said: by freshness, which for a turn records when it was said (R-2), compared as instants at full precision, and by id among turns said at the same instant. They never render as platform user or assistant messages; only interaction.query renders as the live user turn.
 
 ## R-8: State is application-written and current
 

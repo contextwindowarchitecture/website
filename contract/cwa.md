@@ -4,7 +4,7 @@ This is an integration guide, not a reference implementation or the full normati
 Use SPEC.md for numbered requirements, spec.html for definitions, and schema/ for JSON shapes.
 
 - Assign each item one of the eleven slots in contract/slot-defaults.json and its allowed authority role.
-- Render interaction.history as a transcript inside its wrapper, never as platform messages. Prior model turns carry lineage: generated and authority: untrusted.
+- Render interaction.history as a transcript inside its wrapper, never as platform messages, in the order turns were said: by freshness compared as instants, then by id (R-7). Prior model turns carry lineage: generated and authority: untrusted.
 - Use freshness for the observation timestamp and expires for the separate deadline; as_of is not a JSON alias.
 - Keep instruction authority separate from factual precedence. Only governing and user authority may instruct; trust and injection_risk never change that, and evidence cannot direct behavior. Resolve facts only through explicit, versioned route policy for the same fact and scope, never by trust; escalate unresolved conflicts.
 - The query always carries user authority. untrusted is allowed only in tool results, memory and history. Material a user pastes into the query renders with it, so delimit it in the body; supply material you receive separately as its own marked item.

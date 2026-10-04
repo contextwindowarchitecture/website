@@ -62,7 +62,7 @@ What an assembler can check of each requirement (contract/assembler-scope.json).
 | R-4 | Slots that are never omitted | boundary | Refuses with required_slot_missing. Declaring parser: true on every route whose response a parser consumes is the application's. |
 | R-5 | Rule zero: enforce outside the model | application | Application guards enforce invariants. Nothing observable in assembly can prove it. |
 | R-6 | Separate instruction authority from factual precedence | assembler | Classifies each declared group as instruction or fact and resolves it by authority or route policy; only governing and user items are instruction peers, and trust and the injection marker never change that. |
-| R-7 | No slot overrides platform roles; no authority from wording | assembler | Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript, and item bodies are escaped inside xml: wrappers; cwa-messages/v1 hands system and tools text over unescaped. |
+| R-7 | No slot overrides platform roles; no authority from wording | assembler | Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript in the order turns were said, and item bodies are escaped inside xml: wrappers; cwa-messages/v1 hands system and tools text over unescaped. |
 | R-8 | State is application-written and current | boundary | Checks producer kind and state age. Writing state stays with the application. |
 | R-9 | Memory lifetime and producer exclusion reporting | boundary | Excludes expired and revoked memory and merges producer exclusions. Reporting them is the producer's duty. |
 | R-10 | User and fetched content is marked, never elevated, kept out of governance | boundary | Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole. Marking user-controlled and fetched content is the producer's duty, and delimiting material pasted into a body is the application's job. |
@@ -90,7 +90,7 @@ Every implementation provides these four, exactly as conformance/README.md defin
 
 - `fixture-whitespace/v1` counts maximal runs of characters outside the ECMAScript whitespace and line-terminator set. It is a test fixture, not a model tokenizer.
 - `estimate-utf8/v1` counts `(UTF-8 bytes + 3)` divided by 4, discarding the remainder: a portable estimate for a model with no local tokenizer, to pair with a `budget.margin_percent` that covers its error.
-- `fixture-xml/v1` renders each placed item as `<{tag} id="{id}">`, its escaped body on a line of its own, then `</{tag}>`, in placement order and by id within a placement. It supports only `xml:` wraps.
+- `fixture-xml/v1` renders each placed item as `<{tag} id="{id}">`, its escaped body on a line of its own, then `</{tag}>`, in placement order and by id within a placement, except history turns, which go in the order they were said: by freshness, then id (R-7). It supports only `xml:` wraps.
 - `cwa-messages/v1` renders a message request, the RFC 8785 serialization of `{ system, tools, messages }`: governance placed with wrap `system` or `tools` becomes those entries, and every `xml:` placement goes into exactly one user message, rendered as `fixture-xml/v1` renders it, with prior turns marked by `speaker` as part of the transcript (R-7). The query is the only live user turn.
 
 The payload *fits* when its count, times `(100 + margin_percent) / 100` rounded up in integer arithmetic, is at most `budget.input`; only that test takes the margin, and caps, floors and traced counts stay unscaled (R-16). An application may count with a tokenizer of its own under an ID no published tokenizer uses; an assembler stops before assembly on an application tokenizer or renderer that takes a published ID (R-16).
@@ -118,9 +118,9 @@ None is released, so work from a checkout. The table names the commit each impor
 <!-- CONTRACT_IMPLEMENTATIONS_START -->
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `49b321e` (draft-release) | 82 of 82 pass | website `d229b74` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `5e1223f` (draft-release) | 82 of 82 pass | website `d229b74` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `001dadd` (draft-release) | 82 of 82 pass | website `d229b74` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `49b321e` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `5e1223f` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `001dadd` (draft-release) | 81 of 83 pass; 1 changed since its run | website `d229b74` |
 <!-- CONTRACT_IMPLEMENTATIONS_END -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):

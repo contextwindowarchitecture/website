@@ -13,6 +13,7 @@ sys.dont_write_bytecode = True  # importing fitting must not leave a __pycache__
 from digest import snapshot_digest  # noqa: E402
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fitting import DEFAULTS, POLICY, SCOPE, T, TOKENIZERS, count, esc, variant  # noqa: E402
+from order import placed  # noqa: E402
 
 WEB = sys.argv[1] if len(sys.argv) > 1 else os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..")
 RENDERER = "cwa-messages/v1"
@@ -57,7 +58,7 @@ def render(placement, kept, marks, count=count, originals={}):
     the renderer's token count, included rows and compressed rows."""
     system, tools, parts, included, compressed = [], [], [], [], []
     for slot, wrap in placement:
-        for it in sorted((v for v in kept.values() if v["slot"] == slot), key=lambda v: U16(v["id"])):
+        for it in placed(slot, (v for v in kept.values() if v["slot"] == slot)):
             conflict = {"conflict": marks[it["id"]]} if it["id"] in marks else {}
             if wrap in ("system", "tools"):
                 body = it["body"]

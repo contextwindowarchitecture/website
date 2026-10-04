@@ -584,6 +584,30 @@ test('conformance cases are complete, schema-valid, and agree with the published
   assert.deepEqual(await fs.readFile(new URL('expected.payload.txt', fixture)), await fs.readFile(new URL('../examples/payload.txt', import.meta.url)));
 });
 
+// R-7: history turns render in the order they were said, by freshness compared as instants at full precision, then by
+// id. included[] follows render order (conformance/README.md, Running a case), so each run of history rows in every
+// published trace must already be in that order, and history-freshness-order must hold ids that sort against time.
+test('every published case renders interaction.history in the order turns were said (R-7)', async () => {
+  const root = new URL('../conformance/cases/', import.meta.url);
+  const said = (a, b) => compareInstants(a.freshness, b.freshness) || units(a.id, b.id);
+  let pairs = 0;
+  for (const name of await fs.readdir(root)) {
+    const snapshot = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
+    const { included } = JSON.parse(await fs.readFile(new URL(`${name}/expected.trace.json`, root), 'utf8'));
+    const turns = new Map(snapshot.batches.flatMap(b => b.items).filter(i => i.slot === 'interaction.history').map(i => [i.id, i]));
+    included.forEach((row, k) => {
+      const previous = included[k - 1];
+      if (row.slot !== 'interaction.history' || previous?.slot !== 'interaction.history') return;
+      pairs += 1;
+      assert.ok(said(turns.get(previous.item_id), turns.get(row.item_id)) < 0, `${name}: ${previous.item_id} renders before ${row.item_id}`);
+    });
+  }
+  assert.ok(pairs > 0);
+  const snapshot = JSON.parse(await fs.readFile(new URL('history-freshness-order/snapshot.json', root), 'utf8'));
+  const turns = snapshot.batches.flatMap(b => b.items).filter(i => i.slot === 'interaction.history');
+  assert.notDeepEqual(turns.toSorted(said).map(t => t.id), turns.map(t => t.id).toSorted(units));
+});
+
 // conformance/README.md, Tokenizers and renderers: every implementation provides the ones listed there, so a
 // conformant assembler may skip no published case (§1). One published later as optional needs its own list here.
 test('every published case and rejection uses a tokenizer and renderer every implementation provides', async () => {
@@ -917,7 +941,9 @@ test('the landing page request is the cwa-messages/v1 rendering of every item in
   const escape = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
   const request = { system: [], tools: [], messages: [{ role: 'user', content: '' }] };
   for (const { slot, wrap } of snapshot.profile.placement) {
-    for (const item of items.filter(i => i.slot === slot).sort((a, b) => units(a.id, b.id))) {
+    // Within a placement items go by id, and history turns in the order they were said (R-7).
+    const order = slot === 'interaction.history' ? (a, b) => compareInstants(a.freshness, b.freshness) || units(a.id, b.id) : (a, b) => units(a.id, b.id);
+    for (const item of items.filter(i => i.slot === slot).sort(order)) {
       if (wrap === 'system' || wrap === 'tools') { request[wrap].push({ id: item.id, text: item.body }); continue; }
       const speaker = slot === 'interaction.history' ? ` speaker="${item.lineage === 'generated' ? 'assistant' : 'user'}"` : '';
       const tag = wrap.slice('xml:'.length);
