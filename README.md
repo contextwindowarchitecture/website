@@ -39,6 +39,17 @@ The build generates `generated/`, `SPEC.md` (the Spec page's requirement index a
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 
+## The specification by itself
+
+[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code and slot-default files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and CI workflow kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
+
+```sh
+node scripts/export-spec.mjs ../contextwindowarchitecture          # write what changed; remove what is no longer published
+node scripts/export-spec.mjs ../contextwindowarchitecture --check  # exit 1 if the checkout differs
+```
+
+An export writes `website.lock.json` there: the website commit it was taken at and each file's SHA-256. One that changes no file writes nothing, so the lock keeps naming a commit that holds those files. In the directories it copies whole (`schema/`, `contract/`, `conformance/`, `examples/`) it removes any file this repository does not publish; it leaves everything else in that repository alone. That repository's CI checks its files against the website commit its lock names, so push this repository first, then commit and push the export.
+
 ## What the checks establish
 
 The suite checks field types and enums, timestamps, required fields, defaults, producer handoff shape, selected authority and admission constraints, protected-slot and budget invariants, refusal representation, and instruction-versus-fact conflict trace shape. It also checks profile exports, full migrator body preservation, generated-document synchronization, and component rendering.
