@@ -506,6 +506,67 @@ const PROFILE_CONTRACTS = [
       "result": null,
       "artifact": null
     }
+  },
+  {
+    "spec": "cwa/draft",
+    "id": "cache-first-chat",
+    "version": 1,
+    "route": "support-chat",
+    "model_family": null,
+    "route_policy_version": "illustrative/v1",
+    "placement": [
+      {
+        "slot": "governance.instructions",
+        "wrap": "system"
+      },
+      {
+        "slot": "governance.capabilities",
+        "wrap": "tools"
+      },
+      {
+        "slot": "governance.examples",
+        "wrap": "xml:examples"
+      },
+      {
+        "slot": "governance.output_contract",
+        "wrap": "xml:format"
+      },
+      {
+        "slot": "state.user",
+        "wrap": "xml:user_profile"
+      },
+      {
+        "slot": "interaction.memory",
+        "wrap": "xml:memory"
+      },
+      {
+        "slot": "interaction.history",
+        "wrap": "xml:history"
+      },
+      {
+        "slot": "evidence.knowledge",
+        "wrap": "xml:evidence"
+      },
+      {
+        "slot": "evidence.tool_results",
+        "wrap": "xml:observation"
+      },
+      {
+        "slot": "state.task",
+        "wrap": "xml:task"
+      },
+      {
+        "slot": "interaction.query",
+        "wrap": "xml:query"
+      }
+    ],
+    "evaluation": {
+      "status": "unevaluated",
+      "suite": null,
+      "date": null,
+      "result": null,
+      "artifact": null
+    }
   }
 ];
 const PROFILES = [
@@ -571,8 +632,7 @@ const PROFILES = [
       10
     ],
     "principle": "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published",
-    "isNew": true
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
   },
   {
     "name": "Tool-using agent",
@@ -612,6 +672,29 @@ const PROFILES = [
     ],
     "principle": "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.",
     "evalNote": "unevaluated · illustrative profile; no reproducible run published"
+  },
+  {
+    "name": "Cache-first chat",
+    "id": "cache-first-chat/v1",
+    "short": "cache-first",
+    "route": "support-chat",
+    "uses": "Long conversations, agent loops",
+    "order": [
+      0,
+      6,
+      8,
+      9,
+      1,
+      4,
+      5,
+      2,
+      7,
+      3,
+      10
+    ],
+    "principle": "Ordered for prompt caches: what changes least comes first. Governance, the user profile and memory open the payload; history follows and grows at its end; per-turn evidence, observations, task state and the query close it. Retrieved evidence sits late, beside the query, rather than near the top.",
+    "evalNote": "unevaluated · illustrative profile; no reproducible run published",
+    "isNew": true
   }
 ];
 class Component extends DCLogic {

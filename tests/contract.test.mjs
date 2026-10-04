@@ -288,6 +288,26 @@ test('every example profile can be realized as a cwa-messages/v1 request (R-7)',
   }
 });
 
+// evidence.html, Placement and prompt caches: the cache-ordered example puts what changes least first. Governance, the
+// user profile and memory come before the history, which grows at its end (R-7), and the slots a turn refills come after
+// it, so a call repeats the last one's leading part through its last turn.
+test('cache-first-chat/v1 places nothing a turn refills ahead of the history', () => {
+  const profile = profiles.find(p => p.id === 'cache-first-chat' && p.version === 1);
+  assert.ok(profile, 'examples/profiles.json publishes cache-first-chat/v1');
+  assert.equal(profile.route, 'support-chat');
+  assert.equal(profile.evaluation.status, 'unevaluated');
+  const at = slot => profile.placement.findIndex(p => p.slot === slot);
+  const history = at('interaction.history');
+  assert.ok(history >= 0);
+  for (const slot of ['governance.instructions', 'governance.capabilities', 'governance.examples', 'governance.output_contract', 'state.user', 'interaction.memory']) {
+    assert.ok(at(slot) >= 0 && at(slot) < history, `${slot} before the history`);
+  }
+  for (const slot of ['evidence.knowledge', 'evidence.tool_results', 'state.task', 'interaction.query']) {
+    assert.ok(at(slot) > history, `${slot} after the history`);
+  }
+  assert.equal(at('interaction.query'), profile.placement.length - 1, 'the query closes the payload');
+});
+
 test('profiles cannot hide protected items or the parser contract', () => {
   const profile = { ...profiles[0], placement: profiles[0].placement.filter(p => p.slot !== 'governance.output_contract') };
   assert.equal(checkProfile(profile, { parser: true }).valid, false);
