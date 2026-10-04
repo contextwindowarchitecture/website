@@ -653,6 +653,23 @@ test('every published case and rejection uses a required tokenizer and renderer,
   for (const component of optional) assert.ok(used.has(component), `no published case uses ${component}`);
 });
 
+// conformance/README.md, Reporting results: a case that uses an optional component an implementation lacks is skipped,
+// whatever else it lacks. So a required component used only beside an optional one could be missing from a port whose
+// every row is passed or skipped. Each required tokenizer and renderer is used by a case that names nothing optional,
+// which that port fails.
+test('every required tokenizer and renderer is used by a case that names no optional component', async () => {
+  const readme = await fs.readFile(new URL('../conformance/README.md', import.meta.url), 'utf8');
+  const section = readme.split('\n## Tokenizers and renderers\n')[1].split('\n## ')[0];
+  const required = [...section.split('\n### Optional\n')[0].matchAll(/^- `([^`]+)`/gm)].map(m => m[1]);
+  const root = new URL('../conformance/cases/', import.meta.url);
+  const alone = new Set();
+  for (const name of await fs.readdir(root)) {
+    const { tokenizer, renderer } = JSON.parse(await fs.readFile(new URL(`${name}/snapshot.json`, root), 'utf8'));
+    if (required.includes(tokenizer) && required.includes(renderer)) alone.add(tokenizer).add(renderer);
+  }
+  assert.deepEqual(required.filter(component => !alone.has(component)), []);
+});
+
 // conformance/README.md, Timestamps: format checkers disagree, and some validators never assert format at all, so every
 // format in the published schemas is paired with a pattern that holds the shape on its own.
 test('every format in the published schemas has a pattern beside it', async () => {
