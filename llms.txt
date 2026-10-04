@@ -31,6 +31,7 @@ The specification defines three conformance claims, and no others (spec §1):
 
 - [Spec](https://contextwindowarchitecture.io/spec.html): the normative text: conformance, planes, slots and items, governance, admission and fitting, placement profiles, the trace, and the changelog
 - [SPEC.md](https://contextwindowarchitecture.io/SPEC.md): the Spec page's requirement index and sections 1 to 6 as Markdown, each section with the requirements it holds
+- [Specification repository](https://github.com/contextwindowarchitecture/contextwindowarchitecture): SPEC.md, the schemas, the contract data, the conformance cases and the examples without the site, each file exported unchanged from the website repository
 - [contract/requirements.json](https://contextwindowarchitecture.io/contract/requirements.json): requirement IDs and text, the source SPEC.md and the Spec page are generated from
 - [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json): every exclusion and refusal code, in the order a trace ranks them (R-21)
 - [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json): each slot's plane, default authority, tier and policy fields (R-3)

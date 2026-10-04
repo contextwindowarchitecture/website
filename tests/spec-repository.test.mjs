@@ -10,6 +10,7 @@ import { IMPLEMENTATIONS } from '../scripts/conformance-reports.mjs';
 import { LOCK, checkExport, specRepository, writeExport } from '../scripts/spec-repository.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
+const REPOSITORY = 'https://github.com/contextwindowarchitecture/contextwindowarchitecture';
 const COMMIT = 'a'.repeat(40);
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const tracked = (...paths) => execFileSync('git', ['-C', ROOT, 'ls-files', '--', ...paths], { encoding: 'utf8' }).split('\n').filter(Boolean);
@@ -128,4 +129,17 @@ test('the repository README opens with the site\'s own description, links every 
     assert.ok(held.some(name => name === target || name.startsWith(target.replace(/\/$/, '') + '/')), `${target} is in the repository`);
   }
   assert.doesNotMatch(readme, /\bfree\b/i);
+});
+
+// A reader of the site can reach the specification without it: from the Spec page, from the About page's account of
+// how the specification is maintained, and, for an agent, from the llms.txt index.
+test('the Spec page, the About page and llms.txt link the specification repository', async () => {
+  for (const page of ['spec.html', 'about.html']) {
+    const html = await fs.readFile(path.join(ROOT, page), 'utf8');
+    assert.ok(html.includes(`<a href="${REPOSITORY}" target="_blank" rel="noopener">`), `${page} links the specification repository`);
+  }
+  const specification = (await fs.readFile(path.join(ROOT, 'llms.txt'), 'utf8')).split(/^## /m).find(section => section.startsWith('Specification\n'));
+  assert.ok(specification.split('\n').some(line => line.startsWith(`- [Specification repository](${REPOSITORY}): `)), 'llms.txt lists it under Specification');
+  assert.ok((await fs.readFile(path.join(ROOT, 'llms-full.txt'), 'utf8')).includes(`(${REPOSITORY})`), 'llms-full.txt carries the link');
+  assert.ok((await fs.readFile(path.join(ROOT, 'README.md'), 'utf8')).includes(`(${REPOSITORY})`), 'the README names where the export goes');
 });
