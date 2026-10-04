@@ -6,6 +6,7 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { IMPLEMENTATIONS, caseDigestsNow, tally } from './conformance-reports.mjs';
+import { specMarkdown } from './spec-markdown.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -158,8 +159,9 @@ for (const page of ['spec.html', 'assembler.html']) {
   }
   outputs.set(page, updated);
 }
-outputs.set('SPEC.md', '# CWA draft — numbered requirements\n\nGenerated from `contract/requirements.json`. The [Spec page](./spec.html) provides the normative definitions and context. Published schemas in `schema/` define JSON field shapes.\n\n' +
-  rules.map((r, i) => `## R-${i + 1}: ${r[2]}\n\n${r[3]}\n`).join('\n'));
+// SPEC.md is written from the Spec page as this build leaves it, so its requirements and profile are the current ones.
+const site = `https://${(await fs.readFile('CNAME', 'utf8')).trim()}/`;
+outputs.set('SPEC.md', specMarkdown({ html: outputs.get('spec.html'), requirements, site }));
 
 // llms.txt indexes the site for language models. The producer and assembler guides are written by hand around tables
 // generated here, and llms-full.txt joins all three with spec §1, the slots and authority values, every requirement

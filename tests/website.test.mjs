@@ -244,7 +244,7 @@ test('exported profiles pass the same contract as published profile examples', a
   }
 });
 
-test('specification, generated requirement reference, and status matrix share every permanent ID', async () => {
+test('specification, its Markdown copy, and status matrix share every permanent ID', async () => {
   const rules = await component('spec.html', 'RULES');
   const statuses = await component('assembler.html', 'RULES');
   const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));
@@ -259,7 +259,72 @@ test('specification, generated requirement reference, and status matrix share ev
   const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
   assert.equal(view.renderVals().counts, `${met} of ${scopes.filter(s => s.scope !== 'application').length} checkable requirements implemented.`);
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
-  for (const { id } of requirements) assert.ok(markdown.includes(`## ${id}:`));
+  for (const { id } of requirements) assert.ok(markdown.includes(`### ${id}:`));
+});
+
+// SPEC.md is the Spec page's sections 1 to 6 without the page: the text read here straight from the page's markup and
+// from the values its component renders, each of which SPEC.md must hold.
+const SPEC_SECTIONS = { model: 2, gov: 3, fit: 4, prof: 5, trace: 6 };
+const decodeEntities = text => text.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+const squash = text => text.replace(/\s+/g, ' ').trim();
+/** Markdown as the text a reader sees: no emphasis or code marks, a link as its label, a table row as its cells. */
+const readMarkdown = markdown => squash(markdown.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, '')
+  .replace(/^\| /gm, '').replace(/ \|$/gm, '').replace(/(?<!\\)\| /g, '').replace(/\\([\\*<|])/g, '$1'));
+
+test('SPEC.md holds sections 1 to 6 of the Spec page: every paragraph, label and listed value', async () => {
+  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
+  const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
+  const read = readMarkdown(markdown);
+  let sections = html.slice(html.indexOf('<section id="s1">'), html.indexOf('<section id="changelog"'));
+  // The lists a template fills in are compared through the component's values below.
+  const innermost = /<sc-for[^>]*>(?:(?!<sc-for)[\s\S])*?<\/sc-for>/g;
+  while (innermost.test(sections)) sections = sections.replace(innermost, '');
+  const written = sections.replace(/<!--[\s\S]*?-->/g, '').split(/<[^>]+>/).map(t => squash(decodeEntities(t))).filter(t => t && !/^\d$/.test(t));
+  assert.ok(written.length > 60, 'the page has text to compare');
+  for (const text of written) assert.ok(read.includes(text.replaceAll('| ', '')), `SPEC.md lacks the page's text: ${text.slice(0, 80)}`);
+  for (const [n, title] of [...html.matchAll(/<section id="s(\d)">[\s\S]*?<h2[^>]*>([^<]+)<\/h2>/g)].map(m => [m[1], decodeEntities(m[2])])) {
+    assert.ok(markdown.includes(`\n## ${n} ${title}\n`), `SPEC.md heads section ${n}`);
+  }
+  const vals = JSON.parse(JSON.stringify((await component('spec.html')).renderVals()));
+  const listed = [
+    ...vals.planes.flatMap(p => [p.name, p.answers, ...p.slots]), ...vals.slots.flatMap(s => [s.id, s.holds, s.rule]),
+    ...vals.mustFields, ...vals.shouldFields, ...vals.itemFields.flatMap(f => [f.key, f.text]),
+    ...vals.authority.flatMap(a => [a.name, a.value, a.text]), ...vals.conflicts.flatMap(c => [c.when, c.then]),
+    ...vals.stages.flatMap(s => [s.name, s.text]), ...vals.tests.flatMap(t => [t.name, t.text, t.rule]),
+  ];
+  for (const text of listed) assert.ok(read.includes(squash(text)), `SPEC.md lacks the page's value: ${text.slice(0, 80)}`);
+  assert.doesNotMatch(markdown, /\{\{|<\/?(sc-for|div|span|p|a|strong|section)\b/, 'no template or page markup is left');
+});
+
+test('SPEC.md puts each requirement, text unchanged, in the section the Spec page puts it in, and indexes them all', async () => {
+  const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
+  const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));
+  const escape = text => text.replace(/[\\*<]/g, '\\$&');
+  const headings = [...markdown.matchAll(/^## (\d) /gm)].map(m => ({ n: Number(m[1]), at: m.index }));
+  assert.deepEqual(headings.map(h => h.n), [1, 2, 3, 4, 5, 6]);
+  for (const r of requirements) {
+    const block = `### ${r.id}: ${escape(r.summary)}\n\n${escape(r.text)}\n`;
+    const at = markdown.indexOf(block);
+    assert.ok(at >= 0, `${r.id} is in SPEC.md as contract/requirements.json words it`);
+    assert.equal(headings.findLast(h => h.at < at).n, SPEC_SECTIONS[r.section], `${r.id} is in section ${SPEC_SECTIONS[r.section]}`);
+    assert.ok(markdown.includes(`| ${r.id} | ${r.keyword} | ${escape(r.summary)} |`), `${r.id} is in the index`);
+  }
+  assert.equal([...markdown.matchAll(/^### R-\d+:/gm)].length, requirements.length, 'no requirement is repeated or left over');
+  assert.ok(markdown.indexOf('| R-1 |') < headings[0].at, 'the index comes before section 1');
+});
+
+test('SPEC.md reads the same outside this repository: page links are absolute, and file links name files beside it', async () => {
+  const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
+  const site = 'https://' + (await fs.readFile(new URL('../CNAME', import.meta.url), 'utf8')).trim() + '/';
+  const targets = [...markdown.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]);
+  assert.ok(targets.some(t => t === site + 'spec.html'), 'SPEC.md links the page it is generated from');
+  for (const target of targets) {
+    if (target.startsWith(site)) await fs.access(new URL('../' + target.slice(site.length).split('#')[0], import.meta.url));
+    else {
+      assert.doesNotMatch(target, /^[a-z]+:|\.html|^#/, `${target} is a file beside SPEC.md`);
+      await fs.access(new URL('../' + target, import.meta.url));
+    }
+  }
 });
 
 // §1 lists the MUSTs aimed at producers and the ones no component can meet for the application. Assembly cannot
