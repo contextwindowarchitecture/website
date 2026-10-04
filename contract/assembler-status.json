@@ -1,11 +1,9 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-python",
-    "commit": "49b321e4f525d8c879934f28e1c316bb8fc33f6f",
+    "commit": "a6d88ea82015d77f85feb7a3793b77de43c9eed1",
     "dirty": false,
-    "tags": [
-      "draft-release"
-    ]
+    "tags": []
   },
   "requirements": [
     {
@@ -41,7 +39,7 @@
     {
       "id": "R-7",
       "status": "implemented",
-      "tests": 9
+      "tests": 12
     },
     {
       "id": "R-8",
@@ -56,12 +54,12 @@
     {
       "id": "R-10",
       "status": "boundary-checked",
-      "tests": 7
+      "tests": 8
     },
     {
       "id": "R-11",
       "status": "boundary-checked",
-      "tests": 14
+      "tests": 15
     },
     {
       "id": "R-12",
@@ -86,12 +84,12 @@
     {
       "id": "R-16",
       "status": "boundary-checked",
-      "tests": 60
+      "tests": 63
     },
     {
       "id": "R-17",
       "status": "implemented",
-      "tests": 22
+      "tests": 23
     },
     {
       "id": "R-18",
@@ -106,12 +104,12 @@
     {
       "id": "R-20",
       "status": "boundary-checked",
-      "tests": 15
+      "tests": 17
     },
     {
       "id": "R-21",
       "status": "implemented",
-      "tests": 24
+      "tests": 26
     },
     {
       "id": "R-22",

@@ -1,15 +1,15 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-python",
-    "commit": "49b321e4f525d8c879934f28e1c316bb8fc33f6f",
+    "commit": "a6d88ea82015d77f85feb7a3793b77de43c9eed1",
     "dirty": false,
-    "tags": [
-      "draft-release"
-    ]
+    "tags": []
   },
   "cases_at_run": {
     "admission-reasons": "4e15f74942312728a036f8ed2080788e32bdbc5efccc297b2cde66dab31085f7",
     "admission-route-slots": "06fa69f4ee9f03a74fa0148f18dcbb12af82995ac4f7f8588e48a0e0c060bc3d",
+    "blocks-budget": "6836eb20e3ac31b69abd94069081c2bc9c1debea6b7e53f237627aaf1945ba22",
+    "blocks-render": "ae2213691c3b978d4e79f7ccc6caa819bab08135d610ee664b13da9acf785db7",
     "budget-droppable-order": "97b4d6a487933ffccd9aae94e9952e9fa92b3bd1f77dcc3b92ec3df42bb2f118",
     "budget-margin-protected": "cd127a1471b96e3ffa26eb07f888687b06848a25cd2fb2fdb8f9cb7b55f41f80",
     "budget-margin-rounding": "08cf240bb0876c2cb22166dccaf15c296f1de92288de015309b4fa766c7d05a4",
@@ -30,7 +30,7 @@
     "capability-policy-kind": "f0a78b0e3610801f71fced2f29c7dfb929dc2923882de0a1a57e42c9a9173733",
     "conflict-fact": "2bb119f6e75c9792b21cd1c423c87e611d53ff70aa79e5a1067a5aba9044adf1",
     "conflict-instruction-request-context": "e7d0cee0e9331b84cf2765f3c473f31429579de03cca62c53b6c89813c2a1a0f",
-    "conflict-instruction": "9e544e4cc07e32333a26b964236ed284d41bf400bcab6d0eee440e32a021c6f7",
+    "conflict-instruction": "8a32d5f6831681773a892edaefebb5379818153328c020192d85b8095a312626",
     "conflict-refused": "bce2db3ad4a65bfe333a6c69ee75165bb2e314c644e39fa95b28df03fe0b87a8",
     "conflict-request-context": "353e3fd79746339f2d9472c6cd37f7bcaa99d6a98872df8fbed136015881c104",
     "conflict-required-slot-first": "0bb11c82faf5c02f2e65757260993b2dae95a16e455dce0bfc80aa54cfee1ee2",
@@ -48,6 +48,7 @@
     "evidence-request-context": "e3807c5704192f7fe44a7fb6de2a0d8ff859ba9312372efe2fc6a5603b2516ec",
     "evidence-retrieve-narrower": "5caa27762479affe6b5c88e6ad1cc39156e824c00ddf9c6e2b5b8e0e954075cf",
     "fixture-three-slot": "9aaf68239e4fdbb61ffe30903cab49f18abdaaab26bdaad44b40adb77e221d6b",
+    "history-freshness-order": "b95f486069f308649f11ac119df48ed17f57cfe3cad57a29c49df97c0bdb25e4",
     "messages-budget": "9b73d41ac98df2bed0eab01cb3ce0432e003f39e8c323ed0faca13fe8f5020f2",
     "messages-render": "137c0b6f024d9694e889c18a58b820012f161e41937230671466cc87124d9aed",
     "messages-repeated-slot": "f913b30648e0cde677f84d826fd878548acc82c9851ee58a4af8e8a1cb7d2509",
@@ -67,6 +68,7 @@
     "threshold-beyond-2-53": "2f05f21b38a98cba3e5753dbf78d134553c6eb15c1a09faa6ae0f50c7dad32a8",
     "tokenizer-estimate-utf8": "af1aeb2a8bcac1b35c1e6c4910680162c962d0d07964963897fe04438622f0bc",
     "batch-entry-not-object": "a1cefe62434dfddb36d802dab6750e1a69755913c747472581ed1c4dcae88e91",
+    "blocks-system-after-xml": "bcc3bb9db1d4e92d7a94bdaace7961b07816f657dbc08e9db4d8ba31455e9cbd",
     "conflict-group-overlap": "6aa68bb96528c7ebd25176e0914276275af41764e20521806231263cd242a542",
     "conflict-group-repeated-id": "af9ddad7f68158af39dde6140ea6215e41eccd74dbaf6bb81eeecac20976c539",
     "conflict-group-unknown-fact": "5d81756dd67e1e27b750a730db1261f4b6905811f7fb951a36c6ec9f9aa207f4",
@@ -98,7 +100,7 @@
       "language": "python"
     },
     "contract": {
-      "website_commit": "d229b740bac68c4c5ea7ffc9ed20315ac2fccff9",
+      "website_commit": "b7b0d5c523a95e6b8a945a0fd5eaa0168e20335a",
       "dirty": false
     },
     "cases": [
@@ -127,6 +129,25 @@
           "R-15",
           "R-21",
           "R-22"
+        ],
+        "outcome": "passed"
+      },
+      {
+        "id": "blocks-budget",
+        "rules": [
+          "R-7",
+          "R-16",
+          "R-21"
+        ],
+        "outcome": "passed"
+      },
+      {
+        "id": "blocks-render",
+        "rules": [
+          "R-7",
+          "R-10",
+          "R-11",
+          "R-21"
         ],
         "outcome": "passed"
       },
@@ -504,6 +525,13 @@
         "outcome": "passed"
       },
       {
+        "id": "history-freshness-order",
+        "rules": [
+          "R-7"
+        ],
+        "outcome": "passed"
+      },
+      {
         "id": "messages-budget",
         "rules": [
           "R-7",
@@ -687,6 +715,15 @@
         "rules": [
           "R-2",
           "R-17"
+        ],
+        "outcome": "rejected"
+      },
+      {
+        "id": "blocks-system-after-xml",
+        "rules": [
+          "R-7",
+          "R-17",
+          "R-20"
         ],
         "outcome": "rejected"
       },
