@@ -99,7 +99,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Example · steps 1 and 3</div>
       <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">A prompt, split into slots</h2>
-      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Two samples, a system prompt and the same kind of conversation as a JSON array of chat messages, each split into the slots step 1 asks for. They are here to see CWA in action, not to try out your own prompt. You can edit a sample to watch the split respond, and Reset brings it back. Each piece gets a proposed slot, that slot's default authority, and the item fields still to fill in. Only text the application wrote is split by what it says: a user or assistant message, or a paragraph that starts "User:", "Customer:" or "Q:", keeps its speaker's slot however it is worded, because wording never earns authority. The proposals come from simple wording rules written for these samples. On a prompt of your own they would guess, and a guessed governance item would claim a trust it has not earned. A system or developer message that matches no wording goes to <span style="font-family: var(--mono); font-size: 13px;">governance.instructions</span>, and any other piece the rules cannot place is left unassigned. Each body stays whole, as assembly keeps it, so material a user pasted into their message is delimited inside that body, in a form the material cannot imitate (<a href="./spec.html#R-10">R-10</a>).</p>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Two samples, a system prompt and the same kind of conversation as a JSON array of chat messages, each split into the slots step 1 asks for. They are here to see CWA in action, not to try out your own prompt. You can edit a sample to watch the split respond, and Reset brings it back. The message array has to stay a JSON array: when an edit breaks it, the panel names the error and proposes nothing until it parses again. Each piece gets a proposed slot, that slot's default authority, and the item fields still to fill in. Only text the application wrote is split by what it says: a user or assistant message, or a paragraph that starts "User:", "Customer:" or "Q:", keeps its speaker's slot however it is worded, because wording never earns authority. The proposals come from simple wording rules written for these samples. On a prompt of your own they would guess, and a guessed governance item would claim a trust it has not earned. A system or developer message that matches no wording goes to <span style="font-family: var(--mono); font-size: 13px;">governance.instructions</span>, and any other piece the rules cannot place is left unassigned. Each body stays whole, as assembly keeps it, so material a user pasted into their message is delimited inside that body, in a form the material cannot imitate (<a href="./spec.html#R-10">R-10</a>).</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
         <sc-for list="{{ samples }}" as="smp" hint-placeholder-count="2">
           <button onClick="{{ smp.load }}" aria-pressed="{{ smp.pressed }}" style="{{ smp.style }}">{{ smp.label }}</button>
@@ -111,10 +111,11 @@
             <span>sample · text or JSON messages</span>
             <sc-if value="{{ edited }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 10px; color: var(--accent);">edited<button onClick="{{ reset }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--pill); padding: 6px 12px; cursor: pointer;" style-hover="background: var(--fg); border-color: var(--fg);">Reset example</button></span></sc-if>
           </div>
-          <textarea value="{{ src }}" onChange="{{ setSrc }}" spellcheck="false" style="flex: 1; min-height: 420px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
+          <textarea value="{{ src }}" onChange="{{ setSrc }}" aria-invalid="{{ mig.invalid }}" spellcheck="false" style="flex: 1; min-height: 420px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
         </div>
         <div style="background: var(--surface); display: flex; flex-direction: column;">
           <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);"><span>proposed items</span><span>{{ mig.summary }}</span></div>
+          <sc-if value="{{ mig.broken }}" hint-placeholder-val="{{ false }}"><div role="alert" style="padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--accent); overflow-wrap: anywhere;">{{ mig.parseError }}</div></sc-if>
           <div style="display: flex; flex-direction: column;">
             <sc-for list="{{ mig.items }}" as="it" hint-placeholder-count="4">
               <div style="display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: start;">
@@ -138,7 +139,7 @@
           <div style="padding: 16px 18px; max-height: 320px; overflow: auto; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre; color: var(--fg);">{{ mig.yaml }}</div>
         </div>
       </div>
-      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts the tokens the rules could not assign to a slot, estimated as characters divided by four rather than counted by a published tokenizer. Every other item still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span>, a <span style="font-family: var(--mono); font-size: 13px;">source_version</span> and a <span style="font-family: var(--mono); font-size: 13px;">freshness</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>), a memory item an <span style="font-family: var(--mono); font-size: 13px;">expires</span> and a source naming its turn (<a href="./spec.html#R-9">R-9</a>), and a knowledge item a <span style="font-family: var(--mono); font-size: 13px;">relevance</span> score (<a href="./spec.html#R-13">R-13</a>). The migrator already sets governance items to <span style="font-family: var(--mono); font-size: 13px;">trust: verified</span> and marks the query, history, memory and evidence <span style="font-family: var(--mono); font-size: 13px;">injection_risk: untrusted_content</span> (<a href="./spec.html#R-10">R-10</a>). Replacing every TODO is step 3, and it is the part no example can do for you.</p>
+      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts the tokens the rules could not assign to a slot, estimated as characters divided by four rather than counted by a published tokenizer. Every other item still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span>, a <span style="font-family: var(--mono); font-size: 13px;">source_version</span> and a <span style="font-family: var(--mono); font-size: 13px;">freshness</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>), a memory item an <span style="font-family: var(--mono); font-size: 13px;">expires</span> and a source naming its turn (<a href="./spec.html#R-9">R-9</a>), and a knowledge item a <span style="font-family: var(--mono); font-size: 13px;">relevance</span> score (<a href="./spec.html#R-13">R-13</a>). The example already sets governance items to <span style="font-family: var(--mono); font-size: 13px;">trust: verified</span> and marks the query, history, memory and evidence <span style="font-family: var(--mono); font-size: 13px;">injection_risk: untrusted_content</span> (<a href="./spec.html#R-10">R-10</a>). Replacing every TODO is step 3, and it is the part no example can do for you.</p>
     </div>
   </section>
 
@@ -221,7 +222,7 @@ const SAMPLE_MESSAGES = JSON.stringify([
 ], null, 2);
 
 // The two samples the migrator shows. A reader may edit one to watch the split respond; Reset restores it.
-const SAMPLES = [{ label: "sample · system prompt", src: SAMPLE_PROMPT }, { label: "sample · message array", src: SAMPLE_MESSAGES }];
+const SAMPLES = [{ label: "sample · system prompt", src: SAMPLE_PROMPT }, { label: "sample · message array", src: SAMPLE_MESSAGES, messages: true }];
 
 class Component extends DCLogic {
   state = { theme: "light", menu: false, sample: 0, src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
@@ -255,15 +256,24 @@ class Component extends DCLogic {
     if (role === "system" || role === "developer") return "governance.instructions";
     return "unassigned";
   }
-  migrate(src) {
+  // expectArray: the source is the message-array sample, so text that no longer parses as a JSON array is reported,
+  // not split as if it were a prompt.
+  migrate(src, expectArray = false) {
     let pieces = [];
     let parsed = null;
-    try { parsed = JSON.parse(src); } catch (e) {}
+    let parseError = "";
+    try { parsed = JSON.parse(src); } catch (e) { parseError = e.message.replace(/\.$/, ""); }
+    if (expectArray && !Array.isArray(parsed)) {
+      const kind = parseError ? parseError : "it parses as " + (parsed === null ? "null" : typeof parsed === "object" ? "an object" : "a " + typeof parsed) + ", not an array";
+      const message = "This is no longer a JSON array of messages: " + kind + ".";
+      return { items: [{ color: COLOR.none, slot: "—", meta: "", preview: "Nothing to split. Fix the JSON or press Reset example.", flag: "" }], summary: "cannot parse", slotCount: "—", gapPct: "—", missing: "—",
+        yaml: "# nothing to propose: the sample no longer parses as a JSON array of messages", parseError: message, broken: true, invalid: "true" };
+    }
     if (Array.isArray(parsed)) {
       const users = parsed.filter(m => m && m.role === "user").length;
       let seenUsers = 0;
       pieces = parsed.map(m => {
-        if (!m || typeof m !== "object" || Array.isArray(m) || m.content === undefined) return { text: JSON.stringify(m), slot: "unassigned", src: "message:invalid" };
+        if (!m || typeof m !== "object" || Array.isArray(m) || m.content === undefined) return { text: JSON.stringify(m), slot: "unassigned", src: "message:invalid", invalid: true };
         const text = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
         let slot = this.classify(text, m.role);
         if (m.role === "user") { seenUsers++; if (seenUsers < users) slot = "interaction.history"; }
@@ -286,7 +296,7 @@ class Component extends DCLogic {
     const items = pieces.map((c, i) => {
       const m = SLOT_META[c.slot];
       return { color: COLOR[m[0]], slot: c.slot, meta: "authority: " + authority(c) + " · ~" + tok(c.text) + " tok est.", preview: c.text.replace(/\s+/g, " "),
-        flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs " + todo(c.slot).join(" · ")) };
+        flag: c.invalid ? "not a message · needs a role and content" : c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs " + todo(c.slot).join(" · ")) };
     });
     const y = (s) => JSON.stringify(s);
     const yaml = ["# proposed for this sample · replace every TODO before admission (R-2)", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(pieces.map((c, i) => {
@@ -298,7 +308,7 @@ class Component extends DCLogic {
         marked(c.slot) ? ["    injection_risk: untrusted_content   # R-10"] : [],
         ["    body: " + y(c.text)]).join("\n");
     })).join("\n");
-    return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: pieces.length + " piece" + (pieces.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(pieces.filter(c => c.slot !== "unassigned").length), yaml };
+    return { items: items.length ? items : [{ color: COLOR.none, slot: "—", meta: "", preview: "Paste a prompt to begin.", flag: "" }], summary: pieces.length + " piece" + (pieces.length === 1 ? "" : "s"), slotCount: slots.size + " / 11", gapPct: Math.round(gap / total * 100) + "%", missing: String(pieces.filter(c => c.slot !== "unassigned").length), yaml, parseError: "", broken: false, invalid: "false" };
   }
   download(name, text) {
     const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
@@ -318,7 +328,7 @@ class Component extends DCLogic {
     return "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
   }
   renderVals() {
-    const mig = this.migrate(this.state.src);
+    const mig = this.migrate(this.state.src, !!SAMPLES[this.state.sample].messages);
     const SC = this.state.scaffolds || [{ label: "Assembler", filename: "assemble.py", blurb: this.state.scaffoldError || "Loading downloads…", text: "" }];
     const si = Math.min(this.state.scaffold, SC.length - 1);
     const sc = SC[si];

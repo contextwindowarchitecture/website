@@ -278,6 +278,31 @@ test('editing a migrator sample says so and Reset brings the sample back', async
   assert.deepEqual([view.renderVals().src, view.renderVals().edited], [messages, false]);
 });
 
+// The message-array sample is JSON. An edit that leaves it unparseable, or not an array, must say so rather than be
+// split as if it were a prompt, and an entry that is not a message object says what it lacks.
+test('an edit that breaks the message array says it no longer parses', async () => {
+  const view = await component('start.html');
+  view.renderVals().samples[1].load();
+  const good = view.renderVals().mig;
+  assert.equal(good.parseError, '');
+  for (const value of [view.renderVals().src.slice(0, -1), '{"role": "user", "content": "Hi"}']) {
+    view.renderVals().setSrc({ target: { value } });
+    const mig = view.renderVals().mig;
+    assert.match(mig.parseError, /^This is no longer a JSON array of messages/, value);
+    assert.equal(mig.summary, 'cannot parse');
+    assert.deepEqual([...mig.items].map(i => i.slot), ['—']);
+    assert.match(mig.items[0].preview, /Fix the JSON or press Reset example/);
+    assert.doesNotMatch(mig.yaml, /^items:/m);
+  }
+  assert.match(view.migrate('[]x', true).parseError, /^This is no longer a JSON array of messages: /, 'names the parser error');
+  view.renderVals().setSrc({ target: { value: '[1, {"role": "user", "content": "Hi"}]' } });
+  assert.equal(view.renderVals().mig.parseError, '');
+  assert.equal(view.renderVals().mig.items[0].flag, 'not a message · needs a role and content');
+  view.renderVals().samples[0].load();
+  view.renderVals().setSrc({ target: { value: 'You are Ada. [draft' } });
+  assert.equal(view.renderVals().mig.parseError, '', 'the system prompt sample is text, not JSON');
+});
+
 // LICENSE and NOTICE put the specification, schemas, cases, scaffolds and site under Apache-2.0: anyone may use, copy,
 // modify and implement them, and a copy they distribute keeps the licence and NOTICE. No page may waive that.
 test('every page that speaks of the licence names Apache-2.0 and links it, and none waives its terms', async () => {
