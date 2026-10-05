@@ -66,7 +66,7 @@ The specification defines three conformance claims, and no others (spec §1):
 
 ## Optional
 
-- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with an item and batch linter and a trace validator that run local checks in the browser
+- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with the item, batch and trace checks shown on editable examples, to see CWA in action rather than to check your own output
 - [Placement evidence](https://contextwindowarchitecture.io/evidence.html): why placement is a profile and not a rule, the six example profiles, and how to evaluate one
 - [Example item](https://contextwindowarchitecture.io/examples/context-item.json), [producer batch](https://contextwindowarchitecture.io/examples/producer-batch.json), [profiles](https://contextwindowarchitecture.io/examples/profiles.json), [route policies](https://contextwindowarchitecture.io/examples/route-policies.json) and [trace](https://contextwindowarchitecture.io/examples/trace.json)
 - [contract.js](https://contextwindowarchitecture.io/contract.js): the browser module behind the page tools: checkItem, checkProducerBatch, checkSnapshot, checkTrace and checkProfile, local checks only

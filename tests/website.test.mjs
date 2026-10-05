@@ -153,6 +153,66 @@ test('the item linter checks a producer batch in batch mode', async () => {
   assert.equal(view.renderVals().samples[0].label, 'retrieval · valid structure');
 });
 
+// The Producers page's checks show CWA at work on its own samples. Each item sample is checked as if a producer the
+// route lists for its slot sent it, alone in its snapshot, at a fixed time, so the code it names is the one a trace records.
+test('the item and trace examples say they are not for checking your own output', async () => {
+  const html = await fs.readFile(new URL('../producers.html', import.meta.url), 'utf8');
+  for (const id of ['linter', 'validator']) {
+    const section = html.match(new RegExp(`<section id="${id}">[\\s\\S]*?<\\/section>`))[0];
+    assert.doesNotMatch(section, /Paste |Nothing leaves your browser|page-load time/, id);
+    assert.match(section.replace(/\s+/g, ' '), /to see CWA in action, not to check your own/, id);
+  }
+});
+
+test('the item examples are judged at a fixed time and each names the code its trace records', async () => {
+  const view = await component('producers.html');
+  view.state.contract = contract;
+  const vals = view.renderVals();
+  assert.equal(vals.validationTime, contract.TRACE_EXAMPLE.context.assembly_time, 'the example trace\'s assembly time');
+  assert.deepEqual([...vals.samples].map(s => s.label), ['retrieval · valid structure', 'memory · authority too high', 'retrieved chunk · unmarked', 'state · missing fields', 'capability policy · valid structure']);
+  const outcome = i => { view.renderVals().samples[i].load(); const { verdict, traceLine } = view.renderVals().lint; return verdict === 'local checks passed' ? 'passed' : traceLine.replace(/^among the checks run here, would be excluded as /, '').split(';')[0]; };
+  assert.deepEqual([0, 1, 2, 3, 4].map(outcome), ['passed', 'authority_not_allowed', 'untrusted_content_unmarked', 'missing_field:freshness', 'passed']);
+  view.renderVals().samples[0].load();
+  assert.deepEqual(JSON.parse(view.renderVals().src), contract.ITEM_EXAMPLE, 'the published item, expires included');
+});
+
+test('editing an item, batch or trace example says so and Reset brings it back', async () => {
+  const view = await component('producers.html');
+  view.state.contract = contract;
+  view.state.batchExample = JSON.parse(await fs.readFile(new URL('../examples/producer-batch.json', import.meta.url), 'utf8'));
+  view.renderVals().samples[1].load();
+  const memory = view.renderVals().src;
+  assert.equal(view.renderVals().edited, false);
+  view.renderVals().setSrc({ target: { value: '{}' } });
+  assert.equal(view.renderVals().edited, true);
+  view.renderVals().reset();
+  assert.deepEqual([view.renderVals().src, view.renderVals().edited], [memory, false]);
+  view.renderVals().setBatchMode();
+  view.renderVals().samples[2].load();
+  const reused = view.renderVals().src;
+  view.renderVals().setSrc({ target: { value: '[]' } });
+  assert.equal(view.renderVals().edited, true);
+  view.renderVals().reset();
+  assert.deepEqual([view.renderVals().src, view.renderVals().edited], [reused, false]);
+  view.state.traceSrc = JSON.stringify(contract.TRACE_EXAMPLE, null, 2);
+  assert.equal(view.renderVals().traceEdited, false);
+  view.renderVals().setTraceSrc({ target: { value: '{}' } });
+  assert.equal(view.renderVals().traceEdited, true);
+  view.renderVals().resetTrace();
+  assert.deepEqual([JSON.parse(view.renderVals().traceSrc), view.renderVals().traceEdited], [contract.TRACE_EXAMPLE, false]);
+});
+
+// R-21, R-23: the trace example is read back as what it reports, so a reader sees what a trace accounts for.
+test('the trace example reads back what the trace reports', async () => {
+  const view = await component('producers.html');
+  view.state.contract = contract;
+  const text = [...view.validateTrace(JSON.stringify(contract.TRACE_EXAMPLE)).evidenced].map(e => e.rule + ' ' + e.text).join('\n');
+  for (const part of ['fixture-three-slot v1', 'fixture/v1', '2026-09-22T12:00:00Z', 'policy:v12 (governance.instructions, 9 tokens)',
+    'memory:expired: expired, stage producer', '34 input tokens', contract.TRACE_EXAMPLE.result.hash.slice(0, 12), 'not refused'])
+    assert.ok(text.includes(part), part);
+  assert.deepEqual([...view.validateTrace('{}').evidenced].length, 1, 'an invalid trace reads back nothing but the scope note');
+});
+
 test('the migrator preserves long bodies and handles malformed message entries', async () => {
   const view = await component('start.html');
   const body = 'Please explain this technical passage. '.repeat(30);

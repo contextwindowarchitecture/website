@@ -70,7 +70,7 @@ The specification defines three conformance claims, and no others (spec §1):
 
 ### Optional
 
-- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with an item and batch linter and a trace validator that run local checks in the browser
+- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with the item, batch and trace checks shown on editable examples, to see CWA in action rather than to check your own output
 - [Placement evidence](https://contextwindowarchitecture.io/evidence.html): why placement is a profile and not a rule, the six example profiles, and how to evaluate one
 - [Example item](https://contextwindowarchitecture.io/examples/context-item.json), [producer batch](https://contextwindowarchitecture.io/examples/producer-batch.json), [profiles](https://contextwindowarchitecture.io/examples/profiles.json), [route policies](https://contextwindowarchitecture.io/examples/route-policies.json) and [trace](https://contextwindowarchitecture.io/examples/trace.json)
 - [contract.js](https://contextwindowarchitecture.io/contract.js): the browser module behind the page tools: checkItem, checkProducerBatch, checkSnapshot, checkTrace and checkProfile, local checks only
@@ -364,7 +364,7 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 ### Checking your output
 
 - Validate each item against schema/context_item.schema.json and each batch against schema/producer_batch.schema.json with a JSON Schema 2020-12 validator that asserts `format`. The date-time `pattern` pins the shape but not the calendar, so a validator that leaves `format: date-time` unasserted accepts `2026-02-30`.
-- The Producers page's item and batch linter runs the site's local checks in the browser, and so do `checkItem` and `checkProducerBatch` in https://contextwindowarchitecture.io/contract.js. They judge structure and the rules an item shows on its own. They cannot authenticate producers or apply the route, so producer kinds and their slots, the capability grant, the verified flag, scope, `max_age_seconds`, `min_relevance`, `source_prefix`, placement and ids across a snapshot go unchecked. Passing them is not admission.
+- The Producers page shows the site's local checks at work on sample items and batches, to see CWA in action rather than to check your own output. `checkItem` and `checkProducerBatch` in https://contextwindowarchitecture.io/contract.js run the same checks. They judge structure and the rules an item shows on its own. They cannot authenticate producers or apply the route, so producer kinds and their slots, the capability grant, the verified flag, scope, `max_age_seconds`, `min_relevance`, `source_prefix`, placement and ids across a snapshot go unchecked. Passing them is not admission.
 - Admission happens in an assembler. To see it, freeze a snapshot that holds your batch and run it through one of the implementations (https://contextwindowarchitecture.io/llms-assemblers.txt): the trace's `excluded` rows say what happened to each item, and `defaults_filled` which fields the assembler filled.
 
 ### Sources

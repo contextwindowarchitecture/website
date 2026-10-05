@@ -572,7 +572,7 @@
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Producer contract</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">What your tool has to emit.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Paste an item into the linter to check its structure and local invariants; the assembler admits it against the route.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Its examples show the item and trace checks at work on sample items; the assembler admits an item against the route.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the contract →</span>
         </a>
         <a href="./evidence.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
@@ -1342,7 +1342,7 @@ class Component extends DCLogic {
       { key: "items", kicker: "The unit", title: "Items carry their own metadata",
         body: "Eleven fields: provenance, authority, freshness, scope, eligibility, budget, conflict policy, lineage, trust, variants and injection risk. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
       { key: "deeper", kicker: "Go deeper", title: "The spec and the contract have their own pages",
-        body: "Twenty-six numbered requirements on the Spec page; what a retriever, memory store or MCP server has to emit on the Producers page, with a linter. This page keeps the argument.", act: () => {} },
+        body: "Twenty-six numbered requirements on the Spec page; what a retriever, memory store or MCP server has to emit on the Producers page, with its checks shown on examples. This page keeps the argument.", act: () => {} },
       { key: "evidence", kicker: "Evidence", title: "Retrieval is a pipeline",
         body: "Eight steps sit between the vector store and the payload, four the retriever's and four the assembler's. Each is a rule the trace can cite — including what happens when nothing valid comes back.", act: () => {} },
       { key: "harness", kicker: "Where it fits", title: "You don't replace your framework",
