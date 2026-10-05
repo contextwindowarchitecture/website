@@ -1,6 +1,6 @@
 # CWA for assemblers
 
-> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Three implementations exist, in Python, TypeScript and Go, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes, requirement scope and implementations are generated from the contract and the imported conformance reports by the website build.
+> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes, requirement scope and implementations are generated from the contract and the imported conformance reports by the website build.
 
 ## What an assembler does
 
@@ -122,7 +122,8 @@ None is released, so work from a checkout. The table names the commit each impor
 | --- | --- | --- | --- | --- | --- |
 | Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `8d1f4cb` | 86 of 86 pass | website `9e24a29` |
 | TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `cc42355` (draft-release) | 86 of 86 pass | website `9e24a29` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `8992cbe` (draft-release) | 85 of 86 pass; 1 changed since its run | website `fc51bf8` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `4a58ff0` | 86 of 86 pass | website `9e24a29` |
+| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `0960958` (draft-release) | 86 of 86 pass | website `9e24a29` |
 <!-- CONTRACT_IMPLEMENTATIONS_END -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
@@ -161,7 +162,18 @@ result, err := assembler.Assemble(snapshotJSON, assembler.Options{})
 
 `Options.Tokenizers` takes your own tokenizers for one call; there is no option for a renderer.
 
-All three render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
+Rust, crate `contextwindowarchitecture-assembler` (Rust 1.80 or newer; a git dependency on the repository):
+
+```rust
+use contextwindowarchitecture_assembler::{assemble, assemble_with, Error, Options};
+
+let assembly = assemble(&snapshot_bytes)?; // Error::Rejected or Error::Unsupported before assembly
+// assembly.payload is None when the assembly is refused, and assembly.trace holds the trace.
+```
+
+`assemble_with(&snapshot_bytes, &Options::new().tokenizer(id, count))` takes your own tokenizer under an ID no published tokenizer uses; a published ID is `Error::PublishedId`, and there is no option for a renderer. It takes the snapshot's bytes, not parsed JSON, so the I-JSON checks see the text as written.
+
+All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
 
 ## Building a new implementation
 

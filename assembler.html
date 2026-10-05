@@ -92,7 +92,7 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
       <h2 style="margin: 0 0 24px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
       <p style="margin: 0 0 14px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">One row per requirement. The scope says how much of it an assembler can verify. <span style="color: var(--fg);">Assembler</span> rows are fully testable in assembly. <span style="color: var(--fg);">Boundary</span> rows are checked where the snapshot and its items are handed over, and the rest of the obligation sits with producers or the application; the note says which part. <span style="color: var(--fg);">Application</span> rows cannot be observed during assembly, so they are documented rather than tested.</p>
-      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python, TypeScript and Go, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
+      <p style="margin: 0 0 28px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A row moves to <span style="color: var(--fg);">implemented</span>, or <span style="color: var(--fg);">boundary-checked</span> for boundary rows, only when tests exercise every clause in its scope and pass. Both count toward the total above. Statuses are imported from the Python assembler's <span style="font-family: var(--mono); font-size: 14px;">status.json</span>, where every claim cites the tests behind it; its own tests reject a claim while any case exercising it fails. Each implementation, Python, TypeScript, Go and Rust, built independently from the spec, publishes a <span style="font-family: var(--mono); font-size: 14px;">conformance-report.json</span> that records the outcome of every published conformance case, and a row shows how many of the cases exercising it each one passes. A case counts only as it is now: one published, or changed, after an implementation's last run counts as not passing until it runs again, and the implementations table at the top of the page says how many have changed.</p>
       <div style="border: 1px solid var(--line); background: var(--bg);">
         <div class="mx" style="display: grid; grid-template-columns: 64px 92px minmax(0, 1fr) 150px; gap: 14px; padding: 10px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span>rule</span><span class="mx-kw">keyword</span><span>summary · what is checked</span><span class="mx-hide-sm">scope · status</span></div>
         <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="23">
@@ -169,7 +169,8 @@ const RULES = [
     [
       1,
       1,
-      0
+      1,
+      1
     ]
   ],
   [
@@ -182,7 +183,8 @@ const RULES = [
     [
       5,
       5,
-      4
+      5,
+      5
     ]
   ],
   [
@@ -195,7 +197,8 @@ const RULES = [
     [
       5,
       5,
-      4
+      5,
+      5
     ]
   ],
   [
@@ -206,6 +209,7 @@ const RULES = [
     "boundary-checked",
     8,
     [
+      8,
       8,
       8,
       8
@@ -221,6 +225,7 @@ const RULES = [
     [
       0,
       0,
+      0,
       0
     ]
   ],
@@ -232,6 +237,7 @@ const RULES = [
     "implemented",
     7,
     [
+      7,
       7,
       7,
       7
@@ -247,6 +253,7 @@ const RULES = [
     [
       11,
       11,
+      11,
       11
     ]
   ],
@@ -260,7 +267,8 @@ const RULES = [
     [
       1,
       1,
-      0
+      1,
+      1
     ]
   ],
   [
@@ -273,7 +281,8 @@ const RULES = [
     [
       4,
       4,
-      3
+      4,
+      4
     ]
   ],
   [
@@ -286,7 +295,8 @@ const RULES = [
     [
       4,
       4,
-      3
+      4,
+      4
     ]
   ],
   [
@@ -297,6 +307,7 @@ const RULES = [
     "boundary-checked",
     17,
     [
+      17,
       17,
       17,
       17
@@ -312,6 +323,7 @@ const RULES = [
     [
       9,
       9,
+      9,
       9
     ]
   ],
@@ -325,7 +337,8 @@ const RULES = [
     [
       5,
       5,
-      4
+      5,
+      5
     ]
   ],
   [
@@ -338,7 +351,8 @@ const RULES = [
     [
       1,
       1,
-      0
+      1,
+      1
     ]
   ],
   [
@@ -351,7 +365,8 @@ const RULES = [
     [
       7,
       7,
-      6
+      7,
+      7
     ]
   ],
   [
@@ -364,7 +379,8 @@ const RULES = [
     [
       35,
       35,
-      34
+      35,
+      35
     ]
   ],
   [
@@ -375,6 +391,7 @@ const RULES = [
     "implemented",
     47,
     [
+      47,
       47,
       47,
       47
@@ -390,7 +407,8 @@ const RULES = [
     [
       12,
       12,
-      11
+      12,
+      12
     ]
   ],
   [
@@ -401,6 +419,7 @@ const RULES = [
     "boundary-checked",
     1,
     [
+      1,
       1,
       1,
       1
@@ -416,6 +435,7 @@ const RULES = [
     [
       14,
       14,
+      14,
       14
     ]
   ],
@@ -429,7 +449,8 @@ const RULES = [
     [
       61,
       61,
-      60
+      61,
+      61
     ]
   ],
   [
@@ -442,7 +463,8 @@ const RULES = [
     [
       21,
       21,
-      20
+      21,
+      21
     ]
   ],
   [
@@ -453,6 +475,7 @@ const RULES = [
     "boundary-checked",
     5,
     [
+      5,
       5,
       5,
       5
@@ -468,6 +491,7 @@ const RULES = [
     [
       7,
       7,
+      7,
       7
     ]
   ],
@@ -479,6 +503,7 @@ const RULES = [
     "implemented",
     4,
     [
+      4,
       4,
       4,
       4
@@ -494,11 +519,12 @@ const RULES = [
     [
       3,
       3,
+      3,
       3
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"8d1f4cb1000fc2f68b5ef3bceae849b5135b34ea","tags":[],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"cc42355384a2249b338bc3ed39690a3b9f5327af","tags":["draft-release"],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"8992cbe73473b2d1744b5aa079d5956690624184","tags":["draft-release"],"websiteSha":"fc51bf8a1efa8e8c12d23623a8d28de29242b6de","total":86,"passed":85,"stale":1}];
+const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"8d1f4cb1000fc2f68b5ef3bceae849b5135b34ea","tags":[],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"cc42355384a2249b338bc3ed39690a3b9f5327af","tags":["draft-release"],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.1.0","repository":"contextwindowarchitecture/assembler-go","sha":"4a58ff0fbf916df08286527c6639a926440a32b0","tags":[],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0},{"label":"Rust","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-rust","sha":"09609583c459459e9e8b740f15d2fcc3a2d77a6f","tags":["draft-release"],"websiteSha":"9e24a299c6efec7982031e3f0e2f1bd6188d0d0c","total":86,"passed":86,"stale":0}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 const WEBSITE = "https://github.com/contextwindowarchitecture/website";
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.

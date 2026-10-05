@@ -375,7 +375,7 @@ test('an implemented claim imports as boundary-checked on a row the site scopes 
   assert.deepEqual(under.map(c => c.evidence), claims.map(c => c.evidence));
 });
 
-const IMPORTED = [['Python', 'contract/assembler-conformance.json'], ['TypeScript', 'contract/assembler-ts-conformance.json'], ['Go', 'contract/assembler-go-conformance.json']];
+const IMPORTED = [['Python', 'contract/assembler-conformance.json'], ['TypeScript', 'contract/assembler-ts-conformance.json'], ['Go', 'contract/assembler-go-conformance.json'], ['Rust', 'contract/assembler-rust-conformance.json']];
 const readJson = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
 // A case's digest, computed here independently of scripts/conformance-reports.mjs: SHA-256 over its files' paths and SHA-256s.
 async function caseDigest(dir) {

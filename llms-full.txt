@@ -4,7 +4,7 @@
 
 ## Orientation (llms.txt)
 
-> Context Window Architecture (CWA) is a draft specification for assembling every model call from typed slots. Producers emit candidate items, the application authenticates them and freezes a snapshot, and an assembler turns that snapshot into a rendered payload and a trace, deterministically and without calling a model. It is a specification, not a library: three assemblers, in Python, TypeScript and Go, implement it, and none is released.
+> Context Window Architecture (CWA) is a draft specification for assembling every model call from typed slots. Producers emit candidate items, the application authenticates them and freezes a snapshot, and an assembler turns that snapshot into a rendered payload and a trace, deterministically and without calling a model. It is a specification, not a library: four assemblers, in Python, TypeScript, Go and Rust, implement it, and none is released.
 
 The model is four planes (governance, state, evidence, interaction), eleven slots and one item shape. Every item names one slot and one authority and carries its source, version and freshness. The assembler admits it or excludes it with a reason code, resolves the conflict groups the application declared, fits what is left to the token budget in tier order, and renders it in the order a versioned placement profile gives. The trace records every one of those decisions. Requirements are numbered R-1 onward; a number is permanent and never reused.
 
@@ -19,7 +19,7 @@ The specification defines three conformance claims, and no others (spec §1):
 ### Guides
 
 - [Producers](https://contextwindowarchitecture.io/llms-producers.txt): build a retriever, memory store, MCP adapter, state service, capability policy or other producer whose items an assembler admits
-- [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the three assemblers, or build one in a new language and prove it with the conformance cases
+- [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the four assemblers, or build one in a new language and prove it with the conformance cases
 - [Full contract](https://contextwindowarchitecture.io/llms-full.txt): this file, spec §1, the slots and authority values, both guides, every requirement and the conformance README, in one file
 - [Implementation guide for coding agents](https://contextwindowarchitecture.io/contract/cwa.md): what an application integrating CWA does, one rule per line
 
@@ -28,7 +28,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a prompt-to-slots migrator
 - [Integration sketch](https://contextwindowarchitecture.io/contract/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
 - [Payload template](https://contextwindowarchitecture.io/contract/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
-- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all three assemblers render from it, byte for byte
+- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all four assemblers render from it, byte for byte
 - [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
 
 ### Specification
@@ -65,6 +65,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [assembler-python](https://github.com/contextwindowarchitecture/assembler-python): the Python reference assembler, distribution contextwindowarchitecture-assembler, module `cwa`
 - [assembler-typescript](https://github.com/contextwindowarchitecture/assembler-typescript): the TypeScript assembler, package @contextwindowarchitecture/assembler
 - [assembler-go](https://github.com/contextwindowarchitecture/assembler-go): the Go assembler, module github.com/contextwindowarchitecture/assembler-go
+- [assembler-rust](https://github.com/contextwindowarchitecture/assembler-rust): the Rust assembler, crate contextwindowarchitecture-assembler
 - [assembler-template](https://github.com/contextwindowarchitecture/assembler-template): the starting point for a port to another language: porting guide, adapter protocol and conformance scripts
 
 ### Optional
@@ -382,7 +383,7 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 
 ## Assemblers (llms-assemblers.txt)
 
-> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Three implementations exist, in Python, TypeScript and Go, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes, requirement scope and implementations are generated from the contract and the imported conformance reports by the website build.
+> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes, requirement scope and implementations are generated from the contract and the imported conformance reports by the website build.
 
 ### What an assembler does
 
@@ -499,7 +500,8 @@ None is released, so work from a checkout. The table names the commit each impor
 | --- | --- | --- | --- | --- | --- |
 | Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `8d1f4cb` | 86 of 86 pass | website `9e24a29` |
 | TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `cc42355` (draft-release) | 86 of 86 pass | website `9e24a29` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `8992cbe` (draft-release) | 85 of 86 pass; 1 changed since its run | website `fc51bf8` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `4a58ff0` | 86 of 86 pass | website `9e24a29` |
+| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `0960958` (draft-release) | 86 of 86 pass | website `9e24a29` |
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
 
@@ -537,7 +539,18 @@ result, err := assembler.Assemble(snapshotJSON, assembler.Options{})
 
 `Options.Tokenizers` takes your own tokenizers for one call; there is no option for a renderer.
 
-All three render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
+Rust, crate `contextwindowarchitecture-assembler` (Rust 1.80 or newer; a git dependency on the repository):
+
+```rust
+use contextwindowarchitecture_assembler::{assemble, assemble_with, Error, Options};
+
+let assembly = assemble(&snapshot_bytes)?; // Error::Rejected or Error::Unsupported before assembly
+// assembly.payload is None when the assembly is refused, and assembly.trace holds the trace.
+```
+
+`assemble_with(&snapshot_bytes, &Options::new().tokenizer(id, count))` takes your own tokenizer under an ID no published tokenizer uses; a published ID is `Error::PublishedId`, and there is no option for a renderer. It takes the snapshot's bytes, not parsed JSON, so the I-JSON checks see the text as written.
+
+All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
 
 ### Building a new implementation
 
@@ -928,6 +941,6 @@ It also holds one entry per directory under `rejections/`, ordered by id, in `re
 - `failed`: anything else: it assembled a payload, refused, or raised something other than a rejection. `detail` says what happened;
 - `skipped`: the case uses an optional renderer the implementation does not provide, and the check the case breaks is that renderer's, as it is in `profile-unrealizable`, `profile-invalid-tag`, the `messages-*` cases and `blocks-system-after-xml`. Only the last uses an optional renderer. `detail` names it. Every other check runs before a renderer is needed and no check needs a tokenizer, so no other rejection case is skipped, and neither is one whose renderer is required.
 
-Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of the three implementations: the Python reference assembler (beside its `status.json`), the TypeScript assembler and the Go assembler. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.website_commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
+Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of the four implementations: the Python reference assembler (beside its `status.json`), the TypeScript assembler, the Go assembler and the Rust assembler. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.website_commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
 
 Implementations vendor these cases pinned by hash, so a case changes only through a reviewed edit here.

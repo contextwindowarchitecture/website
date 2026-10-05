@@ -1,9 +1,11 @@
 {
   "source": {
-    "repository": "contextwindowarchitecture/assembler-go",
-    "commit": "4a58ff0fbf916df08286527c6639a926440a32b0",
+    "repository": "contextwindowarchitecture/assembler-rust",
+    "commit": "09609583c459459e9e8b740f15d2fcc3a2d77a6f",
     "dirty": false,
-    "tags": []
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "87f98ed34474c56823be571b5da14ea1150c37ecd2efad0475d0fef7d232c28b",
@@ -94,18 +96,10 @@
     "unpaired-surrogate": "7b229d1e9dc4babd7f127a1524bf0f0db8bd18a52d24b2447315df9bb0890eb4"
   },
   "report": {
-    "implementation": {
-      "name": "github.com/contextwindowarchitecture/assembler-go",
-      "version": "0.1.0",
-      "language": "Go"
-    },
-    "contract": {
-      "website_commit": "9e24a299c6efec7982031e3f0e2f1bd6188d0d0c",
-      "dirty": false
-    },
     "cases": [
       {
         "id": "admission-reasons",
+        "outcome": "passed",
         "rules": [
           "R-1",
           "R-2",
@@ -120,73 +114,73 @@
           "R-18",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "admission-route-slots",
+        "outcome": "passed",
         "rules": [
           "R-15",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "blocks-budget",
+        "outcome": "passed",
         "rules": [
           "R-7",
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "blocks-render",
+        "outcome": "passed",
         "rules": [
           "R-7",
           "R-10",
           "R-11",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-droppable-order",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-margin",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-margin-protected",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-margin-rounding",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-omit-after-variants",
+        "outcome": "passed",
         "rules": [
           "R-4",
           "R-12",
@@ -194,241 +188,241 @@
           "R-18",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-protected-variants",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-repeated-compress",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-route-order",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-route-tiers",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-slot-cap-before-pressure",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-slot-caps",
+        "outcome": "passed",
         "rules": [
           "R-3",
           "R-16",
           "R-18",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-slot-floor",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-slot-floor-refused",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-slot-floor-under-cap",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-tier-lowering-ignored",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-token-caps",
+        "outcome": "passed",
         "rules": [
           "R-3",
           "R-16",
           "R-18",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "budget-variant-choice",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "capability-policy-kind",
+        "outcome": "passed",
         "rules": [
           "R-15",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-fact",
+        "outcome": "passed",
         "rules": [
           "R-2",
           "R-6",
           "R-11",
           "R-15",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-instruction",
+        "outcome": "passed",
         "rules": [
           "R-3",
           "R-6",
           "R-7",
           "R-11",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-instruction-request-context",
+        "outcome": "passed",
         "rules": [
           "R-6",
           "R-11",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-refused",
+        "outcome": "passed",
         "rules": [
           "R-6",
           "R-11",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-request-context",
+        "outcome": "passed",
         "rules": [
           "R-11",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-required-slot-first",
+        "outcome": "passed",
         "rules": [
           "R-4",
           "R-11",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "conflict-surfaced-shed",
+        "outcome": "passed",
         "rules": [
           "R-11",
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "dedupe-evidence-required",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-17",
           "R-21",
           "R-24"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "dedupe-exact",
+        "outcome": "passed",
         "rules": [
           "R-21",
           "R-22",
           "R-24"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "dedupe-exemptions",
+        "outcome": "passed",
         "rules": [
           "R-6",
           "R-11",
           "R-16",
           "R-21",
           "R-24"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "dedupe-producer-reported",
+        "outcome": "passed",
         "rules": [
           "R-13",
           "R-21",
           "R-22",
           "R-24"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "diversity-cap",
+        "outcome": "passed",
         "rules": [
           "R-13",
           "R-15",
@@ -436,21 +430,21 @@
           "R-22",
           "R-24",
           "R-26"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "diversity-evidence-required",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-17",
           "R-21",
           "R-26"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "diversity-exemptions",
+        "outcome": "passed",
         "rules": [
           "R-6",
           "R-11",
@@ -459,215 +453,215 @@
           "R-24",
           "R-25",
           "R-26"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "evidence-cap-omitted",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-16",
           "R-17",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "evidence-min-included-items",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "evidence-precompute-summary",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-16",
           "R-17",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "evidence-request-context",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-17",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "evidence-retrieve-narrower",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-16",
           "R-17",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "fixture-three-slot",
+        "outcome": "passed",
         "rules": [
           "R-9",
           "R-21",
           "R-22",
           "R-23"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "history-freshness-order",
+        "outcome": "passed",
         "rules": [
           "R-7"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "messages-budget",
+        "outcome": "passed",
         "rules": [
           "R-7",
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "messages-render",
+        "outcome": "passed",
         "rules": [
           "R-7",
           "R-10",
           "R-11",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "messages-repeated-slot",
+        "outcome": "passed",
         "rules": [
           "R-7",
           "R-16",
           "R-18",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "ordering-astral-ids",
+        "outcome": "passed",
         "rules": [
           "R-3",
           "R-16",
           "R-21",
           "R-22",
           "R-23"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "placement-protected-unplaced",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-20",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "placement-required-slot-first",
+        "outcome": "passed",
         "rules": [
           "R-4",
           "R-17",
           "R-20",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "placement-unplaced-slot",
+        "outcome": "passed",
         "rules": [
           "R-20",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "protected-over-budget",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "protected-over-cap",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "protected-over-slot-cap",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "render-attribute-escaping",
+        "outcome": "passed",
         "rules": [
           "R-11",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "required-instructions-missing",
+        "outcome": "passed",
         "rules": [
           "R-4",
           "R-10",
           "R-17",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "required-slot-missing",
+        "outcome": "passed",
         "rules": [
           "R-4",
           "R-17",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "supersede-evidence-required",
+        "outcome": "passed",
         "rules": [
           "R-12",
           "R-17",
           "R-21",
           "R-25"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "supersede-exemptions",
+        "outcome": "passed",
         "rules": [
           "R-6",
           "R-11",
@@ -675,247 +669,255 @@
           "R-21",
           "R-24",
           "R-25"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "supersede-observations",
+        "outcome": "passed",
         "rules": [
           "R-2",
           "R-15",
           "R-21",
           "R-22",
           "R-25"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "threshold-beyond-2-53",
+        "outcome": "passed",
         "rules": [
           "R-2",
           "R-13",
           "R-16",
           "R-21",
           "R-22"
-        ],
-        "outcome": "passed"
+        ]
       },
       {
         "id": "tokenizer-estimate-utf8",
+        "outcome": "passed",
         "rules": [
           "R-16",
           "R-21"
-        ],
-        "outcome": "passed"
+        ]
       }
     ],
+    "contract": {
+      "dirty": false,
+      "website_commit": "9e24a299c6efec7982031e3f0e2f1bd6188d0d0c"
+    },
+    "implementation": {
+      "language": "Rust",
+      "name": "contextwindowarchitecture-assembler",
+      "version": "0.0.1"
+    },
     "rejections": [
       {
         "id": "batch-entry-not-object",
+        "outcome": "rejected",
         "rules": [
           "R-2",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "blocks-system-after-xml",
+        "outcome": "rejected",
         "rules": [
           "R-7",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "conflict-group-overlap",
+        "outcome": "rejected",
         "rules": [
           "R-11",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "conflict-group-repeated-id",
+        "outcome": "rejected",
         "rules": [
           "R-11",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "conflict-group-unknown-fact",
+        "outcome": "rejected",
         "rules": [
           "R-11",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "conflict-group-unknown-item",
+        "outcome": "rejected",
         "rules": [
           "R-11",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "duplicate-of-unknown",
+        "outcome": "rejected",
         "rules": [
           "R-13",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "integer-out-of-range",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-23"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "messages-system-after-xml",
+        "outcome": "rejected",
         "rules": [
           "R-7",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "messages-system-on-evidence",
+        "outcome": "rejected",
         "rules": [
           "R-7",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "messages-tools-on-instructions",
+        "outcome": "rejected",
         "rules": [
           "R-7",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "number-out-of-range",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-23"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "producer-in-two-batches",
+        "outcome": "rejected",
         "rules": [
           "R-15",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "producer-reason-unknown",
+        "outcome": "rejected",
         "rules": [
           "R-9",
           "R-17",
           "R-21"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-invalid-tag",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-missing-instructions",
+        "outcome": "rejected",
         "rules": [
           "R-4",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-missing-output-contract",
+        "outcome": "rejected",
         "rules": [
           "R-4",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-missing-query",
+        "outcome": "rejected",
         "rules": [
           "R-4",
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-route-mismatch",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-route-policy-mismatch",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "profile-unrealizable",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-20"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "schema-missing-budget",
+        "outcome": "rejected",
         "rules": [
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "schema-profile-spec",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-19"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "superseded-by-unknown",
+        "outcome": "rejected",
         "rules": [
           "R-9",
           "R-17"
-        ],
-        "outcome": "rejected"
+        ]
       },
       {
         "id": "unpaired-surrogate",
+        "outcome": "rejected",
         "rules": [
           "R-17",
           "R-23"
-        ],
-        "outcome": "rejected"
+        ]
       }
     ]
   }

@@ -1,6 +1,6 @@
 # Context Window Architecture
 
-> Context Window Architecture (CWA) is a draft specification for assembling every model call from typed slots. Producers emit candidate items, the application authenticates them and freezes a snapshot, and an assembler turns that snapshot into a rendered payload and a trace, deterministically and without calling a model. It is a specification, not a library: three assemblers, in Python, TypeScript and Go, implement it, and none is released.
+> Context Window Architecture (CWA) is a draft specification for assembling every model call from typed slots. Producers emit candidate items, the application authenticates them and freezes a snapshot, and an assembler turns that snapshot into a rendered payload and a trace, deterministically and without calling a model. It is a specification, not a library: four assemblers, in Python, TypeScript, Go and Rust, implement it, and none is released.
 
 The model is four planes (governance, state, evidence, interaction), eleven slots and one item shape. Every item names one slot and one authority and carries its source, version and freshness. The assembler admits it or excludes it with a reason code, resolves the conflict groups the application declared, fits what is left to the token budget in tier order, and renders it in the order a versioned placement profile gives. The trace records every one of those decisions. Requirements are numbered R-1 onward; a number is permanent and never reused.
 
@@ -15,7 +15,7 @@ The specification defines three conformance claims, and no others (spec §1):
 ## Guides
 
 - [Producers](https://contextwindowarchitecture.io/llms-producers.txt): build a retriever, memory store, MCP adapter, state service, capability policy or other producer whose items an assembler admits
-- [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the three assemblers, or build one in a new language and prove it with the conformance cases
+- [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the four assemblers, or build one in a new language and prove it with the conformance cases
 - [Full contract](https://contextwindowarchitecture.io/llms-full.txt): this file, spec §1, the slots and authority values, both guides, every requirement and the conformance README, in one file
 - [Implementation guide for coding agents](https://contextwindowarchitecture.io/contract/cwa.md): what an application integrating CWA does, one rule per line
 
@@ -24,7 +24,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a prompt-to-slots migrator
 - [Integration sketch](https://contextwindowarchitecture.io/contract/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
 - [Payload template](https://contextwindowarchitecture.io/contract/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
-- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all three assemblers render from it, byte for byte
+- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all four assemblers render from it, byte for byte
 - [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
 
 ## Specification
@@ -61,6 +61,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [assembler-python](https://github.com/contextwindowarchitecture/assembler-python): the Python reference assembler, distribution contextwindowarchitecture-assembler, module `cwa`
 - [assembler-typescript](https://github.com/contextwindowarchitecture/assembler-typescript): the TypeScript assembler, package @contextwindowarchitecture/assembler
 - [assembler-go](https://github.com/contextwindowarchitecture/assembler-go): the Go assembler, module github.com/contextwindowarchitecture/assembler-go
+- [assembler-rust](https://github.com/contextwindowarchitecture/assembler-rust): the Rust assembler, crate contextwindowarchitecture-assembler
 - [assembler-template](https://github.com/contextwindowarchitecture/assembler-template): the starting point for a port to another language: porting guide, adapter protocol and conformance scripts
 
 ## Optional
