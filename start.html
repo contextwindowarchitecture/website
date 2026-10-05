@@ -33,6 +33,7 @@
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 860px) { #tool { grid-template-columns: minmax(0, 1fr) !important; } }
+  @media (max-width: 720px) { .steprow { grid-template-columns: 32px minmax(0, 1fr) !important; } .steprow > :last-child { grid-column: 2; } #walkcard { padding: 18px 16px !important; } }
 </style>
 </helmet>
 
@@ -78,16 +79,19 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Six steps</div>
       <div style="display: flex; flex-direction: column; border: 1px solid var(--line); background: var(--bg);">
         <sc-for list="{{ steps }}" as="s" hint-placeholder-count="6">
-          <div id="{{ s.anchor }}" style="display: grid; grid-template-columns: 48px minmax(0, 260px) minmax(0, 1fr); gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--line); align-items: start;">
+          <div id="{{ s.anchor }}" class="steprow" style="display: grid; grid-template-columns: 48px minmax(0, 260px) minmax(0, 1fr); gap: 20px; padding: 22px 24px; border-bottom: 1px solid var(--line); align-items: start;">
             <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); padding-top: 4px;">{{ s.n }}</span>
             <div>
               <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.2;">{{ s.title }}</div>
               <div style="font-family: var(--mono); font-size: 11.5px; color: var(--muted); margin-top: 6px;">{{ s.rules }}</div>
             </div>
             <div style="min-width: 0;">
-              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--fg); text-wrap: pretty;">{{ s.text }}</p>
+              <p style="margin: 0; font-size: 15px; line-height: 1.6; color: var(--fg); text-wrap: pretty;">{{ s.lead }}</p>
               <div style="margin-top: 10px; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">{{ s.done }}</div>
-              <div style="display: flex; flex-wrap: wrap; gap: 4px 18px; margin-top: 8px; font-family: var(--mono); font-size: 12px; line-height: 1.6;"><sc-for list="{{ s.links }}" as="k"><a href="{{ k.href }}">{{ k.label }}</a></sc-for></div>
+              <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; margin-top: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.6;">
+                <button onClick="{{ s.open }}" disabled="{{ s.disabled }}" aria-haspopup="dialog" style="{{ s.buttonStyle }}">{{ s.walkLabel }}</button>
+                <sc-for list="{{ s.links }}" as="k"><a href="{{ k.href }}">{{ k.label }}</a></sc-for>
+              </div>
             </div>
           </div>
         </sc-for>
@@ -184,6 +188,33 @@
       <p style="margin: 32px 0 0; font-family: var(--mono); font-size: 12px; line-height: 1.6; opacity: 0.7;">The published cases and rejections, and how to run them: <a href="./conformance/README.md">conformance/README.md →</a></p>
     </div>
   </section>
+
+  <sc-if value="{{ walk.on }}" hint-placeholder-val="{{ false }}">
+    <div onKeyDown="{{ walk.key }}" onClick="{{ walk.backdrop }}" style="position: fixed; inset: 0; z-index: 90; background: oklch(0 0 0 / 0.58); display: flex; align-items: center; justify-content: center; padding: 16px;">
+      <div id="walkcard" role="dialog" aria-modal="true" aria-labelledby="walktitle" style="box-sizing: border-box; width: min(760px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--fg); padding: 22px 24px; box-shadow: 0 18px 50px oklch(0 0 0 / 0.35);">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 16px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">
+          <span id="walktitle">{{ walk.kicker }}</span>
+          <span style="color: var(--muted); white-space: nowrap;">{{ walk.count }}</span>
+        </div>
+        <div aria-live="polite" style="font-size: 18px; line-height: 1.4; letter-spacing: -0.01em; font-weight: 600; margin-bottom: 14px; text-wrap: pretty;">{{ walk.caption }}</div>
+        <div style="border: 1px solid var(--line); background: var(--surface);">
+          <div style="padding: 9px 14px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; color: var(--muted); overflow-wrap: anywhere;">{{ walk.source }}</div>
+          <div style="padding: 12px 0; max-height: 46vh; overflow: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.65;">
+            <sc-for list="{{ walk.lines }}" as="l" hint-placeholder-count="8"><div style="{{ l.style }}">{{ l.text }}</div></sc-for>
+          </div>
+        </div>
+        <div style="display: flex; gap: 2px; margin: 18px 0 16px;">
+          <sc-for list="{{ walk.dots }}" as="d" hint-placeholder-count="5"><div style="{{ d.style }}"></div></sc-for>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 10px;">
+          <button id="walknext" onClick="{{ walk.next }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="background: var(--fg); border-color: var(--fg);">{{ walk.nextLabel }}</button>
+          <button onClick="{{ walk.back }}" disabled="{{ walk.backDisabled }}" style="{{ walk.backStyle }}">Back</button>
+          <div style="flex: 1;"></div>
+          <button onClick="{{ walk.close }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; cursor: pointer; padding: 8px 4px;" style-hover="color: var(--fg);">Close</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
@@ -221,16 +252,63 @@ const SAMPLE_MESSAGES = JSON.stringify([
   { role: "user", content: "Yes, the idempotency key is passed through. Verdict?" }
 ], null, 2);
 
+// The six steps. Each row keeps one sentence and its done-when; the walkthrough shows the step on the Ada example.
+const STEPS = [
+  { anchor: "step-1", title: "Name the slots you already send", rules: "R-1 · R-7",
+    lead: "Split what you send the model today into pieces, and give each piece one of the eleven slots.",
+    done: "Done when: every piece has a slot, or is written down as unassigned.", links: [{ label: "the samples below", href: "#migrate" }] },
+  { anchor: "step-2", title: "Freeze a snapshot and hand it to an assembler", rules: "R-7 · R-11 · R-15 · R-16 · R-23 · §1",
+    lead: "Freeze everything one model call needs into a snapshot, and let a conformant assembler turn it into the request.",
+    done: "Done when: the assembler accepts the snapshot, cwa-messages/v1 renders your items under the profile you chose, and the trace hashes that payload.",
+    links: [{ label: "Assembler page", href: "./assembler.html" }, { label: "snapshot.schema.json", href: "./schema/snapshot.schema.json" }, { label: "example snapshot", href: "./examples/messages-snapshot.json" }] },
+  { anchor: "step-3", title: "Give every item an authority and a source", rules: "R-1 · R-2 · R-3 · R-9 · R-10 · R-13",
+    lead: "Turn each piece into an item that says where it came from, when it was true, and with what authority it speaks.",
+    done: "Done when: every item validates against the item schema, and an assembler admits it: its trace lists no exclusion for it.",
+    links: [{ label: "context_item.schema.json", href: "./schema/context_item.schema.json" }, { label: "item checks, by example", href: "./producers.html#linter" }] },
+  { anchor: "step-4", title: "Check the trace and run two checks", rules: "R-13 · R-21 · R-23",
+    lead: "Read the trace the assembler returns, then show that the same snapshot gives the same bytes and that a missing field is excluded.",
+    done: "Done when: the trace passes structural validation and both checks pass.",
+    links: [{ label: "trace.schema.json", href: "./schema/trace.schema.json" }, { label: "example trace", href: "./examples/messages-trace.json" }, { label: "reading a trace", href: "./producers.html#validator" }, { label: "conformance corpus", href: "./conformance/README.md" }] },
+  { anchor: "step-5", title: "Pick a placement profile", rules: "R-4 · R-17 · R-19 · R-20",
+    lead: "Choose the published profile whose route matches yours, since it decides where each slot goes and in what order.",
+    done: "Done when: the assembler accepts the snapshot under that profile, and the trace names a profile id and version you chose deliberately.",
+    links: [{ label: "Evidence page", href: "./evidence.html" }] },
+  { anchor: "step-6", title: "Move enforcement out of the prompt", rules: "R-5",
+    lead: "Give every never, always and must in your governance items a guard that runs outside the model.",
+    done: "Done when: every invariant has a named guard, and the prompt no longer carries the only copy of it.", links: [] }
+];
+// What an assembler records once refunds-eu:v17#p4 loses its relevance: the Python assembler's trace of that edit.
+const UNSCORED_ROW = { item_id: "refunds-eu:v17#p4", reason: "missing_field:relevance", stage: "assembler", slot: "evidence.knowledge" };
+// Step 6's guards are sketches of application code, in the language of the scaffold's assemble.py.
+const GUARD_TOOL = `# Sketch: the application's tool wrapper, not the model's.
+def issue_refund(order_id, amount, session):
+    order = session.confirmed.get(order_id)    # set only by lookup_order
+    if order is None or not order["eligible"]:
+        raise PermissionError("lookup_order has not confirmed eligibility")
+    return refunds.issue(order_id, min(amount, order["total"]))`;
+const GUARD_REPLY = `# Sketch: runs on every reply before it is sent.
+PRICE = re.compile(r"[€$£]\\s?(\\d+(?:\\.\\d{2})?)")
+
+def check_reply(text, tool_results):
+    verified = {str(r.get("total")) for r in tool_results}   # obs:order-8821 gives "240"
+    for price in PRICE.findall(text):
+        if price not in verified:
+            raise ValueError(f"unverified price {price}")
+    return text`;
+
 // The two samples the migrator shows. A reader may edit one to watch the split respond; Reset restores it.
 const SAMPLES = [{ label: "sample · system prompt", src: SAMPLE_PROMPT }, { label: "sample · message array", src: SAMPLE_MESSAGES, messages: true }];
 
 class Component extends DCLogic {
-  state = { theme: "light", menu: false, sample: 0, src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
+  state = { theme: "light", menu: false, sample: 0, src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null, walk: null, walkStep: null, walkFrame: 0 };
   componentDidMount() {
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
     import("./scaffolds.js").then(m => this.setState({ scaffolds: m.SCAFFOLDS })).catch(() => this.setState({ scaffoldError: "Downloads could not load. Reload the page to retry." }));
+    const file = name => fetch("./examples/" + name).then(r => r.ok ? r.json() : Promise.reject(r.status));
+    Promise.all([file("messages-snapshot.json"), file("messages-payload.json"), file("messages-trace.json")])
+      .then(([snapshot, payload, trace]) => this.setState({ walk: { snapshot, payload, trace } })).catch(() => {});
   }
   componentWillUnmount() { clearTimeout(this._c); }
   applyTheme(t) {
@@ -321,6 +399,138 @@ class Component extends DCLogic {
     const fb = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta); done(); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb); else fb();
   }
+  // Snippet lines. json() marks the lines that set one of the given keys; text() marks the lines a test accepts.
+  json(value, keys = []) {
+    return JSON.stringify(value, null, 2).split("\n").map(text => ({ text, hl: keys.some(k => text.trimStart().startsWith(JSON.stringify(k) + ":")) }));
+  }
+  text(value, mark = () => false) {
+    return value.split("\n").map(text => ({ text, hl: mark(text) }));
+  }
+  inline(value) {
+    const t = JSON.stringify(value);
+    if (t.length <= 72) return t;
+    if (Array.isArray(value)) return "[ " + value.length + " entries ]";
+    return "{ " + Object.keys(value).filter(k => typeof value[k] !== "object").slice(0, 2).map(k => JSON.stringify(k) + ": " + JSON.stringify(value[k])).join(", ") + ", … }";
+  }
+  // The frames of each step's walkthrough: the system-prompt sample for step 1, then the Ada example's snapshot,
+  // request and trace (examples/messages-*.json), loaded when the page mounts.
+  walkSteps() {
+    const mig = this.migrate(SAMPLE_PROMPT);
+    const pieces = mig.items.map(it => it.slot.padEnd(27) + (it.preview.length > 52 ? it.preview.slice(0, 51) + "…" : it.preview));
+    const pieceLines = mark => pieces.map((text, k) => ({ text, hl: mark(mig.items[k].slot) }));
+    const steps = [{ frames: [
+      { caption: "Start from what you send today: here, one system prompt in a single string.", source: "sample · system prompt", lines: this.text(SAMPLE_PROMPT) },
+      { caption: "Split it where the owner changes. Each paragraph becomes one piece, and each piece gets one of the eleven slots.", source: "pieces → slots", lines: pieceLines(() => false) },
+      { caption: "Text the application wrote is placed by what it says: rules, format, tools, the customer profile, the policy, memory, an example, the task.", source: "pieces → slots", lines: pieceLines(slot => slot !== "interaction.query") },
+      { caption: "The customer's words keep their speaker's slot however they are worded, because wording never earns authority (R-7). " + mig.summary.replace(" pieces", "") + " pieces, nothing unassigned: done.", source: "pieces → slots", lines: pieceLines(slot => slot === "interaction.query") }
+    ] }];
+    const w = this.state.walk;
+    if (!w) return steps.concat(STEPS.slice(1).map(() => ({ frames: [] })));
+    const { snapshot, payload, trace } = w;
+    const items = Object.fromEntries(snapshot.batches.flatMap(b => b.items).map(i => [i.id, i]));
+    const required = ["assembly_time", "scope", "budget", "profile", "route_policy", "tokenizer", "renderer", "batches", "conflicts"];
+    const request = [].concat(
+      payload.system.map(m => ({ text: "system  " + m.id.padEnd(18) + m.text.split("\n").join(" ⏎ "), hl: true })),
+      payload.tools.map(m => ({ text: "tools   " + m.id.padEnd(18) + JSON.parse(m.text).name, hl: true })),
+      [{ text: "", hl: false }, { text: payload.messages[0].role + " message:", hl: false }],
+      this.text(payload.messages[0].content.replace(/\n$/, "")));
+    steps.push({ frames: [
+      { caption: "Freeze everything one model call needs into a snapshot: nine required members, all fixed before assembly starts, and capabilities when the route admits tools.", source: "examples/messages-snapshot.json",
+        lines: Object.keys(snapshot).map(k => ({ text: JSON.stringify(k) + ": " + this.inline(snapshot[k]), hl: required.includes(k) })) },
+      { caption: "One batch per producer the application authenticated. The identity sits on the batch, outside the items, so an item cannot claim it.", source: "examples/messages-snapshot.json · batches",
+        lines: snapshot.batches.map(b => ({ text: b.producer.id.padEnd(18) + b.producer.kind.padEnd(18) + b.items.map(i => i.id).join(", "), hl: false })) },
+      { caption: "The route policy lists those producers, each with its kind and the slots it may send (R-15).", source: "examples/messages-snapshot.json · route_policy.producers", lines: this.json(snapshot.route_policy.producers) },
+      { caption: "budget.input is the model's context limit less reserved_output, with a margin that covers an estimating tokenizer (R-16). The tokenizer and renderer are published ones.", source: "examples/messages-snapshot.json",
+        lines: this.json({ budget: snapshot.budget, tokenizer: snapshot.tokenizer, renderer: snapshot.renderer }, ["input", "reserved_output", "margin_percent"]) },
+      { caption: "The assembler returns the request: governance as system and tools, everything else in one user message. Send it as it is, adding nothing of your own (§1).", source: "examples/messages-payload.json", lines: request }
+    ] });
+    const two = (a, ka, b, kb) => this.json(a, ka).concat([{ text: "", hl: false }], this.json(b, kb));
+    steps.push({ frames: [
+      { caption: "Step 1's policy paragraph holds two retrieved passages, so it becomes two items, never one merged blob (R-13). Here is one; its body is what the model reads.", source: "examples/messages-snapshot.json · policy-corpus", lines: this.json(items["refunds-eu:v17#p4"], ["slot", "body"]) },
+      { caption: "source and source_version name where it came from, and freshness when it was true (R-2).", source: "examples/messages-snapshot.json · policy-corpus", lines: this.json(items["refunds-eu:v17#p4"], ["source", "source_version", "freshness"]) },
+      { caption: "Authority is its slot's own role (R-1). Knowledge carries its rerank score as relevance (R-13), and evidence is marked untrusted_content (R-10).", source: "examples/messages-snapshot.json · policy-corpus", lines: this.json(items["refunds-eu:v17#p4"], ["authority", "relevance", "injection_risk"]) },
+      { caption: "A memory item carries an expiry, and a source naming the turn it came from (R-9).", source: "examples/messages-snapshot.json · memory-svc", lines: this.json(items["mem:plan-purchase"], ["source", "expires"]) },
+      { caption: "A prior model turn is generated content with untrusted authority (R-1). Governance is verified and governs (R-10).", source: "examples/messages-snapshot.json · conversation, policy-registry",
+        lines: two(items["turn:17"], ["authority", "lineage"], items["policy:v12"], ["trust"]) }
+    ] });
+    steps.push({ frames: [
+      { caption: "Every assembly returns a trace. This one included all " + trace.included.length + " items, each with its slot and its token count.", source: "examples/messages-trace.json · included",
+        lines: trace.included.map(r => ({ text: r.slot.padEnd(27) + r.item_id.padEnd(21) + r.tokens, hl: false })) },
+      { caption: "Nothing excluded or compressed, no conflict, and not refused. When something is left out, excluded says which item and why (R-21).", source: "examples/messages-trace.json",
+        lines: this.json({ excluded: trace.excluded, compressed: trace.compressed, conflicts: trace.conflicts, refused: trace.refused }) },
+      { caption: "First check: assemble the same snapshot twice and compare result.hash, the SHA-256 of the request bytes. Identical inputs give identical bytes (R-23).", source: "examples/messages-trace.json",
+        lines: this.json({ result: trace.result, snapshot_digest: trace.context.snapshot_digest }, ["hash"]) },
+      { caption: "Second check: remove relevance from refunds-eu:v17#p4 and assemble again. The trace records the exclusion and why (R-13, R-21).", source: "examples/messages-trace.json · excluded, after that edit", lines: this.json(UNSCORED_ROW, ["reason"]) }
+    ] });
+    const profile = snapshot.profile;
+    const parser = snapshot.route_policy.parser === true;
+    const placement = mark => profile.placement.map(p => ({ text: p.slot.padEnd(27) + p.wrap, hl: mark(p) }));
+    steps.push({ frames: [
+      { caption: "The snapshot names its profile. Its spec, route and route policy version must match the snapshot's route policy, or the assembler rejects the snapshot (R-17, R-20).", source: "examples/messages-snapshot.json · profile",
+        lines: this.json({ spec: profile.spec, id: profile.id, version: profile.version, route: profile.route, route_policy_version: profile.route_policy_version }, ["spec", "route", "route_policy_version"]) },
+      { caption: "placement puts the slots in order and says how each is wrapped. cwa-messages/v1 takes system only on governance slots, and tools only on governance.capabilities (R-19).", source: "examples/messages-snapshot.json · profile.placement",
+        lines: placement(p => p.wrap === "system" || p.wrap === "tools") },
+      { caption: "It places governance.instructions and interaction.query, as every profile must. " + (parser ? "This route parses replies, so it places the output contract too (R-4)." : "This route sets no parser, so it need not place the output contract (R-4)."), source: "examples/messages-snapshot.json · profile.placement",
+        lines: placement(p => p.slot === "governance.instructions" || p.slot === "interaction.query" || (parser && p.slot === "governance.output_contract")) },
+      { caption: "evaluation.status stays unevaluated until you have a reproducible route evaluation: fine for a draft like this one, never for deployment.", source: "examples/messages-snapshot.json · profile.evaluation", lines: this.json(profile.evaluation, ["status"]) }
+    ] });
+    const rules = mig.items.filter(it => it.slot.startsWith("governance.") && it.slot !== "governance.examples").flatMap(it => it.preview.split(/(?<=\.)\s+/));
+    const invariant = t => /\b(never|always|must|only|do not)\b/i.test(t);
+    steps.push({ frames: [
+      { caption: "Search the governance text for never, always, must and only. Each is an invariant the model could be talked out of.", source: "sample · system prompt, governance pieces", lines: rules.map(text => ({ text, hl: invariant(text) })) },
+      { caption: "Keep each sentence as guidance, and add a guard the model cannot talk past. A tool wrapper enforces the order of calls.", source: "sketch · tools.py", lines: this.text(GUARD_TOOL, t => t.includes("raise")) },
+      { caption: "A check on every reply enforces what a reply may say: no price the tools did not return.", source: "sketch · reply_check.py", lines: this.text(GUARD_REPLY, t => t.includes("raise")) },
+      { caption: "Done when each invariant has a named guard, and the prompt is no longer its only copy.", source: "invariant → guard",
+        lines: rules.filter(invariant).flatMap(t => [{ text: t, hl: false }, { text: "  → " + (/price/i.test(t) ? "check_reply" : /issue_refund/.test(t) ? "the issue_refund wrapper" : /competitor/i.test(t) ? "check_reply, against a competitor list" : "a guard of your own"), hl: true }]) }
+    ] });
+    return steps;
+  }
+  openWalk(step) {
+    if (step > 0 && !this.state.walk) return;
+    try { this._walkReturn = document.activeElement; } catch (e) {}
+    this.setState({ walkStep: step, walkFrame: 0 }, () => { try { document.getElementById("walknext").focus(); } catch (e) {} });
+  }
+  closeWalk() {
+    this.setState({ walkStep: null }, () => { try { this._walkReturn && this._walkReturn.focus(); } catch (e) {} });
+  }
+  walkGo(d) {
+    const steps = this.walkSteps();
+    const step = this.state.walkStep, frame = this.state.walkFrame + d;
+    if (frame < 0) return;
+    if (frame < steps[step].frames.length) return this.setState({ walkFrame: frame });
+    if (step + 1 < STEPS.length && this.state.walk) return this.setState({ walkStep: step + 1, walkFrame: 0 });
+    this.closeWalk();
+  }
+  stepRows() {
+    return STEPS.map((s, i) => {
+      const ready = i === 0 || !!this.state.walk;
+      return { ...s, n: String(i + 1).padStart(2, "0"), ready, disabled: !ready, walkLabel: "Walk through step " + (i + 1), open: () => this.openWalk(i),
+        buttonStyle: "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: " + (ready ? "var(--accent)" : "var(--muted)") + "; border: 0; border-radius: var(--pill); padding: 8px 15px; cursor: " + (ready ? "pointer" : "wait") + ";" };
+    });
+  }
+  walkVals() {
+    const step = this.state.walkStep;
+    if (step === null || step === undefined) return { on: false };
+    const frames = this.walkSteps()[step].frames;
+    const k = Math.min(this.state.walkFrame, frames.length - 1);
+    const f = frames[k];
+    const last = k === frames.length - 1;
+    const line = l => ({ text: l.text === "" ? " " : l.text, hl: l.hl, style: "padding: 0 14px 0 11px; border-left: 3px solid " + (l.hl ? "var(--accent)" : "transparent") + "; background: " + (l.hl ? "var(--accent-soft)" : "transparent") + "; white-space: pre-wrap; overflow-wrap: anywhere;" });
+    return {
+      on: true, kicker: "Step " + (step + 1) + " · " + STEPS[step].title, count: (k + 1) + " / " + frames.length,
+      caption: f.caption, source: f.source, lines: f.lines.map(line),
+      dots: frames.map((x, j) => ({ style: "flex: 1; height: 3px; background: " + (j <= k ? "var(--accent)" : "var(--line)") + ";" })),
+      nextLabel: !last ? "Next" : step + 1 < STEPS.length ? "Step " + (step + 2) + " →" : "Done",
+      next: () => this.walkGo(1), back: () => this.walkGo(-1), close: () => this.closeWalk(), backDisabled: k === 0,
+      backStyle: "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: " + (k === 0 ? "var(--line)" : "var(--muted)") + "; background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: " + (k === 0 ? "default" : "pointer") + ";",
+      key: e => {
+        if (e.key === "Escape") { e.preventDefault(); this.closeWalk(); }
+        else if (e.key === "ArrowRight") { e.preventDefault(); this.walkGo(1); }
+        else if (e.key === "ArrowLeft") { e.preventDefault(); this.walkGo(-1); }
+      },
+      backdrop: e => { if (e.target === e.currentTarget) this.closeWalk(); }
+    };
+  }
   chip(active) {
     return "font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; background: transparent; border: 1px solid " + (active ? "var(--fg)" : "var(--line)") + "; border-radius: var(--pill); padding: 7px 14px; cursor: pointer; color: " + (active ? "var(--fg)" : "var(--muted)") + ";";
   }
@@ -338,14 +548,8 @@ class Component extends DCLogic {
       menuOpen: this.state.menu ? "true" : "false",
       menuLabel: this.state.menu ? "close" : "menu",
       toggleMenu: () => this.setState(s => ({ menu: !s.menu })),
-      steps: [
-        { n: "01", anchor: "step-1", title: "Name the slots you already send", rules: "R-1", text: "Take the function that builds your model call and split its output into pieces. Give each piece one of the eleven slot names. Anything that does not fit is a finding: either it belongs in two slots and should be two items, or it should not be in the window at all.", done: "Done when: every piece has a slot, or is written down as unassigned.", links: [] },
-        { n: "02", anchor: "step-2", title: "Freeze a snapshot and hand it to an assembler", rules: "R-7 · R-11 · R-15 · R-16 · R-23 · §1", text: "You do not write the assembler. Your application freezes one input, the snapshot, and hands it to a conformant assembler; the Python, TypeScript, Go and Rust implementations are on the Assembler page. A snapshot has nine required members, all fixed before assembly starts. batches holds one batch per producer your application authenticated, each {producer: {id, kind}, items, excluded}, so the identity stays bound outside the items. route_policy names the route and its version, and lists those producers with their kinds and the slots each may send. profile is the one you pick in step 5. budget.input is the model's context limit less budget.reserved_output, with a budget.margin_percent that covers the error when the tokenizer estimates, as estimate-utf8/v1 does. renderer names a published renderer, such as cwa-messages/v1; tokenizer names a published tokenizer, or your own under an ID no published tokenizer uses. assembly_time, scope and conflicts, the conflict groups you declare ([] when there are none), complete it, and a route that admits tools adds capabilities, its allow-list. Hand the model each text in the role the renderer assigns, the rest in the one user message, and nothing of your own. Cache breakpoints and other request settings are yours to add; they are not text, so the trace still describes what the model reads (§1).", done: "Done when: the assembler accepts the snapshot, cwa-messages/v1 renders your items under the profile you chose, and the trace hashes that payload.", links: [{ label: "Assembler page", href: "./assembler.html" }, { label: "snapshot.schema.json", href: "./schema/snapshot.schema.json" }, { label: "example snapshot", href: "./examples/messages-snapshot.json" }] },
-        { n: "03", anchor: "step-3", title: "Give every item an authority and a source", rules: "R-1 · R-2 · R-3 · R-9 · R-10 · R-13", text: "Each item needs the eight minimum fields. Authority is the slot's own role (R-1): only tool results, memory and history may carry untrusted instead, and prior model turns in history must. Source and source_version name where the content really came from: a policy file and its commit, a database row and its read time, a retriever and its index version. If you cannot name a source, you have found content with no owner. A history turn's freshness is when it was said, and turns render in that order (R-7). Some slots ask for more: a memory item carries expires and a source naming the turn it came from (R-9), and a knowledge item its rerank score as relevance (R-13). A governance item needs trust: verified. The query, history, memory and evidence carry injection_risk: untrusted_content (R-10); it is their slot's default, which the assembler fills and traces when the field is omitted (R-3), and an item there marked none is excluded unless a verified MCP server produced it.", done: "Done when: every item validates against the item schema, and an assembler admits it: its trace lists no exclusion for it.", links: [{ label: "context_item.schema.json", href: "./schema/context_item.schema.json" }, { label: "item checks, by example", href: "./producers.html#linter" }] },
-        { n: "04", anchor: "step-4", title: "Check the trace and run two checks", rules: "R-13 · R-21 · R-23", text: "The assembler emits a trace with every assembly. Validate it against the trace schema and fix what fails; the Producers page reads an example trace back part by part. Then run two checks of your own. Assemble twice from the same snapshot and compare result.hash: identical inputs give identical bytes (R-23). Remove relevance from one knowledge item and confirm the trace's excluded list records it with reason missing_field:relevance (R-13, R-21). Validation is not conformance: an assembler's claim rests on a conformance-report.json that passes every published case and rejects every published rejection, which the conformance corpus defines and the Assembler page shows for each implementation.", done: "Done when: the trace passes structural validation and both checks pass.", links: [{ label: "trace.schema.json", href: "./schema/trace.schema.json" }, { label: "reading a trace", href: "./producers.html#validator" }, { label: "conformance corpus", href: "./conformance/README.md" }] },
-        { n: "05", anchor: "step-5", title: "Pick a placement profile", rules: "R-4 · R-17 · R-19 · R-20", text: "The integration sketch names the unevaluated policy-first-chat/v1 example. Read the six profiles on the Evidence page and choose the one whose route matches yours. The assembler rejects the snapshot before assembly unless the profile meets four conditions. Its spec is cwa/draft. Its route and route_policy_version equal the route policy's route and version; one id and version name one profile, and one route and version one route policy, so a profile or policy you copy and change gets a version of its own. It places governance.instructions and interaction.query, and governance.output_contract when the route sets parser: true. The renderer can realize it: cwa-messages/v1 takes system only on governance slots and tools only on governance.capabilities, with every system placement before every xml: one, and cwa-message-blocks/v1 takes the same placements. Keep evaluation.status as unevaluated until you have a reproducible route evaluation with a model version, suite, date, results and artifact: an unevaluated profile is for draft use, like this first payload, and a deployment loads only evaluated ones.", done: "Done when: the snapshot passes these checks and the trace names a profile id and version you chose deliberately.", links: [{ label: "Evidence page", href: "./evidence.html" }] },
-        { n: "06", anchor: "step-6", title: "Move enforcement out of the prompt", rules: "R-5", text: "Search your governance items for invariants: never, always, must not. Each one stays in the prompt as guidance and gains a guard outside the model: a tool wrapper, a validator on the output, a permission check. The prompt instructs; the application enforces.", done: "Done when: every invariant has a named guard, and the prompt no longer carries the only copy of it.", links: [] }
-      ],
+      steps: this.stepRows(),
+      walk: this.walkVals(),
       src: this.state.src,
       setSrc: e => this.setState({ src: e.target.value }),
       samples: SAMPLES.map((smp, i) => ({ label: smp.label, pressed: String(i === this.state.sample), style: this.chip(i === this.state.sample), load: () => this.setState({ sample: i, src: smp.src }) })),

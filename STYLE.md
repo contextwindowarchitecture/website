@@ -231,12 +231,12 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 | `1200px` | Hide the nav row (`#sitenav`), show the `#hdrmenu` button; the nav opens as a full-width panel under the header |
 | `1000px` | Docs `#layout` collapses to one column; `#toc` hidden. Landing four-column grids (`.g4`) halve |
 | `860px` | Tool panels (`#tool`) and the evidence `#diff` collapse to one column. Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
-| `720px` | Assembler matrix (`.im`, `.mx`) drops secondary columns |
+| `720px` | Assembler matrix (`.im`, `.mx`) drops secondary columns. Getting started step rows (`.steprow`) drop to two columns, the step text under its title; the walkthrough card (`#walkcard`) pads `18px 16px` |
 | `620px` | Header gutter to `20px`, header gap to `14px`, "Take the tour" hidden. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
 
 On the landing page every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid there has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
-Layers: the header sits at `z-index: 50`, the guided tour overlay at `90`. Nothing else is layered.
+Layers: the header sits at `z-index: 50`, the guided tour overlay and the step walkthrough at `90`. Nothing else is layered.
 
 ## 6. Components
 
@@ -337,6 +337,10 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 ### Guided tour overlay
 
 A fixed, `inset: 0`, `z-index: 90`, `pointer-events: none` layer holding four mask panels, a ring around the current target and a card. The card uses a `10.5px` accent kicker with a muted step count on the right, a `20px` 700 title, `15px` muted body, and a row of `2px`-gapped dots.
+
+### Step walkthrough
+
+The Getting started page's six steps each open a modal walkthrough of the Ada example. A fixed, `inset: 0`, `z-index: 90` backdrop in `oklch(0 0 0 / 0.58)` centres a `role="dialog"` card up to `760px` wide, styled like the tour card: accent kicker with the step count, then an `18px` 600 caption, a snippet panel on `--surface` with a muted mono source line, the tour's dots, a primary Next (which becomes "Step N →" and finally "Done"), a ghost Back and a muted Close. Snippet lines are `12.5px` mono; a marked line has a `3px` `--accent` left border on `--accent-soft`. Arrow keys move, Escape and a backdrop click close, focus goes to Next on open and back to the step's button on close. Snippets are read from `examples/messages-*.json` and the system-prompt sample, never typed into the page.
 
 ### Icons and logo
 

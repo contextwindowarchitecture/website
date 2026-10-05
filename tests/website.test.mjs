@@ -303,6 +303,107 @@ test('an edit that breaks the message array says it no longer parses', async () 
   assert.equal(view.renderVals().mig.parseError, '', 'the system prompt sample is text, not JSON');
 });
 
+// The six steps on the Getting started page each open a walkthrough of the Ada example: the sample prompt for step 1,
+// then examples/messages-snapshot.json, its request and its trace. Snippets are built from those files when the page
+// loads, so they cannot drift from what the assemblers produce.
+async function walkData() {
+  const file = name => fs.readFile(new URL('../examples/' + name, import.meta.url), 'utf8').then(JSON.parse);
+  return { snapshot: await file('messages-snapshot.json'), payload: await file('messages-payload.json'), trace: await file('messages-trace.json') };
+}
+const snippet = frame => [...frame.lines].map(l => l.text).join('\n');
+const marked = frame => [...frame.lines].filter(l => l.hl).map(l => l.text.trim());
+
+test('each of the six steps keeps one sentence and its done-when, and opens a walkthrough', async () => {
+  const html = await fs.readFile(new URL('../start.html', import.meta.url), 'utf8');
+  assert.ok(!html.includes('{{ s.text }}'), 'the long step paragraphs are gone');
+  const view = await component('start.html');
+  let steps = [...view.renderVals().steps];
+  assert.deepEqual(steps.map(s => s.ready), [true, false, false, false, false, false], 'steps 2 to 6 wait for the example files');
+  view.state.walk = await walkData();
+  steps = [...view.renderVals().steps];
+  assert.equal(steps.length, 6);
+  steps.forEach((s, i) => {
+    assert.equal(s.ready, true);
+    assert.equal(s.walkLabel, `Walk through step ${i + 1}`);
+    assert.match(s.lead, /^[^.]+\.$/, `step ${i + 1}: one sentence`);
+    assert.ok(s.lead.split(' ').length <= 24, `step ${i + 1}: ${s.lead.split(' ').length} words`);
+    assert.match(s.done, /^Done when: /);
+  });
+});
+
+test('every walkthrough frame has a caption and a snippet, and marks what it talks about', async () => {
+  const view = await component('start.html');
+  view.state.walk = await walkData();
+  const steps = [...view.walkSteps()];
+  assert.equal(steps.length, 6);
+  for (const [i, step] of steps.entries()) {
+    assert.ok(step.frames.length >= 3 && step.frames.length <= 5, `step ${i + 1}: ${step.frames.length} frames`);
+    for (const frame of step.frames) {
+      assert.ok(frame.caption.length > 0 && frame.source.length > 0, `step ${i + 1}`);
+      assert.ok([...frame.lines].length > 0, `step ${i + 1}: ${frame.caption}`);
+    }
+  }
+});
+
+test('the walkthrough snippets are read from the Ada example, so they cannot drift', async () => {
+  const view = await component('start.html');
+  const data = view.state.walk = await walkData();
+  const [one, two, three, four, five, six] = [...view.walkSteps()].map(s => [...s.frames]);
+  const items = Object.fromEntries(data.snapshot.batches.flatMap(b => b.items).map(i => [i.id, i]));
+  // Step 1 is the system-prompt sample as the migrator splits it.
+  const sample = await component('start.html', 'SAMPLE_PROMPT');
+  assert.equal(snippet(one[0]), sample);
+  const slots = [...view.migrate(sample).items].map(i => i.slot);
+  assert.deepEqual(snippet(one[1]).split('\n').map(l => l.split(/\s+/)[0]), slots);
+  assert.deepEqual(marked(one.at(-1)).map(l => l.split(/\s+/)[0]), ['interaction.query']);
+  // Step 2: the snapshot's members, its batches, the route's producers, the budget and the request.
+  assert.deepEqual(snippet(two[0]).split('\n').map(l => l.match(/^"(\w+)"/)[1]), Object.keys(data.snapshot));
+  for (const b of data.snapshot.batches) assert.ok(snippet(two[1]).includes(b.producer.id), b.producer.id);
+  assert.deepEqual(JSON.parse(snippet(two[2])), data.snapshot.route_policy.producers);
+  for (const m of data.payload.system) assert.ok(snippet(two.at(-1)).includes(m.text.split('\n')[0]), m.id);
+  assert.ok(snippet(two.at(-1)).includes(data.payload.messages[0].content.trim().split('\n').at(-2)));
+  // Step 3: the items themselves, with the fields each caption names marked.
+  assert.deepEqual(JSON.parse(snippet(three[0])), items['refunds-eu:v17#p4']);
+  assert.deepEqual(marked(three[2]).map(l => l.split(':')[0]), ['"authority"', '"relevance"', '"injection_risk"']);
+  assert.deepEqual(JSON.parse(snippet(three[3])), items['mem:plan-purchase']);
+  // Step 4: the trace, and the row an assembler records once relevance is removed.
+  for (const row of data.trace.included) assert.ok(snippet(four[0]).includes(row.item_id), row.item_id);
+  assert.ok(snippet(four[2]).includes(data.trace.result.hash));
+  const { relevance, ...unscored } = items['refunds-eu:v17#p4'];
+  assert.equal(contract.checkItem(unscored, { assemblyTime: data.snapshot.assembly_time }).findings[0].reason, 'missing_field:relevance');
+  assert.deepEqual(JSON.parse(snippet(four.at(-1))), { item_id: 'refunds-eu:v17#p4', reason: 'missing_field:relevance', stage: 'assembler', slot: 'evidence.knowledge' });
+  // Step 5: the profile's own placement.
+  assert.deepEqual(snippet(five[1]).split('\n').map(l => l.trim().split(/\s+/)), data.snapshot.profile.placement.map(p => [p.slot, p.wrap]));
+  assert.deepEqual(marked(five[1]).map(l => l.split(/\s+/)[1]), ['system', 'tools']);
+  // Step 6: the invariants come from the sample's governance text.
+  assert.ok(marked(six[0]).some(l => l.startsWith('Never quote prices')), 'the invariant the payload keeps as guidance');
+});
+
+test('the walkthrough opens on a step, moves with Next and Back, hands on to the next step, and closes', async () => {
+  const view = await component('start.html');
+  view.state.walk = await walkData();
+  const frames = i => [...view.walkSteps()][i].frames.length;
+  [...view.renderVals().steps][2].open();
+  let w = view.renderVals().walk;
+  assert.deepEqual([w.on, w.kicker, w.count, w.backDisabled], [true, 'Step 3 · Give every item an authority and a source', `1 / ${frames(2)}`, true]);
+  w.next();
+  assert.equal(view.renderVals().walk.count, `2 / ${frames(2)}`);
+  view.renderVals().walk.back();
+  assert.equal(view.renderVals().walk.count, `1 / ${frames(2)}`);
+  view.renderVals().walk.key({ key: 'ArrowRight', preventDefault() {} });
+  assert.equal(view.renderVals().walk.count, `2 / ${frames(2)}`);
+  while (view.renderVals().walk.count !== `${frames(2)} / ${frames(2)}`) view.renderVals().walk.next();
+  assert.equal(view.renderVals().walk.nextLabel, 'Step 4 →');
+  view.renderVals().walk.next();
+  assert.deepEqual([view.renderVals().walk.kicker, view.renderVals().walk.count], ['Step 4 · Check the trace and run two checks', `1 / ${frames(3)}`]);
+  view.renderVals().walk.key({ key: 'Escape', preventDefault() {} });
+  assert.equal(view.renderVals().walk.on, false);
+  [...view.renderVals().steps][5].open();
+  while (view.renderVals().walk.nextLabel !== 'Done') view.renderVals().walk.next();
+  view.renderVals().walk.next();
+  assert.equal(view.renderVals().walk.on, false, 'Done on the last step closes the walkthrough');
+});
+
 // LICENSE and NOTICE put the specification, schemas, cases, scaffolds and site under Apache-2.0: anyone may use, copy,
 // modify and implement them, and a copy they distribute keeps the licence and NOTICE. No page may waive that.
 test('every page that speaks of the licence names Apache-2.0 and links it, and none waives its terms', async () => {
