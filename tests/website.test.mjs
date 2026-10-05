@@ -189,6 +189,35 @@ test('the migrator writes every field admission asks for, after the pinned keys'
   assert.deepEqual([developer.items[0].slot, developer.items[0].meta.split(' · ')[0]], ['governance.instructions', 'authority: governing']);
 });
 
+// The migrator shows CWA at work on its samples. It guesses slots from wording, and a guessed governance item would
+// claim trust it has not earned, so it offers nothing to download and says it is not for a reader's own prompt.
+test('the migrator is an example: no download, and it says it is not for your own prompt', async () => {
+  const html = await fs.readFile(new URL('../start.html', import.meta.url), 'utf8');
+  const section = html.match(/<section id="migrate"[\s\S]*?<\/section>/)[0];
+  assert.ok(!html.includes('downloadYaml'));
+  assert.doesNotMatch(section, /Paste a system prompt|Nothing leaves your browser/);
+  assert.match(section.replace(/\s+/g, ' '), /to see CWA in action, not to try out your own prompt/);
+  const view = await component('start.html');
+  assert.equal('downloadYaml' in view.renderVals(), false);
+});
+
+test('editing a migrator sample says so and Reset brings the sample back', async () => {
+  const view = await component('start.html');
+  const [prompt, messages] = await component('start.html', '[SAMPLE_PROMPT, SAMPLE_MESSAGES]');
+  let vals = view.renderVals();
+  assert.deepEqual([...vals.samples].map(s => s.label), ['sample · system prompt', 'sample · message array']);
+  assert.deepEqual([vals.src, vals.edited], [prompt, false]);
+  vals.setSrc({ target: { value: 'You are Ada.' } });
+  assert.equal(view.renderVals().edited, true);
+  view.renderVals().reset();
+  assert.deepEqual([view.renderVals().src, view.renderVals().edited], [prompt, false]);
+  view.renderVals().samples[1].load();
+  view.renderVals().setSrc({ target: { value: '[]' } });
+  assert.equal(view.renderVals().edited, true);
+  view.renderVals().reset();
+  assert.deepEqual([view.renderVals().src, view.renderVals().edited], [messages, false]);
+});
+
 // LICENSE and NOTICE put the specification, schemas, cases, scaffolds and site under Apache-2.0: anyone may use, copy,
 // modify and implement them, and a copy they distribute keeps the licence and NOTICE. No page may waive that.
 test('every page that speaks of the licence names Apache-2.0 and links it, and none waives its terms', async () => {

@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Getting started — Context Window Architecture</title>
-<meta name="description" content="From an existing prompt to a first assembled CWA payload in six steps. Includes the prompt-to-slots migrator and the scaffold downloads." />
+<meta name="description" content="From an existing prompt to a first assembled CWA payload in six steps. Includes a worked prompt-to-slots example and the scaffold downloads." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -65,9 +65,9 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Getting started</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">From a prompt to a payload with owners.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">You already have a function that builds the model call. These six steps turn what it sends into typed items in named slots, frozen in a snapshot that a conformant assembler renders into a payload with a trace. Following them needs nothing installed; the assembler you hand the snapshot to is one of the implementations on the <a href="./assembler.html">Assembler page</a>. Start with the migrator below or read the steps first.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">You already have a function that builds the model call. These six steps turn what it sends into typed items in named slots, frozen in a snapshot that a conformant assembler renders into a payload with a trace. Following them needs nothing installed; the assembler you hand the snapshot to is one of the implementations on the <a href="./assembler.html">Assembler page</a>. Start with a sample prompt split into slots below, or read the steps first.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
-        <a href="#migrate" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--fg);">Migrate a prompt</a>
+        <a href="#migrate" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--fg);">See a prompt in slots</a>
         <a href="#scaffold" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Download the scaffold</a>
       </div>
     </div>
@@ -97,16 +97,20 @@
 
   <section id="migrate" style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Tool · steps 1 and 3</div>
-      <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Prompt → slots migrator</h2>
-      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Paste a system prompt, or a JSON array of chat messages. The migrator proposes a slot for each piece, assigns the slot's default authority, and lists the item fields it cannot fill in for you. Only text your application wrote is split by what it says: a user or assistant message, or a paragraph that starts "User:", "Customer:" or "Q:", keeps its speaker's slot however it is worded, because wording never earns authority. It is a heuristic: a system or developer message that matches no wording goes to <span style="font-family: var(--mono); font-size: 13px;">governance.instructions</span>, and any other piece it cannot place is left unassigned rather than guessed. It keeps each body whole, as assembly does, so delimit material a user pasted into their message inside that body, in a form the material cannot imitate (<a href="./spec.html#R-10">R-10</a>). Nothing leaves your browser.</p>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Example · steps 1 and 3</div>
+      <h2 style="margin: 0 0 18px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">A prompt, split into slots</h2>
+      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Two samples, a system prompt and the same kind of conversation as a JSON array of chat messages, each split into the slots step 1 asks for. They are here to see CWA in action, not to try out your own prompt. You can edit a sample to watch the split respond, and Reset brings it back. Each piece gets a proposed slot, that slot's default authority, and the item fields still to fill in. Only text the application wrote is split by what it says: a user or assistant message, or a paragraph that starts "User:", "Customer:" or "Q:", keeps its speaker's slot however it is worded, because wording never earns authority. The proposals come from simple wording rules written for these samples. On a prompt of your own they would guess, and a guessed governance item would claim a trust it has not earned. A system or developer message that matches no wording goes to <span style="font-family: var(--mono); font-size: 13px;">governance.instructions</span>, and any other piece the rules cannot place is left unassigned. Each body stays whole, as assembly keeps it, so material a user pasted into their message is delimited inside that body, in a form the material cannot imitate (<a href="./spec.html#R-10">R-10</a>).</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px;">
-        <button onClick="{{ loadPrompt }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · system prompt</button>
-        <button onClick="{{ loadMessages }}" style="font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">sample · message array</button>
+        <sc-for list="{{ samples }}" as="smp" hint-placeholder-count="2">
+          <button onClick="{{ smp.load }}" aria-pressed="{{ smp.pressed }}" style="{{ smp.style }}">{{ smp.label }}</button>
+        </sc-for>
       </div>
       <div id="tool" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
         <div style="background: var(--bg); display: flex; flex-direction: column;">
-          <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">your prompt · text or JSON messages</div>
+          <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
+            <span>sample · text or JSON messages</span>
+            <sc-if value="{{ edited }}" hint-placeholder-val="{{ false }}"><span style="display: inline-flex; align-items: center; gap: 10px; color: var(--accent);">edited<button onClick="{{ reset }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--pill); padding: 6px 12px; cursor: pointer;" style-hover="background: var(--fg); border-color: var(--fg);">Reset example</button></span></sc-if>
+          </div>
           <textarea value="{{ src }}" onChange="{{ setSrc }}" spellcheck="false" style="flex: 1; min-height: 420px; width: 100%; padding: 18px; border: 0; outline: none; resize: vertical; background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 12.5px; line-height: 1.7;"></textarea>
         </div>
         <div style="background: var(--surface); display: flex; flex-direction: column;">
@@ -130,12 +134,11 @@
           </div>
           <div style="padding: 12px 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
             <span>items.cwa.yaml</span>
-            <button onClick="{{ downloadYaml }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Download</button>
           </div>
           <div style="padding: 16px 18px; max-height: 320px; overflow: auto; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre; color: var(--fg);">{{ mig.yaml }}</div>
         </div>
       </div>
-      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts the tokens the migrator could not assign to a slot, estimated as characters divided by four rather than counted by a published tokenizer. Every other item still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span>, a <span style="font-family: var(--mono); font-size: 13px;">source_version</span> and a <span style="font-family: var(--mono); font-size: 13px;">freshness</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>), a memory item an <span style="font-family: var(--mono); font-size: 13px;">expires</span> and a source naming its turn (<a href="./spec.html#R-9">R-9</a>), and a knowledge item a <span style="font-family: var(--mono); font-size: 13px;">relevance</span> score (<a href="./spec.html#R-13">R-13</a>). The migrator already sets governance items to <span style="font-family: var(--mono); font-size: 13px;">trust: verified</span> and marks the query, history, memory and evidence <span style="font-family: var(--mono); font-size: 13px;">injection_risk: untrusted_content</span> (<a href="./spec.html#R-10">R-10</a>). Replacing every TODO is step 3, and it is the part no tool can do for you.</p>
+      <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">"No owner" counts the tokens the rules could not assign to a slot, estimated as characters divided by four rather than counted by a published tokenizer. Every other item still needs a <span style="font-family: var(--mono); font-size: 13px;">source</span>, a <span style="font-family: var(--mono); font-size: 13px;">source_version</span> and a <span style="font-family: var(--mono); font-size: 13px;">freshness</span> before an assembler will admit it (<a href="./spec.html#R-2">R-2</a>), a memory item an <span style="font-family: var(--mono); font-size: 13px;">expires</span> and a source naming its turn (<a href="./spec.html#R-9">R-9</a>), and a knowledge item a <span style="font-family: var(--mono); font-size: 13px;">relevance</span> score (<a href="./spec.html#R-13">R-13</a>). The migrator already sets governance items to <span style="font-family: var(--mono); font-size: 13px;">trust: verified</span> and marks the query, history, memory and evidence <span style="font-family: var(--mono); font-size: 13px;">injection_risk: untrusted_content</span> (<a href="./spec.html#R-10">R-10</a>). Replacing every TODO is step 3, and it is the part no example can do for you.</p>
     </div>
   </section>
 
@@ -217,8 +220,11 @@ const SAMPLE_MESSAGES = JSON.stringify([
   { role: "user", content: "Yes, the idempotency key is passed through. Verdict?" }
 ], null, 2);
 
+// The two samples the migrator shows. A reader may edit one to watch the split respond; Reset restores it.
+const SAMPLES = [{ label: "sample · system prompt", src: SAMPLE_PROMPT }, { label: "sample · message array", src: SAMPLE_MESSAGES }];
+
 class Component extends DCLogic {
-  state = { theme: "light", menu: false, src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
+  state = { theme: "light", menu: false, sample: 0, src: SAMPLE_PROMPT, scaffold: 0, copied: false, scaffolds: null };
   componentDidMount() {
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
@@ -283,7 +289,7 @@ class Component extends DCLogic {
         flag: c.slot === "unassigned" ? "no slot proposed · assign by hand" : (c.slot === "governance.instructions" && /never|do not|must/.test(c.text.toLowerCase()) ? "contains an invariant · enforce outside the model (R-5)" : "needs " + todo(c.slot).join(" · ")) };
     });
     const y = (s) => JSON.stringify(s);
-    const yaml = ["# proposed by the migrator · replace every TODO before admission (R-2)", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(pieces.map((c, i) => {
+    const yaml = ["# proposed for this sample · replace every TODO before admission (R-2)", "profile: policy-first-chat/v1   # pick one on /evidence", "items:"].concat(pieces.map((c, i) => {
       return ["  - id: item_" + String(i + 1).padStart(2, "0"), "    slot: " + c.slot, "    authority: " + authority(c)].concat(c.model && c.slot === "interaction.history" ? ["    lineage: generated   # prior model turn (R-1)"] : [],
         ["    source: " + c.src + "   # TODO real producer" + (c.slot === "interaction.memory" ? "; memory names its turn (turn:…)" : ""), "    source_version: \"TODO\"", "    freshness: \"TODO timestamp\""],
         c.slot === "interaction.memory" ? ["    expires: \"TODO deadline\"   # R-9"] : [],
@@ -304,6 +310,9 @@ class Component extends DCLogic {
     const done = () => { this.setState({ copied: true }); clearTimeout(this._c); this._c = setTimeout(() => this.setState({ copied: false }), 2200); };
     const fb = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta); done(); };
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fb); else fb();
+  }
+  chip(active) {
+    return "font-family: var(--mono); font-size: 11.5px; letter-spacing: 0.04em; background: transparent; border: 1px solid " + (active ? "var(--fg)" : "var(--line)") + "; border-radius: var(--pill); padding: 7px 14px; cursor: pointer; color: " + (active ? "var(--fg)" : "var(--muted)") + ";";
   }
   tab(active) {
     return "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
@@ -329,10 +338,10 @@ class Component extends DCLogic {
       ],
       src: this.state.src,
       setSrc: e => this.setState({ src: e.target.value }),
-      loadPrompt: () => this.setState({ src: SAMPLE_PROMPT }),
-      loadMessages: () => this.setState({ src: SAMPLE_MESSAGES }),
+      samples: SAMPLES.map((smp, i) => ({ label: smp.label, pressed: String(i === this.state.sample), style: this.chip(i === this.state.sample), load: () => this.setState({ sample: i, src: smp.src }) })),
+      edited: this.state.src !== SAMPLES[this.state.sample].src,
+      reset: () => this.setState(s => ({ src: SAMPLES[s.sample].src })),
       mig,
-      downloadYaml: () => this.download("items.cwa.yaml", mig.yaml),
       scaffoldTabs: SC.map((s, i) => ({ label: s.label, style: this.tab(i === si), select: () => this.setState({ scaffold: i, copied: false }) })),
       scaffoldName: sc.filename, scaffoldBlurb: sc.blurb,
       scaffoldLines: sc.text.split("\n").map(t => ({ text: t === "" ? " " : t })),
