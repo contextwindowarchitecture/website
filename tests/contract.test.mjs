@@ -998,6 +998,26 @@ test('the landing page request is the cwa-messages/v1 rendering of every item in
   assert.equal(await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url), 'utf8'), canonical(request));
 });
 
+// The Getting started walkthroughs follow examples/messages-snapshot.json from prompt to trace. Its trace is what the
+// Python and TypeScript assemblers emit for it, trace_id aside, which each assembler draws at random: every item is
+// included, none excluded, and the hash is that of the landing page's request.
+test('the messages trace example is the trace of the messages snapshot', async () => {
+  const snapshot = await read('examples/messages-snapshot.json');
+  const example = await read('examples/messages-trace.json');
+  assert.equal(validateTraceSchema(example), true, JSON.stringify(validateTraceSchema.errors));
+  assert.deepEqual(checkTrace(example).findings, []);
+  const items = snapshot.batches.flatMap(b => b.items);
+  assert.deepEqual(example.included.map(i => i.item_id).sort(units), items.map(i => i.id).sort(units));
+  assert.deepEqual([example.excluded, example.compressed, example.conflicts, example.refused], [[], [], [], { bool: false, reason: null }]);
+  assert.deepEqual(example.profile, { id: snapshot.profile.id, version: snapshot.profile.version });
+  assert.deepEqual(example.budget, snapshot.budget);
+  assert.deepEqual([example.context.assembly_time, example.context.tokenizer, example.context.renderer, example.context.route_policy_version],
+    [snapshot.assembly_time, snapshot.tokenizer, snapshot.renderer, snapshot.route_policy.version]);
+  assert.equal(example.context.snapshot_digest, snapshotDigest(snapshot));
+  const payload = await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url));
+  assert.equal(example.result.hash, createHash('sha256').update(payload).digest('hex'));
+});
+
 // conformance/README.md, Tokenizers and renderers: every cwa-messages/v1 and cwa-message-blocks/v1 case's payload and
 // count, rebuilt here from its snapshot and the items its trace includes, independently of generators/messages.py. One
 // set of entries serves both renderers: cwa-messages/v1 joins their texts into its content, and cwa-message-blocks/v1

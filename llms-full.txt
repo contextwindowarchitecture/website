@@ -28,7 +28,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a worked prompt-to-slots example
 - [Integration sketch](https://contextwindowarchitecture.io/contract/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
 - [Payload template](https://contextwindowarchitecture.io/contract/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
-- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all four assemblers render from it, byte for byte
+- [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all four assemblers render from it, byte for byte, and [the trace](https://contextwindowarchitecture.io/examples/messages-trace.json) they emit
 - [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
 
 ### Specification
@@ -550,7 +550,7 @@ let assembly = assemble(&snapshot_bytes)?; // Error::Rejected or Error::Unsuppor
 
 `assemble_with(&snapshot_bytes, &Options::new().tokenizer(id, count))` takes your own tokenizer under an ID no published tokenizer uses; a published ID is `Error::PublishedId`, and there is no option for a renderer. It takes the snapshot's bytes, not parsed JSON, so the I-JSON checks see the text as written.
 
-All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
+All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot, and emit examples/messages-trace.json as its trace, `trace_id` aside.
 
 ### Building a new implementation
 

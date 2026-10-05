@@ -173,7 +173,7 @@ let assembly = assemble(&snapshot_bytes)?; // Error::Rejected or Error::Unsuppor
 
 `assemble_with(&snapshot_bytes, &Options::new().tokenizer(id, count))` takes your own tokenizer under an ID no published tokenizer uses; a published ID is `Error::PublishedId`, and there is no option for a renderer. It takes the snapshot's bytes, not parsed JSON, so the I-JSON checks see the text as written.
 
-All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot.
+All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot, and emit examples/messages-trace.json as its trace, `trace_id` aside.
 
 ## Building a new implementation
 
