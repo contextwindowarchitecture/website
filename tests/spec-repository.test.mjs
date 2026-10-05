@@ -17,7 +17,7 @@ const tracked = (...paths) => execFileSync('git', ['-C', ROOT, 'ls-files', '--',
 // The specification without the site: its text, schemas, contract data, conformance corpus and examples.
 const COPIED = () => tracked('LICENSE', 'NOTICE', 'SPEC.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
   'contract/slot-defaults.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples');
-const WRITTEN = ['README.md', '.github/workflows/ci.yml', LOCK];
+const WRITTEN = ['README.md', '.github/workflows/ci.yml', '.github/workflows/release.yml', LOCK];
 
 async function listing(dir, base = dir) {
   const names = [];
@@ -142,4 +142,32 @@ test('the Spec page, the About page and llms.txt link the specification reposito
   assert.ok(specification.split('\n').some(line => line.startsWith(`- [Specification repository](${REPOSITORY}): `)), 'llms.txt lists it under Specification');
   assert.ok((await fs.readFile(path.join(ROOT, 'llms-full.txt'), 'utf8')).includes(`(${REPOSITORY})`), 'llms-full.txt carries the link');
   assert.ok((await fs.readFile(path.join(ROOT, 'README.md'), 'utf8')).includes(`(${REPOSITORY})`), 'the README names where the export goes');
+});
+
+// Someone who follows only the specification repository learns of a new draft from its releases, so its tags are
+// released as the website's are, and a tag is released only once its files match the website at the same tag.
+test('the specification repository releases each tag, and only against the website at the same tag', async () => {
+  const files = await specRepository(ROOT, COMMIT);
+  const ci = files.get('.github/workflows/ci.yml').toString('utf8');
+  const release = files.get('.github/workflows/release.yml').toString('utf8');
+  assert.match(release, /^on:\n  push:\n    tags: \["\*"\]\n  workflow_dispatch:/m, 'a pushed tag starts it, and an existing tag can be released by hand');
+  const call = release.match(/^  ci:\n    uses: \.\/\.github\/workflows\/ci\.yml\n    with:\n((?:      .*\n)+)/m);
+  assert.ok(call, 'the release calls this repository\'s ci first');
+  const tag = '${{ inputs.tag || github.ref_name }}';
+  assert.ok(call[1].includes(`ref: refs/tags/${tag}\n`), 'ci runs on the tagged commit');
+  assert.ok(call[1].includes(`website_ref: refs/tags/${tag}\n`), 'against the website at the same tag');
+  assert.match(release, /^  release:\n    name: .*\n    needs: ci\n/m, 'no release without that check');
+  assert.match(release, /gh release create "\$TAG" --verify-tag /);
+  assert.ok(ci.includes('ref: ${{ inputs.website_ref || steps.lock.outputs.commit }}'), 'a push is checked against the commit the lock names, a release against the ref it is given');
+  assert.ok(ci.includes('node scripts/export-spec.mjs .. --check'));
+  // The notes give the draft's date as SPEC.md states it.
+  const draft = release.match(/grep -oE '([^']+)' SPEC\.md/);
+  assert.ok(draft, 'the notes read the draft date from SPEC.md');
+  assert.match(files.get('SPEC.md').toString('utf8'), new RegExp(draft[1], 'm'), 'SPEC.md states the date where the release looks for it');
+  const spec = await fs.readFile(path.join(ROOT, 'spec.html'), 'utf8');
+  for (const [, page, anchor] of release.matchAll(/https:\/\/contextwindowarchitecture\.io\/([\w.-]+)#([\w-]+)/g)) {
+    assert.equal(page, 'spec.html');
+    assert.ok(spec.includes(`id="${anchor}"`), `the notes link #${anchor} on the Spec page`);
+  }
+  assert.match(files.get('README.md').toString('utf8'), /`draft-release`/, 'the README says which tag to follow');
 });

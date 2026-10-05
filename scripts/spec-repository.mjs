@@ -1,7 +1,7 @@
 // The specification repository (github.com/contextwindowarchitecture/contextwindowarchitecture): the specification
 // without the site. This website is its only author. An export copies the files below unchanged, writes the README
-// and CI workflow kept in scripts/spec-repository/, and locks the result to the website commit it was taken at.
-// scripts/export-spec.mjs runs it.
+// and the CI and release workflows kept in scripts/spec-repository/, and locks the result to the website commit it
+// was taken at. scripts/export-spec.mjs runs it.
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
@@ -12,7 +12,11 @@ import path from 'node:path';
 export const COPIED = ['LICENSE', 'NOTICE', 'SPEC.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
   'contract/slot-defaults.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples'];
 // Written from this repository's scripts/spec-repository/ to the path the other repository needs them at.
-export const WRITTEN = { 'README.md': 'scripts/spec-repository/README.md', '.github/workflows/ci.yml': 'scripts/spec-repository/ci.yml' };
+export const WRITTEN = {
+  'README.md': 'scripts/spec-repository/README.md',
+  '.github/workflows/ci.yml': 'scripts/spec-repository/ci.yml',
+  '.github/workflows/release.yml': 'scripts/spec-repository/release.yml',
+};
 // Every path an export reads, so the command can refuse one taken from uncommitted files.
 export const SOURCES = [...COPIED, 'scripts/spec-repository'];
 // Directories the export owns whole: a file in one that the website does not publish is removed. Anything else in

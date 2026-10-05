@@ -41,7 +41,7 @@ Ajv compiles the JSON Schemas at build time. The generated browser module has no
 
 ## The specification by itself
 
-[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code and slot-default files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and CI workflow kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
+[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code and slot-default files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
 
 ```sh
 node scripts/export-spec.mjs ../contextwindowarchitecture          # write what changed; remove what is no longer published
@@ -49,6 +49,8 @@ node scripts/export-spec.mjs ../contextwindowarchitecture --check  # exit 1 if t
 ```
 
 An export writes `website.lock.json` there: the website commit it was taken at and each file's SHA-256. One that changes no file writes nothing, so the lock keeps naming a commit that holds those files. In the directories it copies whole (`schema/`, `contract/`, `conformance/`, `examples/`) it removes any file this repository does not publish; it leaves everything else in that repository alone. That repository's CI checks its files against the website commit its lock names, so push this repository first, then commit and push the export.
+
+Its releases follow this repository's. It carries the same tags, `draft-release` among them, and its release workflow releases a tag only once its files match this repository at the same tag. So move a tag here first and push it, then move the same tag there to the export's commit and push it; a tag pushed there before this repository carries it fails its check and is not released.
 
 ## What the checks establish
 
