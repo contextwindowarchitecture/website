@@ -379,6 +379,13 @@
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-04 · admission codes for any JSON type</div>
+          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
+            <li>R-1: an item whose slot, or authority, is not in the closed set is excluded with unknown_slot, or unknown_authority, whatever its JSON type. A slot of 5, null or an array also fails the schema's type, so two codes applied, and R-21 already recorded the earlier one, but nothing said so and no case held such a value: a black-box run of the four implementations found three recording unknown_slot and unknown_authority and one recording invalid_structure, while all passed every case. The reason codes and the conformance README now say it, and nothing else behaves differently.</li>
+            <li>Conformance corpus: admission-reasons adds five candidates, a slot that is a number, null or an array and an authority that is a number or null, each excluded with its unknown code, so its snapshot, trace and digest change. Its payload does not.</li>
+          </ul>
+        </div>
+        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-04 · prompt caching</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>Provider prompt caches reuse a request's leading part only up to the first byte that changed, and nothing here said how an assembled payload meets one. The entries below make the part of each call that the next one repeats exact and visible, and say what the application owns.</li>
@@ -674,7 +681,7 @@ const RULES = [
     "model",
     "MUST",
     "One slot and one authority role per item",
-    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, with two exceptions: prior model turns in history, marked lineage: generated, MUST carry untrusted, and any other item in evidence.tool_results, interaction.memory or interaction.history MAY carry untrusted instead. An item whose slot is not one of the eleven MUST be excluded with unknown_slot, one whose authority is outside the set with unknown_authority, and one whose authority is in the set but not permitted for its slot with authority_not_allowed. untrusted only keeps an item out of an instruction group's peers, so that group neither lets it prevail nor excludes it (R-6, R-11); a fact group ranks it like any other member, and every other rule of its slot still applies. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
+    "Every item MUST name exactly one slot and one authority value from the closed set in section 3.1. Governing slots MUST carry governing; state slots state; knowledge reference_only; tool results observation; memory generated; history and query user, with two exceptions: prior model turns in history, marked lineage: generated, MUST carry untrusted, and any other item in evidence.tool_results, interaction.memory or interaction.history MAY carry untrusted instead. An item whose slot is not one of the eleven, whatever its JSON type, MUST be excluded with unknown_slot, one whose authority is outside the set, whatever its JSON type, with unknown_authority, and one whose authority is in the set but not permitted for its slot with authority_not_allowed. untrusted only keeps an item out of an instruction group's peers, so that group neither lets it prevail nor excludes it (R-6, R-11); a fact group ranks it like any other member, and every other rule of its slot still applies. These values classify instruction authority or data provenance; they MUST NOT form a global factual ranking."
   ],
   [
     "model",
