@@ -498,10 +498,10 @@ None is released, so work from a checkout. The table names the commit each impor
 
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `8d1f4cb` | 86 of 86 pass | website `9e24a29` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `cc42355` (draft-release) | 86 of 86 pass | website `9e24a29` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `4a58ff0` | 86 of 86 pass | website `9e24a29` |
-| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `0960958` (draft-release) | 86 of 86 pass | website `9e24a29` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `b84a8f5` (draft-release) | 86 of 86 pass | website `79da314` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `fc23350` (draft-release) | 86 of 86 pass | website `79da314` |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `9136319` (draft-release) | 86 of 86 pass | website `79da314` |
+| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `aa3e80f` (draft-release) | 86 of 86 pass | website `79da314` |
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
 

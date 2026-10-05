@@ -1,9 +1,11 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-go",
-    "commit": "4a58ff0fbf916df08286527c6639a926440a32b0",
+    "commit": "9136319ae23ab8abb2ac8687a226fccd74f39a9a",
     "dirty": false,
-    "tags": []
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "87f98ed34474c56823be571b5da14ea1150c37ecd2efad0475d0fef7d232c28b",
@@ -100,7 +102,7 @@
       "language": "Go"
     },
     "contract": {
-      "website_commit": "9e24a299c6efec7982031e3f0e2f1bd6188d0d0c",
+      "website_commit": "79da314331b10dccdc1fc938f8e4cc5708d9cfba",
       "dirty": false
     },
     "cases": [

@@ -1,9 +1,11 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-python",
-    "commit": "8d1f4cb1000fc2f68b5ef3bceae849b5135b34ea",
+    "commit": "b84a8f5152f09f578dc4fb1d6c8eed56442cdda2",
     "dirty": false,
-    "tags": []
+    "tags": [
+      "draft-release"
+    ]
   },
   "cases_at_run": {
     "admission-reasons": "87f98ed34474c56823be571b5da14ea1150c37ecd2efad0475d0fef7d232c28b",
@@ -100,7 +102,7 @@
       "language": "python"
     },
     "contract": {
-      "website_commit": "9e24a299c6efec7982031e3f0e2f1bd6188d0d0c",
+      "website_commit": "79da314331b10dccdc1fc938f8e4cc5708d9cfba",
       "dirty": false
     },
     "cases": [
