@@ -498,7 +498,7 @@ None is released, so work from a checkout. The table names the commit each impor
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
 | Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `8d1f4cb` | 86 of 86 pass | website `9e24a29` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `fc45d82` (draft-release) | 85 of 86 pass; 1 changed since its run | website `fc51bf8` |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `cc42355` (draft-release) | 86 of 86 pass | website `9e24a29` |
 | Go | `github.com/contextwindowarchitecture/assembler-go` 0.1.0 | https://github.com/contextwindowarchitecture/assembler-go | `8992cbe` (draft-release) | 85 of 86 pass; 1 changed since its run | website `fc51bf8` |
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
