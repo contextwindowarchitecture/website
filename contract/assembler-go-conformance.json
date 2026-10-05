@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-go",
-    "commit": "9136319ae23ab8abb2ac8687a226fccd74f39a9a",
+    "commit": "9a0ea57cf7a9ffc3a0d776483d9f3ba4d54e4806",
     "dirty": false,
     "tags": [
       "draft-release"
@@ -98,7 +98,7 @@
   "report": {
     "implementation": {
       "name": "github.com/contextwindowarchitecture/assembler-go",
-      "version": "0.1.0",
+      "version": "0.0.1",
       "language": "Go"
     },
     "contract": {
