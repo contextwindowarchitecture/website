@@ -120,7 +120,7 @@ None is released, so work from a checkout. The table names the commit each impor
 <!-- CONTRACT_IMPLEMENTATIONS_START -->
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `b84a8f5` (draft-release) | 86 of 86 pass | website `79da314` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `948c28b` | 86 of 86 pass | website `e39255f` |
 | TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `fc23350` (draft-release) | 86 of 86 pass | website `79da314` |
 | Go | `github.com/contextwindowarchitecture/assembler-go` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-go | `9a0ea57` (draft-release) | 86 of 86 pass | website `79da314` |
 | Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `aa3e80f` (draft-release) | 86 of 86 pass | website `79da314` |
