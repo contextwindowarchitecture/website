@@ -1,0 +1,9 @@
+# The specification is written in contextwindowarchitecture/contextwindowarchitecture; issues here are about the site.
+blank_issues_enabled: true
+contact_links:
+  - name: A problem with the specification, a schema or a case, or a proposed change
+    url: https://github.com/contextwindowarchitecture/contextwindowarchitecture/issues/new/choose
+    about: The specification is written in its own repository; report it there.
+  - name: A question about the specification
+    url: https://github.com/contextwindowarchitecture/contextwindowarchitecture/discussions
+    about: Ask in the specification repository's Discussions.
