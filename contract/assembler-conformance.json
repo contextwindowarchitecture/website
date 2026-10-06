@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-python",
-    "commit": "83b5ae1f9a4fcf30041eabf554b86ea0f020028e",
+    "commit": "f2eada2c9e93d40bc80fea59cc266df0371317d2",
     "dirty": false,
     "tags": [
       "draft-release"
@@ -103,7 +103,7 @@
     },
     "contract": {
       "repository": "contextwindowarchitecture/website",
-      "commit": "4549cf7bc537a349d8cd0dc1a740a491f78965e0",
+      "commit": "d6397de7e8d5d622ea9c4e54b15b68276eef1759",
       "dirty": false
     },
     "cases": [
