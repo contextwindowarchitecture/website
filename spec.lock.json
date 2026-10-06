@@ -1,7 +1,9 @@
 {
   "repository": "contextwindowarchitecture/contextwindowarchitecture",
-  "commit": "161ed75c318b7e8cb5ebc3f4deb379b98381fa37",
-  "tags": [],
+  "commit": "a010650b0c914d3c9aa3ad32ccbeb67faf04831c",
+  "tags": [
+    "draft-release"
+  ],
   "files": {
     "CHANGES.md": "16c23e331ef2c423e2ddaf58154a9531e00776f56b823fb2eeb8b1be36295aed",
     "SPEC.md": "6d6d8eafe17b23949cfc88b08643f31fa1130b32c6fc1b969bf5e64738d70bb8",
@@ -318,14 +320,14 @@
     "examples/profiles.json": "729a2831c8db98460f55b59982b55bf811731185f49a40ebcc0aa70fa33bf2e8",
     "examples/route-policies.json": "6de445c24e8a8afd6b36b9eae326669d812631f0644b5f2816af703f5f4bcb54",
     "examples/trace.json": "06176c3fb8eaaed625e327e6b69a67238dc92c5a38d75936c3212a187c81768a",
-    "guides/assemblers.md": "eda6b05840c082e582cdf9b7c91b56a771ddf092712ec1cd492dbf9a2b98842d",
+    "guides/assemblers.md": "e32fce9191930896d0588003ebb98004cfec8aedf9593defb2c2d73e1b9cceaa",
     "guides/producers.md": "7e6a88f5609fe054879d698781dc5f804baec1550378819659bc13701a0c8f8e",
-    "implementations/go.json": "59d2525d35d9c8e15de3697d70a377e29996fb9f49a52ce7056b37d5b8159647",
+    "implementations/go.json": "9df3b059c3c06e30806aa9e1bfec6a2231a0e4423d799b877b7570b5e591e398",
     "implementations/index.json": "ba1a23678542963ac97687c0e56c3de2f4125bdc188951759b35316c233871ae",
-    "implementations/python.json": "de1a3b6cee70985e1b1631530e31ff7110b90c1b36e22041a5e3b6f67c267520",
-    "implementations/python.status.json": "45d18129f0a8177b93d6ea8cbde69f82b80c8b85d0b09d7aaf02ecd0de16bc79",
-    "implementations/rust.json": "595ae87b58afb37ca91815d766fe10fcf0c452ac1fd24d8be4b0cd6f43e98785",
-    "implementations/typescript.json": "25bfd1953a878a18e069f9c47f22fc17b5877151d0a2b9e9501cf89964c455e9",
+    "implementations/python.json": "d42e58b0b823f667ee148d48617ce22c0e9f08bf9f5ca03e4f3e24655d8a4603",
+    "implementations/python.status.json": "654839bdc4b0f2ff6e58a5ed1b0b3fdc1d6624a07a42f0d117549f4b09268f21",
+    "implementations/rust.json": "7eb530d4df1326f951879bc94f891b7d339f0a50537dde82dfa8c8280c0cb6bf",
+    "implementations/typescript.json": "ec5171aa1301f4406d3c82303703af2d78143ecf172b0d1fbd5ea5b05961428a",
     "schema/conflict_group.schema.json": "06b6df97c84474371194b7f8758c3264d61c96b4a50ca1e865bff3e811365b89",
     "schema/conformance_report.schema.json": "8bd0f68e0b92d70cd2fc2c82a43bcad9ed0fb056402cd92ad091c0fe85f2568a",
     "schema/context_item.schema.json": "de2de6038743aa5f0b473e409e7369aa4fffb515661a71803429fd9017ee8726",
