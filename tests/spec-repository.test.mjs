@@ -16,7 +16,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const tracked = (...paths) => execFileSync('git', ['-C', ROOT, 'ls-files', '--', ...paths], { encoding: 'utf8' }).split('\n').filter(Boolean);
 // The specification without the site: its text, schemas, contract data, conformance corpus and examples.
 const COPIED = () => tracked('LICENSE', 'NOTICE', 'SPEC.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
-  'contract/slot-defaults.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples');
+  'contract/slot-defaults.json', 'contract/model.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples');
 const WRITTEN = ['README.md', '.github/workflows/ci.yml', '.github/workflows/release.yml', LOCK];
 
 async function listing(dir, base = dir) {

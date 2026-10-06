@@ -901,7 +901,7 @@ const PLANES = [
   { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
 ];
 
-/* SLOTS, ITEM_FIELDS and EVIDENCE_STAGES repeat spec.html's SLOTS, ITEM_FIELDS and STAGES; a wording change to one belongs in both. */
+/* SLOTS, ITEM_FIELDS and EVIDENCE_STAGES repeat the slots, item fields and stages of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
 /* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
 const SLOTS = [
   ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Items that aren't verified, or that carry the injection marker, are excluded here.", "authority governing\ntier protected\nlineage verbatim"],

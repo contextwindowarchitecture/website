@@ -19,7 +19,7 @@ npm test
 | Source | Responsibility |
 | --- | --- |
 | `contract/requirements.json` | Permanent requirement IDs (R-1 through R-26; new ones append) and requirement text |
-| `spec.html` | Normative definitions and explanatory context outside the generated requirements |
+| `spec.html` | Normative definitions and explanatory context outside the generated requirements and model lists |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
 | `conformance/rejections/` | Snapshots that break exactly one snapshot check; an assembler must reject each before assembly, with no trace (R-17) |
@@ -30,19 +30,20 @@ npm test
 | `contract/assembler-go-conformance.json` | The Go assembler's conformance report, imported from a clean Go assembler checkout with `node scripts/import-conformance-report.mjs ../assembler-go contract/assembler-go-conformance.json` |
 | `contract/assembler-rust-conformance.json` | The Rust assembler's conformance report, imported from a clean Rust assembler checkout with `node scripts/import-conformance-report.mjs ../assembler-rust contract/assembler-rust-conformance.json` |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
+| `contract/model.json` | The planes, slots, item fields, authority values, conflict rules, pipeline stages and tests the Spec page lists, in its order; generates those lists on the Spec page and the stages on Producers, and fills the slot and authority tables in the llms guides |
 | `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace, and the landing page's message request with its snapshot |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |
 | `contract/*.txt`, `contract/cwa.md` | Downloadable integration guidance and rendering template |
 | `contract/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
 | `llms.txt`, `llms-producers.txt`, `llms-assemblers.txt` | Guides for language models and coding agents: `llms.txt` indexes the site in the [llms.txt](https://llmstxt.org/) format, and the producer and assembler guides are written by hand around tables the build fills in between their `CONTRACT_*` markers |
 
-The build generates `generated/`, `SPEC.md` (the Spec page's requirement index and sections 1 to 6 as Markdown, each section with the requirements it holds, written by `scripts/spec-markdown.mjs`), requirement arrays in the Spec and Assembler pages, slot defaults in Producers, the profile examples in Evidence and Spec, the tables in the two llms guides, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
+The build generates `generated/`, `SPEC.md` (the Spec page's requirement index and sections 1 to 6 as Markdown, each section with the requirements it holds, written by `scripts/spec-markdown.mjs`), requirement arrays in the Spec and Assembler pages, the model lists in Spec and the stages in Producers from `contract/model.json`, slot defaults in Producers, the profile examples in Evidence and Spec, the tables in the two llms guides, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 
 ## The specification by itself
 
-[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code and slot-default files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
+[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code, slot-default and model files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
 
 ```sh
 node scripts/export-spec.mjs ../contextwindowarchitecture          # write what changed; remove what is no longer published

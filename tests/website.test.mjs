@@ -511,6 +511,23 @@ test('SPEC.md holds sections 1 to 6 of the Spec page: every paragraph, label and
   assert.doesNotMatch(markdown, /\{\{|<\/?(sc-for|div|span|p|a|strong|section)\b/, 'no template or page markup is left');
 });
 
+test('the Spec and Producers pages show the planes, slots, fields, authority, conflicts, stages and tests contract/model.json lists, in its order', async () => {
+  const model = JSON.parse(await fs.readFile(new URL('../contract/model.json', import.meta.url), 'utf8'));
+  const vals = JSON.parse(JSON.stringify((await component('spec.html')).renderVals()));
+  const planeOf = slot => slot.split('.')[0];
+  const color = { governance: 'var(--p-gov)', state: 'var(--p-state)', evidence: 'var(--p-evid)', interaction: 'var(--p-inter)' };
+  assert.deepEqual(vals.planes, model.planes.map(p => ({ name: p.name, color: color[p.id], answers: p.answers, slots: model.slots.filter(s => planeOf(s.id) === p.id).map(s => s.id) })));
+  assert.deepEqual(vals.slots, model.slots.map(s => ({ id: s.id, color: color[planeOf(s.id)], holds: s.holds, rule: s.rule })));
+  assert.deepEqual([vals.mustFields, vals.shouldFields], [model.item_fields.must, model.item_fields.should]);
+  assert.deepEqual(vals.itemFields, model.item_fields.described);
+  assert.deepEqual(vals.authority.map(({ name, value, text }) => ({ name, value, text })), model.authority);
+  assert.deepEqual(vals.conflicts, model.conflicts);
+  assert.deepEqual(vals.stages.map(({ name, text }) => ({ name, text })), model.stages.map(({ name, text }) => ({ name, text })));
+  assert.deepEqual(vals.tests.map(({ name, text, rule }) => ({ name, text, requirement: rule })), model.tests);
+  const producers = JSON.parse(JSON.stringify((await component('producers.html')).renderVals()));
+  assert.deepEqual(producers.stages.map(({ name, owner, text }) => ({ name, owner, text })), model.stages);
+});
+
 test('SPEC.md puts each requirement, text unchanged, in the section the Spec page puts it in, and indexes them all', async () => {
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));

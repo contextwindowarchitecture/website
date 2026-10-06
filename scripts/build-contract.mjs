@@ -1,6 +1,5 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
-import vm from 'node:vm';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
@@ -11,6 +10,12 @@ import { specMarkdown } from './spec-markdown.mjs';
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
 const outputs = new Map();
+// Rewrites one generated constant in a page's script; a function replacement, so no "$" in the text is read as a pattern.
+const setConstant = (html, name, value) => {
+  const pattern = new RegExp(`const ${name} = [\\[{][\\s\\S]*?\\n[\\]}];`);
+  if (!pattern.test(html)) throw new Error(`No constant ${name} to write.`);
+  return html.replace(pattern, () => `const ${name} = ${JSON.stringify(value, null, 2)};`);
+};
 const itemSchema = await read('schema/context_item.schema.json');
 const traceSchema = await read('schema/trace.schema.json');
 const profileSchema = await read('schema/profile.schema.json');
@@ -20,6 +25,8 @@ const routePolicySchema = await read('schema/route_policy.schema.json');
 const snapshotSchema = await read('schema/snapshot.schema.json');
 const registryLockSchema = await read('schema/registry_lock.schema.json');
 const conformanceReportSchema = await read('schema/conformance_report.schema.json');
+// The planes, slots, item fields, authority values, conflict rules, stages and tests the Spec page lists, in its order.
+const model = await read('contract/model.json');
 const data = {
   ITEM_SCHEMA: itemSchema,
   TRACE_SCHEMA: traceSchema,
@@ -39,7 +46,7 @@ const escapeHtml = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;')
 const itemPreview = escapeHtml(JSON.stringify(data.ITEM_EXAMPLE, null, 2));
 const producers = await fs.readFile('producers.html', 'utf8');
 const failures = data.REASONS.filter(r => r.kind === 'exclusion').map(r => [r.code, r.text, Number(r.rule.slice(2))]);
-outputs.set('producers.html', producers.replace(/const SLOT_DEFAULTS = \{[\s\S]*?\n\};/,
+outputs.set('producers.html', setConstant(producers, 'STAGES', model.stages).replace(/const SLOT_DEFAULTS = \{[\s\S]*?\n\};/,
   `const SLOT_DEFAULTS = ${JSON.stringify(data.SLOT_DEFAULTS, null, 2)};`)
   .replace(/const FAILURES = \[[\s\S]*?\n\];/, `const FAILURES = ${JSON.stringify(failures, null, 2)};`)
   .replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
@@ -153,6 +160,8 @@ for (const page of ['spec.html', 'assembler.html']) {
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
   if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
   if (page === 'spec.html') {
+    for (const [name, value] of Object.entries({ PLANES: model.planes, SLOTS: model.slots, AUTHORITY: model.authority,
+      CONFLICTS: model.conflicts, STAGES: model.stages, ITEM_FIELDS: model.item_fields, TESTS: model.tests })) updated = setConstant(updated, name, value);
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     updated = updated.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
       `<!-- CONTRACT_PROFILE_START -->\n          <pre style="padding: 18px; overflow: auto; margin: 0;">${profile}</pre>\n          <!-- CONTRACT_PROFILE_END -->`);
@@ -166,27 +175,23 @@ outputs.set('SPEC.md', specMarkdown({ html: outputs.get('spec.html'), requiremen
 // llms.txt indexes the site for language models. The producer and assembler guides are written by hand around tables
 // generated here, and llms-full.txt joins all three with spec §1, the slots and authority values, every requirement
 // and the conformance README, so that one file holds the whole contract.
-const pageConstants = (html, names) => vm.runInNewContext(
-  html.match(/<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/)[1] + `\n({ ${names.join(', ')} })`, { DCLogic: class {} });
 const specHtml = await fs.readFile('spec.html', 'utf8');
-const { PLANES, SLOTS, AUTHORITY } = pageConstants(specHtml, ['PLANES', 'SLOTS', 'AUTHORITY']);
-const { STAGES } = pageConstants(producers, ['STAGES']);
 const slotOrder = Object.keys(data.SLOT_DEFAULTS);
-if (SLOTS.length !== slotOrder.length || SLOTS.some(s => !slotOrder.includes(s[0]))) throw new Error('spec.html SLOTS must name every slot in contract/slot-defaults.json.');
-const slotPlane = Object.fromEntries(SLOTS.map(s => [s[0], PLANES[s[1]]]));
+if (model.slots.length !== slotOrder.length || model.slots.some(s => !slotOrder.includes(s.id))) throw new Error('contract/model.json slots must name every slot in contract/slot-defaults.json.');
+const planeOf = slot => model.planes.find(p => p.id === slot.split('.')[0]);
 const codeSpan = text => '`' + text + '`';
 const mdTable = (head, rows) => [head, head.map(() => '---'), ...rows]
   .map(row => `| ${row.map(c => String(c).replaceAll('|', '\\|')).join(' | ')} |`).join('\n');
 const reasonTable = kind => mdTable(['Code', 'Rule', 'When'], data.REASONS.filter(r => r.kind === kind).map(r => [codeSpan(r.code), r.rule, r.text]));
 const githubTree = repository => `https://github.com/${repository}`;
 const llmsBlocks = {
-  STAGES: STAGES.map(([name, owner, text], i) => `${i + 1}. ${name} (${owner}): ${text}`).join('\n'),
+  STAGES: model.stages.map(({ name, owner, text }, i) => `${i + 1}. ${name} (${owner}): ${text}`).join('\n'),
   BATCH: '```json\n' + JSON.stringify(await read('examples/producer-batch.json'), null, 2) + '\n```',
   SLOTS: mdTable(['Slot', 'Plane', 'Holds', 'Authority', 'Tier', 'Lineage', 'injection_risk', 'conflict_policy'], slotOrder.map(slot => {
     const d = data.SLOT_DEFAULTS[slot];
-    return [codeSpan(slot), slotPlane[slot].name, SLOTS.find(s => s[0] === slot)[2], codeSpan(d.authority), d.tier, d.lineage, d.injection_risk, d.conflict_policy];
+    return [codeSpan(slot), planeOf(slot).name, model.slots.find(s => s.id === slot).holds, codeSpan(d.authority), d.tier, d.lineage, d.injection_risk, d.conflict_policy];
   })),
-  AUTHORITY: mdTable(['Authority', 'Role', 'Meaning'], AUTHORITY.map(([name, value, text]) => [codeSpan(value), name, text])),
+  AUTHORITY: mdTable(['Authority', 'Role', 'Meaning'], model.authority.map(({ name, value, text }) => [codeSpan(value), name, text])),
   EXCLUSIONS: reasonTable('exclusion'),
   REFUSALS: reasonTable('refusal'),
   SCOPE: mdTable(['Rule', 'Summary', 'Scope', 'What an assembler checks'], requirements.map((r, i) => [r.id, r.summary, scopes[i].scope, scopes[i].note])),
@@ -220,8 +225,8 @@ const conformanceSection = specHtml.match(/<section id="s1">([\s\S]*?)<\/section
 const conformanceText = [...conformanceSection.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)]
   .map(m => decodeHtml(m[1].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim());
 if (conformanceText.length === 0) throw new Error('spec.html section 1 has no paragraphs.');
-const model = PLANES.map((plane, k) => `### ${plane.name}: ${plane.answers}\n\n` + SLOTS.filter(s => s[1] === k)
-  .map(([slot, , holds, rule]) => `- ${codeSpan(slot)}: ${holds} ${rule}`).join('\n')).join('\n\n');
+const planes = model.planes.map(plane => `### ${plane.name}: ${plane.answers}\n\n` + model.slots.filter(s => planeOf(s.id) === plane)
+  .map(({ id, holds, rule }) => `- ${codeSpan(id)}: ${holds} ${rule}`).join('\n')).join('\n\n');
 outputs.set('llms-full.txt', [
   '# Context Window Architecture: the full contract\n\n' +
   '> Everything an AI agent needs to write a producer for, implement, or build an application on Context Window Architecture (CWA), a draft specification for assembling every model call from typed slots, in one file. ' +
@@ -231,7 +236,7 @@ outputs.set('llms-full.txt', [
   '## Conformance (spec §1)\n\n' + conformanceText.join('\n\n') + '\n',
   '## Planes, slots and authority values (spec §2 and §3.1)\n\n' +
   'A model call is assembled from items. Every item belongs to exactly one slot, and slots are grouped into four planes, which answer four different questions and are never merged. ' +
-  'Each slot takes the authority its defaults name (R-1); the producer guide below has the full table of defaults.\n\n' + model + '\n\n' +
+  'Each slot takes the authority its defaults name (R-1); the producer guide below has the full table of defaults.\n\n' + planes + '\n\n' +
   '### Authority values\n\n' + llmsBlocks.AUTHORITY + '\n',
   nest('Producers (llms-producers.txt)', guides['llms-producers.txt']),
   nest('Assemblers (llms-assemblers.txt)', guides['llms-assemblers.txt']),

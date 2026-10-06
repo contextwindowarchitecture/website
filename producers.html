@@ -461,15 +461,48 @@ const SLOT_DEFAULTS = {
   }
 };
 const PLANE_COLOR = { gov: "var(--p-gov)", state: "var(--p-state)", evid: "var(--p-evid)", inter: "var(--p-inter)" };
+/* Written from contract/model.json by npm run build:contract. */
 const STAGES = [
-  ["Rewrite", "producer", "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
-  ["Retrieve", "producer", "Pull candidate chunks from sources whose provenance you can name."],
-  ["Rerank", "producer", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Package", "producer", "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."],
-  ["Admit", "assembler", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
-  ["Resolve", "assembler", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
-  ["Fit", "assembler", "Refuse before any reduction if protected content can't fit (R-16, R-17). Otherwise apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If too little evidence is left on a route that requires it, refuse instead (R-12)."],
-  ["Render & trace", "assembler", "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."]
+  {
+    "name": "Rewrite",
+    "owner": "producer",
+    "text": "Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."
+  },
+  {
+    "name": "Retrieve",
+    "owner": "producer",
+    "text": "Pull candidate chunks from sources whose provenance you can name."
+  },
+  {
+    "name": "Rerank",
+    "owner": "producer",
+    "text": "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."
+  },
+  {
+    "name": "Package",
+    "owner": "producer",
+    "text": "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."
+  },
+  {
+    "name": "Admit",
+    "owner": "assembler",
+    "text": "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."
+  },
+  {
+    "name": "Resolve",
+    "owner": "assembler",
+    "text": "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."
+  },
+  {
+    "name": "Fit",
+    "owner": "assembler",
+    "text": "Refuse before any reduction if protected content can't fit (R-16, R-17). Otherwise apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If too little evidence is left on a route that requires it, refuse instead (R-12)."
+  },
+  {
+    "name": "Render & trace",
+    "owner": "assembler",
+    "text": "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."
+  }
 ];
 const FAILURES = [
   [
@@ -760,7 +793,7 @@ class Component extends DCLogic {
       toggleMenu: () => this.setState(s => ({ menu: !s.menu })),
       minimum: [["id", "Stable, and unique across the whole snapshot, not just your batch: a candidate sharing an id with another candidate or a producer exclusion is excluded with the earliest code that applies to it, duplicate_item_id when nothing earlier does. It must be a non-blank string, one with a character other than whitespace; an item without one is recorded as {producer id}#invalid-{n}, counting from 0 in batch order (R-2). The trace and the payload both cite it."], ["slot", "One of the eleven slot names, plane-prefixed."], ["source", "Which document, turn, tool call, database field, allow-list or memory write it came from. Where the route sets the slot's source_prefix, a source that does not start with it is excluded as source_invalid (R-3). The per-source cap counts items by source, so a retriever names the document, not the chunk (R-26)."], ["source_version", "The version of that source at read time. The trace records it for every included occurrence (R-22)."], ["authority", "Exactly one of the seven roles in Spec §3.1: governing, user, state, reference_only, observation, generated, untrusted. It must be allowed for the slot, and any other value is excluded."], ["freshness", "When the content was observed or true, as an RFC 3339 instant: date, T, time, any fraction, then Z or ±HH:MM, with no leap second; instants compare at full precision (R-2). It is not an expiry; that is the separate expires deadline, in the same form. A freshness later than assembly_time by more than the route's clock_skew_seconds (default 0) is excluded as future_freshness."], ["trust", "verified, unverified or untrusted. Only admission reads it, and only for governance: a governance item must be verified, or it is untrusted_in_governance (R-6, R-10). It proves no authorization (R-15), and fact groups never consult it (R-11)."], ["body", "The content itself, verbatim unless lineage says otherwise."], ["scope", "Optional: any of tenant, user, session, task, locale and step. Every key the item carries must equal the request's, and a key the request lacks never matches; the slot's required_scope can make keys mandatory. A missing key is never a wildcard. Otherwise the item is out_of_scope (R-2)."]].map(f => ({ key: f[0], text: f[1] })),
       defaults: Object.keys(SLOT_DEFAULTS).map(k => { const d = SLOT_DEFAULTS[k]; return { slot: k, color: PLANE_COLOR[d.plane], authority: d.authority, tier: d.tier, lineage: d.lineage, rest: d.injection_risk + " · " + d.conflict_policy }; }),
-      stages: STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s[0], owner: s[1], ownerColor: s[1] === "producer" ? "var(--accent)" : "var(--muted)", text: s[2] })),
+      stages: STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s.name, owner: s.owner, ownerColor: s.owner === "producer" ? "var(--accent)" : "var(--muted)", text: s.text })),
       failures: FAILURES.map(f => ({ reason: f[0], text: f[1], rule: "R-" + f[2], href: "./spec.html#R-" + f[2] })),
       isItemMode: !batch, itemPressed: String(!batch), batchPressed: String(batch),
       tabItem: this.tab(!batch), tabBatch: this.tab(batch),
