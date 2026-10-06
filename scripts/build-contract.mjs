@@ -1,5 +1,6 @@
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
@@ -27,6 +28,22 @@ const registryLockSchema = await read('schema/registry_lock.schema.json');
 const conformanceReportSchema = await read('schema/conformance_report.schema.json');
 // The planes, slots, item fields, authority values, conflict rules, stages and tests the Spec page lists, in its order.
 const model = await read('contract/model.json');
+// CHANGES.md is the specification's revision history: a draft-history paragraph, then one group per revision, newest
+// first. The Spec page's changelog and its draft date are written from it.
+const changes = (() => {
+  const text = readFileSync('CHANGES.md', 'utf8');
+  const unescape = md => md.replace(/\\([\\*<])/g, '$1');
+  const history = text.match(/^\*\*Draft history\.\*\* (.*)$/m)?.[1];
+  const groups = text.split(/^## /m).slice(1).map(block => {
+    const [heading, ...lines] = block.trim().split('\n');
+    const [, date, title] = heading.match(/^(\d{4}-\d{2}-\d{2})(?: · (.+))?$/) ?? [];
+    const bullets = lines.filter(Boolean).map(line => line.match(/^- (.+)$/)?.[1]);
+    if (!date || bullets.length === 0 || bullets.some(b => b === undefined)) throw new Error(`CHANGES.md: a group is not "## date · title" over "- " bullets: ${heading}`);
+    return { date, title: title === undefined ? null : unescape(title), bullets: bullets.map(unescape) };
+  });
+  if (!history || groups.length === 0) throw new Error('CHANGES.md needs its draft-history paragraph and at least one group.');
+  return { history: unescape(history), groups };
+})();
 const data = {
   ITEM_SCHEMA: itemSchema,
   TRACE_SCHEMA: traceSchema,
@@ -160,6 +177,15 @@ for (const page of ['spec.html', 'assembler.html']) {
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
   if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
   if (page === 'spec.html') {
+    const changelog = '\n        <p style="font-size: 15px; line-height: 1.6;"><strong>Draft history.</strong> ' + escapeHtml(changes.history) + '</p>\n\n' +
+      '        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>\n' +
+      // The last group has no space below it.
+      changes.groups.map((g, i) => `        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px;${i < changes.groups.length - 1 ? ' margin-bottom: 20px;' : ''}">\n` +
+        `          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />${g.date}${g.title === null ? '' : ' · ' + escapeHtml(g.title)}</div>\n` +
+        '          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">\n' +
+        g.bullets.map(b => `            <li>${escapeHtml(b)}</li>\n`).join('') + '          </ul>\n        </div>\n').join('') + '      ';
+    updated = updated.replace(/(<section id="changelog"[^>]*>)[\s\S]*?(<\/section>)/, (_, open, close) => open + changelog + close)
+      .replace(/Specification · draft · \d{4}-\d{2}-\d{2}/, () => `Specification · draft · ${changes.groups[0].date}`);
     for (const [name, value] of Object.entries({ PLANES: model.planes, SLOTS: model.slots, AUTHORITY: model.authority,
       CONFLICTS: model.conflicts, STAGES: model.stages, ITEM_FIELDS: model.item_fields, TESTS: model.tests })) updated = setConstant(updated, name, value);
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');

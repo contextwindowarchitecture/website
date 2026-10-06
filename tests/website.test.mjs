@@ -459,6 +459,31 @@ test('exported profiles pass the same contract as published profile examples', a
   }
 });
 
+// CHANGES.md is the specification's revision history. The Spec page's changelog and draft date are written from it,
+// and SPEC.md states the same date.
+test('the Spec page shows the changelog CHANGES.md holds, newest first, and its draft date is the newest revision\'s', async () => {
+  const changes = await fs.readFile(new URL('../CHANGES.md', import.meta.url), 'utf8');
+  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
+  const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
+  const unescape = md => md.replace(/\\([\\*<])/g, '$1');
+  const decodeEntities = text => text.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+  const groups = changes.split(/^## /m).slice(1).map(block => {
+    const [heading, ...lines] = block.trim().split('\n');
+    return { heading: unescape(heading), bullets: lines.filter(Boolean).map(line => unescape(line.replace(/^- /, ''))) };
+  });
+  const section = html.slice(html.indexOf('<section id="changelog"'), html.indexOf('</section>', html.indexOf('<section id="changelog"')));
+  const shown = [...section.matchAll(/draft<br \/>([^<]+)<\/div>\s*<ul[^>]*>([\s\S]*?)<\/ul>/g)].map(([, heading, ul]) => ({
+    heading: decodeEntities(heading), bullets: [...ul.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m => decodeEntities(m[1])) }));
+  assert.ok(groups.length > 10);
+  assert.deepEqual(shown, groups);
+  const history = unescape(changes.match(/^\*\*Draft history\.\*\* (.*)$/m)[1]);
+  assert.ok(decodeEntities(section).includes(`<strong>Draft history.</strong> ${history}</p>`), 'the draft history paragraph');
+  const dates = groups.map(g => g.heading.slice(0, 10));
+  assert.deepEqual(dates, [...dates].sort().reverse(), 'newest first');
+  assert.ok(html.includes(`Specification · draft · ${dates[0]}<`), 'the page is dated by the newest revision');
+  assert.ok(markdown.includes(`\nDraft of ${dates[0]}, `), 'SPEC.md states the same date');
+});
+
 test('specification, its Markdown copy, and status matrix share every permanent ID', async () => {
   const rules = await component('spec.html', 'RULES');
   const statuses = await component('assembler.html', 'RULES');
