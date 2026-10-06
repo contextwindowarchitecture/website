@@ -502,38 +502,65 @@ test('specification, its Markdown copy, and status matrix share every permanent 
   for (const { id } of requirements) assert.ok(markdown.includes(`### ${id}:`));
 });
 
-// SPEC.md is the Spec page's sections 1 to 6 without the page: the text read here straight from the page's markup and
-// from the values its component renders, each of which SPEC.md must hold.
 const SPEC_SECTIONS = { model: 2, gov: 3, fit: 4, prof: 5, trace: 6 };
-const decodeEntities = text => text.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
-const squash = text => text.replace(/\s+/g, ' ').trim();
-/** Markdown as the text a reader sees: no emphasis or code marks, a link as its label, a table row as its cells. */
-const readMarkdown = markdown => squash(markdown.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, '')
-  .replace(/^\| /gm, '').replace(/ \|$/gm, '').replace(/(?<!\\)\| /g, '').replace(/\\([\\*<|])/g, '$1'));
+// A plain paragraph of the page to edit in the tests below: the first that is a bare <p> holding words only.
+const plainParagraph = async source => {
+  const { specBlocks } = await import('../scripts/spec-markdown.mjs');
+  const block = specBlocks(source).blocks.find(b => b.kind === 'paragraph' && !/[\\*\[<&]/.test(b.md) &&
+    source.html.slice(b.node.start, b.node.innerStart) === '<p style="margin: 0;">' && source.html.slice(b.node.innerStart, b.node.innerEnd) === b.md);
+  assert.ok(block, 'the page has a plain paragraph');
+  return block.md;
+};
+const specSource = async () => ({
+  html: await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8'),
+  markdown: await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8'),
+  requirements: JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8')),
+  site: 'https://' + (await fs.readFile(new URL('../CNAME', import.meta.url), 'utf8')).trim() + '/',
+});
 
-test('SPEC.md holds sections 1 to 6 of the Spec page: every paragraph, label and listed value', async () => {
-  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
-  const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
-  const read = readMarkdown(markdown);
-  let sections = html.slice(html.indexOf('<section id="s1">'), html.indexOf('<section id="changelog"'));
-  // The lists a template fills in are compared through the component's values below.
-  const innermost = /<sc-for[^>]*>(?:(?!<sc-for)[\s\S])*?<\/sc-for>/g;
-  while (innermost.test(sections)) sections = sections.replace(innermost, '');
-  const written = sections.replace(/<!--[\s\S]*?-->/g, '').split(/<[^>]+>/).map(t => squash(decodeEntities(t))).filter(t => t && !/^\d$/.test(t));
-  assert.ok(written.length > 60, 'the page has text to compare');
-  for (const text of written) assert.ok(read.includes(text.replaceAll('| ', '')), `SPEC.md lacks the page's text: ${text.slice(0, 80)}`);
-  for (const [n, title] of [...html.matchAll(/<section id="s(\d)">[\s\S]*?<h2[^>]*>([^<]+)<\/h2>/g)].map(m => [m[1], decodeEntities(m[2])])) {
-    assert.ok(markdown.includes(`\n## ${n} ${title}\n`), `SPEC.md heads section ${n}`);
-  }
-  const vals = JSON.parse(JSON.stringify((await component('spec.html')).renderVals()));
-  const listed = [
-    ...vals.planes.flatMap(p => [p.name, p.answers, ...p.slots]), ...vals.slots.flatMap(s => [s.id, s.holds, s.rule]),
-    ...vals.mustFields, ...vals.shouldFields, ...vals.itemFields.flatMap(f => [f.key, f.text]),
-    ...vals.authority.flatMap(a => [a.name, a.value, a.text]), ...vals.conflicts.flatMap(c => [c.when, c.then]),
-    ...vals.stages.flatMap(s => [s.name, s.text]), ...vals.tests.flatMap(t => [t.name, t.text, t.rule]),
-  ];
-  for (const text of listed) assert.ok(read.includes(squash(text)), `SPEC.md lacks the page's value: ${text.slice(0, 80)}`);
-  assert.doesNotMatch(markdown, /\{\{|<\/?(sc-for|div|span|p|a|strong|section)\b/, 'no template or page markup is left');
+// SPEC.md is the normative text and the Spec page renders it: the page, read back as Markdown, is SPEC.md from its
+// requirement index on, byte for byte once SPEC.md's generated markers are set aside, and carries the same draft date.
+// An edit to either one alone fails here: SPEC.md's until a sync, the page's for good.
+test('the Spec page, read back, says exactly what SPEC.md says, from its requirement index to Future work', async () => {
+  const { specMarkdown, specBody } = await import('../scripts/spec-markdown.mjs');
+  const { pageMatches } = await import('../scripts/spec-page.mjs');
+  const source = await specSource();
+  const body = specBody(source.markdown);
+  assert.ok(body.startsWith('## Requirement index\n') && body.includes('\n## 6 ') && body.includes('\n## Future work · non-normative\n'));
+  assert.equal(specMarkdown(source), body);
+  assert.equal(pageMatches(source), true);
+  const sentence = await plainParagraph(source);
+  assert.equal(pageMatches({ ...source, html: source.html.replace(`>${sentence}<`, `>${sentence} Edited.<`) }), false, 'page prose edited alone');
+  assert.equal(pageMatches({ ...source, markdown: source.markdown.replace(/^Draft of \d{4}/m, 'Draft of 1999') }), false, 'another draft date');
+});
+
+test('a sync rewrites only the page blocks whose SPEC.md text changed, and lays out an added one as the page does', async () => {
+  const { syncPage, pageMatches } = await import('../scripts/spec-page.mjs');
+  const source = await specSource();
+  assert.deepEqual(syncPage(source), { html: source.html, changed: [] }, 'nothing changed, nothing written');
+  const outside = (html, inner) => html.replace(inner, '');
+  const sentence = await plainParagraph(source);
+  const paragraph = [null, sentence];
+
+  const changed = { ...source, markdown: source.markdown.replace(sentence, 'Every implementation cites requirements by number, as **R-1** shows in [the README](https://contextwindowarchitecture.io/conformance/README.md).') };
+  const after = syncPage(changed);
+  assert.equal(after.changed.length, 1);
+  assert.ok(after.html.includes('Every implementation cites requirements by number, as <strong><a href="#R-1">R-1</a></strong> shows in <a href="./conformance/README.md">the README</a>.</p>'));
+  const newInner = after.html.match(/<p style="margin: 0;">([^<]*Every implementation cites[\s\S]*?)<\/p>/)[1];
+  assert.equal(outside(after.html, newInner), outside(source.html, paragraph[1]), 'nothing outside that block moved');
+  assert.equal(pageMatches({ ...changed, html: after.html }), true);
+
+  const added = { ...source, markdown: source.markdown.replace(`${sentence}\n\n`, `${sentence}\n\nA paragraph SPEC.md added, citing R-9.\n\n`) };
+  const grown = syncPage(added);
+  assert.ok(grown.html.includes(`${sentence}</p>\n          <p style="margin: 0;">A paragraph SPEC.md added, citing <a href="#R-9">R-9</a>.</p>\n`), 'set as the paragraph before it');
+  assert.equal(pageMatches({ ...added, html: grown.html }), true);
+
+  const removed = { ...source, markdown: source.markdown.replace(`${paragraph[1]}\n\n`, '') };
+  const shrunk = syncPage(removed);
+  assert.ok(!shrunk.html.includes(sentence) && shrunk.html.length < source.html.length);
+  assert.equal(pageMatches({ ...removed, html: shrunk.html }), true);
+
+  assert.throws(() => syncPage({ ...source, markdown: source.markdown.replace('<!-- generated:tests -->', '<!-- generated:extra -->\n\nx\n\n<!-- /generated:extra -->\n\n<!-- generated:tests -->') }), /generated blocks/);
 });
 
 test('the Spec and Producers pages show the planes, slots, fields, authority, conflicts, stages and tests contract/model.json lists, in its order', async () => {
@@ -574,7 +601,7 @@ test('SPEC.md reads the same outside this repository: page links are absolute, a
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   const site = 'https://' + (await fs.readFile(new URL('../CNAME', import.meta.url), 'utf8')).trim() + '/';
   const targets = [...markdown.matchAll(/\]\(([^)]+)\)/g)].map(m => m[1]);
-  assert.ok(targets.some(t => t === site + 'spec.html'), 'SPEC.md links the page it is generated from');
+  assert.ok(targets.some(t => t === site + 'spec.html'), 'SPEC.md links the Spec page that renders it');
   for (const target of targets) {
     if (target.startsWith(site)) await fs.access(new URL('../' + target.slice(site.length).split('#')[0], import.meta.url));
     else {

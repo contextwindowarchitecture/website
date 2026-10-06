@@ -20,7 +20,8 @@ npm test
 | --- | --- |
 | `contract/requirements.json` | Permanent requirement IDs (R-1 through R-26; new ones append) and requirement text |
 | `CHANGES.md` | Every revision of the specification, newest first; the Spec page's changelog and draft date are written from it |
-| `spec.html` | Normative definitions and explanatory context outside the generated requirements and model lists |
+| `SPEC.md` | The normative text: written by hand, except the blocks between its `generated` markers, which `python3 conformance/check.py --write` writes from `contract/requirements.json`, `contract/model.json` and `examples/profiles.json` with its draft date from `CHANGES.md` |
+| `spec.html` | Renders `SPEC.md` with the site's design. After an edit to `SPEC.md`, `node scripts/spec-page.mjs --sync` rewrites the page blocks whose text changed and lays out added ones as the page does; the tests fail while the page, read back by `scripts/spec-markdown.mjs`, differs from `SPEC.md` |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
 | `conformance/rejections/` | Snapshots that break exactly one snapshot check; an assembler must reject each before assembly, with no trace (R-17) |
@@ -38,7 +39,7 @@ npm test
 | `site/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
 | `llms.txt`, `llms-producers.txt`, `llms-assemblers.txt` | Guides for language models and coding agents: `llms.txt` indexes the site in the [llms.txt](https://llmstxt.org/) format, and the producer and assembler guides are written by hand around tables the build fills in between their `CONTRACT_*` markers |
 
-The build generates `generated/`, `SPEC.md` (the Spec page's requirement index and sections 1 to 6 as Markdown, each section with the requirements it holds, written by `scripts/spec-markdown.mjs`), requirement arrays in the Spec and Assembler pages, the model lists in Spec and the stages in Producers from `contract/model.json`, slot defaults in Producers, the profile examples in Evidence and Spec, the tables in the two llms guides, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
+The build generates `generated/`, requirement arrays in the Spec and Assembler pages, the model lists in Spec and the stages in Producers from `contract/model.json`, slot defaults in Producers, the profile examples in Evidence and Spec, the Spec page's changelog and draft date from `CHANGES.md`, the tables in the two llms guides, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 

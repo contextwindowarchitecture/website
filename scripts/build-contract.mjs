@@ -6,7 +6,6 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { IMPLEMENTATIONS, caseDigestsNow, ranAt, reportErrors, tally } from './conformance-reports.mjs';
-import { specMarkdown } from './spec-markdown.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -194,14 +193,10 @@ for (const page of ['spec.html', 'assembler.html']) {
   }
   outputs.set(page, updated);
 }
-// SPEC.md is written from the Spec page as this build leaves it, so its requirements and profile are the current ones.
-const site = `https://${(await fs.readFile('CNAME', 'utf8')).trim()}/`;
-outputs.set('SPEC.md', specMarkdown({ html: outputs.get('spec.html'), requirements, site }));
 
 // llms.txt indexes the site for language models. The producer and assembler guides are written by hand around tables
 // generated here, and llms-full.txt joins all three with spec §1, the slots and authority values, every requirement
 // and the conformance README, so that one file holds the whole contract.
-const specHtml = await fs.readFile('spec.html', 'utf8');
 const slotOrder = Object.keys(data.SLOT_DEFAULTS);
 if (model.slots.length !== slotOrder.length || model.slots.some(s => !slotOrder.includes(s.id))) throw new Error('contract/model.json slots must name every slot in contract/slot-defaults.json.');
 const planeOf = slot => model.planes.find(p => p.id === slot.split('.')[0]);
@@ -246,20 +241,19 @@ const nest = (heading, text) => {
   }).join('\n');
   return `## ${heading}\n${body.trimEnd()}\n`;
 };
-const decodeHtml = text => text.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
-const conformanceSection = specHtml.match(/<section id="s1">([\s\S]*?)<\/section>/)[1];
-const conformanceText = [...conformanceSection.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/g)]
-  .map(m => decodeHtml(m[1].replace(/<[^>]+>/g, '')).replace(/\s+/g, ' ').trim());
-if (conformanceText.length === 0) throw new Error('spec.html section 1 has no paragraphs.');
+// Spec §1 as SPEC.md words it, as plain text.
+const conformanceText = (await fs.readFile('SPEC.md', 'utf8')).match(/^## 1 .*\n\n([\s\S]*?)\n\n## 2 /m)[1].split('\n\n')
+  .map(p => p.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*/g, '').replace(/\\([\\*<])/g, '$1'));
+if (conformanceText.length === 0) throw new Error('SPEC.md section 1 has no paragraphs.');
 const planes = model.planes.map(plane => `### ${plane.name}: ${plane.answers}\n\n` + model.slots.filter(s => planeOf(s.id) === plane)
   .map(({ id, holds, rule }) => `- ${codeSpan(id)}: ${holds} ${rule}`).join('\n')).join('\n\n');
 outputs.set('llms-full.txt', [
   '# Context Window Architecture: the full contract\n\n' +
   '> Everything an AI agent needs to write a producer for, implement, or build an application on Context Window Architecture (CWA), a draft specification for assembling every model call from typed slots, in one file. ' +
-  'It is generated from the website repository by npm run build:contract: llms.txt, spec §1 and the slots and authority values from the Spec page, the producer and assembler guides, ' +
-  'every requirement from contract/requirements.json, and conformance/README.md. Where anything here disagrees with the Spec page, the Spec page holds.\n',
+  'It is generated from the website repository by npm run build:contract: llms.txt, spec §1 from SPEC.md, the slots and authority values from contract/model.json, the producer and assembler guides, ' +
+  'every requirement from contract/requirements.json, and conformance/README.md. Where anything here disagrees with SPEC.md, SPEC.md holds.\n',
   nest('Orientation (llms.txt)', await fs.readFile('llms.txt', 'utf8')),
-  '## Conformance (spec §1)\n\n' + conformanceText.join('\n\n') + '\n',
+  '## Conformance (SPEC.md §1)\n\n' + conformanceText.join('\n\n') + '\n',
   '## Planes, slots and authority values (spec §2 and §3.1)\n\n' +
   'A model call is assembled from items. Every item belongs to exactly one slot, and slots are grouped into four planes, which answer four different questions and are never merged. ' +
   'Each slot takes the authority its defaults name (R-1); the producer guide below has the full table of defaults.\n\n' + planes + '\n\n' +
