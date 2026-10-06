@@ -184,3 +184,46 @@ test('the export command runs, and reports an empty checkout as not holding the 
     await fs.rm(dir, { recursive: true, force: true });
   }
 });
+
+// The closure gate of the spec-separation plan (A8): the exported files are a specification that runs by itself, says
+// nothing of how this site is built, and copies back over the site without a change.
+const PYTHON = process.env.CWA_PYTHON?.includes('/') ? path.resolve(process.env.CWA_PYTHON) : process.env.CWA_PYTHON ?? 'python3';
+const pythonReady = spawnSync(PYTHON, ['-c', 'import jsonschema, rfc3339_validator'], { encoding: 'utf8' }).status === 0;
+
+test('the exported specification runs alone: check.py, its tests and the regeneration pass with no website beside it, and change nothing', { skip: !pythonReady && `needs a Python with jsonschema and rfc3339-validator; set CWA_PYTHON` }, async () => {
+  const files = await specRepository(ROOT, COMMIT);
+  await inTempDir(async dir => {
+    await writeExport(dir, files);
+    const env = { ...process.env, PYTHONDONTWRITEBYTECODE: '1' };
+    const check = spawnSync(PYTHON, ['conformance/check.py'], { cwd: dir, encoding: 'utf8', env });
+    assert.equal(check.status, 0, check.stdout + check.stderr);
+    assert.match(check.stdout, /\nok\n$/);
+    const tests = spawnSync(PYTHON, ['-m', 'unittest', 'discover', '-s', 'conformance/tests'], { cwd: dir, encoding: 'utf8', env });
+    assert.equal(tests.status, 0, tests.stderr.slice(-2000));
+    assert.deepEqual(await checkExport(dir, files), [], 'running them changed no file');
+  });
+});
+
+test('no specification file names the site\'s insides: its page sources, its npm scripts or its Node modules', async () => {
+  const files = await specRepository(ROOT, COMMIT);
+  // The README and workflows are the mirror's own until the specification repository writes its own.
+  const written = new Set(['README.md', '.github/workflows/ci.yml', '.github/workflows/release.yml', LOCK]);
+  for (const [name, bytes] of files) {
+    if (written.has(name) || /\.(json|txt)$/.test(name) && name.startsWith('conformance/')) continue;
+    const text = bytes.toString('utf8').replace(/https:\/\/contextwindowarchitecture\.io\/\S*/g, '');
+    assert.doesNotMatch(text, /spec\.html|(?<![\w-])npm run|\.mjs\b/, name);
+  }
+});
+
+test('a vendor of the exported specification over this website changes nothing', async () => {
+  const { vendorPlan, VENDORED } = await import('../scripts/vendor-spec.mjs');
+  const files = await specRepository(ROOT, COMMIT);
+  assert.ok(VENDORED.every(name => [...files.keys()].some(f => f === name || f.startsWith(name + '/'))), 'each vendored path is exported');
+  await inTempDir(async dir => {
+    await writeExport(dir, files);
+    assert.deepEqual(await vendorPlan(dir, ROOT), { write: [], remove: [] });
+    await fs.writeFile(path.join(dir, 'SPEC.md'), 'changed');
+    await fs.rm(path.join(dir, 'guides', 'producers.md'));
+    assert.deepEqual(await vendorPlan(dir, ROOT), { write: ['SPEC.md'], remove: ['guides/producers.md'] });
+  });
+});
