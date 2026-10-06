@@ -829,7 +829,9 @@ test('every route policy route and version in the corpus, the examples and the r
 });
 
 test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
-  const { report } = await read('contract/assembler-conformance.json');
+  // The stored report's own contract member is judged against the schema of the commit it ran against; this test holds
+  // the rest of it to the current schema.
+  const report = { ...(await read('contract/assembler-conformance.json')).report, contract: { repository: 'contextwindowarchitecture/website', commit: 'a'.repeat(40), dirty: false } };
   for (const [row, valid] of [
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'rejected' }, true],
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'failed', detail: 'assembled a payload' }, true],
@@ -1107,11 +1109,12 @@ test('the registry lock pins the published profiles and route policies by digest
 });
 
 test('a conformance report records one outcome per case, and why any case did not pass (R-21)', () => {
-  const report = { implementation: { name: 'contextwindowarchitecture-assembler', version: '0.0.1', language: 'python' }, contract: { website_commit: 'a'.repeat(40), dirty: false },
+  const report = { implementation: { name: 'contextwindowarchitecture-assembler', version: '0.0.1', language: 'python' }, contract: { repository: 'contextwindowarchitecture/website', commit: 'a'.repeat(40), dirty: false },
     cases: [{ id: 'fixture-three-slot', rules: ['R-16', 'R-21'], outcome: 'passed' }, { id: 'messages-render', rules: ['R-7'], outcome: 'failed', detail: 'no cwa-messages/v1 renderer' }] };
   assert.equal(validateConformanceReportSchema(report), true, JSON.stringify(validateConformanceReportSchema.errors));
   for (const mutate of [r => r.cases[0].outcome = 'failed', r => r.cases[1].detail = '', r => r.cases[0].outcome = 'partial', r => r.cases[0].rules = [`R-${requirementIds.length + 1}`],
-    r => r.cases[0].rules = ['R-1\n'], r => r.cases[0].rules = [], r => r.contract.website_commit = 'abc1234', r => r.contract.website_commit += '\n',
+    r => r.cases[0].rules = ['R-1\n'], r => r.cases[0].rules = [], r => r.contract.commit = 'abc1234', r => r.contract.commit += '\n', r => delete r.contract.repository, r => r.contract.repository = 'website',
+    r => r.contract.repository = 'a/b\n', r => r.contract = { website_commit: 'a'.repeat(40), dirty: false },
     r => delete r.implementation.version, r => r.implementation.name = '\ufeff', r => r.cases[0].passed = true, r => delete r.contract.dirty]) {
     const candidate = copy(report); mutate(candidate);
     assert.equal(validateConformanceReportSchema(candidate), false, mutate.toString());

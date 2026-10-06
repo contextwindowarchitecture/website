@@ -649,8 +649,10 @@ test('the implementations table and status matrix count, per implementation, the
     assert.equal(row.commit, source.commit.slice(0, 7), file);
     assert.equal(row.commitHref, `https://github.com/${source.repository}/commit/${source.commit}`, file);
     assert.deepEqual(JSON.parse(JSON.stringify(row.tags)), source.tags.map(name => ({ name, href: `https://github.com/${source.repository}/releases/tag/${encodeURIComponent(name)}` })), file);
-    assert.equal(row.website, report.contract.website_commit.slice(0, 7), file);
-    assert.equal(row.websiteHref, `${website}/commit/${report.contract.website_commit}`, file);
+    // A report written before the contract member named its repository calls the commit website_commit.
+    const ranAt = report.contract.commit ?? report.contract.website_commit;
+    assert.equal(row.website, ranAt.slice(0, 7), file);
+    assert.equal(row.websiteHref, `${website}/commit/${ranAt}`, file);
     assert.equal(row.cases, `${passing.size} of ${published.length} published cases pass`, file);
     assert.equal(row.caseNote, stale ? `${stale} changed since its run` : '', file);
   }
@@ -666,8 +668,8 @@ test('every imported report comes from a clean checkout and ran against a clean 
   }
 });
 
-test('an imported report is stored whole, valid against its schema, beside its source and the digests of the cases it ran', async () => {
-  const { validateConformanceReportSchema } = await import('../generated/schema-validators.js');
+test('an imported report is stored whole, valid against the report schema of the commit it ran against, beside its source and the digests of the cases it ran', async () => {
+  const { reportErrors } = await import('../scripts/conformance-reports.mjs');
   for (const [, file] of IMPORTED) {
     const { source, cases_at_run: atRun, report, ...rest } = await readJson(file);
     assert.deepEqual(Object.keys(rest), [], `${file} carries only source, cases_at_run and report`);
@@ -675,7 +677,40 @@ test('an imported report is stored whole, valid against its schema, beside its s
     assert.ok(Array.isArray(source.tags) && source.tags.every(tag => typeof tag === 'string' && tag !== ''), `${file}: source.tags`);
     assert.deepEqual(source.tags, [...new Set(source.tags)].sort(), `${file}: source.tags sorted and distinct`);
     assert.ok(atRun === null || typeof atRun === 'object', file);
-    assert.equal(validateConformanceReportSchema(report), true, `${file}: ${JSON.stringify(validateConformanceReportSchema.errors)}`);
+    assert.equal(reportErrors(report), null, file);
+  }
+});
+
+// A report is judged by the contract it ran against, as its cases are: one written before the report schema changed
+// stays valid against the schema of its own commit, and a report naming a later commit is held to that commit's.
+test('a report is valid or not against conformance_report.schema.json as it stood at the commit the report ran against', async () => {
+  const { reportErrors } = await import('../scripts/conformance-reports.mjs');
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'cwa-report-schema-'));
+  const git = (...args) => execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@example.invalid', '-c', 'core.hooksPath=/dev/null',
+    '-c', 'commit.gpgSign=false', ...args], { encoding: 'utf8' }).trim();
+  const schema = await readJson('schema/conformance_report.schema.json');
+  const before = structuredClone(schema);
+  before.properties.contract = { type: 'object', properties: { website_commit: { type: 'string', pattern: '^[0-9a-f]{40}$' }, dirty: { type: 'boolean' } },
+    required: ['website_commit', 'dirty'], additionalProperties: false };
+  const commit = async (body, message) => {
+    await fs.writeFile(path.join(dir, 'schema', 'conformance_report.schema.json'), JSON.stringify(body));
+    git('add', '.');
+    git('commit', '-q', '-m', message);
+    return git('rev-parse', 'HEAD');
+  };
+  try {
+    git('init', '-q');
+    await fs.mkdir(path.join(dir, 'schema'));
+    const old = await commit(before, 'website_commit');
+    const now = await commit(schema, 'repository and commit');
+    const report = contract => ({ implementation: { name: 'x', version: '1' }, contract, cases: [{ id: 'a', rules: ['R-1'], outcome: 'passed' }] });
+    assert.equal(reportErrors(report({ website_commit: old, dirty: false }), dir), null, 'the old shape at the old commit');
+    assert.notEqual(reportErrors(report({ website_commit: now, dirty: false }), dir), null, 'the old shape at the new commit');
+    assert.equal(reportErrors(report({ repository: 'contextwindowarchitecture/website', commit: now, dirty: false }), dir), null, 'the new shape at the new commit');
+    assert.notEqual(reportErrors(report({ repository: 'contextwindowarchitecture/website', commit: old, dirty: false }), dir), null, 'the new shape at the old commit');
+    assert.notEqual(reportErrors(report({ repository: 'contextwindowarchitecture/website', dirty: false }), dir), null, 'no commit at all');
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
   }
 });
 

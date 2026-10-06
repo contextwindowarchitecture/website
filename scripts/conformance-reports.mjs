@@ -4,6 +4,8 @@ import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import Ajv from 'ajv/dist/2020.js';
+import addFormats from 'ajv-formats';
 
 export const IMPLEMENTATIONS = [
   { label: 'Python', file: 'contract/assembler-conformance.json' },
@@ -29,7 +31,7 @@ export async function caseDigestsNow(root = '.') {
   return digests;
 }
 
-/** Each case's digest as its files were at a website commit, read from git, keyed by case id. */
+/** Each case's digest as its files were at a commit of this repository, read from git, keyed by case id. */
 export function caseDigestsAt(commit, root = '.') {
   const git = (...args) => execFileSync('git', ['-C', root, ...args], { maxBuffer: 1 << 28 });
   const byCase = new Map();
@@ -62,6 +64,29 @@ export function claimsUnder(scopes, claims) {
   return claims.map(c => c.status === 'implemented' && scope.get(c.id) === 'boundary' ? { ...c, status: 'boundary-checked' } : c);
 }
 
+/** The commit a report's cases came from. A report written before the contract member named its repository calls it
+ * website_commit. */
+export const ranAt = report => report?.contract?.commit ?? report?.contract?.website_commit;
+
+const validators = new Map();
+/**
+ * A report's errors against conformance_report.schema.json as it stood at the commit the report ran against, read from
+ * git, or null when it is valid there. A report is judged by the contract it ran on, as its cases are (cases_at_run),
+ * so a change to the report schema leaves stored reports valid until their implementations run again.
+ */
+export function reportErrors(report, root = '.') {
+  const commit = ranAt(report);
+  if (typeof commit !== 'string' || !/^[0-9a-f]{40}$/.test(commit)) return [{ message: 'the report names no contract commit' }];
+  const text = execFileSync('git', ['-C', root, 'show', `${commit}:schema/conformance_report.schema.json`], { encoding: 'utf8' });
+  if (!validators.has(text)) {
+    const ajv = new Ajv({ allErrors: true, strict: true });
+    addFormats(ajv);
+    validators.set(text, ajv.compile(JSON.parse(text)));
+  }
+  const validate = validators.get(text);
+  return validate(report) ? null : validate.errors;
+}
+
 /** A remote URL as owner/repo when it is on GitHub, over HTTPS or SSH; any other URL as given; null for none. */
 export function repositoryOf(url) {
   if (!url) return null;
@@ -89,8 +114,9 @@ export function sourceOf(checkout, ...paths) {
 
 /** A report as the website stores it: { source, cases_at_run, report }. source names the implementation's checkout,
  * cases_at_run holds the digests of the cases as they were at the website commit it ran against, and report is the
- * implementation's conformance-report.json untouched, so it validates against conformance_report.schema.json on its own. */
+ * implementation's conformance-report.json untouched, so it validates on its own against conformance_report.schema.json
+ * as it stood at that commit (reportErrors). */
 export function imported(source, report, root = '.') {
-  const atRun = report.contract.dirty ? null : caseDigestsAt(report.contract.website_commit, root);
+  const atRun = report.contract.dirty ? null : caseDigestsAt(ranAt(report), root);
   return { source, cases_at_run: atRun, report };
 }

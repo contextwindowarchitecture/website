@@ -7,8 +7,7 @@
 // them again and renders the Assembler matrix.
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { claimsUnder, imported, sourceOf } from './conformance-reports.mjs';
+import { claimsUnder, imported, reportErrors, sourceOf } from './conformance-reports.mjs';
 
 const assembler = process.argv[2];
 if (!assembler) throw new Error('usage: node scripts/import-assembler-status.mjs <path to assembler-python>');
@@ -20,7 +19,8 @@ await fs.writeFile('contract/assembler-status.json', JSON.stringify({
   source, requirements: claimsUnder(scopes, requirements).map(({ id, status, evidence }) => ({ id, status, tests: evidence.length }))
 }, null, 2) + '\n');
 const report = await read('conformance-report.json');
-if (!validateConformanceReportSchema(report)) throw new Error('conformance-report.json: ' + JSON.stringify(validateConformanceReportSchema.errors));
+const errors = reportErrors(report);
+if (errors) throw new Error('conformance-report.json: ' + JSON.stringify(errors));
 await fs.writeFile('contract/assembler-conformance.json', JSON.stringify(imported(source, report), null, 2) + '\n');
 const passed = report.cases.filter(c => c.outcome === 'passed').length;
 const rejections = report.rejections ?? [];
