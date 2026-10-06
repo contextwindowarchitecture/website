@@ -10,7 +10,7 @@ import path from 'node:path';
 // Copied as they are, under the same paths: the text, the JSON shapes, the contract data, the conformance corpus
 // and the examples. The site's pages, guides, tools, generators and implementation reports stay here.
 export const COPIED = ['LICENSE', 'NOTICE', 'SPEC.md', 'CHANGES.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
-  'contract/slot-defaults.json', 'contract/model.json', 'contract/assembler-scope.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations', 'guides'];
+  'contract/slot-defaults.json', 'contract/model.json', 'contract/assembler-scope.json', 'conformance', 'examples', 'implementations', 'guides'];
 // Written from this repository's scripts/spec-repository/ to the path the other repository needs them at.
 export const WRITTEN = {
   'README.md': 'scripts/spec-repository/README.md',

@@ -43,7 +43,7 @@ Ajv compiles the JSON Schemas at build time. The generated browser module has no
 
 ## The specification by itself
 
-[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code, slot-default and model files of `contract/`, `conformance/` without its generators and `check.py`, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
+[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code, slot-default and model files of `contract/`, `conformance/` with its generators, `check.py`, the import tool and their tests, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
 
 ```sh
 node scripts/export-spec.mjs ../contextwindowarchitecture          # write what changed; remove what is no longer published
