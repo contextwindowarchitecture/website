@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { implementations } from '../scripts/conformance-reports.mjs';
@@ -170,4 +170,17 @@ test('the specification repository releases each tag, and only against the websi
     assert.ok(spec.includes(`id="${anchor}"`), `the notes link #${anchor} on the Spec page`);
   }
   assert.match(files.get('README.md').toString('utf8'), /`draft-release`/, 'the README says which tag to follow');
+});
+
+// The export command loads and runs: pointed at an empty directory it reports what that directory lacks, or, while the
+// specification files here have uncommitted changes, refuses to export them.
+test('the export command runs, and reports an empty checkout as not holding the specification', async () => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'cwa-export-cmd-'));
+  try {
+    const run = spawnSync(process.execPath, ['scripts/export-spec.mjs', dir, '--check'], { cwd: ROOT, encoding: 'utf8' });
+    assert.notEqual(run.status, 0);
+    assert.match(run.stderr, /does not hold the specification|Commit the specification files first/, run.stderr);
+  } finally {
+    await fs.rm(dir, { recursive: true, force: true });
+  }
 });

@@ -3,14 +3,15 @@
 //   node scripts/export-spec.mjs ../contextwindowarchitecture
 //   node scripts/export-spec.mjs ../contextwindowarchitecture --check
 // Run from the website root with the specification files committed: the export's lock names this commit.
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs/promises';
-import { sourceOf } from './conformance-reports.mjs';
 import { SOURCES, checkExport, specRepository, writeExport } from './spec-repository.mjs';
 
 const [target, flag] = process.argv.slice(2);
 if (!target || (flag !== undefined && flag !== '--check')) throw new Error('usage: node scripts/export-spec.mjs <specification repository checkout> [--check]');
 if (!(await fs.stat(target).catch(() => null))?.isDirectory()) throw new Error(`${target} is not a directory.`);
-const source = sourceOf('.', ...SOURCES);
+const git = (...args) => execFileSync('git', args, { encoding: 'utf8' }).trim();
+const source = { commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain', '--', ...SOURCES) !== '' };
 if (source.dirty) throw new Error('Commit the specification files first: an export names the website commit that holds them.');
 const files = await specRepository('.', source.commit);
 const problems = await checkExport(target, files);
