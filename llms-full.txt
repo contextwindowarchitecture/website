@@ -499,7 +499,7 @@ None is released, so work from a checkout. The table names the commit each impor
 
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `f2eada2` (draft-release) | 86 of 86 pass | website `d6397de` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `5ff7ee1` (draft-release) | 86 of 86 pass | website `d5ef9d6` |
 | TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `0d7eb50` (draft-release) | 86 of 86 pass | website `4549cf7` |
 | Go | `github.com/contextwindowarchitecture/assembler-go` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-go | `13b4451` (draft-release) | 86 of 86 pass | website `4549cf7` |
 | Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `47385da` (draft-release) | 86 of 86 pass | website `4549cf7` |
