@@ -204,5 +204,5 @@ It hands the payload to the model with each text in the platform role its render
 - Conformance report schema: https://contextwindowarchitecture.io/schema/conformance_report.schema.json
 - Cases and rejections: https://github.com/contextwindowarchitecture/website/tree/main/conformance
 - Assembler page, reports and matrix: https://contextwindowarchitecture.io/assembler.html
-- Integration sketch: https://contextwindowarchitecture.io/contract/assembly-sketch.txt
+- Integration sketch: https://contextwindowarchitecture.io/site/assembly-sketch.txt
 - The whole contract in one file: https://contextwindowarchitecture.io/llms-full.txt

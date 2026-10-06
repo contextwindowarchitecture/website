@@ -17,13 +17,13 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Producers](https://contextwindowarchitecture.io/llms-producers.txt): build a retriever, memory store, MCP adapter, state service, capability policy or other producer whose items an assembler admits
 - [Assemblers](https://contextwindowarchitecture.io/llms-assemblers.txt): call one of the four assemblers, or build one in a new language and prove it with the conformance cases
 - [Full contract](https://contextwindowarchitecture.io/llms-full.txt): this file, spec §1, the slots and authority values, both guides, every requirement and the conformance README, in one file
-- [Implementation guide for coding agents](https://contextwindowarchitecture.io/contract/cwa.md): what an application integrating CWA does, one rule per line
+- [Implementation guide for coding agents](https://contextwindowarchitecture.io/site/cwa.md): what an application integrating CWA does, one rule per line
 
 ## Applications and agents
 
 - [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a worked prompt-to-slots example
-- [Integration sketch](https://contextwindowarchitecture.io/contract/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
-- [Payload template](https://contextwindowarchitecture.io/contract/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
+- [Integration sketch](https://contextwindowarchitecture.io/site/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
+- [Payload template](https://contextwindowarchitecture.io/site/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
 - [Example snapshot](https://contextwindowarchitecture.io/examples/messages-snapshot.json): a support-chat snapshot, with [the cwa-messages/v1 payload](https://contextwindowarchitecture.io/examples/messages-payload.json) all four assemblers render from it, byte for byte, and [the trace](https://contextwindowarchitecture.io/examples/messages-trace.json) they emit
 - [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
 
