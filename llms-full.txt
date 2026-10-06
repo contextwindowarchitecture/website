@@ -36,7 +36,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Spec](https://contextwindowarchitecture.io/spec.html): SPEC.md as a page: conformance, planes, slots and items, governance, admission and fitting, placement profiles, the trace, and the changelog
 - [SPEC.md](https://contextwindowarchitecture.io/SPEC.md): the normative text: the requirement index and sections 1 to 6, each with the requirements it holds, then future work
 - [CHANGES.md](https://contextwindowarchitecture.io/CHANGES.md): every revision of the draft, newest first
-- [Specification repository](https://github.com/contextwindowarchitecture/contextwindowarchitecture): SPEC.md, the schemas, the contract data, the conformance cases and the examples without the site, each file exported unchanged from the website repository
+- [Specification repository](https://github.com/contextwindowarchitecture/contextwindowarchitecture): where the specification is written: SPEC.md, CHANGES.md, the schemas, the contract data, the conformance cases with their checks, the examples, the guides and the implementations' reports; issues, pull requests and discussions go there
 - [contract/requirements.json](https://contextwindowarchitecture.io/contract/requirements.json): requirement IDs and text, from which SPEC.md's requirement blocks and the Spec page are written
 - [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json): every exclusion and refusal code, in the order a trace ranks them (R-21)
 - [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json): each slot's plane, default authority, tier and policy fields (R-3)
@@ -57,8 +57,8 @@ The specification defines three conformance claims, and no others (spec §1):
 ### Conformance
 
 - [conformance/README.md](https://contextwindowarchitecture.io/conformance/README.md): how to run a case, and the algorithm: trace order, timestamps, numbers, ordering, the snapshot digest, refusals, conflicts, supersession, deduplication, source diversity, fitting, snapshot checks, tokenizers and renderers, registry and reporting
-- [Cases](https://github.com/contextwindowarchitecture/website/tree/main/conformance/cases): one directory per case, holding a snapshot, the expected trace and, unless the case expects a refusal, the expected payload bytes
-- [Rejections](https://github.com/contextwindowarchitecture/website/tree/main/conformance/rejections): snapshots that each break one snapshot check, which an assembler rejects before assembly
+- [Cases](https://github.com/contextwindowarchitecture/contextwindowarchitecture/tree/main/conformance/cases): one directory per case, holding a snapshot, the expected trace and, unless the case expects a refusal, the expected payload bytes
+- [Rejections](https://github.com/contextwindowarchitecture/contextwindowarchitecture/tree/main/conformance/rejections): snapshots that each break one snapshot check, which an assembler rejects before assembly
 - [Assembler page](https://contextwindowarchitecture.io/assembler.html): each implementation's imported report, and a matrix of every requirement's scope and status
 
 ### Implementations
@@ -551,17 +551,17 @@ let assembly = assemble(&snapshot_bytes)?; // Error::Rejected or Error::Unsuppor
 
 `assemble_with(&snapshot_bytes, &Options::new().tokenizer(id, count))` takes your own tokenizer under an ID no published tokenizer uses; a published ID is `Error::PublishedId`, and there is no option for a renderer. It takes the snapshot's bytes, not parsed JSON, so the I-JSON checks see the text as written.
 
-All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request the website's tests also derive from that snapshot, and emit examples/messages-trace.json as its trace, `trace_id` aside.
+All four render examples/messages-snapshot.json to examples/messages-payload.json byte for byte, a `cwa-messages/v1` request `conformance/check.py` also derives from that snapshot, and emit examples/messages-trace.json as its trace, `trace_id` aside.
 
 ### Building a new implementation
 
 Start from the template, https://github.com/contextwindowarchitecture/assembler-template, and follow its PORTING.md:
 
-1. Name the port with `scripts/init_port.py`, then vendor the contract from a website checkout with `scripts/vendor_contract.py --website ../website`. It copies the schemas, contract data, cases, rejections and registry into `vendor/cwa/`, each file pinned by SHA-256 with the website commit in `vendor/cwa.lock.json`.
+1. Name the port with `scripts/init_port.py`, then vendor the contract from a checkout of this repository with `scripts/vendor_contract.py --spec ../contextwindowarchitecture`. It copies the schemas, contract data, cases, rejections and registry into `vendor/cwa/`, each file pinned by SHA-256 with the commit in `vendor/cwa.lock.json`.
 2. Read conformance/README.md end to end, then contract/requirements.json, then the snapshot and trace schemas, then one case, `fixture-three-slot`, with its snapshot, trace and payload side by side. The requirements say what must happen; the README says how.
 3. Build test-first, in this order: strings and instants; canonical JSON and the digest; schemas and snapshot checks (every rejection case); tokenizers and renderers; admission and defaults; conflicts, supersession, deduplication and source diversity; refusals and fitting; the trace and the runner. Unit-test each README section's rules before letting its cases pass, and keep cases the port cannot pass yet in a `PENDING` set that only shrinks.
 4. Run the cases through a small adapter: `python3 scripts/conformance.py --command "<adapter>" --name <package> --version <version> --language <Language>`, then `python3 scripts/check_report.py`. The adapter reads one snapshot's raw bytes on stdin and exits 0 with `{"payload": <base64 or null>, "trace": <trace>}` on stdout for an assembly or a refusal, 2 with the problems on stderr for a rejection, and 3 for a tokenizer or renderer it does not provide.
-5. Commit the report with every change that alters it. The website's maintainers import it, and the Assembler page then counts, per requirement, the cases the port passes.
+5. Commit the report with every change that alters it. To list the port, import its report into a checkout of this repository with `conformance/import_report.py` and open a pull request (conformance/README.md, Reporting results); the Assembler page then counts, per requirement, the cases it passes.
 
 Build from the published contract alone, and never read another implementation's code. Two implementations that both pass every case and still disagree have found a gap in the spec, and the fix is a spec change with a case, made in the website first and vendored after.
 
@@ -580,7 +580,7 @@ It hands the payload to the model with each text in the platform role its render
 - Snapshot schema: [schema/snapshot.schema.json](https://contextwindowarchitecture.io/schema/snapshot.schema.json)
 - Trace schema: [schema/trace.schema.json](https://contextwindowarchitecture.io/schema/trace.schema.json)
 - Conformance report schema: [schema/conformance_report.schema.json](https://contextwindowarchitecture.io/schema/conformance_report.schema.json)
-- Cases and rejections: https://github.com/contextwindowarchitecture/website/tree/main/conformance
+- Cases and rejections: https://github.com/contextwindowarchitecture/contextwindowarchitecture/tree/main/conformance
 - Assembler page, reports and matrix: https://contextwindowarchitecture.io/assembler.html
 - Integration sketch: https://contextwindowarchitecture.io/site/assembly-sketch.txt
 - The whole contract in one file: https://contextwindowarchitecture.io/llms-full.txt
@@ -708,7 +708,7 @@ One profile id and version name one profile across the corpus, as R-20 requires 
 
 Some cases have a generator in `generators/`. It holds a table of each candidate's intended outcome, and it derives the expected trace and payload from that table rather than from any assembler's logic. Regenerate a case with `python3 conformance/generators/<case>.py`, or every generated case, then the rejections and the registry, which read some of them, with `python3 conformance/generators/all.py`, and review the diff.
 
-`check.py` checks the contract's own consistency: every case and rejection against the schemas, digests and hashes against their definitions here, each rejection against exactly one Snapshot check, reason codes against the requirements that cite them, the examples and every published payload's rendering and count, `SPEC.md` and the guides against the contract files, and the implementations' stored reports. Run `python3 conformance/check.py` after editing any of them; `python3 conformance/check.py --write` rewrites the blocks of `SPEC.md` and the guides that are written from the contract files. `python3 -m unittest discover -s conformance/tests` holds the schemas to their rules one change at a time, checks the import tool, and regenerates every case to show nothing changes. `check.py` needs the `jsonschema` and `rfc3339-validator` packages, the second so that `format: date-time` is asserted (Timestamps), and it stops when it is not.
+`check.py` checks the contract's own consistency: every case and rejection against the schemas, digests and hashes against their definitions here, each rejection against exactly one Snapshot check, reason codes against the requirements that cite them, the examples and every published payload's rendering and count, `SPEC.md` and the guides against the contract files, and the implementations' stored reports. Run `python3 conformance/check.py` after editing any of them; `python3 conformance/check.py --write` rewrites the blocks of `SPEC.md` and the guides that are written from the contract files. `python3 -m unittest discover -s conformance/tests` holds the schemas to their rules one change at a time, checks the import tool, and regenerates every case to show nothing changes. `check.py` needs the `jsonschema` and `rfc3339-validator` packages, the second so that `format: date-time` is asserted (Timestamps), and it stops when it is not. `pyproject.toml` names both, so `uv run python conformance/check.py` runs it with nothing else installed.
 
 ### Running a case
 
@@ -942,6 +942,8 @@ It also holds one entry per directory under `rejections/`, ordered by id, in `re
 - `failed`: anything else: it assembled a payload, refused, or raised something other than a rejection. `detail` says what happened;
 - `skipped`: the case uses an optional renderer the implementation does not provide, and the check the case breaks is that renderer's, as it is in `profile-unrealizable`, `profile-invalid-tag`, the `messages-*` cases and `blocks-system-after-xml`. Only the last uses an optional renderer. `detail` names it. Every other check runs before a renderer is needed and no check needs a tokenizer, so no other rejection case is skipped, and neither is one whose renderer is required.
 
-Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). The Assembler page shows the reports of the four implementations: the Python reference assembler (beside its `status.json`), the TypeScript assembler, the Go assembler and the Rust assembler. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
+Only `passed` and `rejected` count. A report without `rejections` has not run them. A trace that validates against `schema/trace.schema.json` but differs from the expected one has failed: schema validation alone is not conformance (R-21). `implementations/` holds the report of each listed implementation, today the Python reference assembler (beside its `status.json`), the TypeScript assembler, the Go assembler and the Rust assembler, and the Assembler page shows them. A report counts a case only as the case is now: the import records a digest of each case's files at the report's `contract.commit`, and a case published or changed since then counts as not passing until the implementation runs it again.
+
+To list an implementation, run `python3 conformance/import_report.py <its checkout> <id> --label <Language>` in a checkout of this repository and open a pull request with the files it writes under `implementations/`. The checkout must be clean and its report must name a commit of this repository. CI checks the entry, and that the stored report is the `conformance-report.json` the implementation's repository publishes at the stored commit (`import_report.py --verify`). A report is the implementation's own claim (SPEC.md §1); listing it records that claim, it does not re-run it. The Assembler page shows the entry once the website takes that commit.
 
 Implementations vendor these cases pinned by hash, so a case changes only through a reviewed edit here.

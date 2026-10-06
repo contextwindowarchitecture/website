@@ -1,5 +1,6 @@
-# Generated artifacts are current, and the contract and site tests pass, on each supported Node. A tag runs it
-# through release.yml, on the tagged commit.
+# Generated artifacts are current, and the contract and site tests pass, on each supported Node; and the vendored
+# specification is the specification repository's at the commit spec.lock.json names. A tag runs it through
+# release.yml, on the tagged commit, against the specification repository at the same tag.
 name: ci
 
 on:
@@ -10,6 +11,10 @@ on:
     inputs:
       ref:
         description: The commit to test; release.yml passes the tag
+        type: string
+        default: ""
+      spec_ref:
+        description: The specification ref to check the vendored files against; release.yml passes the same tag
         type: string
         default: ""
 
@@ -34,3 +39,23 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+  spec:
+    name: vendored specification matches its repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      - id: lock
+        run: echo "commit=$(node -p "require('./spec.lock.json').commit")" >> "$GITHUB_OUTPUT"
+      # The commit or tag must be pushed to the specification repository for this checkout to find it.
+      - uses: actions/checkout@v5
+        with:
+          repository: contextwindowarchitecture/contextwindowarchitecture
+          ref: ${{ inputs.spec_ref || steps.lock.outputs.commit }}
+          path: spec
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/vendor-spec.mjs spec --check

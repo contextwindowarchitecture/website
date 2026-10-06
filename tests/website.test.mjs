@@ -670,8 +670,6 @@ test('the implementations table and status matrix count, per implementation, the
   assert.equal(new Set(published.map(c => c.id)).size, published.length, 'case and rejection ids are distinct');
   const { implementations } = (await component('assembler.html')).renderVals();
   assert.equal(implementations.length, IMPORTED.length);
-  const website = await component('assembler.html', 'WEBSITE');
-  assert.match(website, /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+$/);
   for (const [n, [label, file]] of IMPORTED.entries()) {
     const { source, cases_at_run: atRun, report } = await readJson(file);
     assert.match(source.commit, /^[0-9a-f]{40}$/, file);
@@ -692,10 +690,12 @@ test('the implementations table and status matrix count, per implementation, the
     assert.equal(row.commit, source.commit.slice(0, 7), file);
     assert.equal(row.commitHref, `https://github.com/${source.repository}/commit/${source.commit}`, file);
     assert.deepEqual(JSON.parse(JSON.stringify(row.tags)), source.tags.map(name => ({ name, href: `https://github.com/${source.repository}/releases/tag/${encodeURIComponent(name)}` })), file);
-    // A report written before the contract member named its repository calls the commit website_commit.
-    const ranAt = report.contract.commit ?? report.contract.website_commit;
-    assert.equal(row.website, ranAt.slice(0, 7), file);
-    assert.equal(row.websiteHref, `${website}/commit/${ranAt}`, file);
+    // The repository and commit the report's cases came from: the website's before the specification repository
+    // became the author, that repository's since. A report in the older shape names only a website commit.
+    const contract = { repository: 'contextwindowarchitecture/website', commit: report.contract.website_commit, ...report.contract };
+    assert.equal(row.contract, { 'contextwindowarchitecture/website': 'website', 'contextwindowarchitecture/contextwindowarchitecture': 'spec' }[contract.repository], file);
+    assert.equal(row.contractSha, contract.commit.slice(0, 7), file);
+    assert.equal(row.contractHref, `https://github.com/${contract.repository}/commit/${contract.commit}`, file);
     assert.equal(row.cases, `${passing.size} of ${published.length} published cases pass`, file);
     assert.equal(row.caseNote, stale ? `${stale} changed since its run` : '', file);
   }
@@ -755,4 +755,20 @@ test('the llms guides cite only requirements and identifiers the contract define
     for (const [cited, n] of text.matchAll(/\bR-(\d+)\b/g)) assert.ok(Number(n) >= 1 && Number(n) <= requirements.length, `${file} cites ${cited}`);
     for (const [, name] of text.matchAll(/`([a-z]+(?:_[a-z0-9]+)+)`/g)) assert.ok(defined.includes(name), `${file} names ${name}, which the contract does not define`);
   }
+});
+
+// A reader of the site can reach the specification's home: from the Spec page, from the About page's account of how
+// the specification is maintained, and, for an agent, from the llms.txt index.
+test('the Spec page, the About page and llms.txt link the specification repository', async () => {
+  const REPOSITORY = 'https://github.com/contextwindowarchitecture/contextwindowarchitecture';
+  for (const page of ['spec.html', 'about.html']) {
+    const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
+    assert.ok(html.includes(`<a href="${REPOSITORY}" target="_blank" rel="noopener">`), `${page} links the specification repository`);
+  }
+  const lock = JSON.parse(await fs.readFile(new URL('../spec.lock.json', import.meta.url), 'utf8'));
+  assert.ok((await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8')).includes(`This page renders commit <a href="${REPOSITORY}/commit/${lock.commit}">${lock.commit.slice(0, 7)}</a>`), 'the Spec page names the commit it renders');
+  const specification = (await fs.readFile(new URL('../llms.txt', import.meta.url), 'utf8')).split(/^## /m).find(section => section.startsWith('Specification\n'));
+  assert.ok(specification.split('\n').some(line => line.startsWith(`- [Specification repository](${REPOSITORY}): `)), 'llms.txt lists it under Specification');
+  assert.ok((await fs.readFile(new URL('../llms-full.txt', import.meta.url), 'utf8')).includes(`(${REPOSITORY})`), 'llms-full.txt carries the link');
+  assert.ok((await fs.readFile(new URL('../README.md', import.meta.url), 'utf8')).includes(`(${REPOSITORY})`), 'the README names where the specification comes from');
 });

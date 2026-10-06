@@ -163,7 +163,7 @@ const runs = await Promise.all((await implementations()).map(async ({ label, fil
 }));
 const conformance = runs.map(({ label, source, report, outcomes }) => ({
   label, name: report.implementation.name, version: report.implementation.version, repository: source.repository,
-  sha: source.commit, tags: source.tags, websiteSha: ranAt(report), total: published.length,
+  sha: source.commit, tags: source.tags, contractRepository: report.contract.repository ?? 'contextwindowarchitecture/website', contractSha: ranAt(report), total: published.length,
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
 for (const page of ['spec.html', 'assembler.html']) {
@@ -180,6 +180,11 @@ for (const page of ['spec.html', 'assembler.html']) {
         `          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />${g.date}${g.title === null ? '' : ' · ' + escapeHtml(g.title)}</div>\n` +
         '          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">\n' +
         g.bullets.map(b => `            <li>${escapeHtml(b)}</li>\n`).join('') + '          </ul>\n        </div>\n').join('') + '      ';
+    // The page names the specification commit it renders, from spec.lock.json.
+    const lock = await read('spec.lock.json');
+    const renders = /This page renders commit <a href="https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/commit\/[0-9a-f]{40}">[0-9a-f]{7}<\/a>/;
+    if (!renders.test(updated)) throw new Error('spec.html no longer says which specification commit it renders.');
+    updated = updated.replace(renders, () => `This page renders commit <a href="https://github.com/${lock.repository}/commit/${lock.commit}">${lock.commit.slice(0, 7)}</a>`);
     updated = updated.replace(/(<section id="changelog"[^>]*>)[\s\S]*?(<\/section>)/, (_, open, close) => open + changelog + close)
       .replace(/Specification · draft · \d{4}-\d{2}-\d{2}/, () => `Specification · draft · ${changes.groups[0].date}`);
     for (const [name, value] of Object.entries({ PLANES: model.planes, SLOTS: model.slots, AUTHORITY: model.authority,
@@ -223,7 +228,7 @@ const countedImplementations = mdTable(['Language', 'Package', 'Repository', 'Co
     c.label, `${codeSpan(c.name)} ${c.version}`, githubTree(c.repository),
     `${codeSpan(c.sha.slice(0, 7))}${c.tags.length ? ' (' + c.tags.join(', ') + ')' : ''}`,
     `${c.passed} of ${c.total} pass${c.stale ? `; ${c.stale} changed since its run` : ''}`,
-    `website ${codeSpan(c.websiteSha.slice(0, 7))}`]));
+    `${{ 'contextwindowarchitecture/website': 'website', 'contextwindowarchitecture/contextwindowarchitecture': 'spec' }[c.contractRepository] ?? c.contractRepository} ${codeSpan(c.contractSha.slice(0, 7))}`]));
 // The site serves each guide as an llms file: links to the specification's files resolve against the site, the guides
 // link each other's llms file, and the markers go.
 const GUIDE_BLOCK = /<!-- generated:(\w+) -->\n\n([\s\S]*?)\n\n<!-- \/generated:\1 -->/g;

@@ -1,0 +1,10 @@
+# Copied from github.com/contextwindowarchitecture/contextwindowarchitecture by scripts/vendor-spec.mjs, at the commit
+# spec.lock.json names. Never edit them here: npm test fails when one differs from the lock.
+SPEC.md linguist-generated
+CHANGES.md linguist-generated
+schema/** linguist-generated
+contract/** linguist-generated
+conformance/** linguist-generated
+examples/** linguist-generated
+guides/** linguist-generated
+implementations/** linguist-generated

@@ -1,4 +1,6 @@
-# A GitHub release for each tag, made once ci passes on the tagged commit. The notes are the tag's own commits,
+# A GitHub release for each tag, made once ci passes on the tagged commit, with the vendored specification checked
+# against the specification repository at the same tag: a site release never describes a revision that was not tagged
+# there, so that repository's tag is pushed first. The notes are the tag's own commits,
 # written by git-cliff from cliff.toml. A tag that is not vX.Y.Z, such as draft-release, is a prerelease. A tag
 # pushed before this workflow existed is released by hand: gh workflow run release.yml -f tag=<tag>
 name: release
@@ -21,6 +23,7 @@ jobs:
     uses: ./.github/workflows/ci.yml
     with:
       ref: refs/tags/${{ inputs.tag || github.ref_name }}
+      spec_ref: refs/tags/${{ inputs.tag || github.ref_name }}
 
   release:
     name: GitHub release

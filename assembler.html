@@ -80,7 +80,7 @@
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="overflow-wrap: anywhere;">{{ i.scope }}<wbr>{{ i.pkg }}</span><span style="color: var(--muted);">{{ i.version }}</span></span>
             <span role="cell" class="im-hide-sm" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><a href="{{ i.repoHref }}" target="_blank" rel="noopener" style="overflow-wrap: anywhere;">{{ i.repo }}</a><span><sc-for list="{{ i.tags }}" as="t"><a href="{{ t.href }}" target="_blank" rel="noopener">{{ t.name }}</a><span style="color: var(--muted);"> · </span></sc-for><a href="{{ i.commitHref }}" target="_blank" rel="noopener">{{ i.commit }}</a></span></span>
             <span role="cell" style="display: flex; flex-direction: column; gap: 3px; min-width: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.45;"><span style="color: {{ i.casesColor }};">{{ i.cases }}</span><span style="color: var(--muted);">{{ i.caseNote }}</span></span>
-            <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">website <a href="{{ i.websiteHref }}" target="_blank" rel="noopener">{{ i.website }}</a></span>
+            <span role="cell" class="im-hide-sm" style="font-family: var(--mono); font-size: 12.5px; line-height: 1.45; color: var(--muted);">{{ i.contract }} <a href="{{ i.contractHref }}" target="_blank" rel="noopener">{{ i.contractSha }}</a></span>
           </div>
         </sc-for>
       </div>
@@ -524,9 +524,10 @@ const RULES = [
     ]
   ]
 ];
-const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6d6514f00067e4dc31b69681a5a468706e62168d","tags":["draft-release"],"websiteSha":"b37f444ca09c5c1c807c3e7911dbc0dc963b046c","total":86,"passed":86,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"b7a8940fa7c997a8b89f4dda4bbde92d90517f41","tags":["draft-release"],"websiteSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.0.1","repository":"contextwindowarchitecture/assembler-go","sha":"91a3ffcbca15952f86dfa15426333a91ce59a53a","tags":["draft-release"],"websiteSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0},{"label":"Rust","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-rust","sha":"22fa759ef9c1e1dcfa2fb44cb46408c9965f7838","tags":["draft-release"],"websiteSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0}];
+const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"6d6514f00067e4dc31b69681a5a468706e62168d","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/website","contractSha":"b37f444ca09c5c1c807c3e7911dbc0dc963b046c","total":86,"passed":86,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"b7a8940fa7c997a8b89f4dda4bbde92d90517f41","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/website","contractSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.0.1","repository":"contextwindowarchitecture/assembler-go","sha":"91a3ffcbca15952f86dfa15426333a91ce59a53a","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/website","contractSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0},{"label":"Rust","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-rust","sha":"22fa759ef9c1e1dcfa2fb44cb46408c9965f7838","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/website","contractSha":"7ef12765e79906a1cb95529cd93747c8a0389221","total":86,"passed":86,"stale":0}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
-const WEBSITE = "https://github.com/contextwindowarchitecture/website";
+// The repository each report's cases came from, by the name its column gives it.
+const CONTRACT_NAMES = { "contextwindowarchitecture/website": "website", "contextwindowarchitecture/contextwindowarchitecture": "spec" };
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
 const GITHUB = /^[\w.-]+\/[\w.-]+$/;
 class Component extends DCLogic {
@@ -572,7 +573,8 @@ class Component extends DCLogic {
           commit: c.sha.slice(0, 7), commitHref: github ? repoHref + "/commit/" + c.sha : repoHref,
           // The tags on that commit when it was imported, each before the commit and linked to its page.
           tags: c.tags.map(name => ({ name, href: github ? repoHref + "/releases/tag/" + encodeURIComponent(name) : repoHref })),
-          website: c.websiteSha.slice(0, 7), websiteHref: WEBSITE + "/commit/" + c.websiteSha,
+          contract: CONTRACT_NAMES[c.contractRepository] ?? c.contractRepository, contractSha: c.contractSha.slice(0, 7),
+          contractHref: "https://github.com/" + c.contractRepository + "/commit/" + c.contractSha,
           cases: c.passed + " of " + c.total + " published cases pass", casesColor: c.passed === c.total ? "var(--p-evid)" : "var(--accent)",
           caseNote: c.stale ? c.stale + " changed since its run" : ""
         };

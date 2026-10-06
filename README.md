@@ -12,47 +12,58 @@ npm run build:contract
 npm test
 ```
 
-`npm test` fails if generated artifacts are stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Each tag gets a GitHub release once CI passes on the tagged commit (`.github/workflows/release.yml`), with the tag's own commits as notes, written by git-cliff; a tag that is not `vX.Y.Z` is a prerelease, and a tag pushed before the workflow existed is released with `gh workflow run release.yml -f tag=<tag>`. `CHANGELOG.md` is generated from the commit history with git-cliff (`cliff.toml`): regenerate it at a release with `uvx git-cliff --tag vX.Y.Z -o CHANGELOG.md` and never edit it by hand. The spec's own revision history is `CHANGES.md`, which the build writes into the Spec page's Changelog and draft date: add a revision's bullets there, never in `spec.html`. Commit generated files with their sources so static hosting serves the tested validators.
+`npm test` fails if a vendored specification file differs from `spec.lock.json` or a generated artifact is stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Each tag gets a GitHub release once CI passes on the tagged commit (`.github/workflows/release.yml`), with the tag's own commits as notes, written by git-cliff; a tag that is not `vX.Y.Z` is a prerelease, and a tag pushed before the workflow existed is released with `gh workflow run release.yml -f tag=<tag>`. `CHANGELOG.md` is generated from the commit history with git-cliff (`cliff.toml`): regenerate it at a release with `uvx git-cliff --tag vX.Y.Z -o CHANGELOG.md` and never edit it by hand. The spec's own revision history is `CHANGES.md`, which the build writes into the Spec page's Changelog and draft date: add a revision's bullets there, never in `spec.html`. Commit generated files with their sources so static hosting serves the tested validators.
 
 ## Sources of truth
+
+The specification is not written here. `SPEC.md`, `CHANGES.md`, `schema/`, `contract/`, `conformance/`, `examples/`, `guides/` and `implementations/` are copies of [contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) at the commit `spec.lock.json` names. Never edit them: `npm test` fails when one differs from the lock. To change one, change it there, then run `node scripts/vendor-spec.mjs ../contextwindowarchitecture`.
+
+### Vendored from the specification repository
 
 | Source | Responsibility |
 | --- | --- |
 | `contract/requirements.json` | Permanent requirement IDs (R-1 through R-26; new ones append) and requirement text |
 | `CHANGES.md` | Every revision of the specification, newest first; the Spec page's changelog and draft date are written from it |
 | `SPEC.md` | The normative text: written by hand, except the blocks between its `generated` markers, which `python3 conformance/check.py --write` writes from `contract/requirements.json`, `contract/model.json` and `examples/profiles.json` with its draft date from `CHANGES.md` |
-| `spec.html` | Renders `SPEC.md` with the site's design. After an edit to `SPEC.md`, `node scripts/spec-page.mjs --sync` rewrites the page blocks whose text changed and lays out added ones as the page does; the tests fail while the page, read back by `scripts/spec-markdown.mjs`, differs from `SPEC.md` |
 | `schema/*.schema.json` | Item, trace, placement-profile, producer-batch, conflict-group, route-policy and snapshot JSON structures |
 | `conformance/cases/` | Language-neutral assembler test cases: snapshot in, expected trace and payload out (see `conformance/README.md`) |
 | `conformance/rejections/` | Snapshots that break exactly one snapshot check; an assembler must reject each before assembly, with no trace (R-17) |
 | `contract/reasons.json` | Canonical exclusion and refusal reason codes; generates the Producers failure table |
 | `contract/assembler-scope.json` | What an assembler can verify per requirement; generates the Assembler matrix scope column |
-| `implementations/` | Each listed implementation's conformance report, stored untouched beside its source (repository, commit, tags) and the digests of the cases at the commit it ran against, and the Python reference assembler's status claims (`python.status.json`); `index.json` lists them in the Assembler page's order. Import a clean checkout with `python3 conformance/import_report.py ../assembler-python python --status`, or `../assembler-typescript typescript`, `../assembler-go go`, `../assembler-rust rust`; a new implementation also takes `--label`. Re-import after moving a tag. `python3 conformance/check.py --implementations` prints each one's count |
+| `implementations/` | Each listed implementation's conformance report, stored untouched beside its source (repository, commit, tags) and the digests of the cases at the commit it ran against, and the Python reference assembler's status claims (`python.status.json`); `index.json` lists them in the Assembler page's order. Reports are imported in the specification repository with `conformance/import_report.py` and reach this site with the next vendor |
 | `contract/slot-defaults.json` | Default roles, protection tiers, and policy fields |
 | `contract/model.json` | The planes, slots, item fields, authority values, conflict rules, pipeline stages and tests the Spec page lists, in its order; generates those lists on the Spec page and the stages on Producers, and fills the slot and authority tables in the llms guides |
 | `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace, and the landing page's message request with its snapshot |
+| `guides/producers.md`, `guides/assemblers.md` | The producer and assembler guides, written by hand around the blocks between their `generated` markers, which `python3 conformance/check.py --write` writes from the contract files and `implementations/`. Links to the specification's files are relative, links to site pages absolute |
+
+### Written here
+
+| Source | Responsibility |
+| --- | --- |
+| `spec.html` | Renders `SPEC.md` with the site's design, and names the specification commit it renders. A vendor runs `node scripts/spec-page.mjs --sync`, which rewrites the page blocks whose text changed and lays out added ones as the page does; the tests fail while the page, read back by `scripts/spec-markdown.mjs`, differs from `SPEC.md` |
 | `contract.js` | Shared local semantic checks used by the browser tools and tests |
 | `site/*.txt`, `site/cwa.md` | Downloadable integration guidance and rendering template, owned by the site, not the specification |
 | `site/profile-display.json` | Profile explorer labels and descriptions; tests check placement against canonical examples |
-| `guides/producers.md`, `guides/assemblers.md` | The producer and assembler guides, written by hand around the blocks between their `generated` markers, which `python3 conformance/check.py --write` writes from the contract files and `implementations/`. Links to the specification's files are relative, links to site pages absolute |
 | `llms.txt`, `llms-producers.txt`, `llms-assemblers.txt` | Guides for language models and coding agents: `llms.txt` indexes the site in the [llms.txt](https://llmstxt.org/) format, written by hand. The build writes the two others from `guides/`, with links resolved against the site and each implementation's count added, and stops when a guide's generated block differs from its own rendering |
 
 The build generates `generated/`, requirement arrays in the Spec and Assembler pages, the model lists in Spec and the stages in Producers from `contract/model.json`, slot defaults in Producers, the profile examples in Evidence and Spec, the Spec page's changelog and draft date from `CHANGES.md`, the two llms guides from `guides/`, and `llms-full.txt`, which joins `llms.txt`, spec §1, the slots and authority values, both guides, every requirement and `conformance/README.md` into one file. The Start-page downloads import `scaffolds.js`; the landing-page item preview is generated from the same canonical example, and its sample request, with the request's token count and hash, from `examples/messages-payload.json`. Unused duplicate landing-page scaffold logic has been removed.
 
 Ajv compiles the JSON Schemas at build time. The generated browser module has no remote dependency or runtime schema compiler. See [Ajv standalone validation](https://ajv.js.org/standalone.html) and `THIRD_PARTY_NOTICES.md`.
 
-## The specification by itself
+## Where the specification comes from
 
-[contextwindowarchitecture/contextwindowarchitecture](https://github.com/contextwindowarchitecture/contextwindowarchitecture) holds the specification without the site, for readers who want only the text, the schemas and the cases. This repository is its only author: nothing is edited there. `scripts/spec-repository.mjs` lists what goes: `SPEC.md`, `schema/`, the requirement, reason-code, slot-default and model files of `contract/`, `conformance/` with its generators, `check.py`, the import tool and their tests, `examples/`, `LICENSE` and `NOTICE`, each copied unchanged under the same path, plus the README and the CI and release workflows kept in `scripts/spec-repository/`. With a checkout of that repository beside this one, and the files here committed:
+With a checkout of the specification repository beside this one:
 
 ```sh
-node scripts/export-spec.mjs ../contextwindowarchitecture          # write what changed; remove what is no longer published
-node scripts/export-spec.mjs ../contextwindowarchitecture --check  # exit 1 if the checkout differs
+node scripts/vendor-spec.mjs ../contextwindowarchitecture           # copy, remove what the spec no longer publishes, write spec.lock.json, sync the Spec page
+node scripts/vendor-spec.mjs ../contextwindowarchitecture --check   # exit 1 if the vendored files differ from that checkout
+node scripts/vendor-spec.mjs --verify                               # exit 1 if a vendored file differs from the lock; npm test runs this
+npm run build:contract && npm test
 ```
 
-An export writes `website.lock.json` there: the website commit it was taken at and each file's SHA-256. One that changes no file writes nothing, so the lock keeps naming a commit that holds those files. In the directories it copies whole (`schema/`, `contract/`, `conformance/`, `examples/`) it removes any file this repository does not publish; it leaves everything else in that repository alone. That repository's CI checks its files against the website commit its lock names, so push this repository first, then commit and push the export.
+A vendor refuses a checkout with uncommitted changes, so `spec.lock.json` always names a commit (and the tags on it) that holds what was copied, and it prints the revisions `CHANGES.md` gained since the last vendor: check the pages that restate them. It then syncs the Spec page to the new `SPEC.md`. CI checks the vendored files against the specification repository at the locked commit, and a tag is released only against that repository at the same tag, so tag it there first.
 
-Its releases follow this repository's. It carries the same tags, `draft-release` among them, and its release workflow releases a tag only once its files match this repository at the same tag. So move a tag here first and push it, then move the same tag there to the export's commit and push it; a tag pushed there before this repository carries it fails its check and is not released.
+The specification's own checks run there, in Python: `uv run python conformance/check.py` and `uv run python -m unittest discover -s conformance/tests`. Implementations are listed there too, with `conformance/import_report.py`.
 
 ## What the checks establish
 

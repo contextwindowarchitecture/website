@@ -6,7 +6,8 @@
   "scripts": {
     "build:contract": "node scripts/build-contract.mjs",
     "check:generated": "node scripts/build-contract.mjs --check",
-    "test": "npm run check:generated && node --test tests/*.test.mjs"
+    "test": "npm run verify:spec && npm run check:generated && node --test tests/*.test.mjs",
+    "verify:spec": "node scripts/vendor-spec.mjs --verify"
   },
   "devDependencies": {
     "ajv": "8.20.0",
