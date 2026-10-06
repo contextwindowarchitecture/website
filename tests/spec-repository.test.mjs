@@ -16,7 +16,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const tracked = (...paths) => execFileSync('git', ['-C', ROOT, 'ls-files', '--', ...paths], { encoding: 'utf8' }).split('\n').filter(Boolean);
 // The specification without the site: its text, schemas, contract data, conformance corpus and examples.
 const COPIED = () => tracked('LICENSE', 'NOTICE', 'SPEC.md', 'CHANGES.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
-  'contract/slot-defaults.json', 'contract/model.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations');
+  'contract/slot-defaults.json', 'contract/model.json', 'contract/assembler-scope.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations', 'guides');
 const WRITTEN = ['README.md', '.github/workflows/ci.yml', '.github/workflows/release.yml', LOCK];
 
 async function listing(dir, base = dir) {
@@ -48,7 +48,7 @@ test('the specification repository holds the spec, schemas, contract data, confo
   assert.deepEqual([...files.keys()].sort(), [...copied, ...WRITTEN].sort());
   for (const name of copied) assert.ok(files.get(name).equals(await fs.readFile(path.join(ROOT, name))), `${name} is copied byte for byte`);
   for (const name of files.keys()) {
-    assert.doesNotMatch(name, /\.html$|^scripts\/|^generated\/|^llms|generators\/|check\.py$|assembler-|profile-display|\.txt$(?<!payload\.txt)/, `${name} is site or tooling material`);
+    assert.doesNotMatch(name, /\.html$|^scripts\/|^generated\/|^llms|generators\/|check\.py$|assembler-(?!scope\.json)|profile-display|\.txt$(?<!payload\.txt)/, `${name} is site or tooling material`);
   }
 });
 
@@ -66,7 +66,7 @@ test('writing an export replaces what the website publishes, removes what it no 
   const files = await specRepository(ROOT, COMMIT);
   await inTempDir(async (dir, put) => {
     const kept = ['.git/HEAD', '.github/workflows/other.yml', 'assets/images/logo.svg', 'docs/index.mdx', 'CONTRIBUTING.md'];
-    const stale = ['schema/draft/schema.json', 'examples/old.json', 'conformance/check.py', 'contract/assembler-scope.json'];
+    const stale = ['schema/draft/schema.json', 'examples/old.json', 'conformance/check.py', 'contract/assembler-status.json'];
     for (const name of [...kept, ...stale, 'README.md', 'SPEC.md']) await put(name, 'before');
     const { removed } = await writeExport(dir, files);
     assert.deepEqual(removed.sort(), [...stale].sort());

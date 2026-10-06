@@ -1,6 +1,6 @@
 # CWA for assemblers
 
-> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes and requirement scope and its list of implementations are written from the contract files and [implementations/index.json](https://contextwindowarchitecture.io/implementations/index.json) by `python3 conformance/check.py --write`; the copy on the site, https://contextwindowarchitecture.io/llms-assemblers.txt, also counts each implementation's report against the published cases.
+> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](../SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes and requirement scope and its list of implementations are written from the contract files and [implementations/index.json](../implementations/index.json) by `python3 conformance/check.py --write`; the copy on the site, https://contextwindowarchitecture.io/llms-assemblers.txt, also counts each implementation's report against the published cases.
 
 ## What an assembler does
 
@@ -32,6 +32,8 @@ The order every implementation follows, from conformance/README.md:
 
 Refusal codes, in the order the first that holds is recorded (contract/reasons.json):
 
+<!-- generated:refusals -->
+
 | Code | Rule | When |
 | --- | --- | --- |
 | `required_slot_missing` | R-4 | governance.instructions or interaction.query, or governance.output_contract on a parser route, has no admitted item. |
@@ -40,6 +42,8 @@ Refusal codes, in the order the first that holds is recorded (contract/reasons.j
 | `protected_content_over_budget` | R-17 | The payload rendered from protected content alone does not fit budget.input, charged with any margin_percent, or protected items exceed their slot's max_tokens, or a protected item exceeds its own token_budget. The assembler refuses rather than truncating. |
 | `slot_floor_over_budget` | R-17 | The payload does not fit budget.input without shedding a slot below the route's min_tokens. The assembler refuses rather than break the floor. |
 | `evidence_required` | R-12 | The route requires evidence and too little survived admission and fitting. The trace records recovery.action. |
+
+<!-- /generated:refusals -->
 
 ## The conformance claim
 
@@ -50,6 +54,8 @@ A case passes when the payload matches `expected.payload.txt` byte for byte, or 
 ## Requirement scope
 
 What an assembler can check of each requirement (contract/assembler-scope.json). Assembler rows are fully testable in assembly. Boundary rows are checked where the snapshot and its items are handed over, and the rest of the obligation sits with producers or the application. Application rows cannot be observed during assembly.
+
+<!-- generated:scope -->
 
 | Rule | Summary | Scope | What an assembler checks |
 | --- | --- | --- | --- |
@@ -79,6 +85,8 @@ What an assembler can check of each requirement (contract/assembler-scope.json).
 | R-24 | Route-requested exact deduplication | assembler | Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items. |
 | R-25 | Route-requested supersession of stale observations | assembler | Keeps only the latest observation per producer and source in the slots a route opts in, after conflicts, keeping protected and grouped items. |
 | R-26 | Route-requested source diversity | assembler | Keeps at most max_per_source items per producer and source in the slots a route opts in, after dedupe, keeping protected and grouped items. |
+
+<!-- /generated:scope -->
 
 ## Tokenizers and renderers
 
@@ -113,12 +121,16 @@ Each is a place where languages disagree. Most have a published case written to 
 
 None is released, so work from a checkout. Each publishes a conformance report, and the Assembler page counts it against the published cases as they are now: a case published or changed since the run does not count as passing (conformance/README.md, Reporting results).
 
-| Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
-| --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `5ff7ee1` (draft-release) | 86 of 86 pass | website `d5ef9d6` |
-| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `0d7eb50` (draft-release) | 86 of 86 pass | website `4549cf7` |
-| Go | `github.com/contextwindowarchitecture/assembler-go` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-go | `13b4451` (draft-release) | 86 of 86 pass | website `4549cf7` |
-| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `47385da` (draft-release) | 86 of 86 pass | website `4549cf7` |
+<!-- generated:implementations -->
+
+| Language | Package | Repository |
+| --- | --- | --- |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python |
+| TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript |
+| Go | `github.com/contextwindowarchitecture/assembler-go` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-go |
+| Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust |
+
+<!-- /generated:implementations -->
 
 Python, module `cwa` (Python 3.11 or newer; `uv sync` in the checkout):
 
@@ -189,13 +201,13 @@ It hands the payload to the model with each text in the platform role its render
 
 ## Sources
 
-- Conformance README, the algorithm: [conformance/README.md](https://contextwindowarchitecture.io/conformance/README.md)
-- Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md) and [contract/requirements.json](https://contextwindowarchitecture.io/contract/requirements.json)
-- Reason codes, in rank order: [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json)
-- Slot defaults: [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json)
-- Snapshot schema: [schema/snapshot.schema.json](https://contextwindowarchitecture.io/schema/snapshot.schema.json)
-- Trace schema: [schema/trace.schema.json](https://contextwindowarchitecture.io/schema/trace.schema.json)
-- Conformance report schema: [schema/conformance_report.schema.json](https://contextwindowarchitecture.io/schema/conformance_report.schema.json)
+- Conformance README, the algorithm: [conformance/README.md](../conformance/README.md)
+- Requirements: [SPEC.md](../SPEC.md) and [contract/requirements.json](../contract/requirements.json)
+- Reason codes, in rank order: [contract/reasons.json](../contract/reasons.json)
+- Slot defaults: [contract/slot-defaults.json](../contract/slot-defaults.json)
+- Snapshot schema: [schema/snapshot.schema.json](../schema/snapshot.schema.json)
+- Trace schema: [schema/trace.schema.json](../schema/trace.schema.json)
+- Conformance report schema: [schema/conformance_report.schema.json](../schema/conformance_report.schema.json)
 - Cases and rejections: https://github.com/contextwindowarchitecture/website/tree/main/conformance
 - Assembler page, reports and matrix: https://contextwindowarchitecture.io/assembler.html
 - Integration sketch: https://contextwindowarchitecture.io/site/assembly-sketch.txt

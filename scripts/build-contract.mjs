@@ -202,37 +202,47 @@ const mdTable = (head, rows) => [head, head.map(() => '---'), ...rows]
   .map(row => `| ${row.map(c => String(c).replaceAll('|', '\\|')).join(' | ')} |`).join('\n');
 const reasonTable = kind => mdTable(['Code', 'Rule', 'When'], data.REASONS.filter(r => r.kind === kind).map(r => [codeSpan(r.code), r.rule, r.text]));
 const githubTree = repository => `https://github.com/${repository}`;
-const llmsBlocks = {
-  STAGES: model.stages.map(({ name, owner, text }, i) => `${i + 1}. ${name} (${owner}): ${text}`).join('\n'),
-  BATCH: '```json\n' + JSON.stringify(await read('examples/producer-batch.json'), null, 2) + '\n```',
-  SLOTS: mdTable(['Slot', 'Plane', 'Holds', 'Authority', 'Tier', 'Lineage', 'injection_risk', 'conflict_policy'], slotOrder.map(slot => {
+const site = `https://${(await fs.readFile('CNAME', 'utf8')).trim()}/`;
+// The guides' generated blocks, written by python3 conformance/check.py --write. This is the second derivation of
+// them, and the build stops when the two disagree.
+const guideBlocks = {
+  stages: model.stages.map(({ name, owner, text }, i) => `${i + 1}. ${name} (${owner}): ${text}`).join('\n'),
+  batch: '```json\n' + JSON.stringify(await read('examples/producer-batch.json'), null, 2) + '\n```',
+  slots: mdTable(['Slot', 'Plane', 'Holds', 'Authority', 'Tier', 'Lineage', 'injection_risk', 'conflict_policy'], slotOrder.map(slot => {
     const d = data.SLOT_DEFAULTS[slot];
     return [codeSpan(slot), planeOf(slot).name, model.slots.find(s => s.id === slot).holds, codeSpan(d.authority), d.tier, d.lineage, d.injection_risk, d.conflict_policy];
   })),
-  AUTHORITY: mdTable(['Authority', 'Role', 'Meaning'], model.authority.map(({ name, value, text }) => [codeSpan(value), name, text])),
-  EXCLUSIONS: reasonTable('exclusion'),
-  REFUSALS: reasonTable('refusal'),
-  SCOPE: mdTable(['Rule', 'Summary', 'Scope', 'What an assembler checks'], requirements.map((r, i) => [r.id, r.summary, scopes[i].scope, scopes[i].note])),
-  IMPLEMENTATIONS: mdTable(['Language', 'Package', 'Repository', 'Commit', 'Published cases and rejections', 'Contract vendored at'], conformance.map(c => [
+  authority: mdTable(['Authority', 'Role', 'Meaning'], model.authority.map(({ name, value, text }) => [codeSpan(value), name, text])),
+  exclusions: reasonTable('exclusion'),
+  refusals: reasonTable('refusal'),
+  scope: mdTable(['Rule', 'Summary', 'Scope', 'What an assembler checks'], requirements.map((r, i) => [r.id, r.summary, scopes[i].scope, scopes[i].note])),
+  implementations: mdTable(['Language', 'Package', 'Repository'], conformance.map(c => [c.label, `${codeSpan(c.name)} ${c.version}`, githubTree(c.repository)])),
+};
+// The copy of the assembler guide served on the site also counts each implementation's report.
+const countedImplementations = mdTable(['Language', 'Package', 'Repository', 'Commit', 'Published cases and rejections', 'Contract vendored at'], conformance.map(c => [
     c.label, `${codeSpan(c.name)} ${c.version}`, githubTree(c.repository),
     `${codeSpan(c.sha.slice(0, 7))}${c.tags.length ? ' (' + c.tags.join(', ') + ')' : ''}`,
     `${c.passed} of ${c.total} pass${c.stale ? `; ${c.stale} changed since its run` : ''}`,
-    `website ${codeSpan(c.websiteSha.slice(0, 7))}`]))
-};
-const fillBlocks = text => text.replace(/<!-- CONTRACT_([A-Z_]+)_START -->\n[\s\S]*?<!-- CONTRACT_\1_END -->/g, (block, name) => {
-  if (!(name in llmsBlocks)) throw new Error(`No generated block named ${name}.`);
-  return `<!-- CONTRACT_${name}_START -->\n${llmsBlocks[name]}\n<!-- CONTRACT_${name}_END -->`;
-});
+    `website ${codeSpan(c.websiteSha.slice(0, 7))}`]));
+// The site serves each guide as an llms file: links to the specification's files resolve against the site, the guides
+// link each other's llms file, and the markers go.
+const GUIDE_BLOCK = /<!-- generated:(\w+) -->\n\n([\s\S]*?)\n\n<!-- \/generated:\1 -->/g;
+const servedAs = { 'producers.md': 'llms-producers.txt', 'assemblers.md': 'llms-assemblers.txt' };
 const guides = {};
-for (const path of ['llms-producers.txt', 'llms-assemblers.txt']) {
-  guides[path] = fillBlocks(await fs.readFile(path, 'utf8'));
+for (const [guide, path] of [['guides/producers.md', 'llms-producers.txt'], ['guides/assemblers.md', 'llms-assemblers.txt']]) {
+  const text = await fs.readFile(guide, 'utf8');
+  for (const [, name, body] of text.matchAll(GUIDE_BLOCK)) {
+    if (body !== guideBlocks[name]) throw new Error(`${guide}: its ${name} block differs from the contract files; run python3 conformance/check.py --write`);
+  }
+  guides[path] = text.replace(GUIDE_BLOCK, (_, name, body) => name === 'implementations' ? countedImplementations : body)
+    .replace(/\]\((?![a-z]+:|#)([^)\s]+)\)/g, (_, target) => `](${site}${servedAs[target] ?? target.replace(/^\.\.\//, '')})`);
   outputs.set(path, guides[path]);
 }
-// A file joins llms-full.txt under a heading of its own: its title line goes, its headings drop one level, and the
-// block markers go, so the file reads as one document.
+// A file joins llms-full.txt under a heading of its own: its title line goes and its headings drop one level, so the
+// file reads as one document.
 const nest = (heading, text) => {
   let fenced = false;
-  const body = text.replace(/^# .*\n/, '').replace(/^<!-- CONTRACT_[A-Z_]+_(START|END) -->\n/gm, '').split('\n').map(line => {
+  const body = text.replace(/^# .*\n/, '').split('\n').map(line => {
     if (line.startsWith('```')) fenced = !fenced;
     return !fenced && /^#{1,5} /.test(line) ? '#' + line : line;
   }).join('\n');
@@ -254,7 +264,7 @@ outputs.set('llms-full.txt', [
   '## Planes, slots and authority values (spec §2 and §3.1)\n\n' +
   'A model call is assembled from items. Every item belongs to exactly one slot, and slots are grouped into four planes, which answer four different questions and are never merged. ' +
   'Each slot takes the authority its defaults name (R-1); the producer guide below has the full table of defaults.\n\n' + planes + '\n\n' +
-  '### Authority values\n\n' + llmsBlocks.AUTHORITY + '\n',
+  '### Authority values\n\n' + guideBlocks.authority + '\n',
   nest('Producers (llms-producers.txt)', guides['llms-producers.txt']),
   nest('Assemblers (llms-assemblers.txt)', guides['llms-assemblers.txt']),
   `## Requirements R-1 to R-${requirements.length} (contract/requirements.json)\n\n` +

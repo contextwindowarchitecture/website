@@ -10,7 +10,7 @@ import path from 'node:path';
 // Copied as they are, under the same paths: the text, the JSON shapes, the contract data, the conformance corpus
 // and the examples. The site's pages, guides, tools, generators and implementation reports stay here.
 export const COPIED = ['LICENSE', 'NOTICE', 'SPEC.md', 'CHANGES.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
-  'contract/slot-defaults.json', 'contract/model.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations'];
+  'contract/slot-defaults.json', 'contract/model.json', 'contract/assembler-scope.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations', 'guides'];
 // Written from this repository's scripts/spec-repository/ to the path the other repository needs them at.
 export const WRITTEN = {
   'README.md': 'scripts/spec-repository/README.md',
@@ -21,7 +21,7 @@ export const WRITTEN = {
 export const SOURCES = [...COPIED, 'scripts/spec-repository'];
 // Directories the export owns whole: a file in one that the website does not publish is removed. Anything else in
 // the repository, its logos for one, is left alone.
-export const OWNED = ['schema', 'contract', 'conformance', 'examples', 'implementations'];
+export const OWNED = ['schema', 'contract', 'conformance', 'examples', 'implementations', 'guides'];
 export const LOCK = 'website.lock.json';
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');

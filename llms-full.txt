@@ -131,7 +131,7 @@ A model call is assembled from items. Every item belongs to exactly one slot, an
 
 ## Producers (llms-producers.txt)
 
-> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are generated from the contract by the website build.
+> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
 
 ### What a producer is
 
@@ -366,25 +366,25 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 
 - Validate each item against schema/context_item.schema.json and each batch against schema/producer_batch.schema.json with a JSON Schema 2020-12 validator that asserts `format`. The date-time `pattern` pins the shape but not the calendar, so a validator that leaves `format: date-time` unasserted accepts `2026-02-30`.
 - The Producers page shows the site's local checks at work on sample items and batches, to see CWA in action rather than to check your own output. `checkItem` and `checkProducerBatch` in https://contextwindowarchitecture.io/contract.js run the same checks. They judge structure and the rules an item shows on its own. They cannot authenticate producers or apply the route, so producer kinds and their slots, the capability grant, the verified flag, scope, `max_age_seconds`, `min_relevance`, `source_prefix`, placement and ids across a snapshot go unchecked. Passing them is not admission.
-- Admission happens in an assembler. To see it, freeze a snapshot that holds your batch and run it through one of the implementations (https://contextwindowarchitecture.io/llms-assemblers.txt): the trace's `excluded` rows say what happened to each item, and `defaults_filled` which fields the assembler filled.
+- Admission happens in an assembler. To see it, freeze a snapshot that holds your batch and run it through one of the implementations (the [assembler guide](https://contextwindowarchitecture.io/llms-assemblers.txt)): the trace's `excluded` rows say what happened to each item, and `defaults_filled` which fields the assembler filled.
 
 ### Sources
 
 - Producer contract page: https://contextwindowarchitecture.io/producers.html
 - Spec, sections 2 to 4: https://contextwindowarchitecture.io/spec.html
-- Requirements: https://contextwindowarchitecture.io/SPEC.md
-- Item schema: https://contextwindowarchitecture.io/schema/context_item.schema.json
-- Producer-batch schema: https://contextwindowarchitecture.io/schema/producer_batch.schema.json
-- Route-policy schema, where producers, slot rules and fact precedence live: https://contextwindowarchitecture.io/schema/route_policy.schema.json
-- Slot defaults: https://contextwindowarchitecture.io/contract/slot-defaults.json
-- Reason codes: https://contextwindowarchitecture.io/contract/reasons.json
-- Example item: https://contextwindowarchitecture.io/examples/context-item.json
-- Example route policies: https://contextwindowarchitecture.io/examples/route-policies.json
+- Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md)
+- Item schema: [schema/context_item.schema.json](https://contextwindowarchitecture.io/schema/context_item.schema.json)
+- Producer-batch schema: [schema/producer_batch.schema.json](https://contextwindowarchitecture.io/schema/producer_batch.schema.json)
+- Route-policy schema, where producers, slot rules and fact precedence live: [schema/route_policy.schema.json](https://contextwindowarchitecture.io/schema/route_policy.schema.json)
+- Slot defaults: [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json)
+- Reason codes: [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json)
+- Example item: [examples/context-item.json](https://contextwindowarchitecture.io/examples/context-item.json)
+- Example route policies: [examples/route-policies.json](https://contextwindowarchitecture.io/examples/route-policies.json)
 - The whole contract in one file: https://contextwindowarchitecture.io/llms-full.txt
 
 ## Assemblers (llms-assemblers.txt)
 
-> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative on the Spec page, https://contextwindowarchitecture.io/spec.html; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes, requirement scope and implementations are generated from the contract and the imported conformance reports by the website build.
+> How to use a Context Window Architecture (CWA) assembler, or build one: the component that turns a frozen snapshot into a rendered payload and a trace. Four implementations exist, in Python, TypeScript, Go and Rust, built independently from the published contract, and none is released. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders; conformance/README.md is normative wherever they leave an ordering, tie-break, boundary or algorithm step open (R-21). Its tables of refusal codes and requirement scope and its list of implementations are written from the contract files and [implementations/index.json](https://contextwindowarchitecture.io/implementations/index.json) by `python3 conformance/check.py --write`; the copy on the site, https://contextwindowarchitecture.io/llms-assemblers.txt, also counts each implementation's report against the published cases.
 
 ### What an assembler does
 
@@ -495,7 +495,7 @@ Each is a place where languages disagree. Most have a published case written to 
 
 ### Using an implementation
 
-None is released, so work from a checkout. The table names the commit each imported report came from, with the tags on it when it was imported, and counts the report against the published cases as they are now: a case published or changed since the run does not count as passing (conformance/README.md, Reporting results).
+None is released, so work from a checkout. Each publishes a conformance report, and the Assembler page counts it against the published cases as they are now: a case published or changed since the run does not count as passing (conformance/README.md, Reporting results).
 
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
@@ -573,13 +573,13 @@ It hands the payload to the model with each text in the platform role its render
 
 ### Sources
 
-- Conformance README, the algorithm: https://contextwindowarchitecture.io/conformance/README.md
-- Requirements: https://contextwindowarchitecture.io/SPEC.md and https://contextwindowarchitecture.io/contract/requirements.json
-- Reason codes, in rank order: https://contextwindowarchitecture.io/contract/reasons.json
-- Slot defaults: https://contextwindowarchitecture.io/contract/slot-defaults.json
-- Snapshot schema: https://contextwindowarchitecture.io/schema/snapshot.schema.json
-- Trace schema: https://contextwindowarchitecture.io/schema/trace.schema.json
-- Conformance report schema: https://contextwindowarchitecture.io/schema/conformance_report.schema.json
+- Conformance README, the algorithm: [conformance/README.md](https://contextwindowarchitecture.io/conformance/README.md)
+- Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md) and [contract/requirements.json](https://contextwindowarchitecture.io/contract/requirements.json)
+- Reason codes, in rank order: [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json)
+- Slot defaults: [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json)
+- Snapshot schema: [schema/snapshot.schema.json](https://contextwindowarchitecture.io/schema/snapshot.schema.json)
+- Trace schema: [schema/trace.schema.json](https://contextwindowarchitecture.io/schema/trace.schema.json)
+- Conformance report schema: [schema/conformance_report.schema.json](https://contextwindowarchitecture.io/schema/conformance_report.schema.json)
 - Cases and rejections: https://github.com/contextwindowarchitecture/website/tree/main/conformance
 - Assembler page, reports and matrix: https://contextwindowarchitecture.io/assembler.html
 - Integration sketch: https://contextwindowarchitecture.io/site/assembly-sketch.txt

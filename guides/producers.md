@@ -1,6 +1,6 @@
 # CWA for producers
 
-> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
+> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](../SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
 
 ## What a producer is
 
@@ -17,6 +17,8 @@ The claim rests on the producer's word. Admission catches some breaches and excl
 
 Between a source and the payload there are eight steps (spec §4). The first four are the producer's and happen before assembly starts. The last four are the assembler's, and everything it leaves out shows up in the trace with a reason code.
 
+<!-- generated:stages -->
+
 1. Rewrite (producer): Decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later.
 2. Retrieve (producer): Pull candidate chunks from sources whose provenance you can name.
 3. Rerank (producer): Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13).
@@ -25,6 +27,8 @@ Between a source and the payload there are eight steps (spec §4). The first fou
 6. Resolve (assembler): Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order.
 7. Fit (assembler): Refuse before any reduction if protected content can't fit (R-16, R-17). Otherwise apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If too little evidence is left on a route that requires it, refuse instead (R-12).
 8. Render & trace (assembler): Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21).
+
+<!-- /generated:stages -->
 
 ## The batch
 
@@ -37,6 +41,8 @@ Whatever its kind, a producer hands over one batch per call: `{ items, excluded 
 - Your rows reach the trace as reported, at `stage: "producer"` and with no slot, ahead of the assembler's rows, even from a batch whose producer the route does not admit (R-9). Every other row is the assembler's own, at `stage: "assembler"`.
 
 The published example batch, examples/producer-batch.json:
+
+<!-- generated:batch -->
 
 ```json
 {
@@ -75,6 +81,8 @@ The published example batch, examples/producer-batch.json:
 }
 ```
 
+<!-- /generated:batch -->
+
 ## The item
 
 Every item carries eight fields: `id`, `slot`, `source`, `source_version`, `authority`, `freshness`, `trust` and `body`. Without them the assembler cannot place, rank, expire or trace the item, so it excludes it with `missing_field:<name>` (R-2). Two slots need one more, whoever produces the item: every `interaction.memory` item carries `expires` (R-9), and every `evidence.knowledge` item its rerank score in `relevance` (R-13). The item schema is closed, so an undeclared field, a wrong type or a malformed timestamp is `invalid_structure`.
@@ -110,6 +118,8 @@ Every date-time is `YYYY-MM-DDTHH:MM:SS`, an optional fraction of any length, th
 
 Each slot takes the authority shown, and the defaults fill the policy fields an item omits (R-1, R-3; contract/slot-defaults.json):
 
+<!-- generated:slots -->
+
 | Slot | Plane | Holds | Authority | Tier | Lineage | injection_risk | conflict_policy |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | `governance.instructions` | Governance | Identity, goals, refusals, and safety boundaries: the system's constitution. | `governing` | protected | verbatim | none | governs |
@@ -124,7 +134,11 @@ Each slot takes the authority shown, and the defaults fill the policy fields an 
 | `interaction.history` | Interaction | A verbatim transcript of the most recent turns, bounded by turn count and tokens. | `user` | compressible | verbatim | untrusted_content | defers |
 | `interaction.query` | Interaction | The most recent, unprocessed input the model must respond to. | `user` | protected | verbatim | untrusted_content | defers |
 
+<!-- /generated:slots -->
+
 The authority column has two exceptions: a prior model turn in `interaction.history`, marked `lineage: generated`, carries `untrusted`, and any other item in `evidence.tool_results`, `interaction.memory` or `interaction.history` may carry `untrusted` instead (R-1). An authority outside the seven is `unknown_authority`, and one the slot does not take is `authority_not_allowed`. Only `governing` and `user` items may instruct the model; the other five values record where data came from and are not a ranking of which facts are true (R-6).
+
+<!-- generated:authority -->
 
 | Authority | Role | Meaning |
 | --- | --- | --- |
@@ -135,6 +149,8 @@ The authority column has two exceptions: a prior model turn in `interaction.hist
 | `observation` | Tool observation | What a tool returned, and any retrieved chunk a route sends to tool results: evidence about the world, not permission to act on it. |
 | `generated` | Generated memory | Summaries and inferences the system wrote. They are fallible, they expire, and they can be revoked. |
 | `untrusted` | Untrusted (least privilege) | Prior model turns in history, which must carry it, and any other item in tool results, memory or history whose producer wants it handled with the least privilege. It keeps the item out of an instruction group's peers and changes nothing else. Governance, knowledge, state and the query never carry it. Not the same as injection_risk: untrusted_content, which flags content that might carry an injection. |
+
+<!-- /generated:authority -->
 
 The tier column is the highest tier your items can claim. Only the route's versioned policy can raise a slot's tier, and an item that claims more than its slot's tier is excluded with `tier_upgrade_not_allowed`, so a producer cannot protect its own items. In a slot that is protected by default the tier is also the lowest: an item that sets a lower one there is excluded with `protected_tier_changed`. Anywhere else you may lower an item's tier, say to `droppable` so it sheds earlier, even in a slot only the route raised to protected (R-16).
 
@@ -199,6 +215,8 @@ The assembler picks a variant only when its rendered body is shorter than the it
 
 Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, plus `duplicate_of` or `superseded_by` when the reason calls for it. When an item fails several checks, the assembler records the earliest code in this list, and among several missing fields the alphabetically first (R-21). These are the codes a producer can meet, in that order (contract/reasons.json):
 
+<!-- generated:exclusions -->
+
 | Code | Rule | When |
 | --- | --- | --- |
 | `producer_not_authenticated` | R-15 | The route policy does not list this batch's producer, or lists it with a different kind. Identity comes from the application's authentication and the route, never from item fields. A snapshot with two batches from one producer is rejected before assembly. |
@@ -231,22 +249,24 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 | `source_diversity_cap` | R-26 | The route caps this slot at max_per_source items per producer and source, and higher-ranked or exempt items from the same source filled every place. |
 | `over_budget` | R-16 | The item was omitted to fit the rendered budget, its own token_budget or its slot's max_tokens, in tier order and by the route's fitting policy. |
 
+<!-- /generated:exclusions -->
+
 ## Checking your output
 
 - Validate each item against schema/context_item.schema.json and each batch against schema/producer_batch.schema.json with a JSON Schema 2020-12 validator that asserts `format`. The date-time `pattern` pins the shape but not the calendar, so a validator that leaves `format: date-time` unasserted accepts `2026-02-30`.
 - The Producers page shows the site's local checks at work on sample items and batches, to see CWA in action rather than to check your own output. `checkItem` and `checkProducerBatch` in https://contextwindowarchitecture.io/contract.js run the same checks. They judge structure and the rules an item shows on its own. They cannot authenticate producers or apply the route, so producer kinds and their slots, the capability grant, the verified flag, scope, `max_age_seconds`, `min_relevance`, `source_prefix`, placement and ids across a snapshot go unchecked. Passing them is not admission.
-- Admission happens in an assembler. To see it, freeze a snapshot that holds your batch and run it through one of the implementations (the [assembler guide](https://contextwindowarchitecture.io/llms-assemblers.txt)): the trace's `excluded` rows say what happened to each item, and `defaults_filled` which fields the assembler filled.
+- Admission happens in an assembler. To see it, freeze a snapshot that holds your batch and run it through one of the implementations (the [assembler guide](assemblers.md)): the trace's `excluded` rows say what happened to each item, and `defaults_filled` which fields the assembler filled.
 
 ## Sources
 
 - Producer contract page: https://contextwindowarchitecture.io/producers.html
 - Spec, sections 2 to 4: https://contextwindowarchitecture.io/spec.html
-- Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md)
-- Item schema: [schema/context_item.schema.json](https://contextwindowarchitecture.io/schema/context_item.schema.json)
-- Producer-batch schema: [schema/producer_batch.schema.json](https://contextwindowarchitecture.io/schema/producer_batch.schema.json)
-- Route-policy schema, where producers, slot rules and fact precedence live: [schema/route_policy.schema.json](https://contextwindowarchitecture.io/schema/route_policy.schema.json)
-- Slot defaults: [contract/slot-defaults.json](https://contextwindowarchitecture.io/contract/slot-defaults.json)
-- Reason codes: [contract/reasons.json](https://contextwindowarchitecture.io/contract/reasons.json)
-- Example item: [examples/context-item.json](https://contextwindowarchitecture.io/examples/context-item.json)
-- Example route policies: [examples/route-policies.json](https://contextwindowarchitecture.io/examples/route-policies.json)
+- Requirements: [SPEC.md](../SPEC.md)
+- Item schema: [schema/context_item.schema.json](../schema/context_item.schema.json)
+- Producer-batch schema: [schema/producer_batch.schema.json](../schema/producer_batch.schema.json)
+- Route-policy schema, where producers, slot rules and fact precedence live: [schema/route_policy.schema.json](../schema/route_policy.schema.json)
+- Slot defaults: [contract/slot-defaults.json](../contract/slot-defaults.json)
+- Reason codes: [contract/reasons.json](../contract/reasons.json)
+- Example item: [examples/context-item.json](../examples/context-item.json)
+- Example route policies: [examples/route-policies.json](../examples/route-policies.json)
 - The whole contract in one file: https://contextwindowarchitecture.io/llms-full.txt
