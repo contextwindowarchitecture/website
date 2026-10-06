@@ -382,6 +382,7 @@
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-05 · reports name their repository</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
             <li>Conformance report: the contract member names the repository the cases came from as well as the commit, as {repository, commit, dirty}, in place of website_commit. The cases come from contextwindowarchitecture/website today; once the specification repository holds them, reports name that repository and the schema stays as it is. A report written in the old shape is read against the report schema of the commit it ran against, as its cases already are, so it keeps counting until its implementation runs again.</li>
+            <li>Implementations: the Python, TypeScript, Go and Rust assemblers vendored this revision and write the new member, each still passing 61 cases and rejecting 25 rejections, and assembler-template's report check rejects a report in the old shape.</li>
           </ul>
         </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">

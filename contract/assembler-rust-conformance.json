@@ -1,7 +1,7 @@
 {
   "source": {
     "repository": "contextwindowarchitecture/assembler-rust",
-    "commit": "aa3e80fdb913cfd33bc17fb8d7480a119515413c",
+    "commit": "47385da6e8eeed61c8a569c3f5642e4a8f43b154",
     "dirty": false,
     "tags": [
       "draft-release"
@@ -703,8 +703,9 @@
       }
     ],
     "contract": {
+      "commit": "4549cf7bc537a349d8cd0dc1a740a491f78965e0",
       "dirty": false,
-      "website_commit": "79da314331b10dccdc1fc938f8e4cc5708d9cfba"
+      "repository": "contextwindowarchitecture/website"
     },
     "implementation": {
       "language": "Rust",
