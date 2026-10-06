@@ -499,7 +499,7 @@ None is released, so work from a checkout. Each publishes a conformance report, 
 
 | Language | Package | Repository | Commit | Published cases and rejections | Contract vendored at |
 | --- | --- | --- | --- | --- | --- |
-| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `61b7b4e` (draft-release) | 86 of 86 pass | website `7ef1276` |
+| Python | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-python | `6d6514f` (draft-release) | 86 of 86 pass | website `b37f444` |
 | TypeScript | `@contextwindowarchitecture/assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-typescript | `b7a8940` (draft-release) | 86 of 86 pass | website `7ef1276` |
 | Go | `github.com/contextwindowarchitecture/assembler-go` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-go | `91a3ffc` (draft-release) | 86 of 86 pass | website `7ef1276` |
 | Rust | `contextwindowarchitecture-assembler` 0.0.1 | https://github.com/contextwindowarchitecture/assembler-rust | `22fa759` (draft-release) | 86 of 86 pass | website `7ef1276` |
