@@ -831,7 +831,7 @@ test('every route policy route and version in the corpus, the examples and the r
 test('a conformance report lists rejection cases as rejected, failed or skipped (R-17)', async () => {
   // The stored report's own contract member is judged against the schema of the commit it ran against; this test holds
   // the rest of it to the current schema.
-  const report = { ...(await read('contract/assembler-conformance.json')).report, contract: { repository: 'contextwindowarchitecture/website', commit: 'a'.repeat(40), dirty: false } };
+  const report = { ...(await read('implementations/python.json')).report, contract: { repository: 'contextwindowarchitecture/website', commit: 'a'.repeat(40), dirty: false } };
   for (const [row, valid] of [
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'rejected' }, true],
     [{ id: 'profile-route-mismatch', rules: ['R-17', 'R-20'], outcome: 'failed', detail: 'assembled a payload' }, true],

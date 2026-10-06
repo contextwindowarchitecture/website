@@ -5,7 +5,7 @@ import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
-import { IMPLEMENTATIONS, caseDigestsNow, ranAt, reportErrors, tally } from './conformance-reports.mjs';
+import { caseDigestsNow, implementations, ranAt, tally } from './conformance-reports.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -141,13 +141,13 @@ const scopes = await read('contract/assembler-scope.json');
 if (scopes.length !== requirements.length || scopes.some((row, index) => row.id !== `R-${index + 1}` || !['assembler', 'boundary', 'application'].includes(row.scope) || !row.note)) {
   throw new Error(`contract/assembler-scope.json needs R-1 through R-${requirements.length} in order, each with a scope and a note.`);
 }
-// Claims imported from the reference assembler (scripts/import-assembler-status.mjs).
-const { requirements: statuses } = await read('contract/assembler-status.json');
+// The reference assembler's claims, imported by conformance/import_report.py --status.
+const { requirements: statuses } = await read('implementations/python.status.json');
 const allowed = { assembler: ['planned', 'in progress', 'implemented'], boundary: ['planned', 'in progress', 'boundary-checked'], application: ['documented'] };
 statuses.forEach((row, i) => {
-  if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`contract/assembler-status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
+  if (row.id !== `R-${i + 1}` || !allowed[scopes[i].scope].includes(row.status)) throw new Error(`implementations/python.status.json: ${row.id} status ${row.status} does not fit scope ${scopes[i].scope}`);
 });
-if (statuses.length !== requirements.length) throw new Error(`contract/assembler-status.json needs R-1 through R-${requirements.length}.`);
+if (statuses.length !== requirements.length) throw new Error(`implementations/python.status.json needs R-1 through R-${requirements.length}.`);
 // Each implementation's conformance run, checked against this repo's own cases: a published case the report
 // lacks, reports as anything but passed (rejected, for a rejection case), or ran before its files last changed
 // does not count (conformance/README.md, Reporting results).
@@ -156,12 +156,9 @@ const digests = await caseDigestsNow();
 const published = (await Promise.all([...await caseFiles('conformance/cases'), ...await caseFiles('conformance/rejections')].map(read)))
   .map(c => ({ ...c, digest: digests[c.id] }));
 const casesFor = id => published.filter(c => c.rules.includes(id));
-const runs = await Promise.all(IMPLEMENTATIONS.map(async ({ label, file }) => {
+// conformance/check.py holds each stored report to its schema and its digests; the page counts them.
+const runs = await Promise.all((await implementations()).map(async ({ label, file }) => {
   const { source, cases_at_run: atRun, report } = await read(file);
-  if (report === undefined || atRun === undefined) throw new Error(`${file} has no report or cases_at_run; import it with scripts/import-conformance-report.mjs`);
-  if (!Array.isArray(source.tags)) throw new Error(`${file} has no source.tags; import it again with scripts/import-conformance-report.mjs`);
-  const errors = reportErrors(report);
-  if (errors) throw new Error(`${file}: ` + JSON.stringify(errors));
   return { label, source, report, outcomes: tally(report, atRun, published) };
 }));
 const conformance = runs.map(({ label, source, report, outcomes }) => ({

@@ -1,18 +1,15 @@
-// The conformance reports the Assembler page shows, one per implementation, and how the build counts them
-// against the published cases (conformance/README.md, Reporting results).
-import { execFileSync } from 'node:child_process';
+// The conformance reports the Assembler page shows, one per implementation listed in implementations/index.json, and
+// how the build counts them against the published cases (conformance/README.md, Reporting results). The reports are
+// imported, and checked, by conformance/import_report.py and conformance/check.py.
 import { createHash } from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import Ajv from 'ajv/dist/2020.js';
-import addFormats from 'ajv-formats';
 
-export const IMPLEMENTATIONS = [
-  { label: 'Python', file: 'contract/assembler-conformance.json' },
-  { label: 'TypeScript', file: 'contract/assembler-ts-conformance.json' },
-  { label: 'Go', file: 'contract/assembler-go-conformance.json' },
-  { label: 'Rust', file: 'contract/assembler-rust-conformance.json' },
-];
+/** Each listed implementation: its id, the label the page gives it, and the file that stores its report. */
+export async function implementations(root = '.') {
+  const index = JSON.parse(await fs.readFile(path.join(root, 'implementations', 'index.json'), 'utf8'));
+  return index.map(({ id, label }) => ({ id, label, file: `implementations/${id}.json` }));
+}
 
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 // A case's digest: SHA-256 over its files' names and SHA-256s, in name order.
@@ -31,21 +28,10 @@ export async function caseDigestsNow(root = '.') {
   return digests;
 }
 
-/** Each case's digest as its files were at a commit of this repository, read from git, keyed by case id. */
-export function caseDigestsAt(commit, root = '.') {
-  const git = (...args) => execFileSync('git', ['-C', root, ...args], { maxBuffer: 1 << 28 });
-  const byCase = new Map();
-  for (const file of git('ls-tree', '-r', '--name-only', commit, '--', 'conformance/cases', 'conformance/rejections').toString('utf8').split('\n').filter(Boolean)) {
-    const [, , id, name] = file.split('/');
-    byCase.set(id, [...(byCase.get(id) ?? []), [name, git('show', `${commit}:${file}`)]]);
-  }
-  return Object.fromEntries([...byCase].map(([id, files]) => [id, digest(files)]));
-}
-
 /**
  * Each published case's outcome in a report: passed (or, for a rejection case, rejected), failed, stale when the
  * case changed after the run, or not run when the report lacks it. atRun is null when the run cannot be tied to
- * a clean website commit, and then every case the report has is stale.
+ * a clean commit, and then every case the report has is stale.
  */
 export function tally(report, atRun, published) {
   const outcomes = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
@@ -53,70 +39,6 @@ export function tally(report, atRun, published) {
     !outcomes.has(c.id) ? 'not run' : atRun?.[c.id] !== c.digest ? 'stale' : outcomes.get(c.id) ? 'passed' : 'failed']));
 }
 
-/**
- * A reference assembler's status claims under this site's scopes (contract/assembler-scope.json). implemented means
- * tests exercise every clause of an assembler row, so on a row the site has since scoped boundary, a narrower scope,
- * the same tests prove boundary-checked. Nothing is widened: boundary-checked on an assembler row stays, and the
- * build rejects it.
- */
-export function claimsUnder(scopes, claims) {
-  const scope = new Map(scopes.map(s => [s.id, s.scope]));
-  return claims.map(c => c.status === 'implemented' && scope.get(c.id) === 'boundary' ? { ...c, status: 'boundary-checked' } : c);
-}
-
 /** The commit a report's cases came from. A report written before the contract member named its repository calls it
  * website_commit. */
 export const ranAt = report => report?.contract?.commit ?? report?.contract?.website_commit;
-
-const validators = new Map();
-/**
- * A report's errors against conformance_report.schema.json as it stood at the commit the report ran against, read from
- * git, or null when it is valid there. A report is judged by the contract it ran on, as its cases are (cases_at_run),
- * so a change to the report schema leaves stored reports valid until their implementations run again.
- */
-export function reportErrors(report, root = '.') {
-  const commit = ranAt(report);
-  if (typeof commit !== 'string' || !/^[0-9a-f]{40}$/.test(commit)) return [{ message: 'the report names no contract commit' }];
-  const text = execFileSync('git', ['-C', root, 'show', `${commit}:schema/conformance_report.schema.json`], { encoding: 'utf8' });
-  if (!validators.has(text)) {
-    const ajv = new Ajv({ allErrors: true, strict: true });
-    addFormats(ajv);
-    validators.set(text, ajv.compile(JSON.parse(text)));
-  }
-  const validate = validators.get(text);
-  return validate(report) ? null : validate.errors;
-}
-
-/** A remote URL as owner/repo when it is on GitHub, over HTTPS or SSH; any other URL as given; null for none. */
-export function repositoryOf(url) {
-  if (!url) return null;
-  const github = /^(?:https:\/\/github\.com\/|git@github\.com:|ssh:\/\/git@github\.com\/)([\w.-]+)\/([\w.-]+?)(?:\.git)?\/?$/.exec(url);
-  return github ? `${github[1]}/${github[2]}` : url;
-}
-
-/** A checkout's origin remote as repositoryOf names it, or null when it has none. */
-export function remoteOf(checkout) {
-  try {
-    return repositoryOf(execFileSync('git', ['-C', checkout, 'remote', 'get-url', 'origin'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim());
-  } catch {
-    return null;
-  }
-}
-
-/** An implementation checkout as an import records it: its repository (remoteOf), its commit, whether it was dirty
- * (in paths, when given, else anywhere) and every tag on that commit, in name order, which the Assembler page shows
- * beside the commit. */
-export function sourceOf(checkout, ...paths) {
-  const git = (...args) => execFileSync('git', ['-C', checkout, ...args], { encoding: 'utf8' }).trim();
-  return { repository: remoteOf(checkout), commit: git('rev-parse', 'HEAD'), dirty: git('status', '--porcelain', '--', ...paths) !== '',
-    tags: git('tag', '--points-at', 'HEAD').split('\n').filter(Boolean).sort() };
-}
-
-/** A report as the website stores it: { source, cases_at_run, report }. source names the implementation's checkout,
- * cases_at_run holds the digests of the cases as they were at the website commit it ran against, and report is the
- * implementation's conformance-report.json untouched, so it validates on its own against conformance_report.schema.json
- * as it stood at that commit (reportErrors). */
-export function imported(source, report, root = '.') {
-  const atRun = report.contract.dirty ? null : caseDigestsAt(ranAt(report), root);
-  return { source, cases_at_run: atRun, report };
-}

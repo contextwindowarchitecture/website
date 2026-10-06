@@ -493,7 +493,7 @@ test('specification, its Markdown copy, and status matrix share every permanent 
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r.slice(0, 2)))), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
   const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => [r[2], r[3]]))), scopes.map(s => [s.scope, s.note]));
-  const imported = JSON.parse(await fs.readFile(new URL('../contract/assembler-status.json', import.meta.url), 'utf8'));
+  const imported = JSON.parse(await fs.readFile(new URL('../implementations/python.status.json', import.meta.url), 'utf8'));
   assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r[4]))), imported.requirements.map(r => r.status));
   const view = await component('assembler.html');
   const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
@@ -650,16 +650,7 @@ test('the landing page shows its sample request exactly as the payload holds it'
   assert.ok(html.includes(`sha256 · ${createHash('sha256').update(bytes).digest('hex').slice(0, 12)}`));
 });
 
-test('an implemented claim imports as boundary-checked on a row the site scopes boundary, and nothing is widened', async () => {
-  const { claimsUnder } = await import('../scripts/conformance-reports.mjs');
-  const scopes = ['assembler', 'boundary', 'boundary', 'boundary', 'assembler'].map((scope, i) => ({ id: `R-${i + 1}`, scope }));
-  const claims = ['implemented', 'implemented', 'boundary-checked', 'in progress', 'boundary-checked'].map((status, i) => ({ id: `R-${i + 1}`, status, evidence: ['t'] }));
-  const under = claimsUnder(scopes, claims);
-  assert.deepEqual(under.map(c => c.status), ['implemented', 'boundary-checked', 'boundary-checked', 'in progress', 'boundary-checked']);
-  assert.deepEqual(under.map(c => c.evidence), claims.map(c => c.evidence));
-});
-
-const IMPORTED = [['Python', 'contract/assembler-conformance.json'], ['TypeScript', 'contract/assembler-ts-conformance.json'], ['Go', 'contract/assembler-go-conformance.json'], ['Rust', 'contract/assembler-rust-conformance.json']];
+const IMPORTED = JSON.parse(await fs.readFile(new URL('../implementations/index.json', import.meta.url), 'utf8')).map(({ label, id }) => [label, `implementations/${id}.json`]);
 const readJson = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
 // A case's digest, computed here independently of scripts/conformance-reports.mjs: SHA-256 over its files' paths and SHA-256s.
 async function caseDigest(dir) {
@@ -710,89 +701,6 @@ test('the implementations table and status matrix count, per implementation, the
   }
 });
 
-// README.md promises each report was imported from a clean checkout, and conformance-reports.mjs counts no case from a run
-// whose contract was dirty, so an imported report records both its source and the contract it ran against as clean.
-test('every imported report comes from a clean checkout and ran against a clean contract', async () => {
-  for (const [, file] of IMPORTED) {
-    const { source, report } = await readJson(file);
-    assert.equal(source.dirty, false, `${file}: source`);
-    assert.equal(report.contract.dirty, false, `${file}: contract`);
-  }
-});
-
-test('an imported report is stored whole, valid against the report schema of the commit it ran against, beside its source and the digests of the cases it ran', async () => {
-  const { reportErrors } = await import('../scripts/conformance-reports.mjs');
-  for (const [, file] of IMPORTED) {
-    const { source, cases_at_run: atRun, report, ...rest } = await readJson(file);
-    assert.deepEqual(Object.keys(rest), [], `${file} carries only source, cases_at_run and report`);
-    assert.match(source.commit, /^[0-9a-f]{40}$/, file);
-    assert.ok(Array.isArray(source.tags) && source.tags.every(tag => typeof tag === 'string' && tag !== ''), `${file}: source.tags`);
-    assert.deepEqual(source.tags, [...new Set(source.tags)].sort(), `${file}: source.tags sorted and distinct`);
-    assert.ok(atRun === null || typeof atRun === 'object', file);
-    assert.equal(reportErrors(report), null, file);
-  }
-});
-
-// A report is judged by the contract it ran against, as its cases are: one written before the report schema changed
-// stays valid against the schema of its own commit, and a report naming a later commit is held to that commit's.
-test('a report is valid or not against conformance_report.schema.json as it stood at the commit the report ran against', async () => {
-  const { reportErrors } = await import('../scripts/conformance-reports.mjs');
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'cwa-report-schema-'));
-  const git = (...args) => execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@example.invalid', '-c', 'core.hooksPath=/dev/null',
-    '-c', 'commit.gpgSign=false', ...args], { encoding: 'utf8' }).trim();
-  const schema = await readJson('schema/conformance_report.schema.json');
-  const before = structuredClone(schema);
-  before.properties.contract = { type: 'object', properties: { website_commit: { type: 'string', pattern: '^[0-9a-f]{40}$' }, dirty: { type: 'boolean' } },
-    required: ['website_commit', 'dirty'], additionalProperties: false };
-  const commit = async (body, message) => {
-    await fs.writeFile(path.join(dir, 'schema', 'conformance_report.schema.json'), JSON.stringify(body));
-    git('add', '.');
-    git('commit', '-q', '-m', message);
-    return git('rev-parse', 'HEAD');
-  };
-  try {
-    git('init', '-q');
-    await fs.mkdir(path.join(dir, 'schema'));
-    const old = await commit(before, 'website_commit');
-    const now = await commit(schema, 'repository and commit');
-    const report = contract => ({ implementation: { name: 'x', version: '1' }, contract, cases: [{ id: 'a', rules: ['R-1'], outcome: 'passed' }] });
-    assert.equal(reportErrors(report({ website_commit: old, dirty: false }), dir), null, 'the old shape at the old commit');
-    assert.notEqual(reportErrors(report({ website_commit: now, dirty: false }), dir), null, 'the old shape at the new commit');
-    assert.equal(reportErrors(report({ repository: 'contextwindowarchitecture/website', commit: now, dirty: false }), dir), null, 'the new shape at the new commit');
-    assert.notEqual(reportErrors(report({ repository: 'contextwindowarchitecture/website', commit: old, dirty: false }), dir), null, 'the new shape at the old commit');
-    assert.notEqual(reportErrors(report({ repository: 'contextwindowarchitecture/website', dirty: false }), dir), null, 'no commit at all');
-  } finally {
-    await fs.rm(dir, { recursive: true, force: true });
-  }
-});
-
-test('an import records the checkout\'s repository and commit, whether the given paths are dirty, and every tag on that commit', async () => {
-  const { sourceOf } = await import('../scripts/conformance-reports.mjs');
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'cwa-source-'));
-  const git = (...args) => execFileSync('git', ['-C', dir, '-c', 'user.name=t', '-c', 'user.email=t@example.invalid', '-c', 'core.hooksPath=/dev/null',
-    '-c', 'commit.gpgSign=false', '-c', 'tag.gpgSign=false', '-c', 'tag.forceSignAnnotated=false', ...args], { encoding: 'utf8' }).trim();
-  try {
-    git('init', '-q');
-    await fs.writeFile(path.join(dir, 'a.txt'), '1');
-    git('add', 'a.txt');
-    git('commit', '-q', '-m', 'one');
-    git('tag', 'earlier');
-    await fs.writeFile(path.join(dir, 'a.txt'), '2');
-    git('commit', '-q', '-a', '-m', 'two');
-    git('tag', '-a', '-m', 'annotated', 'v0.1.0');
-    git('tag', 'draft-release');
-    git('remote', 'add', 'origin', 'git@github.com:example/assembler-x.git');
-    assert.deepEqual(sourceOf(dir), { repository: 'example/assembler-x', commit: git('rev-parse', 'HEAD'), dirty: false, tags: ['draft-release', 'v0.1.0'] });
-    await fs.writeFile(path.join(dir, 'b.txt'), 'untracked');
-    assert.equal(sourceOf(dir).dirty, true);
-    assert.equal(sourceOf(dir, 'a.txt').dirty, false);
-    git('checkout', '-q', 'earlier');
-    assert.deepEqual(sourceOf(dir).tags, ['earlier']);
-  } finally {
-    await fs.rm(dir, { recursive: true, force: true });
-  }
-});
-
 test('a case changed or published after a report\'s run does not count as passing', async () => {
   const { tally } = await import('../scripts/conformance-reports.mjs');
   const published = [{ id: 'a', digest: 'd1' }, { id: 'b', digest: 'd2' }, { id: 'c', digest: 'd3' }, { id: 'd', digest: 'd4' }];
@@ -802,20 +710,6 @@ test('a case changed or published after a report\'s run does not count as passin
   assert.deepEqual(Object.fromEntries(tally(report, null, published)), { a: 'stale', b: 'stale', c: 'stale', d: 'not run' });
   const rejection = tally({ cases: [], rejections: [{ id: 'a', outcome: 'rejected' }] }, { a: 'd1' }, published.slice(0, 1));
   assert.deepEqual(Object.fromEntries(rejection), { a: 'passed' });
-});
-
-test('an imported report names its GitHub repository as owner/repo, from the checkout\'s remote', async () => {
-  const { repositoryOf } = await import('../scripts/conformance-reports.mjs');
-  for (const url of ['https://github.com/contextwindowarchitecture/assembler-python', 'https://github.com/contextwindowarchitecture/assembler-python.git',
-    'git@github.com:contextwindowarchitecture/assembler-python.git', 'ssh://git@github.com/contextwindowarchitecture/assembler-python']) {
-    assert.equal(repositoryOf(url), 'contextwindowarchitecture/assembler-python', url);
-  }
-  assert.equal(repositoryOf('https://gitlab.example.org/team/assembler.git'), 'https://gitlab.example.org/team/assembler.git');
-  assert.equal(repositoryOf(null), null);
-  for (const [, file] of IMPORTED) {
-    const { source } = await readJson(file);
-    assert.match(source.repository ?? '', /^[\w.-]+\/[\w.-]+$/, file);
-  }
 });
 
 // llms.txt indexes the site for language models in the llms.txt format (https://llmstxt.org/): a title, a one-paragraph

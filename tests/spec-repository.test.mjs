@@ -6,7 +6,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
-import { IMPLEMENTATIONS } from '../scripts/conformance-reports.mjs';
+import { implementations } from '../scripts/conformance-reports.mjs';
 import { LOCK, checkExport, specRepository, writeExport } from '../scripts/spec-repository.mjs';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -16,7 +16,7 @@ const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const tracked = (...paths) => execFileSync('git', ['-C', ROOT, 'ls-files', '--', ...paths], { encoding: 'utf8' }).split('\n').filter(Boolean);
 // The specification without the site: its text, schemas, contract data, conformance corpus and examples.
 const COPIED = () => tracked('LICENSE', 'NOTICE', 'SPEC.md', 'CHANGES.md', 'schema', 'contract/requirements.json', 'contract/reasons.json',
-  'contract/slot-defaults.json', 'contract/model.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples');
+  'contract/slot-defaults.json', 'contract/model.json', 'conformance/README.md', 'conformance/cases', 'conformance/rejections', 'conformance/registry', 'examples', 'implementations');
 const WRITTEN = ['README.md', '.github/workflows/ci.yml', '.github/workflows/release.yml', LOCK];
 
 async function listing(dir, base = dir) {
@@ -118,7 +118,7 @@ test('the repository README opens with the site\'s own description, links every 
   const described = llms.match(/^> (.*?\.) /m)[1];
   assert.match(described, /^Context Window Architecture \(CWA\) is /);
   assert.ok(readme.includes(`# Context Window Architecture\n\n${described} `), 'the README opens with the sentence llms.txt opens with');
-  for (const { file } of IMPLEMENTATIONS) {
+  for (const { file } of await implementations(ROOT)) {
     const { source } = JSON.parse(await fs.readFile(path.join(ROOT, file), 'utf8'));
     assert.ok(readme.includes(`(https://github.com/${source.repository})`), `the README links ${source.repository}`);
   }
