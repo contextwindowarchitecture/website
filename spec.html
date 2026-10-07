@@ -63,13 +63,13 @@
 
   <section style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-05</div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-06</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page renders SPEC.md, the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span>The normative text: <a href="./SPEC.md">SPEC.md</a>; every revision: <a href="./CHANGES.md">CHANGES.md</a>. JSON contracts: <a href="./schema/context_item.schema.json">items</a> · <a href="./schema/trace.schema.json">traces</a> · <a href="./schema/conflict_group.schema.json">conflict groups</a> · <a href="./contract/reasons.json">reason codes</a>.</span>
-        <span>The specification's home is <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>: its text, schemas, cases, issues and discussions. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/a010650b0c914d3c9aa3ad32ccbeb67faf04831c">a010650</a>.</span>
+        <span>The specification's home is <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>: its text, schemas, cases, issues and discussions. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/c9d42bbab1af737626757017f48bcf9b51326a70">c9d42bb</a>.</span>
         <span>Licence: <a href="./LICENSE">Apache-2.0</a>; a copy you distribute keeps the licence and the <a href="./NOTICE">NOTICE</a>.</span>
       </div>
     </div>
@@ -378,6 +378,15 @@
         <p style="font-size: 15px; line-height: 1.6;"><strong>Draft history.</strong> The 2026-09-22 revision separated instruction authority from factual precedence; made freshness, producer exclusions, refusal traces, clock snapshots, token accounting, and draft evaluation status explicit; and published executable JSON contracts and shared validators. Example profiles are all unevaluated. Changelog entries older than that revision describe superseded draft behavior.</p>
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
+        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-06 · digests of numbers beyond 2^53</div>
+          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
+            <li>generators/digest.py wrote a whole double beyond 2^53 as its exact value, where RFC 8785 writes ECMAScript's shortest round-trip digits padded with zeros: 12345678901234567890 came out as 12345678901234567168 rather than 12345678901234567000. The conformance README's Snapshot digest already said the second, and the Python, TypeScript, Go and Rust assemblers already computed it; only the generator departed, and no published case held such a number, so every published digest is unchanged. It now writes such a double as ECMAScript does, and a test holds it to JavaScript's output.</li>
+            <li>Conformance corpus: the new digest-beyond-2-53 case holds scores of more than 17 significant digits, as integers and as a fraction with an exponent, which round to the same double as min_relevance and pass, and one that rounds to the double below and is below_threshold. A digest that writes the exact value fails it. Implementations count it as not run until they run it. No requirement changes.</li>
+            <li>Fixes contextwindowarchitecture/contextwindowarchitecture#3.</li>
+            <li>Implementations: the Python, TypeScript, Go and Rust assemblers vendored this revision with no code change, each passing 62 cases, digest-beyond-2-53 included, and rejecting 25 rejections.</li>
+          </ul>
+        </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-05 · reports name their repository</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
