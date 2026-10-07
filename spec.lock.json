@@ -1,7 +1,9 @@
 {
   "repository": "contextwindowarchitecture/contextwindowarchitecture",
-  "commit": "c9d42bbab1af737626757017f48bcf9b51326a70",
-  "tags": [],
+  "commit": "4e957aba3f5e67e02592f65db06ba05bbb44e151",
+  "tags": [
+    "draft-release"
+  ],
   "files": {
     "CHANGES.md": "b2844a375e44aa36e632f794c91e4ad06a122d9f2f983ce37ef5582441d54fbf",
     "SPEC.md": "5cb95074e77d7a024b72eeefa41597ced57d25a755a1acb1b8f680742fde8eb2",
@@ -326,12 +328,12 @@
     "examples/trace.json": "06176c3fb8eaaed625e327e6b69a67238dc92c5a38d75936c3212a187c81768a",
     "guides/assemblers.md": "41cd91c823012a59d00c0ddab91acad5eb5753c7dab9ae1f16d29987bdfcadf8",
     "guides/producers.md": "7e6a88f5609fe054879d698781dc5f804baec1550378819659bc13701a0c8f8e",
-    "implementations/go.json": "b7b92b1b1db42e5160d75268d6e858e20d2625014ec9cab6ebdc5f577e2aeaa6",
+    "implementations/go.json": "cd7a71fbeabf806fca4fca5abd1399de07adc973568fa4aedbd099800760610c",
     "implementations/index.json": "ba1a23678542963ac97687c0e56c3de2f4125bdc188951759b35316c233871ae",
-    "implementations/python.json": "cc0783bc92012ff502540c3d42267c354b77884601fa15c17a93ba244b6b62e7",
-    "implementations/python.status.json": "015a51aab2dd10699812e0f27b6c69670b45b0784fab4b54807b4d192539b4e7",
-    "implementations/rust.json": "544f10e4d3a1f67e7fa9eeaa215676b83a62969458ec5a6321b1fe6614d4afdf",
-    "implementations/typescript.json": "13309979a55c214f22b96e0f6b5b154fad40752b102200285d82a1b4d202dd97",
+    "implementations/python.json": "de85aa46385f8a10d11b55fb265dd266cc27fae5c72af1547a47777450d9ffb8",
+    "implementations/python.status.json": "9b9cac024dd8336ba33a791ef9f6f85fa3bef7235eca3b1c13a4dc107c6b4373",
+    "implementations/rust.json": "24eedd30fdddc8d18ece5285d52d9322d9b0a14f03692fb0e1e47f7b82600a56",
+    "implementations/typescript.json": "3bd3930e2ba9420b79d3576b057cf4a31b51e592d94613d1b181e699d24d35d9",
     "schema/conflict_group.schema.json": "06b6df97c84474371194b7f8758c3264d61c96b4a50ca1e865bff3e811365b89",
     "schema/conformance_report.schema.json": "8bd0f68e0b92d70cd2fc2c82a43bcad9ed0fb056402cd92ad091c0fe85f2568a",
     "schema/context_item.schema.json": "de2de6038743aa5f0b473e409e7369aa4fffb515661a71803429fd9017ee8726",
