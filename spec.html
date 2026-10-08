@@ -63,13 +63,13 @@
 
   <section style="border-bottom: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-06</div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-07</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page renders SPEC.md, the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span>The normative text: <a href="./SPEC.md">SPEC.md</a>; every revision: <a href="./CHANGES.md">CHANGES.md</a>. JSON contracts: <a href="./schema/context_item.schema.json">items</a> · <a href="./schema/trace.schema.json">traces</a> · <a href="./schema/conflict_group.schema.json">conflict groups</a> · <a href="./contract/reasons.json">reason codes</a>.</span>
-        <span>The specification's home is <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>: its text, schemas, cases, issues and discussions. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/4e957aba3f5e67e02592f65db06ba05bbb44e151">4e957ab</a>.</span>
+        <span>The specification's home is <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>: its text, schemas, cases, issues and discussions. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/16de4be0534583f135a597171c927d42c87ee82c">16de4be</a>.</span>
         <span>Licence: <a href="./LICENSE">Apache-2.0</a>; a copy you distribute keeps the licence and the <a href="./NOTICE">NOTICE</a>.</span>
       </div>
     </div>
@@ -378,6 +378,16 @@
         <p style="font-size: 15px; line-height: 1.6;"><strong>Draft history.</strong> The 2026-09-22 revision separated instruction authority from factual precedence; made freshness, producer exclusions, refusal traces, clock snapshots, token accounting, and draft evaluation status explicit; and published executable JSON contracts and shared validators. Example profiles are all unevaluated. Changelog entries older than that revision describe superseded draft behavior.</p>
 
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Changelog</div>
+        <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
+          <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-07 · numbers however they are written</div>
+          <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
+            <li>Conformance corpus: three new cases and one changed. All four listed assemblers passed every published case, while generated inputs found a defect in three of them that no case reached. The conformance README already decides each, so no requirement changes. The README's Numbers section and its defaults_filled rule now name the cases.</li>
+            <li>doubles-nearest writes scores near 2^53 with fractions and exponents, including halfway values that round to even, and doubles-largest writes the largest double as 1797693134862315700E290 and as 1.7976931348623158e308, which rounds to it rather than out of range. Each must be read as the nearest double, which a parser that is not correctly rounded misses.</li>
+            <li>integer-written-as-double repeats diversity-cap with max_per_source written 2.0. That is the same double as 2, which JSON Schema also counts as an integer, so the case has diversity-cap's decisions and payload. generators/conflicts.py now reads the cap as an integer, so it builds this case too.</li>
+            <li>admission-reasons: two candidates excluded with duplicate_item_id now leave lineage to the slot default, so defaults_filled lists them (R-3: it covers items later excluded). Its snapshot, trace and digest change; its payload does not.</li>
+            <li>Implementations count the three new cases, and admission-reasons, as not run until they run them again. Fixes contextwindowarchitecture/contextwindowarchitecture#7; see contextwindowarchitecture/assembler-go#1, contextwindowarchitecture/assembler-python#1 and contextwindowarchitecture/assembler-rust#1.</li>
+          </ul>
+        </div>
         <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 20px; margin-bottom: 20px;">
           <div style="font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted);">draft<br />2026-10-06 · digests of numbers beyond 2^53</div>
           <ul style="margin: 0; padding: 0 0 0 18px; font-size: 14.5px; line-height: 1.6; color: var(--muted); display: grid; gap: 4px;">
