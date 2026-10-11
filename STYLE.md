@@ -276,7 +276,7 @@ All buttons are pills. There is no disabled, loading or pressed style.
 | Large inverse (inverted band) | inverse at `font-size: 16px; padding: 15px 26px`, coloured `--bg` fill with `--fg` text | `background: var(--accent); color: var(--bg)` |
 | Outline on the inverted band | `font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;` | `border-color: var(--bg)` |
 
-A `<button>` always sets `font-family: inherit` (or `var(--mono)` for ghosts) because the browser default would not. Labels are sentence case: "Take the tour", "Watch it assemble", "Copy the scaffold".
+A `<button>` always sets `font-family: inherit` (or `var(--mono)` for ghosts) because the browser default would not. Labels are sentence case: "Take the tour", "Watch it assemble", "Getting started →".
 
 ### Links
 
