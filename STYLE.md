@@ -17,7 +17,7 @@ Warm, flat, typographic, hairline, editorial.
 
 ## 2. Tokens
 
-Every page declares the same custom properties on `:root`, with a dark override on `html[data-theme="dark"]`. Colours are authored in OKLCH; the hex columns are the sRGB values Chrome renders and exist only for handoff to tools that cannot read OKLCH.
+Every page declares the same custom properties on `:root`, with a dark override on `html[data-theme="dark"]`. Colours are authored in OKLCH; the hex columns are the sRGB conversions `tests/accessibility.test.mjs` computes and holds this table to, and exist only for handoff to tools that cannot read OKLCH. The same test holds every colour used as text to 4.5:1 against `--bg` and `--surface` in both themes, so a token change that fails WCAG AA fails the build.
 
 | Token | Role | Light | Light hex | Dark | Dark hex |
 |---|---|---|---|---|---|
@@ -26,11 +26,11 @@ Every page declares the same custom properties on `:root`, with a dark override 
 | `--fg` | Primary text, inverted panels | `oklch(0.20 0.010 80)` | `#181611` | `oklch(0.955 0.004 90)` | `#f1f0ed` |
 | `--muted` | Secondary text, labels, nav at rest | `oklch(0.52 0.010 80)` | `#6c6863` | `oklch(0.68 0.010 85)` | `#9b9891` |
 | `--line` | Every border and divider | `oklch(0.885 0.006 90)` | `#dad9d5` | `oklch(0.305 0.008 80)` | `#312f2b` |
-| `--accent` | Emphasis, links, primary button | `oklch(0.60 0.20 38)` | `#dd4300` | `oklch(0.74 0.17 45)` | `#ff8244` |
+| `--accent` | Emphasis, links, primary button | `oklch(0.55 0.20 38)` | `#cb3000` | `oklch(0.74 0.17 45)` | `#ff8244` |
 | `--accent-soft` | Hover fills, note callouts | `oklch(0.94 0.035 45)` | `#ffe5d8` | `oklch(0.30 0.045 45)` | `#41261a` |
-| `--p-gov` | Governance plane | `oklch(0.58 0.17 38)` | `#ca4b20` | `oklch(0.76 0.15 45)` | `#fe8f5b` |
-| `--p-state` | State plane | `oklch(0.56 0.14 250)` | `#2378c3` | `oklch(0.76 0.12 250)` | `#73b6fa` |
-| `--p-evid` | Evidence plane | `oklch(0.54 0.13 155)` | `#0d844c` | `oklch(0.76 0.13 155)` | `#65c98c` |
+| `--p-gov` | Governance plane | `oklch(0.55 0.17 38)` | `#bf4213` | `oklch(0.76 0.15 45)` | `#fe8f5b` |
+| `--p-state` | State plane | `oklch(0.53 0.14 250)` | `#166eb9` | `oklch(0.76 0.12 250)` | `#73b6fa` |
+| `--p-evid` | Evidence plane | `oklch(0.52 0.13 155)` | `#007e46` | `oklch(0.76 0.13 155)` | `#65c98c` |
 | `--p-inter` | Interaction plane | `oklch(0.54 0.15 310)` | `#8951af` | `oklch(0.76 0.13 310)` | `#ca99ef` |
 
 Non-colour tokens:
@@ -55,11 +55,11 @@ The block to copy into a new page, verbatim:
   --fg: oklch(0.20 0.010 80);
   --muted: oklch(0.52 0.010 80);
   --line: oklch(0.885 0.006 90);
-  --accent: oklch(0.60 0.20 38);
+  --accent: oklch(0.55 0.20 38);
   --accent-soft: oklch(0.94 0.035 45);
-  --p-gov: oklch(0.58 0.17 38);
-  --p-state: oklch(0.56 0.14 250);
-  --p-evid: oklch(0.54 0.13 155);
+  --p-gov: oklch(0.55 0.17 38);
+  --p-state: oklch(0.53 0.14 250);
+  --p-evid: oklch(0.52 0.13 155);
   --p-inter: oklch(0.54 0.15 310);
 }
 html[data-theme="dark"] {
@@ -82,6 +82,10 @@ a { color: var(--accent); text-decoration: none; }
 a:hover { color: var(--fg); }
 ::selection { background: var(--accent); color: var(--bg); }
 @keyframes cwaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
 ```
 
 The landing page uses `overflow-x: hidden` on `html` instead of `scroll-padding-top`. The `.thumbnail` WebP and the `__bundler_thumbnail` SVG template in `index.html` use rounded hex approximations of these tokens (`#faf8f5`, `#c9502a`, `#4a72b8`, `#3f8a5c`, `#8a5aa6`). They are for the canvas thumbnail only and are not tokens.
@@ -119,7 +123,7 @@ Do not use a plane colour for a status, a category or a chart series that is not
 
 ### Dark mode
 
-The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each page reads `localStorage["cwa-theme"]` on load, defaults to `light`, and writes the choice back when the header toggle is pressed. The toggle's label names the theme you would switch to ("Dark" while light). Everything else follows from the token override, so a component that only uses tokens needs no dark-mode work. The header's translucent background uses `color-mix(in oklab, var(--bg) 88%, transparent)` so it adapts too. The landing page's canvas `accent` prop is pinned inline on `<html>` only when it differs from the default `oklch(0.60 0.20 38)`, so the theme token stays in charge unless the canvas overrides it.
+The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each page reads `localStorage["cwa-theme"]` on load, defaults to `light`, and writes the choice back when the header toggle is pressed. The toggle's label names the theme you would switch to ("Dark" while light). Everything else follows from the token override, so a component that only uses tokens needs no dark-mode work. The header's translucent background uses `color-mix(in oklab, var(--bg) 88%, transparent)` so it adapts too. The landing page's canvas `accent` prop is pinned inline on `<html>` only when it differs from the default `oklch(0.55 0.20 38)`, so the theme token stays in charge unless the canvas overrides it.
 
 ## 4. Typography
 
@@ -249,7 +253,7 @@ Snippets are the exact inline styles in use; hover states use the `style-hover` 
   <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
 ```
 
-Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), "Take the tour" primary button, menu button (narrow only), theme toggle, GitHub inverse button. The wordmark is `font-weight: 700; letter-spacing: -0.02em; font-size: 16px` in `--fg`.
+Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), "Take the tour" primary button, menu button (narrow only), theme toggle, GitHub inverse button. The wordmark is `font-weight: 700; letter-spacing: -0.02em; font-size: 16px` in `--fg`, and the logo link is `min-height: 24px`, the WCAG 2.2 target size.
 
 ### Navigation
 
@@ -336,7 +340,7 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 ### Guided tour overlay
 
-A fixed, `inset: 0`, `z-index: 90`, `pointer-events: none` layer holding four mask panels, a ring around the current target and a card. The card uses a `10.5px` accent kicker with a muted step count on the right, a `20px` 700 title, `15px` muted body, and a row of `2px`-gapped dots.
+A fixed, `inset: 0`, `z-index: 90`, `pointer-events: none` layer holding four mask panels, a ring around the current target and a card. The card uses a `10.5px` accent kicker with a muted step count on the right, a `20px` 700 title, `15px` muted body, and a row of `2px`-gapped dots. The card is `role="dialog"`, named by its title through `aria-labelledby="tourtitle"`, and not modal, because the page stays usable behind it: focus moves to Next (`#tournext`) when the tour opens and on each step, and returns to the button that opened the tour when it closes.
 
 ### Step walkthrough
 
@@ -352,6 +356,8 @@ Icons are the three 18px line icons in the landing hero: `viewBox="0 0 24 24" fi
 - **The one animation** is `cwaRise` (opacity 0 to 1, `translateY(14px)` to none), applied when the demo inserts a slot row: `animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both` for rows, `240ms` for nested detail, `260ms ease` for a revealed paragraph.
 - **The one transition** is `flex-basis 320ms ease` on the budget bar segments in the demo.
 - Scrolling is `scroll-behavior: smooth` with an `88px` offset for the sticky header.
+- **Reduced motion.** Every page's `<style>` ends with a `prefers-reduced-motion: reduce` rule that stops smooth scrolling, `cwaRise` and every transition. The landing page also reads the preference on mount: the demo and the hero preview start complete and still, with Play to run them. The hero preview has a Pause button of its own in any case, since it would otherwise cycle with no control.
+- **Announcements and states.** The demo's slots panel holds a visually hidden `role="status"` live region that says what a visitor changed: a slot removed or restored, the budget, the system, the blob toggle, play or pause. The system tabs, budget buttons, blob toggle, schema tabs and framework tabs carry `aria-pressed`.
 - Compressed or dropped items fade with `opacity: 0.5` or `0.8`; the inverted band de-emphasises its lede with `opacity: 0.72`.
 
 Hover conventions, in order of frequency:
@@ -379,7 +385,7 @@ Selection is `--accent` on `--bg`. Interactive elements set `cursor: pointer`. T
 
 The pages are exports from a Claude Design canvas and are rendered by `support.js`. Editing them means editing the export, so follow its shape.
 
-- **Structure:** `<body>` wraps everything in `<x-dc>`; the `<helmet>` holds the title, meta description, font links and the `<style>` block; the page content follows as ordinary elements.
+- **Structure:** `<body>` wraps everything in `<x-dc>`, followed by a `<noscript>` block that hides the unrendered template and names `SPEC.md` and `llms.txt`; the `<helmet>` holds the title, meta description, font links and the `<style>` block; the page content follows as ordinary elements.
 - **Inline styles only.** Elements carry `style="…"` with token references. There are no class-based styles, apart from responsive hooks: the assembler matrix helpers (`.im`, `.mx` and their `-hide-sm` variants) and the landing page's grid hooks (`.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd`, `.rm`), which exist only so a media query can reach many elements at once. A class never carries a style of its own outside a media rule.
 - **Hover** is the `style-hover="…"` attribute, which the runtime turns into a hover rule. There is no `style-focus` or `style-active` in use.
 - **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ tourCard }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`. The runtime passes every prop's default, so the component pins `--accent` inline only when the value differs from `ACCENT_DEFAULT`; a test keeps that constant equal to the `data-props` default and the `:root` token.
@@ -404,11 +410,11 @@ These are how the site behaves today. They are recorded so that a matching page 
 
 - **Focus visibility.** No custom focus styles, and textareas suppress the default ring.
 - **Small mono.** Labels run down to `10.5px` and `11px`. Do not go smaller.
-- **Duplicated tokens.** Because each page repeats the token block, a token change is a seven-file change. Change all seven in one commit.
+- **Duplicated tokens.** Because each page repeats the token block, a token change is a seven-file change. Change all seven in one commit; `tests/accessibility.test.mjs` holds the seven copies and this guide's table to one set of values.
 
 ## 11. Checklist for a new page or section
 
-1. Copy the `<helmet>` from `about.html`: fonts, the token block, the nav media queries, `scroll-padding-top`. Set the `<title>` as "Name — Context Window Architecture" and a one-sentence meta description.
+1. Copy the `<helmet>` and the `<noscript>` block from `about.html`: fonts, the token block, the nav media queries, `scroll-padding-top`, the reduced-motion rule. Set the `<title>` as "Name — Context Window Architecture" and a one-sentence meta description.
 2. Copy the header and footer unchanged, and set `aria-current="page"` on this page's nav link.
 3. Open with a kicker, a fluid h1 with `text-wrap: balance`, and an 18px muted lede at `64ch`.
 4. Build the body from sections separated by `border-top: 1px solid var(--line)`, alternating `--bg` and `--surface`, each in a `1180px` container with `72px 32px 88px` padding.

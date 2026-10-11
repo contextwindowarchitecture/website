@@ -19,7 +19,6 @@
 <body>
 <x-dc>
 <helmet>
-<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Context Window Architecture — a context assembler spec (draft)</title>
 <meta name="description" content="CWA is a specification for assembling every model call from typed slots: the problem it fixes, the evidence for placement profiles, normative rules with a conformance definition, and the producer contract for retrievers, memory stores and MCP servers." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,11 +34,11 @@
     --fg: oklch(0.20 0.010 80);
     --muted: oklch(0.52 0.010 80);
     --line: oklch(0.885 0.006 90);
-    --accent: oklch(0.60 0.20 38);
+    --accent: oklch(0.55 0.20 38);
     --accent-soft: oklch(0.94 0.035 45);
-    --p-gov: oklch(0.58 0.17 38);
-    --p-state: oklch(0.56 0.14 250);
-    --p-evid: oklch(0.54 0.13 155);
+    --p-gov: oklch(0.55 0.17 38);
+    --p-state: oklch(0.53 0.14 250);
+    --p-evid: oklch(0.52 0.13 155);
     --p-inter: oklch(0.54 0.15 310);
   }
   html[data-theme="dark"] {
@@ -87,6 +86,10 @@
   a:hover { color: var(--fg); }
   ::selection { background: var(--accent); color: var(--bg); }
   @keyframes cwaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
 </style>
 </helmet>
 
@@ -94,7 +97,7 @@
 
   <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
     <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
-      <a href="#top" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+      <a href="#top" style="display: flex; align-items: center; gap: 10px; min-height: 24px; color: var(--fg);">
         <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
           <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
         </span>
@@ -135,7 +138,7 @@
       <div style="border: 1px solid var(--line); background: var(--surface); padding: 18px; min-height: 460px; display: flex; flex-direction: column;">
         <div style="display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">
           <span style="color: var(--accent);">Assembling · {{ mUcName }}</span>
-          <span>{{ mProgress }}</span>
+          <span style="display: flex; align-items: center; gap: 10px;"><span>{{ mProgress }}</span><button onClick="{{ toggleHero }}" aria-label="{{ heroPlayAria }}" style="font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 3px 9px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ heroPlayLabel }}</button></span>
         </div>
         <div style="display: flex; flex-direction: column; gap: 5px; flex: 1;">
           <sc-for list="{{ heroBlocks }}" as="b" hint-placeholder-count="6">
@@ -309,18 +312,18 @@
 
       <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
         <sc-for list="{{ ucTabs }}" as="tab" hint-placeholder-count="4">
-          <button onClick="{{ tab.select }}" style="{{ tab.style }}">{{ tab.label }}</button>
+          <button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}" style="{{ tab.style }}">{{ tab.label }}</button>
         </sc-for>
       </div>
 
       <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px;">
         <span data-tour="play" style="display: flex; gap: 10px;"><button onClick="{{ togglePlay }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ playLabel }}</button>
-        <button data-tour="badbtn" onClick="{{ toggleBad }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
+        <button data-tour="badbtn" onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
         <span style="width: 1px; height: 22px; background: var(--line); margin: 0 4px;"></span>
         <span data-tour="budget" style="display: flex; align-items: center; gap: 10px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Input budget</span>
         <span style="display: flex; gap: 6px;">
           <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
-            <button onClick="{{ b.select }}" style="{{ b.style }}">{{ b.label }}</button>
+            <button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}" style="{{ b.style }}">{{ b.label }}</button>
           </sc-for>
         </span></span>
       </div>
@@ -345,6 +348,7 @@
 
       <div class="g2" style="display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 28px; align-items: start;">
         <div data-tour="slots" style="border: 1px solid var(--line); background: var(--bg); padding: 18px;">
+          <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;">{{ announce }}</div>
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
             <span>Slots</span>
             <span>{{ usedLabel }}</span>
@@ -449,8 +453,8 @@
           <h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Four planes. Eleven slots. Any number of items.</h2>
         </div>
         <div style="display: flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface);">
-          <button onClick="{{ setPlanesMode }}" style="{{ tabPlanes }}">Planes</button>
-          <button onClick="{{ setSlotsMode }}" style="{{ tabSlots }}">Slots</button>
+          <button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}" style="{{ tabPlanes }}">Planes</button>
+          <button onClick="{{ setSlotsMode }}" aria-pressed="{{ slotsPressed }}" style="{{ tabSlots }}">Slots</button>
         </div>
       </div>
       <p style="margin: 0 0 44px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
@@ -720,7 +724,7 @@ Never quote prices you cannot verify with a tool.</div>
 
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;">
         <sc-for list="{{ fwTabs }}" as="t" hint-placeholder-count="5">
-          <button onClick="{{ t.on }}" style="{{ t.style }}">{{ t.label }}</button>
+          <button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}" style="{{ t.style }}">{{ t.label }}</button>
         </sc-for>
       </div>
 
@@ -855,12 +859,12 @@ Never quote prices you cannot verify with a tool.</div>
       <div style="{{ maskL }}"></div>
       <div style="{{ maskR }}"></div>
       <div style="{{ tourRing }}"></div>
-      <div style="{{ tourCard }}">
+      <div role="dialog" aria-labelledby="tourtitle" style="{{ tourCard }}">
         <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">
           <span>{{ tourKicker }}</span>
           <span style="color: var(--muted);">{{ tourCount }}</span>
         </div>
-        <div style="font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 10px; text-wrap: pretty;">{{ tourTitle }}</div>
+        <div id="tourtitle" style="font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 10px; text-wrap: pretty;">{{ tourTitle }}</div>
         <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ tourBody }}</div>
         <div style="display: flex; gap: 2px; margin: 18px 0 16px;">
           <sc-for list="{{ tourDots }}" as="d" hint-placeholder-count="17">
@@ -868,7 +872,7 @@ Never quote prices you cannot verify with a tool.</div>
           </sc-for>
         </div>
         <div style="display: flex; align-items: center; gap: 10px;">
-          <button onClick="{{ tourNext }}" style="{{ tourNextStyle }}">{{ tourNextLabel }}</button>
+          <button id="tournext" onClick="{{ tourNext }}" style="{{ tourNextStyle }}">{{ tourNextLabel }}</button>
           <button onClick="{{ tourBack }}" style="{{ tourBackStyle }}">Back</button>
           <div style="flex: 1;"></div>
           <button onClick="{{ endTour }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; cursor: pointer; padding: 8px 4px;" style-hover="color: var(--fg);">{{ tourSkipLabel }}</button>
@@ -890,9 +894,13 @@ Never quote prices you cannot verify with a tool.</div>
   </footer>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;oklch(0.60 0.20 38)&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;oklch(0.60 0.20 38)&quot;, &quot;oklch(0.55 0.17 250)&quot;, &quot;oklch(0.55 0.14 155)&quot;, &quot;oklch(0.50 0.20 310)&quot;], &quot;section&quot;: &quot;Theme&quot;}}">
+<noscript>
+  <style>x-dc { display: none; }</style>
+  <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
+</noscript>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;: {&quot;editor&quot;: &quot;color&quot;, &quot;default&quot;: &quot;oklch(0.55 0.20 38)&quot;, &quot;tsType&quot;: &quot;string&quot;, &quot;options&quot;: [&quot;oklch(0.55 0.20 38)&quot;, &quot;oklch(0.55 0.17 250)&quot;, &quot;oklch(0.55 0.14 155)&quot;, &quot;oklch(0.50 0.20 310)&quot;], &quot;section&quot;: &quot;Theme&quot;}}">
 /* The Claude Design "accent" prop's default. It must match the data-props default above and the :root --accent token, so the standalone runtime, which passes the default when nothing was overridden, can be told apart from a real override. */
-const ACCENT_DEFAULT = "oklch(0.60 0.20 38)";
+const ACCENT_DEFAULT = "oklch(0.55 0.20 38)";
 
 const PLANES = [
   { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
@@ -1139,7 +1147,7 @@ const ITEM_FIELDS = [
 
 
 class Component extends DCLogic {
-  state = { mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true };
+  state = { mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, mPlaying: true, announce: "" };
 
   componentWillUnmount() {
     clearInterval(this._t); clearInterval(this._m); clearInterval(this._track);
@@ -1151,6 +1159,7 @@ class Component extends DCLogic {
   startHeroClock() {
     clearInterval(this._m);
     this._m = setInterval(() => {
+      if (!this.state.mPlaying) return;
       const n = UCS[this.state.mUc || 0].picks.length;
       const step = this.state.mStep || 0;
       if (step < n) this.setState({ mStep: step + 1 });
@@ -1165,10 +1174,16 @@ class Component extends DCLogic {
   toggleSlot(layer) {
     const uc = this.state.uc;
     const cur = Object.assign({}, this.offMap(uc));
-    if (cur[layer]) delete cur[layer]; else cur[layer] = true;
+    const removing = !cur[layer];
+    if (removing) cur[layer] = true; else delete cur[layer];
     const off = Object.assign({}, this.state.off || {});
     off[uc] = cur;
-    this.setState({ off, playing: false, step: 99, hold: 0 });
+    const admitted = UCS[uc].picks.filter(p => !cur[p[0]]).length;
+    // What a screen reader hears: the slot, what happened to it, and the payload's count or its refusal (R-4).
+    const announce = removing && REQUIRED.includes(layer)
+      ? SLOTS[layer][0] + " removed. The assembly is refused with required_slot_missing: " + SLOTS[layer][1] + " is never omitted (R-4)."
+      : SLOTS[layer][0] + (removing ? " removed from" : " added back to") + " the payload. " + admitted + " of 11 admitted.";
+    this.setState({ off, playing: false, step: 99, hold: 0, announce });
   }
 
   openFailure(i) { this.setState({ uc: i, bad: true, off: {}, budget: 0, playing: false, step: 99, hold: 0 }); }
@@ -1176,7 +1191,7 @@ class Component extends DCLogic {
   restoreSlots() {
     const off = Object.assign({}, this.state.off || {});
     delete off[this.state.uc];
-    this.setState({ off, step: 99 });
+    this.setState({ off, step: 99, announce: "All slots restored. " + UCS[this.state.uc].picks.length + " of 11 admitted." });
   }
 
   startClock() {
@@ -1194,6 +1209,10 @@ class Component extends DCLogic {
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
+    let still = false;
+    try { still = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    // A visitor who asked for less motion gets the demo and the hero preview complete and still, with Play to run them.
+    if (still) this.setState({ playing: false, step: 99, mPlaying: false, mStep: 99 });
     this.startClock();
     this.startHeroClock();
     this._hash = () => this.applyHash();
@@ -1295,6 +1314,7 @@ class Component extends DCLogic {
     const f = fws[i];
     out.fwTabs = fws.map((x, k) => ({
       label: x.label,
+      pressed: k === i ? "true" : "false",
       on: () => this.setState({ fw: k }),
       style: "font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; padding: 10px 16px; border-radius: var(--pill); cursor: pointer; font-weight: 500; border: 1px solid " +
         (k === i ? "var(--accent); background: var(--accent); color: var(--bg);" : "var(--line); background: transparent; color: var(--muted);")
@@ -1355,6 +1375,7 @@ class Component extends DCLogic {
   }
 
   startTour() {
+    try { this._tourReturn = document.activeElement; } catch (e) {}
     if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
     this._tourKeys = e => {
       if (e.key === "Escape") this.endTour();
@@ -1365,14 +1386,14 @@ class Component extends DCLogic {
     this._tourScroll = () => this.measureTour();
     window.addEventListener("scroll", this._tourScroll, { passive: true });
     window.addEventListener("resize", this._tourScroll);
-    this.setState({ tour: 0 }, () => this.enterStep());
+    this.setState({ tour: 0 }, () => { this.enterStep(); this.focusTour(); });
   }
 
   endTour() {
     clearInterval(this._track);
     if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
     if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
-    this.setState({ tour: null, trect: null, playing: true });
+    this.setState({ tour: null, trect: null, playing: true }, () => { try { this._tourReturn && this._tourReturn.focus(); } catch (e) {} });
   }
 
   tourGo(d) {
@@ -1381,8 +1402,11 @@ class Component extends DCLogic {
     const i = this.state.tour + d;
     if (i < 0) return;
     if (i >= n) { this.endTour(); return; }
-    this.setState({ tour: i }, () => this.enterStep());
+    this.setState({ tour: i }, () => { this.enterStep(); this.focusTour(); });
   }
+
+  // Focus follows the card: Next is where a keyboard or screen-reader user continues from.
+  focusTour() { try { const next = document.getElementById("tournext"); if (next) next.focus({ preventScroll: true }); } catch (e) {} }
 
   enterStep() {
     const st = this.tourSteps()[this.state.tour];
@@ -1599,11 +1623,17 @@ class Component extends DCLogic {
       evictionLabel, evictionStyle,
       renderedLabel: refused ? "no payload · refused" : "↓ rendered by policy-first-chat/v1",
       traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
-      budgets: BUDGETS.map((b, i) => ({ label: b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k", style: this.ucTabStyle(i === (this.state.budget || 0)), select: () => this.setState({ budget: i }) })),
+      budgets: BUDGETS.map((b, i) => {
+        const label = b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k";
+        const active = i === (this.state.budget || 0);
+        return { label, pressed: active ? "true" : "false", style: this.ucTabStyle(active), select: () => this.setState({ budget: i, announce: "Input budget set to " + label + " tokens." }) };
+      }),
       playLabel: this.state.playing ? "Pause" : "Play",
-      togglePlay: () => this.setState(s => ({ playing: !s.playing })),
-      ucTabs: UCS.map((u, i) => ({ label: u.label, style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true }) })),
+      togglePlay: () => this.setState(s => ({ playing: !s.playing, announce: s.playing ? "Paused." : "Playing." })),
+      ucTabs: UCS.map((u, i) => ({ label: u.label, pressed: i === this.state.uc ? "true" : "false", style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true, announce: "Showing " + u.label + "." }) })),
       isPlanesMode: mode === "planes", isSlotsMode: mode === "slots",
+      planesPressed: mode === "planes" ? "true" : "false", slotsPressed: mode === "slots" ? "true" : "false",
+      announce: this.state.announce || "",
       tabPlanes: this.tab(mode === "planes"), tabSlots: this.tab(mode === "slots"),
       setPlanesMode: () => this.setState({ mode: "planes" }),
       setSlotsMode: () => this.setState({ mode: "slots" }),
@@ -1630,11 +1660,15 @@ class Component extends DCLogic {
     out.mProgress = mstep + " of 11 slots";
     out.mTokens = "~" + fmt(mTok) + " / " + fmt(HERO_BUDGET) + " tokens";
     out.mFill = "height: 100%; width: " + Math.min(100, (mTok / HERO_BUDGET) * 100) + "%; background: var(--accent); transition: width 400ms ease;";
+    out.heroPlayLabel = this.state.mPlaying ? "Pause" : "Play";
+    out.heroPlayAria = out.heroPlayLabel + " the assembly preview";
+    out.toggleHero = () => this.setState(s => ({ mPlaying: !s.mPlaying }));
 
     out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
     out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
     out.badBtnStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.bad ? "var(--fg)" : "var(--line)") + "; background: " + (this.state.bad ? "var(--fg)" : "transparent") + "; color: " + (this.state.bad ? "var(--bg)" : "var(--muted)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer;";
-    out.toggleBad = () => this.setState(s => ({ bad: !s.bad, playing: false, step: 99 }));
+    out.badPressed = this.state.bad ? "true" : "false";
+    out.toggleBad = () => this.setState(s => ({ bad: !s.bad, playing: false, step: 99, announce: s.bad ? "Showing the assembled request." : "Showing the unassembled blob." }));
     out.ucSymptom = uc.symptom;
     out.badNotes = [
       { text: "An undelimited blob obscures provenance and instruction boundaries, increasing the risk that the model follows instruction-shaped evidence. Platform role precedence still applies." },

@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 <style>
-  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.60 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.58 0.17 38); --p-state: oklch(0.56 0.14 250); --p-evid: oklch(0.54 0.13 155); --p-inter: oklch(0.54 0.15 310); }
+  :root { --sans: 'Space Grotesk', Helvetica, Arial, sans-serif; --mono: 'IBM Plex Mono', monospace; --pill: 999px; --bg: oklch(0.985 0.004 90); --surface: oklch(0.955 0.005 90); --fg: oklch(0.20 0.010 80); --muted: oklch(0.52 0.010 80); --line: oklch(0.885 0.006 90); --accent: oklch(0.55 0.20 38); --accent-soft: oklch(0.94 0.035 45); --p-gov: oklch(0.55 0.17 38); --p-state: oklch(0.53 0.14 250); --p-evid: oklch(0.52 0.13 155); --p-inter: oklch(0.54 0.15 310); }
   html[data-theme="dark"] { --bg: oklch(0.175 0.008 80); --surface: oklch(0.215 0.008 80); --fg: oklch(0.955 0.004 90); --muted: oklch(0.68 0.010 85); --line: oklch(0.305 0.008 80); --accent: oklch(0.74 0.17 45); --accent-soft: oklch(0.30 0.045 45); --p-gov: oklch(0.76 0.15 45); --p-state: oklch(0.76 0.12 250); --p-evid: oklch(0.76 0.13 155); --p-inter: oklch(0.76 0.13 310); }
   html { background: var(--bg); scroll-behavior: smooth; scroll-padding-top: 88px; }
   body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
@@ -33,6 +33,10 @@
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
   @media (max-width: 860px) { #diff { grid-template-columns: minmax(0, 1fr) !important; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
 </style>
 </helmet>
 
@@ -40,7 +44,7 @@
 
   <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
     <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
-      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; color: var(--fg);">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; min-height: 24px; color: var(--fg);">
         <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
           <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
         </span>
@@ -256,6 +260,10 @@
   </div>
 </div>
 </x-dc>
+<noscript>
+  <style>x-dc { display: none; }</style>
+  <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
+</noscript>
 <script type="text/x-dc" data-dc-script>
 const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "governance.examples", "governance.output_contract", "interaction.query"];
 const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
