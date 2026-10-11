@@ -29,6 +29,7 @@
     #sitenav a { padding: 13px 0 !important; border-bottom: 1px solid var(--line) !important; }
     #sitenav a:last-child { border-bottom: 0 !important; }
     #sitenav a[aria-current="page"] { border-left: 3px solid var(--accent); padding-left: 12px !important; }
+    #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
@@ -57,6 +58,7 @@
         <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
         <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
         <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+        <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
       </nav>
       <div style="flex: 1;"></div>
       <button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}" style="display: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ menuLabel }}</button>
@@ -70,6 +72,12 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-07</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page renders SPEC.md, the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+        <span>This page assumes you know:</span>
+        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
+        </sc-for>
+      </div>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span>The normative text: <a href="./SPEC.md">SPEC.md</a>; every revision: <a href="./CHANGES.md">CHANGES.md</a>. JSON contracts: <a href="./schema/context_item.schema.json">items</a> · <a href="./schema/trace.schema.json">traces</a> · <a href="./schema/conflict_group.schema.json">conflict groups</a> · <a href="./contract/reasons.json">reason codes</a>.</span>
@@ -631,6 +639,36 @@
 
     </article>
   </div>
+  <!-- GLOSSARY_START -->
+  <sc-if value="{{ glossaryOn }}" hint-placeholder-val="{{ false }}">
+    <aside id="glossary" role="dialog" aria-labelledby="glossarytitle" onKeyDown="{{ glossaryKey }}" style="position: fixed; top: 0; right: 0; bottom: 0; z-index: 85; width: min(440px, 100%); background: var(--bg); border-left: 1px solid var(--line); display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--line);">
+        <span id="glossarytitle" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);">Glossary</span>
+        <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">{{ glossaryCount }}</span>
+        <button onClick="{{ closeGlossary }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Close</button>
+      </div>
+      <div style="padding: 16px 24px; border-bottom: 1px solid var(--line);">
+        <input id="glossarysearch" type="search" value="{{ glossaryQuery }}" onChange="{{ setGlossaryQuery }}" placeholder="Search terms, aliases and definitions" aria-label="Search the glossary" autocomplete="off" spellcheck="false" style="width: 100%; padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface); color: var(--fg); font-family: var(--sans); font-size: 15px;">
+      </div>
+      <div style="flex: 1; overflow: auto; padding: 0 24px 32px;">
+        <sc-for list="{{ glossaryEntries }}" as="g" hint-placeholder-count="6">
+          <div id="{{ g.id }}" tabindex="-1" style="{{ g.style }}">
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px;">{{ g.term }}</div>
+            <div style="font-size: 14.5px; line-height: 1.55; text-wrap: pretty;">{{ g.plain }}</div>
+            <div style="{{ g.specStyle }}">{{ g.spec }}</div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px;">
+              <a href="{{ g.whereHref }}" style="{{ g.whereStyle }}">{{ g.where }}</a>
+              <sc-for list="{{ g.related }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.open }}" style="font-family: var(--mono); font-size: 11px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 4px 10px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ r.term }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="{{ glossaryEmptyStyle }}">{{ glossaryEmpty }}</div>
+      </div>
+    </aside>
+  </sc-if>
+  <!-- GLOSSARY_END -->
 </div>
 </x-dc>
 <noscript>
@@ -1102,9 +1140,15 @@ const RULES = [
 ];
 const KW = /(MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)/g;
 
+// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
+const PREREQUISITES = ["plane","slot","item","producer","assembler","requirement"];
+
 class Component extends DCLogic {
-  state = { theme: "light", menu: false };
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false };
+  componentWillUnmount() { this.glossaryUnmount(); }
+
   componentDidMount() {
+    this.glossaryMount();
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
@@ -1118,9 +1162,62 @@ class Component extends DCLogic {
     const set = new Set(["MUST NOT", "MUST", "SHOULD NOT", "SHOULD", "MAY"]);
     return text.split(KW).filter(s => s !== "").map(s => ({ text: s, style: set.has(s) ? "color: var(--accent); font-weight: 600;" : "" }));
   }
+  // GLOSSARY_GLUE_START
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
+  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  glossaryMount() {
+    this._glossaryHash = () => this.glossaryHash();
+    try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
+    import("./site/glossary.js")
+      .then(m => { this._glossary = m; return m.load(); })
+      .then(g => { this.setState({ glossary: g }); this.glossaryHash(); }, () => this.setState({ glossaryError: "The glossary could not load. Reload the page to retry." }))
+      .catch(() => {});
+  }
+  glossaryUnmount() { try { if (this._glossaryHash) window.removeEventListener("hashchange", this._glossaryHash); } catch (e) {} }
+  glossaryHash() {
+    const m = (location.hash || "").match(/^#glossary(?:\/([a-z0-9-]+))?$/);
+    if (m) this.openGlossary(m[1] || null);
+  }
+  openGlossary(term) {
+    if (!this.state.glossaryOpen) { try { this._glossaryReturn = document.activeElement; } catch (e) {} }
+    this.setState({ glossaryOpen: true, glossaryTerm: term || null, glossaryQuery: term ? "" : (this.state.glossaryQuery || "") }, () => {
+      try { const el = document.getElementById(term ? "glossary-" + term : "glossarysearch"); if (el) el.focus({ preventScroll: true }); } catch (e) {}
+    });
+  }
+  closeGlossary() {
+    this.setState({ glossaryOpen: false, glossaryTerm: null }, () => { try { this._glossaryReturn && this._glossaryReturn.focus(); } catch (e) {} });
+    try { if (/^#glossary/.test(location.hash || "")) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  }
+  glossaryVals() {
+    const g = this.state.glossary, open = !!this.state.glossaryOpen, query = this.state.glossaryQuery || "", term = this.state.glossaryTerm;
+    const entries = g ? this._glossary.search(g.entries, query) : [];
+    const none = !!g && !!query && entries.length === 0;
+    return {
+      glossaryOn: open, glossaryOpen: open ? "true" : "false", glossaryQuery: query,
+      glossaryCount: g ? (query ? entries.length + " of " + g.entries.length + " terms" : g.entries.length + " terms") : (this.state.glossaryError || "Loading\u2026"),
+      glossaryEmpty: none ? "No term matches " + query + "." : "",
+      glossaryEmptyStyle: none ? "padding: 18px 0; font-size: 14.5px; color: var(--muted);" : "display: none;",
+      toggleGlossary: () => open ? this.closeGlossary() : this.openGlossary(null),
+      closeGlossary: () => this.closeGlossary(),
+      setGlossaryQuery: e => this.setState({ glossaryQuery: e.target.value, glossaryTerm: null }),
+      glossaryKey: e => { if (e.key === "Escape") { e.preventDefault(); this.closeGlossary(); } },
+      glossaryEntries: entries.map(e => ({
+        id: "glossary-" + e.id, term: e.term, plain: e.plain,
+        spec: e.spec ? "\u201C" + e.spec + "\u201D" : "",
+        specStyle: e.spec ? "margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--line); font-size: 13.5px; line-height: 1.55; color: var(--muted);" : "display: none;",
+        where: e.where ? "Defined on " + e.where.label + " \u2192" : "", whereHref: this._glossary.whereHref(e),
+        whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
+        related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
+        style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
+      })),
+      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+    };
+  }
+  // GLOSSARY_GLUE_END
+
   renderVals() {
     const rules = RULES.map((r, i) => ({ n: i + 1, id: "R-" + (i + 1), href: "#R-" + (i + 1), sec: r[0], kw: r[1], summary: r[2], segs: this.segs(r[3]) }));
-    return {
+    return Object.assign({
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       menuOpen: this.state.menu ? "true" : "false",
@@ -1142,7 +1239,7 @@ class Component extends DCLogic {
       conflicts: CONFLICTS.map(c => ({ when: c.when, then: c.then })),
       stages: STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s.name, text: s.text })),
       tests: TESTS.map(t => ({ name: t.name, text: t.text, rule: t.requirement, href: "#" + t.requirement }))
-    };
+    }, this.glossaryVals());
   }
 }
 </script>

@@ -59,3 +59,180 @@ test('the hero offers two actions, the tour under one name and then the demo, an
   assert.deepEqual(location.assigned, ['./start.html']);
   assert.equal(view.renderVals().tourOn, false);
 });
+
+// The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens, with
+// a prerequisite strip under each page's lede whose pills open the panel at a term.
+const GLOSSARY = JSON.parse(await fs.readFile(new URL('../site/glossary.json', import.meta.url), 'utf8'));
+const glossaryModule = await import('../site/glossary.js');
+const normalize = md => md.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*/g, '').replace(/\\([\\*<_])/g, '$1').replace(/`/g, '').replace(/\s+/g, ' ');
+
+test('every glossary entry is complete, relates to terms that exist, names where the site defines it, and quotes the specification exactly', async () => {
+  const ids = new Set(GLOSSARY.map(e => e.id));
+  assert.equal(ids.size, GLOSSARY.length, 'ids are unique');
+  const spec = normalize(await read('SPEC.md'));
+  const requirements = JSON.parse(await read('contract/requirements.json')).length;
+  const pages = Object.fromEntries(await Promise.all(PAGES.map(async p => [p, await read(p)])));
+  for (const e of GLOSSARY) {
+    assert.match(e.id, /^[a-z0-9-]+$/, e.id);
+    assert.ok(e.term && e.plain && /[.]$/.test(e.plain), `${e.id} has a term and a plain definition`);
+    assert.ok(e.plain.split(' ').length <= 60, `${e.id}: the plain definition stays short`);
+    for (const r of e.related ?? []) assert.ok(ids.has(r) && r !== e.id, `${e.id} relates to ${r}`);
+    if (e.spec) assert.ok(spec.includes(normalize(e.spec)), `${e.id} quotes SPEC.md: ${e.spec}`);
+    assert.ok(e.where && pages[e.where.page] && e.where.label, `${e.id} says where the site defines it`);
+    if (e.where.anchor) {
+      const rendered = e.where.page === 'spec.html' && /^R-\d+$/.test(e.where.anchor) && Number(e.where.anchor.slice(2)) <= requirements;
+      assert.ok(rendered || pages[e.where.page].includes(`id="${e.where.anchor}"`), `${e.id}: ${e.where.page}#${e.where.anchor} exists`);
+    }
+  }
+  // The planes and slots the model lists each have a home in the glossary.
+  const model = JSON.parse(await read('contract/model.json'));
+  const mentions = e => [e.id, e.term, ...(e.aliases ?? []), e.plain].join(' ');
+  for (const plane of model.planes) assert.ok(GLOSSARY.some(e => e.id === plane.id || e.id === plane.id + '-plane'), `plane ${plane.id}`);
+  for (const slot of model.slots) assert.ok(GLOSSARY.some(e => mentions(e).includes(slot.id)), `slot ${slot.id} is mentioned`);
+});
+
+test('the glossary module indexes entries and searches terms, aliases and definitions, terms that start with the query first', () => {
+  const g = glossaryModule.index(GLOSSARY);
+  assert.equal(g.byId.get('tier').term, 'tier');
+  assert.equal(glossaryModule.search(g.entries, '').length, GLOSSARY.length);
+  assert.equal(glossaryModule.search(g.entries, 'Tier')[0].id, 'tier', 'by term, case-insensitively');
+  assert.equal(glossaryModule.search(g.entries, 'untrusted_content')[0].id, 'injection-risk', 'by alias');
+  assert.ok(glossaryModule.search(g.entries, 'never calls a model').some(e => e.id === 'assembler'), 'by definition');
+  assert.deepEqual(glossaryModule.search(g.entries, 'conformance').slice(0, 2).map(e => e.id), ['conformance', 'conformance-case'], 'starts-with first');
+  assert.deepEqual(glossaryModule.search(g.entries, 'no such term'), []);
+  assert.equal(glossaryModule.whereHref(g.byId.get('tier')), './spec.html#s4');
+  assert.throws(() => glossaryModule.index([{ id: 'a', related: ['b'] }]), /relates to b/);
+});
+
+test('every page opens the same glossary panel from its nav, and shows a prerequisite strip whose terms the glossary defines', async () => {
+  const blocks = new Set(), glue = new Set();
+  for (const page of PAGES) {
+    const html = await read(page);
+    assert.ok(header(html).includes('<button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary"'), `${page}: the nav opens the glossary`);
+    assert.ok(html.includes('#sitenav button {'), `${page}: the narrow nav styles the glossary button`);
+    const block = html.match(/<!-- GLOSSARY_START -->[\s\S]*?<!-- GLOSSARY_END -->/);
+    assert.ok(block, `${page} has the panel`);
+    blocks.add(block[0]);
+    assert.ok(block[0].includes('<aside id="glossary" role="dialog" aria-labelledby="glossarytitle"') && !block[0].includes('aria-modal'), `${page}: a non-modal dialog`);
+    assert.ok(block[0].includes('<input id="glossarysearch" type="search" value="{{ glossaryQuery }}" onChange="{{ setGlossaryQuery }}"'), `${page}: search`);
+    const code = html.match(/\/\/ GLOSSARY_GLUE_START[\s\S]*?\/\/ GLOSSARY_GLUE_END/);
+    assert.ok(code, `${page} has the glossary glue`);
+    glue.add(code[0]);
+    assert.ok(html.includes('<sc-for list="{{ prereq }}" as="p"'), `${page} has the prerequisite strip`);
+    const { view } = await component(page);
+    const ids = view.constructor.name && vm.runInNewContext('PREREQUISITES', { PREREQUISITES: undefined }) === undefined ? null : null; // placeholder to keep vm imported
+    const prereq = html.match(/const PREREQUISITES = (\[[^\]]*\]);/);
+    assert.ok(prereq, `${page} names its prerequisites`);
+    const list = JSON.parse(prereq[1]);
+    assert.ok(list.length >= 3 && list.length <= 6, `${page}: ${list.length} prerequisites`);
+    for (const id of list) assert.ok(GLOSSARY.some(e => e.id === id), `${page} assumes ${id}, which the glossary defines`);
+    assert.deepEqual([...view.renderVals().prereq].map(p => p.term), list.map(id => id.replace(/-/g, ' ')), `${page}: before the glossary loads the strip shows the ids as words`);
+  }
+  assert.equal(blocks.size, 1, 'the panel markup is identical on every page');
+  assert.equal(glue.size, 1, 'the glossary logic is identical on every page');
+});
+
+test('the panel opens from the nav or a pill, searches, follows #glossary/<term>, and returns focus when it closes', async () => {
+  const { view, document, byId, location } = await component('producers.html');
+  view._glossary = glossaryModule;
+  view.state.glossary = glossaryModule.index(GLOSSARY);
+  byId['glossary-tier'] = { focused: 0, focus() { this.focused += 1; } };
+  const trigger = document.activeElement;
+  let vals = view.renderVals();
+  assert.deepEqual([vals.glossaryOn, vals.glossaryOpen, vals.glossaryCount], [false, 'false', `${GLOSSARY.length} terms`]);
+  vals.toggleGlossary();
+  vals = view.renderVals();
+  assert.deepEqual([vals.glossaryOn, vals.glossaryOpen, byId.glossarysearch.focused], [true, 'true', 1], 'opening focuses the search field');
+  assert.equal([...vals.glossaryEntries].length, GLOSSARY.length);
+  vals.setGlossaryQuery({ target: { value: 'budget' } });
+  vals = view.renderVals();
+  assert.equal(vals.glossaryEntries[0].term, 'budget');
+  assert.equal(vals.glossaryCount, `${glossaryModule.search(view.state.glossary.entries, 'budget').length} of ${GLOSSARY.length} terms`);
+  assert.ok(vals.glossaryEntries[0].spec.startsWith('“') && vals.glossaryEntries[0].whereHref === './spec.html#R-16' && vals.glossaryEntries[0].where === 'Defined on Spec R-16 →');
+  vals.setGlossaryQuery({ target: { value: 'zzz' } });
+  assert.deepEqual([view.renderVals().glossaryEntries.length, view.renderVals().glossaryEmpty], [0, 'No term matches zzz.']);
+  vals.glossaryEntries[0]; // the budget entry's related pills open their terms
+  view.renderVals().setGlossaryQuery({ target: { value: 'budget' } });
+  view.renderVals().glossaryEntries[0].related.find(r => r.term === 'tier').open();
+  vals = view.renderVals();
+  assert.deepEqual([view.state.glossaryTerm, vals.glossaryQuery, byId['glossary-tier'].focused], ['tier', '', 1], 'a related pill opens the panel at that term');
+  assert.ok(vals.glossaryEntries.find(e => e.id === 'glossary-tier').style.includes('var(--accent)'), 'the opened term is marked');
+  vals.glossaryKey({ key: 'Escape', preventDefault() {} });
+  assert.deepEqual([view.renderVals().glossaryOn, trigger.focused], [false, 1], 'Escape closes and returns focus');
+  view.renderVals().prereq[0].open();
+  assert.equal(view.state.glossaryOpen, true, 'a prerequisite pill opens the panel');
+  view.renderVals().closeGlossary();
+  location.hash = '#glossary/tier';
+  view.glossaryHash();
+  assert.deepEqual([view.state.glossaryOpen, view.state.glossaryTerm], [true, 'tier'], 'a deep link opens the panel at its term');
+  location.hash = '#assemble';
+  view.renderVals().closeGlossary();
+  view.glossaryHash();
+  assert.equal(view.state.glossaryOpen, false, 'another hash leaves the panel alone');
+});
+
+// The home page is layer 1: it hooks and orients, and the material it used to repeat lives on the deeper pages.
+test('the home page is layer 1: a plain hero with no preview widget, what it is before who it is for, one determinism card, and no field table, pipeline or wire request', async () => {
+  const html = await read('index.html');
+  assert.ok(!html.includes('{{ heroBlocks }}') && !html.includes('toggleHero') && !html.includes('startHeroClock'), 'no hero preview widget');
+  const lede = html.match(/<h1[^>]*>Context isn't a prompt[^<]*<\/h1>\s*<p[^>]*>([^<]+)<\/p>/)[1];
+  assert.ok(lede.split(' ').length <= 50, `the hero lede stays short: ${lede.split(' ').length} words`);
+  for (const word of ['authority', 'lifecycle', 'deterministic', 'payload', 'slot']) assert.ok(!lede.toLowerCase().includes(word), `the hero lede avoids ${word}`);
+  assert.ok(html.indexOf('>What it is</div>') < html.indexOf(">Who it's for</div>"), 'what it is comes before who it is for');
+  assert.ok(!html.includes('Everyday AI users') && html.includes('>Evaluating CWA</div>'), 'the audience cards serve readers the site serves');
+  assert.ok(!html.includes('consistency, and governance'), 'the organisations card does not use governance in a second sense');
+  assert.equal((html.match(/>Deterministic assembly</g) || []).length, 1, 'determinism is claimed once');
+  assert.ok(html.includes('>Rule zero</h3>') && !html.includes('Rule zero (R-5):'), 'rule zero is a card, not a footnote');
+  for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
+  assert.ok(html.includes('href="./producers.html#minimum"'), 'the unit points to the field list on Producers');
+  const deeper = html.slice(html.indexOf('<section id="deeper"'), html.indexOf('</section>', html.indexOf('<section id="deeper"')));
+  assert.deepEqual([...deeper.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html'], 'Go deeper starts with Getting started');
+  assert.ok(deeper.includes('eight-step admission pipeline'), 'the Producers card names the pipeline that moved there');
+  assert.ok(html.includes('>Try the draft. Four assemblers pass every published case.</h2>'), 'the closing heading fits a draft');
+});
+
+test('every guided-tour step points at a section the home page still has', async () => {
+  const html = await read('index.html');
+  const { view } = await component('index.html');
+  const keys = view.tourSteps().map(s => s.key);
+  assert.ok(keys.length >= 14 && !keys.includes('evidence'));
+  for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `the tour step ${key} has a target`);
+});
+
+test('the closing call to action states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {
+  const { caseDigestsNow, implementations, tally, maturitySentence } = await import('../scripts/conformance-reports.mjs');
+  const date = (await read('CHANGES.md')).match(/^## (\d{4}-\d{2}-\d{2})/m)[1];
+  const digests = await caseDigestsNow(new URL('../', import.meta.url).pathname);
+  const published = [];
+  for (const dir of ['cases', 'rejections']) {
+    const root = new URL(`../conformance/${dir}/`, import.meta.url);
+    for (const name of await fs.readdir(root)) published.push({ ...JSON.parse(await read(`conformance/${dir}/${name}/case.json`)), digest: digests[name] });
+  }
+  const runs = [];
+  for (const { label, file } of await implementations(new URL('../', import.meta.url).pathname)) {
+    const { cases_at_run: atRun, report } = JSON.parse(await read(file));
+    runs.push({ label, total: published.length, passed: [...tally(report, atRun, published).values()].filter(o => o === 'passed').length });
+  }
+  const sentence = maturitySentence(date, runs);
+  assert.ok(sentence.startsWith(`Draft of ${date}. `) && runs.every(r => sentence.includes(r.label)) && sentence.includes(`${published.length} published cases`), sentence);
+  const html = await read('index.html');
+  assert.ok(html.includes(`<!-- CONTRACT_MATURITY_START -->${sentence}<!-- CONTRACT_MATURITY_END -->`), 'the page carries the sentence the build writes');
+  assert.equal(maturitySentence('2026-01-01', [{ label: 'Python', total: 10, passed: 10 }, { label: 'Go', total: 10, passed: 9 }]),
+    'Draft of 2026-01-01. Two assemblers, in Python and Go, pass between 9 and 10 of 10 published cases, rejections included, and the Assembler page shows which; none has a versioned release yet, and we want to hear what they must do.');
+});
+
+test('Getting started shows the sample request on the wire, Producers holds the two evidence callouts, and the Assembler page speaks of assemblers with no hand-written date', async () => {
+  const start = await read('start.html');
+  const wire = start.match(/<section id="wire"[\s\S]*?<\/section>/);
+  assert.ok(wire && wire[0].includes('<!-- CONTRACT_PAYLOAD_START -->') && wire[0].includes('<!-- CONTRACT_PAYLOAD_COUNT_START -->') && wire[0].includes('id="wirerow"'), 'the wire request lives on Getting started');
+  assert.ok(start.indexOf('<section id="wire"') < start.indexOf('<section id="migrate"'), 'after the six steps, before the migrator');
+  assert.ok(start.includes('#wirerow > div { position: static !important; }'), 'its sticky column stacks on narrow screens');
+  const producers = await read('producers.html');
+  const pipeline = producers.slice(producers.indexOf('<section id="pipeline">'), producers.indexOf('<section id="failures">'));
+  assert.ok(pipeline.includes('When nothing valid is retrieved') && pipeline.includes('href="./spec.html#R-12"'), 'the refusal callout, citing R-12');
+  assert.ok(pipeline.includes('Factual precedence is route policy') && pipeline.includes('href="./spec.html#R-11"'), 'the precedence callout, citing R-11');
+  const assembler = await read('assembler.html');
+  assert.ok(assembler.includes('>Reference assemblers</div>') && !assembler.includes('Updated: 20') && assembler.includes('reference assemblers: in progress'), 'assemblers, plural, and no date to go stale');
+  const llms = await read('llms.txt');
+  assert.ok(!llms.match(/^- \[Landing page\].*sample request/m) && llms.match(/^- \[Getting started\].*sample request/m), 'llms.txt follows the move');
+});

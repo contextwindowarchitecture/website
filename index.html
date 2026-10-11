@@ -62,13 +62,14 @@
     #sitenav a { padding: 13px 0 !important; border-bottom: 1px solid var(--line) !important; }
     #sitenav a:last-child { border-bottom: 0 !important; }
     #sitenav a[aria-current="page"] { border-left: 3px solid var(--accent); padding-left: 12px !important; }
+    #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 620px) { #hdrtour { display: none !important; } }
   @media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
   @media (max-width: 860px) {
     #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }
-    #unitrow > div, #wirerow > div { position: static !important; }
+    #unitrow > div { position: static !important; }
     #ctarow > a { justify-self: start; }
     .g6, .g6p { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
     .g6p > div { grid-column: 1 !important; }
@@ -110,6 +111,7 @@
         <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
         <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
         <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+        <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
       </nav>
       <div style="flex: 1;"></div>
       <button id="hdrtour" onClick="{{ startTour }}" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 9px 18px; border: 0; cursor: pointer; font-family: inherit; white-space: nowrap;" style-hover="background: var(--fg);">Take the tour</button>
@@ -124,67 +126,17 @@
       <span style="display: block; width: 28px; height: 1px; background: var(--accent);"></span>
       <span>Context assembler spec · draft</span>
     </div>
-    <div id="hero" style="display: grid; grid-template-columns: minmax(0, 1.06fr) minmax(0, 0.94fr); gap: 56px; align-items: start;">
+    <div id="hero" style="max-width: 820px;">
       <div>
         <h1 style="margin: 0; font-size: clamp(42px, 5.6vw, 82px); line-height: 0.94; letter-spacing: -0.045em; font-weight: 700; max-width: 13ch; text-wrap: balance;">Context isn't a prompt. It's an assembled request.</h1>
-        <p style="margin: 32px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 48ch; text-wrap: pretty;">CWA is a specification for assembling everything a model call needs — instructions, state, evidence, history, the live turn — into one payload where every item has an owner, an authority, a lifecycle, a budget, and a place. The assembly is deterministic, and every step of it can be inspected.</p>
+        <p style="margin: 32px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 48ch; text-wrap: pretty;">Every model call is built from pieces: instructions, what the app knows, what it looked up, the conversation, and the question. CWA specifies how those pieces are chosen, fitted to a budget and ordered, so the same inputs always build the same request, and every decision can be read back.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
           <button onClick="{{ startTour }}" style="font-size: 16px; font-weight: 600; font-family: inherit; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px; border: 0; cursor: pointer;" style-hover="background: var(--fg);">Take the tour</button>
           <a href="#assemble" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Watch it assemble</a>
         </div>
       </div>
-
-      <div style="border: 1px solid var(--line); background: var(--surface); padding: 18px; min-height: 460px; display: flex; flex-direction: column;">
-        <div style="display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">
-          <span style="color: var(--accent);">Assembling · {{ mUcName }}</span>
-          <span style="display: flex; align-items: center; gap: 10px;"><span>{{ mProgress }}</span><button onClick="{{ toggleHero }}" aria-label="{{ heroPlayAria }}" style="font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 3px 9px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ heroPlayLabel }}</button></span>
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 5px; flex: 1;">
-          <sc-for list="{{ heroBlocks }}" as="b" hint-placeholder-count="6">
-            <div style="{{ b.style }}">
-              <div style="font-family: var(--mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 3px;">{{ b.tag }}</div>
-              <div style="font-family: var(--mono); font-size: 11.5px; line-height: 1.45; overflow-wrap: anywhere;">{{ b.text }}</div>
-            </div>
-          </sc-for>
-        </div>
-        <div style="margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
-          <div style="height: 6px; background: var(--bg); border: 1px solid var(--line); overflow: hidden;">
-            <div style="{{ mFill }}"></div>
-          </div>
-          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px;">
-            <span>{{ mTokens }}</span>
-            <span>profile · policy-first-chat/v1</span>
-          </div>
-        </div>
-      </div>
     </div>
-    <div style="margin-top: 80px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Who it's for</div>
-      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-        <div style="background: var(--bg); padding: 26px 28px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Everyday AI users</div>
-          </div>
-          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Not a developer? No problem. CWA helps you understand how AI uses context, so you can write better prompts and get better results.</div>
-        </div>
-        <div style="background: var(--bg); padding: 26px 28px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><polyline points="8 6 2 12 8 18"></polyline><polyline points="16 6 22 12 16 18"></polyline><line x1="14" y1="4" x2="10" y2="20"></line></svg>
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Developers &amp; builders</div>
-          </div>
-          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Use CWA to build more reliable AI applications with a consistent way to manage context.</div>
-        </div>
-        <div style="background: var(--bg); padding: 26px 28px;">
-          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><circle cx="9" cy="8" r="3.5"></circle><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"></path><circle cx="17" cy="9" r="2.75"></circle><path d="M17.5 14.5c2.7.3 4.5 2.4 4.5 5.5"></path></svg>
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Organizations</div>
-          </div>
-          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Adopt a shared standard for AI context to improve quality, consistency, and governance.</div>
-        </div>
-      </div>
-    </div>
-    <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-top: 40px; margin-bottom: 16px;">What it is</div>
+    <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-top: 80px; margin-bottom: 16px;">What it is</div>
     <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Not a library</div>
@@ -197,6 +149,32 @@
       <div style="background: var(--bg); padding: 26px 28px;">
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Traceable</div>
         <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Every assembly run emits a trace: what got in, what was compressed, what was left out, and why.</div>
+      </div>
+    </div>
+    <div style="margin-top: 40px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Who it's for</div>
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><circle cx="12" cy="8" r="4"></circle><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"></path></svg>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Evaluating CWA</div>
+          </div>
+          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Deciding whether to adopt it? The problem section names the failures it prevents, the demo shows one assembly end to end, and the tour walks you through both in ten minutes.</div>
+        </div>
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><polyline points="8 6 2 12 8 18"></polyline><polyline points="16 6 22 12 16 18"></polyline><line x1="14" y1="4" x2="10" y2="20"></line></svg>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Developers &amp; builders</div>
+          </div>
+          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">Name the slots you already send, give every item an owner, and hand the snapshot to an assembler that renders it with a trace.</div>
+        </div>
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; color: var(--accent);"><circle cx="9" cy="8" r="3.5"></circle><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6"></path><circle cx="17" cy="9" r="2.75"></circle><path d="M17.5 14.5c2.7.3 4.5 2.4 4.5 5.5"></path></svg>
+            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Organizations</div>
+          </div>
+          <div style="font-size: 17px; line-height: 1.45; text-wrap: pretty;">A shared vocabulary and a conformance definition, so teams can compare assemblers, file precise bugs, and audit what each model call contained.</div>
+        </div>
       </div>
     </div>
     <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
@@ -289,8 +267,8 @@
         </div>
         <div>
           <div style="font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px;">02</div>
-          <h3 style="margin: 0 0 12px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Deterministic assembly</h3>
-          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Given the same request state, source versions, selection rules, and budget, the assembler emits the same payload in the same order. That is a claim a test can check. "The model will answer the same way" is not, and CWA never makes it.</p>
+          <h3 style="margin: 0 0 12px; font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Rule zero</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">A governance item may state a rule, but the application enforces it outside the model (R-5). CWA never relies on context to keep an invariant, and it never claims the model will answer the same way twice.</p>
         </div>
         <div>
           <div style="font-family: var(--mono); font-size: 12px; color: var(--muted); margin-bottom: 14px;">03</div>
@@ -298,7 +276,6 @@
           <p style="margin: 0; font-size: 16px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Tokens are finite, so when every item is measured and tiered the assembler knows what to protect, what to compress, what to drop, and when to stop and report that the evidence did not fit.</p>
         </div>
       </div>
-      <p style="margin: 40px 0 0; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Rule zero (R-5): a governance item may state a rule, but the application enforces it outside the model. No assembler relies on context to keep an invariant.</p>
     </div>
   </section>
 
@@ -457,7 +434,13 @@
           <button onClick="{{ setSlotsMode }}" aria-pressed="{{ slotsPressed }}" style="{{ tabSlots }}">Slots</button>
         </div>
       </div>
-      <p style="margin: 0 0 44px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
+      <p style="margin: 0 0 20px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 44px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+        <span>The words this site uses:</span>
+        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
+        </sc-for>
+      </div>
 
       <sc-if value="{{ isPlanesMode }}" hint-placeholder-val="{{ true }}">
         <div class="g4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
@@ -517,14 +500,8 @@
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The unit</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">A slot holds items, not a paragraph.</h2>
         <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved chunks, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
-        <div style="display: flex; flex-direction: column; gap: 0; border-top: 1px solid var(--line);">
-          <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="11">
-            <div style="display: grid; grid-template-columns: 130px minmax(0, 1fr); gap: 14px; padding: 12px 0; border-bottom: 1px solid var(--line);">
-              <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ f.key }}</span>
-              <span style="font-size: 14.5px; line-height: 1.5; color: var(--fg); text-wrap: pretty;">{{ f.text }}</span>
-            </div>
-          </sc-for>
-        </div>
+        <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Every item carries its source and version, its authority, when it was true and when it expires, its scope, its budget and tier, and the fields that say how it may be handled. The Producers page lists all fourteen, with the slot defaults that fill the ones a producer omits.</p>
+        <a href="./producers.html#minimum" style="font-family: var(--mono); font-size: 12px; color: var(--accent);">The minimum item →</a>
       </div>
       <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.8; position: sticky; top: 100px;">
         <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">
@@ -565,8 +542,14 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Go deeper</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Order alone is not an architecture.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A fixed order reproduces a payload, but it says nothing about who is allowed to direct the model, what wins when sources disagree, whether this order is right for this model, or how anyone would know. The normative rules, the producer contract, the placement evidence and the implementations each have a page of their own.</p>
-      <div class="g4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A fixed order reproduces a payload, but it says nothing about who is allowed to direct the model, what wins when sources disagree, whether this order is right for this model, or how anyone would know. The six steps, the normative rules, the producer contract, the placement evidence and the implementations each have a page of their own.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <a href="./start.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
+          <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);">Getting started</span>
+          <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">Six steps from your prompt to a payload with owners.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Split what you send today into slots, give every item an authority and a source, freeze a snapshot, hand it to an assembler, read the trace, pick a profile, and move enforcement out of the prompt. With a sample prompt split into slots and the request as the model receives it.</span>
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Get started →</span>
+        </a>
         <a href="./spec.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Specification · draft</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">26 numbered requirements.</span>
@@ -576,7 +559,7 @@
         <a href="./producers.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--p-evid);">Producer contract</span>
           <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.02em;">What your tool has to emit.</span>
-          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. Its examples show the item and trace checks at work on sample items; the assembler admits an item against the route.</span>
+          <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">It covers the eight minimum fields, slot defaults, and the rules for retrievers, memory stores, state services, MCP servers, and the capability policy. It walks the eight-step admission pipeline between the vector store and the payload, and its examples show the item and trace checks at work on sample items.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">Read the contract →</span>
         </a>
         <a href="./evidence.html" style="background: var(--bg); padding: 26px 24px; display: flex; flex-direction: column; gap: 10px; color: var(--fg);" style-hover="background: var(--surface);">
@@ -591,97 +574,6 @@
           <span style="font-size: 14.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Assemblers in Python, TypeScript, Go and Rust run every published case and rejection, and their reports are imported here. A matrix marks each requirement as assembler, boundary or application, so you can see who owns which part.</span>
           <span style="font-family: var(--mono); font-size: 12px; color: var(--accent); margin-top: 6px;">See the reports →</span>
         </a>
-      </div>
-    </div>
-  </section>
-
-  <section id="evidence" data-tour="evidence" style="border-top: 1px solid var(--line); background: var(--surface);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Evidence selection</div>
-      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Retrieval feeds Evidence through an admission pipeline.</h2>
-      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">"Retrieval goes in slot three" is memorable, but it is too coarse. Between the vector store and the payload there are eight steps: four the retriever does before assembly, and four the assembler does, each one a rule the trace can point at. A route can also opt a slot into supersession of stale observations, exact deduplication and a per-source cap (R-25, R-24, R-26); a slot that doesn't ask for them skips those steps. For high-stakes answers the slot holds evidence items, each carrying its chunk plus source, version, relevance and authority, rather than undifferentiated "knowledge."</p>
-      <div class="g4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-        <sc-for list="{{ evidenceStages }}" as="s" hint-placeholder-count="8">
-          <div style="background: var(--bg); padding: 22px 20px 24px; display: flex; flex-direction: column; gap: 10px;">
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; color: var(--p-evid);">{{ s.n }}</div>
-            <div style="font-size: 18px; font-weight: 600; letter-spacing: -0.015em;">{{ s.name }}</div>
-            <p style="margin: 0; font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ s.text }}</p>
-          </div>
-        </sc-for>
-      </div>
-      <div class="g2c" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0;">
-        <div style="background: var(--bg); padding: 24px 22px;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">When nothing valid is retrieved</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">On a route that requires evidence, the assembler refuses with evidence_required and a recovery action. The application retrieves narrower, precomputes a summary, or requests context before constructing a new snapshot.</div>
-          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-family: var(--mono); font-size: 12px; line-height: 1.65; color: var(--fg);"><a href="./spec.html#R-12">R-12 · Never answer from nothing →</a></div>
-        </div>
-        <div style="background: var(--bg); padding: 24px 22px;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Factual precedence is route policy</div>
-          <div style="font-size: 16px; line-height: 1.5; text-wrap: pretty;">A recent observation and an older retrieved chunk are both evidence. A route may prefer a verified observation for the same current fact by listing its producer first; neither age nor source kind establishes a universal truth ranking.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section id="payload" style="border-top: 1px solid var(--line);">
-    <div id="wirerow" class="g2" style="max-width: 1180px; margin: 0 auto; padding: 88px 32px; display: grid; grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); gap: 56px; align-items: start;">
-      <div style="position: sticky; top: 100px;">
-        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">In practice</div>
-        <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">What an assembled request looks like on the wire.</h2>
-        <p style="margin: 0; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">The profile picks each slot's tag and order, and a renderer the spec publishes writes the request. Message roles are not a style choice: only governance takes the system and tool roles, prior turns stay a transcript inside their tag, and the query is the only live user turn. Every item names its slot and authority, evidence arrives as separate items with provenance, and the trace records the profile that ordered them. The spec publishes two tokenizers, fixture-whitespace/v1 and estimate-utf8/v1, and two renderers, fixture-xml/v1 and cwa-messages/v1, and every implementation provides all four. A third renderer, cwa-message-blocks/v1, is optional: it hands the user message over as one entry per item, so a prompt cache can break between them. An application may count with a tokenizer of its own under an ID no published tokenizer uses (R-16).</p>
-      </div>
-      <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.85; overflow: auto;">
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 18px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-bottom: 1px solid var(--line);"><span>cwa-messages/v1 request</span><span>profile · policy-first-chat/v1</span></div>
-        <div style="padding: 20px 18px; display: flex; flex-direction: column; gap: 18px;">
-          <p style="margin: 0; font-family: var(--sans); font-size: 12.5px; line-height: 1.6; color: var(--muted);">Each member's text as the model receives it. On the wire the request is one RFC 8785 JSON object, and each system and tools entry also carries its item's id. The token count covers each entry's text and the message content; roles, ids and JSON punctuation are left to the route's budget.margin_percent, 15 here (R-16).</p>
-<!-- CONTRACT_PAYLOAD_START -->
-          <div>
-            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">system · <span style="color: var(--p-gov);">governance.instructions</span></div>
-            <div data-member="system/0" style="white-space: pre-wrap; overflow-wrap: anywhere;">You are Ada, a support agent for Northwind.
-Never quote prices you cannot verify with a tool.</div>
-          </div>
-          <div style="display: flex; flex-direction: column; gap: 6px;">
-            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 0;">tools · <span style="color: var(--p-gov);">governance.capabilities</span></div>
-            <div data-member="tools/0" style="white-space: pre-wrap; overflow-wrap: anywhere;">{"name": "issue_refund", "parameters": {"order_id": "string", "amount": "number"}}</div>
-            <div data-member="tools/1" style="white-space: pre-wrap; overflow-wrap: anywhere;">{"name": "lookup_order", "parameters": {"order_id": "string"}}</div>
-          </div>
-          <div>
-            <div style="font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">messages[0] · role user</div>
-            <div data-member="messages/0/content" style="white-space: pre-wrap; overflow-wrap: anywhere;"><span style="color: var(--p-state);">&lt;user_profile id="user:profile"&gt;
-</span>plan=pro; region=EU; tone=concise
-<span style="color: var(--p-state);">&lt;/user_profile&gt;
-</span><span style="color: var(--p-evid);">&lt;evidence id="billing-faq:v3#p1"&gt;
-</span>Refunds return to the original payment method.
-<span style="color: var(--p-evid);">&lt;/evidence&gt;
-</span><span style="color: var(--p-evid);">&lt;evidence id="refunds-eu:v17#p4"&gt;
-</span>Pro plans refund in full within 30 days of purchase.
-<span style="color: var(--p-evid);">&lt;/evidence&gt;
-</span><span style="color: var(--p-state);">&lt;task id="task:refund_request"&gt;
-</span>refund_request: verify_eligibility=done, issue=pending
-<span style="color: var(--p-state);">&lt;/task&gt;
-</span><span style="color: var(--p-inter);">&lt;memory id="mem:plan-purchase"&gt;
-</span>User bought Pro in March, EU billing.
-<span style="color: var(--p-inter);">&lt;/memory&gt;
-</span><span style="color: var(--p-inter);">&lt;history id="turn:16" speaker="user"&gt;
-</span>Is my order refundable?
-<span style="color: var(--p-inter);">&lt;/history&gt;
-</span><span style="color: var(--p-inter);">&lt;history id="turn:17" speaker="assistant"&gt;
-</span>Let me check order 8821.
-<span style="color: var(--p-inter);">&lt;/history&gt;
-</span><span style="color: var(--p-evid);">&lt;observation id="obs:order-8821"&gt;
-</span>{"order_id": "8821", "total": 240, "days_since_purchase": 12}
-<span style="color: var(--p-evid);">&lt;/observation&gt;
-</span><span style="color: var(--p-gov);">&lt;format id="format:chat"&gt;
-</span>Max 3 sentences. No bullet lists.
-<span style="color: var(--p-gov);">&lt;/format&gt;
-</span><span style="color: var(--p-inter);">&lt;query id="turn:18"&gt;
-</span>Can you just process it now?
-<span style="color: var(--p-inter);">&lt;/query&gt;
-</span></div>
-          </div>
-<!-- CONTRACT_PAYLOAD_END -->
-        </div>
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 12px 18px; color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; border-top: 1px solid var(--line);"><!-- CONTRACT_PAYLOAD_COUNT_START --><span>estimate-utf8/v1 · 272 input tokens</span><span style="text-transform: none;">sha256 · b8e42c7b290b…</span><!-- CONTRACT_PAYLOAD_COUNT_END --></div>
       </div>
     </div>
   </section>
@@ -843,8 +735,8 @@ Never quote prices you cannot verify with a tool.</div>
 
   <section id="adopt" data-tour="adopt" style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
-      <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Adopt the spec. Four assemblers already pass it.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. Four assemblers, in Python, TypeScript, Go and Rust, implement this spec, covering admission, fitting, profiles and traces, and pass every published conformance case and reject every published rejection; none is released yet, and we want to hear what they must do. That report is what an assembler's conformance claim rests on, while a producer's or an application's rests on its word, and an application must render with a renderer the published cases cover (<a href="./spec.html#s1">§1</a>).</p>
+      <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Try the draft. Four assemblers pass every published case.</h2>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. <!-- CONTRACT_MATURITY_START -->Draft of 2026-10-07. Four assemblers, in Python, TypeScript, Go and Rust, each pass all 90 published cases, rejections included; none has a versioned release yet, and we want to hear what they must do.<!-- CONTRACT_MATURITY_END --> That report is what an assembler's conformance claim rests on, while a producer's or an application's rests on its word, and an application must render with a renderer the published cases cover (<a href="./spec.html#s1">§1</a>).</p>
       <div style="display: flex; flex-wrap: wrap; gap: 12px;">
         <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">View on GitHub</a>
         <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">Read the spec</a>
@@ -892,6 +784,36 @@ Never quote prices you cannot verify with a tool.</div>
       </div>
     </div>
   </footer>
+  <!-- GLOSSARY_START -->
+  <sc-if value="{{ glossaryOn }}" hint-placeholder-val="{{ false }}">
+    <aside id="glossary" role="dialog" aria-labelledby="glossarytitle" onKeyDown="{{ glossaryKey }}" style="position: fixed; top: 0; right: 0; bottom: 0; z-index: 85; width: min(440px, 100%); background: var(--bg); border-left: 1px solid var(--line); display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--line);">
+        <span id="glossarytitle" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);">Glossary</span>
+        <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">{{ glossaryCount }}</span>
+        <button onClick="{{ closeGlossary }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Close</button>
+      </div>
+      <div style="padding: 16px 24px; border-bottom: 1px solid var(--line);">
+        <input id="glossarysearch" type="search" value="{{ glossaryQuery }}" onChange="{{ setGlossaryQuery }}" placeholder="Search terms, aliases and definitions" aria-label="Search the glossary" autocomplete="off" spellcheck="false" style="width: 100%; padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface); color: var(--fg); font-family: var(--sans); font-size: 15px;">
+      </div>
+      <div style="flex: 1; overflow: auto; padding: 0 24px 32px;">
+        <sc-for list="{{ glossaryEntries }}" as="g" hint-placeholder-count="6">
+          <div id="{{ g.id }}" tabindex="-1" style="{{ g.style }}">
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px;">{{ g.term }}</div>
+            <div style="font-size: 14.5px; line-height: 1.55; text-wrap: pretty;">{{ g.plain }}</div>
+            <div style="{{ g.specStyle }}">{{ g.spec }}</div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px;">
+              <a href="{{ g.whereHref }}" style="{{ g.whereStyle }}">{{ g.where }}</a>
+              <sc-for list="{{ g.related }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.open }}" style="font-family: var(--mono); font-size: 11px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 4px 10px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ r.term }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="{{ glossaryEmptyStyle }}">{{ glossaryEmpty }}</div>
+      </div>
+    </aside>
+  </sc-if>
+  <!-- GLOSSARY_END -->
 </div>
 </x-dc>
 <noscript>
@@ -909,7 +831,7 @@ const PLANES = [
   { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
 ];
 
-/* SLOTS, ITEM_FIELDS and EVIDENCE_STAGES repeat the slots, item fields and stages of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
+/* SLOTS repeats the slots of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
 /* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
 const SLOTS = [
   ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Items that aren't verified, or that carry the injection marker, are excluded here.", "authority governing\ntier protected\nlineage verbatim"],
@@ -1118,54 +1040,21 @@ const REQUIRED = [0, 10];
 const EVIDENCE = [2, 7];
 const COMPRESS = 0.4;
 const BUDGETS = [8192, 4096, 2048, 1024];
-const HERO_BUDGET = 4096;
 
-const EVIDENCE_STAGES = [
-  ["Rewrite", "Producer practice the spec doesn't govern: decide whether to rewrite the query for retrieval, and keep the rewritten form so you can explain the results later."],
-  ["Retrieve", "Pull candidate chunks from sources whose provenance you can name."],
-  ["Rerank", "Score each candidate against the query and put the score in relevance. If you drop a near-duplicate, report it as duplicate_content, with duplicate_of naming the one you kept (R-13)."],
-  ["Package", "Send each chunk as its own evidence item with source, source_version, relevance and the authority its evidence slot takes (R-1). Never one merged blob (R-13)."],
-  ["Admit", "Check each item against its schema and the route: who sent it, which slot, what authority, its scope, age and expiry, and the route's min_relevance. Anything that fails is excluded with a reason code."],
-  ["Resolve", "Settle the conflict groups the application declared (R-11). Then, in the slots where the route asks, drop superseded observations (R-25), exact duplicates (R-24) and anything past max_per_source (R-26), in that order."],
-  ["Fit", "Refuse before any reduction if protected content can't fit (R-16, R-17). Otherwise apply item and slot caps, then shed in tier order under budget pressure: droppable first, then compressible (R-16). If too little evidence is left on a route that requires it, refuse instead (R-12)."],
-  ["Render & trace", "Render the payload in the profile's order, hash it, and write a trace that accounts for every decision above (R-21)."]
-];
 
-const ITEM_FIELDS = [
-  ["provenance", "source and source_version: which document, turn, tool call, database field or memory write it came from, and which version."],
-  ["authority", "Exactly one of the seven roles in section 3.1 of the spec: governing instruction, user intent, state, reference evidence, observation, generated memory, or untrusted. Each slot takes its own role; tool results, memory and history may take untrusted instead (R-1). Only governing and user can instruct. No other value is valid."],
-  ["freshness", "freshness records when content was observed or true; expires is the separate expiration deadline. as_of is prose, not a JSON alias. Expired items are excluded rather than aged silently (R-9)."],
-  ["scope", "Tenant, user, session, task, locale, workflow step. Out-of-scope items never reach the payload."],
-  ["eligibility", "A short note on why this item belongs in the request, for whoever reads the trace. It isn't code; the route owns the rule that actually decides (R-3)."],
-  ["budget", "token_budget and tier: how much it may consume, which tier it sits in, and what shortens first under pressure."],
-  ["conflict_policy", "What wins if another item disagrees: this one defers, governs, or forces escalation. Applied only to permitted instruction peers; factual precedence belongs to route policy."],
-  ["lineage", "Verbatim, summarised, redacted, translated, extracted, or model-generated."],
-  ["trust", "Verified, unverified, or untrusted: the producer's own claim about its source, so it proves nothing (R-15). Only the governance gate reads it, which admits verified items alone (R-10). It never decides who can instruct or which fact wins."],
-  ["variants", "Shorter versions the producer computed ahead of time, each with its own id, body, method and lineage. Fitting can swap one in but never writes its own (R-18)."],
-  ["injection_risk", "untrusted_content when the body might carry an injection, whatever its authority. A retrieved chunk is reference_only in knowledge and observation in tool results, and untrusted_content in both (R-10). The marker never changes authority or where an item renders: a query or history turn keeps user authority although marked, and material pasted into its body renders with it, because the assembler never splits a body."]
-];
 
+// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
+const PREREQUISITES = ["plane","slot","item","assembler","trace"];
 
 class Component extends DCLogic {
-  state = { mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, mPlaying: true, announce: "" };
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
 
   componentWillUnmount() {
-    clearInterval(this._t); clearInterval(this._m); clearInterval(this._track);
+    this.glossaryUnmount();
+    clearInterval(this._t); clearInterval(this._track);
     if (this._hash) window.removeEventListener("hashchange", this._hash);
     if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
     if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
-  }
-
-  startHeroClock() {
-    clearInterval(this._m);
-    this._m = setInterval(() => {
-      if (!this.state.mPlaying) return;
-      const n = UCS[this.state.mUc || 0].picks.length;
-      const step = this.state.mStep || 0;
-      if (step < n) this.setState({ mStep: step + 1 });
-      else if ((this.state.mHold || 0) < 4) this.setState(s => ({ mHold: (s.mHold || 0) + 1 }));
-      else this.setState(s => ({ mUc: ((s.mUc || 0) + 1) % UCS.length, mStep: 0, mHold: 0 }));
-    }, 520);
   }
 
   offMap(uc) { return (this.state.off || {})[uc] || {}; }
@@ -1206,15 +1095,15 @@ class Component extends DCLogic {
   }
 
   componentDidMount() {
+    this.glossaryMount();
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
     let still = false;
     try { still = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
-    // A visitor who asked for less motion gets the demo and the hero preview complete and still, with Play to run them.
-    if (still) this.setState({ playing: false, step: 99, mPlaying: false, mStep: 99 });
+    // A visitor who asked for less motion gets the demo complete and still, with Play to run it.
+    if (still) this.setState({ playing: false, step: 99 });
     this.startClock();
-    this.startHeroClock();
     this._hash = () => this.applyHash();
     window.addEventListener("hashchange", this._hash);
     this.applyHash();
@@ -1360,11 +1249,9 @@ class Component extends DCLogic {
         body: "A plane says why context exists. A slot is a typed collection inside it. Newcomers learn four words; implementers use eleven identifiers.",
         act: () => this.setState({ bad: false, off: {}, playing: true, step: 0, hold: 0, budget: 0, mode: "planes" }) },
       { key: "items", kicker: "The unit", title: "Items carry their own metadata",
-        body: "Eleven fields: provenance, authority, freshness, scope, eligibility, budget, conflict policy, lineage, trust, variants and injection risk. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
+        body: "Every item carries its own metadata: provenance, authority, freshness, scope, budget and tier, and the fields that say how it may be handled. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
       { key: "deeper", kicker: "Go deeper", title: "The spec and the contract have their own pages",
         body: "Twenty-six numbered requirements on the Spec page; what a retriever, memory store or MCP server has to emit on the Producers page, with its checks shown on examples. This page keeps the argument.", act: () => {} },
-      { key: "evidence", kicker: "Evidence", title: "Retrieval is a pipeline",
-        body: "Eight steps sit between the vector store and the payload, four the retriever's and four the assembler's. Each is a rule the trace can cite — including what happens when nothing valid comes back.", act: () => {} },
       { key: "harness", kicker: "Where it fits", title: "You don't replace your framework",
         body: "Your harness runs the loop; stage 04 is the blank it hands you. Pick your stack and the seam is named in your own API — plus an honest list of when to skip CWA entirely.", act: () => {} },
       { key: "scaffold", kicker: "Take it with you", title: "Six steps and five files",
@@ -1491,14 +1378,65 @@ class Component extends DCLogic {
   }
 
   schemaVals(out) {
-    out.evidenceStages = EVIDENCE_STAGES.map((s, k) => ({ n: String(k + 1).padStart(2, "0"), name: s[0], text: s[1] }));
-    out.itemFields = ITEM_FIELDS.map(f => ({ key: f[0], text: f[1] }));
     out.planes = PLANES.map((pl, k) => ({
       name: pl.name, answers: pl.answers, blurb: pl.blurb,
       barStyle: "height: 6px; width: 48px; background: " + pl.color + ";",
       slots: SLOTS.filter(s => s[2] === k).map(s => ({ name: s[0], id: s[1] }))
     }));
   }
+
+  // GLOSSARY_GLUE_START
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
+  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  glossaryMount() {
+    this._glossaryHash = () => this.glossaryHash();
+    try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
+    import("./site/glossary.js")
+      .then(m => { this._glossary = m; return m.load(); })
+      .then(g => { this.setState({ glossary: g }); this.glossaryHash(); }, () => this.setState({ glossaryError: "The glossary could not load. Reload the page to retry." }))
+      .catch(() => {});
+  }
+  glossaryUnmount() { try { if (this._glossaryHash) window.removeEventListener("hashchange", this._glossaryHash); } catch (e) {} }
+  glossaryHash() {
+    const m = (location.hash || "").match(/^#glossary(?:\/([a-z0-9-]+))?$/);
+    if (m) this.openGlossary(m[1] || null);
+  }
+  openGlossary(term) {
+    if (!this.state.glossaryOpen) { try { this._glossaryReturn = document.activeElement; } catch (e) {} }
+    this.setState({ glossaryOpen: true, glossaryTerm: term || null, glossaryQuery: term ? "" : (this.state.glossaryQuery || "") }, () => {
+      try { const el = document.getElementById(term ? "glossary-" + term : "glossarysearch"); if (el) el.focus({ preventScroll: true }); } catch (e) {}
+    });
+  }
+  closeGlossary() {
+    this.setState({ glossaryOpen: false, glossaryTerm: null }, () => { try { this._glossaryReturn && this._glossaryReturn.focus(); } catch (e) {} });
+    try { if (/^#glossary/.test(location.hash || "")) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  }
+  glossaryVals() {
+    const g = this.state.glossary, open = !!this.state.glossaryOpen, query = this.state.glossaryQuery || "", term = this.state.glossaryTerm;
+    const entries = g ? this._glossary.search(g.entries, query) : [];
+    const none = !!g && !!query && entries.length === 0;
+    return {
+      glossaryOn: open, glossaryOpen: open ? "true" : "false", glossaryQuery: query,
+      glossaryCount: g ? (query ? entries.length + " of " + g.entries.length + " terms" : g.entries.length + " terms") : (this.state.glossaryError || "Loading\u2026"),
+      glossaryEmpty: none ? "No term matches " + query + "." : "",
+      glossaryEmptyStyle: none ? "padding: 18px 0; font-size: 14.5px; color: var(--muted);" : "display: none;",
+      toggleGlossary: () => open ? this.closeGlossary() : this.openGlossary(null),
+      closeGlossary: () => this.closeGlossary(),
+      setGlossaryQuery: e => this.setState({ glossaryQuery: e.target.value, glossaryTerm: null }),
+      glossaryKey: e => { if (e.key === "Escape") { e.preventDefault(); this.closeGlossary(); } },
+      glossaryEntries: entries.map(e => ({
+        id: "glossary-" + e.id, term: e.term, plain: e.plain,
+        spec: e.spec ? "\u201C" + e.spec + "\u201D" : "",
+        specStyle: e.spec ? "margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--line); font-size: 13.5px; line-height: 1.55; color: var(--muted);" : "display: none;",
+        where: e.where ? "Defined on " + e.where.label + " \u2192" : "", whereHref: this._glossary.whereHref(e),
+        whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
+        related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
+        style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
+      })),
+      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+    };
+  }
+  // GLOSSARY_GLUE_END
 
   renderVals() {
     // Only an overridden accent is pinned inline on <html>. Pinning the default would beat the
@@ -1647,23 +1585,6 @@ class Component extends DCLogic {
       toggleMenu: () => this.setState(s => ({ menu: !s.menu }))
     };
 
-    const mu = UCS[this.state.mUc || 0];
-    const mstep = Math.min(this.state.mStep || 0, mu.picks.length);
-    const mShown = mu.picks.slice(0, mstep);
-    const mTok = mShown.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0);
-    out.heroBlocks = mShown.map(p => ({
-      tag: SLOTS[p[0]][1],
-      text: p[1].length > 62 ? p[1].slice(0, 62).trim() + "…" : p[1],
-      style: "border-left: 2px solid " + this.color(p[0]) + "; background: var(--bg); padding: 7px 11px; animation: cwaRise 240ms cubic-bezier(.2,.8,.25,1) both;"
-    }));
-    out.mUcName = mu.name;
-    out.mProgress = mstep + " of 11 slots";
-    out.mTokens = "~" + fmt(mTok) + " / " + fmt(HERO_BUDGET) + " tokens";
-    out.mFill = "height: 100%; width: " + Math.min(100, (mTok / HERO_BUDGET) * 100) + "%; background: var(--accent); transition: width 400ms ease;";
-    out.heroPlayLabel = this.state.mPlaying ? "Pause" : "Play";
-    out.heroPlayAria = out.heroPlayLabel + " the assembly preview";
-    out.toggleHero = () => this.setState(s => ({ mPlaying: !s.mPlaying }));
-
     out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
     out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
     out.badBtnStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.bad ? "var(--fg)" : "var(--line)") + "; background: " + (this.state.bad ? "var(--fg)" : "transparent") + "; color: " + (this.state.bad ? "var(--bg)" : "var(--muted)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer;";
@@ -1712,7 +1633,7 @@ class Component extends DCLogic {
     this.schemaVals(out);
     this.fwVals(out);
     this.tourVals(out);
-    return out;
+    return Object.assign(out, this.glossaryVals());
   }
 }
 </script>

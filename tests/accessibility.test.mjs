@@ -4,8 +4,8 @@ import fs from 'node:fs/promises';
 import vm from 'node:vm';
 
 // The site's accessibility floor, WCAG 2.2 AA as the yardstick: every colour the pages use as text clears 4.5:1 on
-// both page backgrounds in both themes; every page carries a reduced-motion rule, and the landing page's animations
-// start still under it; every page falls back without JavaScript to a note that names the readable files; the guided
+// both page backgrounds in both themes; every page carries a reduced-motion rule, and the landing page's demo
+// starts still under it; every page falls back without JavaScript to a note that names the readable files; the guided
 // tour is a labelled dialog that moves focus in and gives it back; the assembler demo announces what a visitor changed
 // and marks its pressed tabs; and the header logo meets the 24px target size.
 
@@ -95,30 +95,12 @@ test('every page carries a reduced-motion rule, and the landing page starts its 
     assert.ok(rule[1].includes('scroll-behavior: auto'), `${page} stops smooth scrolling`);
     assert.ok(rule[1].includes('animation-duration: 0.01ms !important') && rule[1].includes('transition-duration: 0.01ms !important'), `${page} stops animation and transitions`);
   }
-  const picks = (await component('index.html')).view.constructor.name && (await read('index.html')).match(/const UCS = \[\s*\{[\s\S]*?picks: \[([\s\S]*?)\n    \]/)[1].split('\n').filter(l => l.trim().startsWith('[')).length;
   for (const reduceMotion of [false, true]) {
     const { view } = await component('index.html', { reduceMotion, setInterval: () => 0 });
     view.componentDidMount();
     assert.equal(view.state.playing, !reduceMotion, `the demo ${reduceMotion ? 'starts paused' : 'plays'}`);
-    assert.equal(view.state.mPlaying, !reduceMotion, `the hero widget ${reduceMotion ? 'starts paused' : 'plays'}`);
-    if (reduceMotion) assert.equal([...view.renderVals().heroBlocks].length, picks, 'the hero widget shows the whole payload at once');
+    if (reduceMotion) assert.equal(view.state.step, 99, 'the demo shows the whole payload at once');
   }
-});
-
-test('the hero widget has a pause control, and its clock honours it', async () => {
-  const html = await read('index.html');
-  assert.match(html, /<button onClick="\{\{ toggleHero \}\}" aria-label="\{\{ heroPlayAria \}\}"[^>]*>\{\{ heroPlayLabel \}\}<\/button>/);
-  const ticks = [];
-  const { view } = await component('index.html', { setInterval: fn => ticks.push(fn) });
-  view.startHeroClock();
-  assert.deepEqual([view.renderVals().heroPlayLabel, view.renderVals().heroPlayAria], ['Pause', 'Pause the assembly preview']);
-  const before = view.state.mStep || 0;
-  ticks.at(-1)();
-  assert.equal(view.state.mStep, before + 1, 'playing, a tick advances the preview');
-  view.renderVals().toggleHero();
-  assert.deepEqual([view.renderVals().heroPlayLabel, view.renderVals().heroPlayAria], ['Play', 'Play the assembly preview']);
-  ticks.at(-1)();
-  assert.equal(view.state.mStep, before + 1, 'paused, a tick changes nothing');
 });
 
 test('the guided tour is a dialog named by its title, not modal; opening it and each step focus Next, and closing it returns focus to the trigger', async () => {

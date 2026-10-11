@@ -5,7 +5,7 @@ import Ajv from 'ajv/dist/2020.js';
 import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
-import { caseDigestsNow, implementations, ranAt, tally } from './conformance-reports.mjs';
+import { caseDigestsNow, implementations, maturitySentence, ranAt, tally } from './conformance-reports.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -68,12 +68,12 @@ outputs.set('producers.html', setConstant(producers, 'STAGES', model.stages).rep
   .replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
     `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`));
 const index = await fs.readFile('index.html', 'utf8');
-// The landing page's sample request shows examples/messages-payload.json one member at a time, each text as the model
-// receives it, coloured by the plane of the slot the snapshot's profile placed it from.
+// The Getting started page's sample request shows examples/messages-payload.json one member at a time, each text as the
+// model receives it, coloured by the plane of the slot the snapshot's profile placed it from.
 const payloadBytes = await fs.readFile('examples/messages-payload.json');
 const payload = JSON.parse(payloadBytes.toString('utf8'));
 const payloadSnapshot = await read('examples/messages-snapshot.json');
-if (payloadSnapshot.tokenizer !== 'estimate-utf8/v1') throw new Error('The landing-page payload count supports estimate-utf8/v1 only.');
+if (payloadSnapshot.tokenizer !== 'estimate-utf8/v1') throw new Error('The Getting started payload count supports estimate-utf8/v1 only.');
 const planeColor = slot => `var(--p-${{ governance: 'gov', state: 'state', evidence: 'evid', interaction: 'inter' }[slot.split('.')[0]]})`;
 const placedBy = wrap => payloadSnapshot.profile.placement.filter(p => p.wrap === wrap).map(p => p.slot);
 const memberText = 'style="white-space: pre-wrap; overflow-wrap: anywhere;"';
@@ -95,11 +95,15 @@ const payloadTokens = [...payload.system, ...payload.tools].map(e => e.text).con
   .reduce((sum, text) => sum + Math.floor((Buffer.byteLength(text, 'utf8') + 3) / 4), 0);
 const payloadHash = createHash('sha256').update(payloadBytes).digest('hex').slice(0, 12);
 outputs.set('index.html', index.replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
-  `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 20px 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`)
+  `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 20px 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`));
+const start = await fs.readFile('start.html', 'utf8');
+outputs.set('start.html', start
   .replace(/<!-- CONTRACT_PAYLOAD_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_END -->/,
     `<!-- CONTRACT_PAYLOAD_START -->\n${roleGroup('system')}${roleGroup('tools')}${messagesGroup}<!-- CONTRACT_PAYLOAD_END -->`)
   .replace(/<!-- CONTRACT_PAYLOAD_COUNT_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_COUNT_END -->/,
     `<!-- CONTRACT_PAYLOAD_COUNT_START --><span>${payloadSnapshot.tokenizer} · ${payloadTokens} input tokens</span><span style="text-transform: none;">sha256 · ${payloadHash}…</span><!-- CONTRACT_PAYLOAD_COUNT_END -->`));
+
+if (!/<!-- CONTRACT_MATURITY_START -->/.test(index)) throw new Error('index.html has no maturity block to write.');
 
 const ajv = new Ajv({ allErrors: true, strict: true, code: { source: true, esm: true } });
 addFormats(ajv);
@@ -166,6 +170,9 @@ const conformance = runs.map(({ label, source, report, outcomes }) => ({
   sha: source.commit, tags: source.tags, contractRepository: report.contract.repository ?? 'contextwindowarchitecture/website', contractSha: ranAt(report), total: published.length,
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
+// The landing page's closing sentence states the draft's maturity from the same counts, so it cannot drift from them.
+outputs.set('index.html', outputs.get('index.html').replace(/<!-- CONTRACT_MATURITY_START -->[\s\S]*?<!-- CONTRACT_MATURITY_END -->/,
+  () => `<!-- CONTRACT_MATURITY_START -->${maturitySentence(changes.groups[0].date, conformance.map(c => ({ label: c.label, total: c.total, passed: c.passed })))}<!-- CONTRACT_MATURITY_END -->`));
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');
   const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status,

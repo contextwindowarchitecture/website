@@ -42,3 +42,19 @@ export function tally(report, atRun, published) {
 /** The commit a report's cases came from. A report written before the contract member named its repository calls it
  * website_commit. */
 export const ranAt = report => report?.contract?.commit ?? report?.contract?.website_commit;
+
+const WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
+/**
+ * The landing page's closing sentence about the draft's maturity: its date, the listed assemblers, and what each
+ * passes of the published cases, rejections included, as the Assembler page counts them.
+ */
+export function maturitySentence(date, runs) {
+  const labels = runs.map(r => r.label);
+  const list = labels.length > 1 ? labels.slice(0, -1).join(', ') + ' and ' + labels.at(-1) : labels[0];
+  const total = runs[0]?.total ?? 0;
+  const passed = runs.map(r => r.passed);
+  const n = WORDS[runs.length] ?? String(runs.length);
+  const pass = passed.every(p => p === total) ? `each pass all ${total} published cases, rejections included`
+    : `pass between ${Math.min(...passed)} and ${Math.max(...passed)} of ${total} published cases, rejections included, and the Assembler page shows which`;
+  return `Draft of ${date}. ${n[0].toUpperCase() + n.slice(1)} assembler${runs.length === 1 ? '' : 's'}, in ${list}, ${pass}; none has a versioned release yet, and we want to hear what they must do.`;
+}

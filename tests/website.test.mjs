@@ -60,7 +60,7 @@ test('the landing page stacks its fixed multi-column grids on narrow viewports',
   assert.ok(style.includes('@media (max-width: 860px) {\n    #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }'), 'the hero, two-column sections and three-column cards stack below 860px');
   assert.ok(style.includes('@media (max-width: 620px) {\n    .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
   assert.ok(style.includes('@media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }'), 'four-column grids halve below 1000px');
-  assert.ok(style.includes('#unitrow > div, #wirerow > div { position: static !important; }'), 'stacked columns stop sticking');
+  assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
   const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
   const hooks = ['id="hero"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
   for (const hook of hooks) {
@@ -70,7 +70,7 @@ test('the landing page stacks its fixed multi-column grids on narrow viewports',
   const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
     .map(m => ({ tag: m[1], tracks: m[2] }))
     .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[2-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
-  assert.ok(fixed.length >= 20, `found ${fixed.length} fixed multi-column grids`);
+  assert.ok(fixed.length >= 15, `found ${fixed.length} fixed multi-column grids`);
   for (const g of fixed) assert.ok(hooks.some(h => g.tag.includes(h)), `a "${g.tracks}" grid stacks on narrow viewports: ${g.tag.slice(0, 80)}`);
 });
 
@@ -624,10 +624,10 @@ test('every requirement §1 lists as a producer or application duty is a boundar
   for (const id of new Set([...producers, ...application])) assert.notEqual(scope[id], 'assembler', `§1 gives part of ${id} to a producer or the application`);
 });
 
-// index.html #payload shows examples/messages-payload.json one member at a time, each text as the model receives it,
+// start.html #wire shows examples/messages-payload.json one member at a time, each text as the model receives it,
 // with the request's own token count and hash. tests/contract.test.mjs derives that payload from its snapshot.
-test('the landing page shows its sample request exactly as the payload holds it', async () => {
-  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
+test('the Getting started page shows its sample request exactly as the payload holds it', async () => {
+  const html = await fs.readFile(new URL('../start.html', import.meta.url), 'utf8');
   const bytes = await fs.readFile(new URL('../examples/messages-payload.json', import.meta.url));
   const { tokenizer } = JSON.parse(await fs.readFile(new URL('../examples/messages-snapshot.json', import.meta.url), 'utf8'));
   const request = JSON.parse(bytes.toString('utf8'));
