@@ -843,7 +843,16 @@ class Component extends DCLogic {
 
   applyHash() {
     const parts = (location.hash || "").replace(/^#/, "").split("/");
-    if (parts.length < 2) return;
+    // A jump, not the page's smooth scroll: this is where the link said the page opens.
+    const scrollTo = id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const top = (window.pageYOffset || 0) + el.getBoundingClientRect().top - 68;
+      try { window.scrollTo({ top, behavior: "instant" }); } catch (e) { (document.scrollingElement || document.documentElement).scrollTop = top; }
+    };
+    // The page renders after it loads, so a plain anchor (#problem, #assemble, #harness) is scrolled to here, once it exists.
+    // Twice: once the page has rendered, and again once the first render has settled above the target.
+    if (parts.length < 2) { if (parts[0] && parts[0] !== "glossary" && parts[0] !== "tour") for (const wait of [0, 600]) setTimeout(() => scrollTo(parts[0]), wait); return; }
     const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     let patch = null;
     if (parts[0] === "assemble") {
@@ -853,10 +862,7 @@ class Component extends DCLogic {
       }
     }
     if (!patch) return;
-    this.setState(patch, () => {
-      const el = document.getElementById(parts[0]);
-      if (el) { const sc = document.scrollingElement || document.documentElement; sc.scrollTop = sc.scrollTop + el.getBoundingClientRect().top - 68; }
-    });
+    this.setState(patch, () => scrollTo(parts[0]));
   }
 
   ucTabStyle(active) {

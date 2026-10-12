@@ -23,10 +23,10 @@ async function component(page, { hash = '' } = {}) {
     activeElement: focusable(), getElementById: id => byId[id] ?? null, querySelector: () => null, addEventListener() {}, removeEventListener() {},
   };
   const location = { hash, pathname: '/' + page, search: '', assigned: [], replaced: [], assign(url) { this.assigned.push(url); }, replace(url) { this.replaced.push(url); } };
-  const window = { location, matchMedia: () => ({ matches: false }), addEventListener() {}, removeEventListener() {}, innerWidth: 1280, innerHeight: 800, scrollTo() {} };
+  const window = { location, matchMedia: () => ({ matches: false }), addEventListener() {}, removeEventListener() {}, innerWidth: 1280, innerHeight: 800, scrolls: [], scrollTo(o) { this.scrolls.push(typeof o === 'object' ? o.top : o); } };
   const timers = [];
   const view = vm.runInNewContext(source + '\nnew Component()', { DCLogic, console, Date, setTimeout: fn => { timers.push(fn); return 0; }, clearTimeout() {}, setInterval: () => 0, clearInterval() {}, structuredClone, document, window, location, history: { replaceState() {} } });
-  return { view, document, byId, location, timers };
+  return { view, document, byId, location, timers, window };
 }
 
 test('the home page is three slides, each a full-height section with one heading, and nothing else of the old page', async () => {
@@ -105,6 +105,11 @@ test('the Demo page holds the failure cards, the simulator and harness engineeri
   const opened = await component('demo.html', { hash: '#assemble/clinical-triage/blob' });
   opened.view.applyHash();
   assert.deepEqual([opened.view.state.uc, opened.view.state.bad], [2, true], 'a failure link opens its system as the blob');
+  const anchored = await component('demo.html', { hash: '#harness' });
+  anchored.byId.harness = { getBoundingClientRect: () => ({ top: 8000 }) };
+  anchored.view.applyHash();
+  for (const fn of anchored.timers.splice(0)) fn();
+  assert.deepEqual(anchored.window.scrolls, [8000 - 68, 8000 - 68], 'a plain anchor jumps to its section once the page has rendered, and again once it has settled');
 });
 
 test('every page lists Demo first in its nav, and llms.txt follows the moves', async () => {
