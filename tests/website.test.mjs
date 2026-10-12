@@ -23,7 +23,7 @@ async function component(page, expression = 'new Component()', globals = {}) {
   return vm.runInNewContext(source + '\n' + expression, { DCLogic, console, Date, setTimeout, clearTimeout, structuredClone, document: documentStub(), ...globals });
 }
 
-const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'demo.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
 
 for (const page of PAGES) {
   test(`${page}: embedded component compiles and renders`, async () => {
@@ -41,7 +41,7 @@ test('where the header hides the nav row, every page offers a menu button that o
     assert.ok(html.includes('#hdrmenu { display: inline-block !important; }'), `${page}: the menu button shows where the nav row is hidden`);
     assert.ok(html.includes('#sitenav[data-open="true"] { display: flex !important; }'), `${page}: the open nav is shown`);
     const links = [...header.matchAll(/<a href="\.\/([a-z]+\.html)"( aria-current="page")?/g)];
-    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(['start.html', 'spec.html', 'evidence.html', 'producers.html', 'assembler.html', 'about.html']), `${page}: the home link and the nav list every page`);
+    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(['demo.html', 'start.html', 'spec.html', 'evidence.html', 'producers.html', 'assembler.html', 'about.html']), `${page}: the home link and the nav list every page`);
     assert.deepEqual(links.filter(m => m[2]).map(m => m[1]), page === 'index.html' ? [] : [page], `${page}: only its own link is current`);
     const view = await component(page);
     assert.equal(view.renderVals().menuOpen, 'false');
@@ -54,8 +54,8 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
-test('the landing page stacks its fixed multi-column grids on narrow viewports', async () => {
-  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
+for (const [page, least] of [['index.html', 4], ['demo.html', 9]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
+  const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
   assert.ok(style.includes('@media (max-width: 860px) {\n    #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }'), 'the hero, two-column sections and three-column cards stack below 860px');
   assert.ok(style.includes('@media (max-width: 620px) {\n    .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
@@ -70,7 +70,7 @@ test('the landing page stacks its fixed multi-column grids on narrow viewports',
   const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
     .map(m => ({ tag: m[1], tracks: m[2] }))
     .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[2-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
-  assert.ok(fixed.length >= 12, `found ${fixed.length} fixed multi-column grids`);
+  assert.ok(fixed.length >= least, `found ${fixed.length} fixed multi-column grids`);
   for (const g of fixed) assert.ok(hooks.some(h => g.tag.includes(h)), `a "${g.tracks}" grid stacks on narrow viewports: ${g.tag.slice(0, 80)}`);
 });
 

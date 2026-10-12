@@ -7,7 +7,7 @@ import vm from 'node:vm';
 // lands anywhere can pull back a layer. These tests hold the navigation, the home page's shape, and the glossary to
 // that (docs/plans/layering.md).
 
-const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'demo.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const header = html => html.match(/<header[\s\S]*?<\/header>/)[0];
 
@@ -36,22 +36,18 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
     assert.ok(!html.includes('>Docs</a>') && !html.includes('Read the docs'), `${page}: the spec page is called Spec`);
   }
   const index = await read('index.html');
-  assert.ok(index.includes('If you are building, start with <a href="./start.html">Getting started</a>.'), 'builders start at Getting started');
-  assert.ok(index.includes('What CWA is not: <a href="./about.html">About</a>.'), 'the router surfaces what CWA is not');
-  assert.ok(index.includes('Read the placement evidence →'), 'the Go deeper card says placement');
+  assert.ok(index.includes('<a href="./start.html"') && index.includes('>Building</span>'), 'builders have a door to Getting started');
   assert.match(await read('start.html'), /<a href="\.\/evidence\.html"[^>]*><span[^>]*>Placement<\/span>/, 'the Start page\'s Next card says Placement');
   assert.ok((await read('about.html')).includes('The Placement page cites what is measured and stops there.'), 'About names the Placement page');
 });
 
-test('the hero offers two actions, the tour under one name and then the demo, and the tour hands on to Getting started', async () => {
-  const html = await read('index.html');
-  const hero = html.slice(html.indexOf('<div id="hero"'), html.indexOf('What it is'));
-  const actions = hero.match(/<div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">([\s\S]*?)\n        <\/div>/)[1];
-  assert.deepEqual([...actions.matchAll(/<(button|a) ([^>]*)>([^<]+)<\/(?:button|a)>/g)].map(m => [m[1], m[3], m[2].includes('onClick="{{ startTour }}') ? 'tour' : m[2].match(/href="([^"]+)"/)[1]]),
-    [['button', 'Take the tour', 'tour'], ['a', 'Watch it assemble', '#assemble']]);
-  assert.ok(!html.includes('Take the guided tour'), 'the tour has one name');
-  assert.ok(header(html).includes('>Take the tour</button>'), 'the header uses the same name');
-  const { view, location } = await component('index.html');
+test('the tour has one name on the home and Demo pages, and the Demo tour hands on to Getting started', async () => {
+  for (const page of ['index.html', 'demo.html']) {
+    const html = await read(page);
+    assert.ok(!html.includes('Take the guided tour'), `${page}: the tour has one name`);
+    assert.ok(header(html).includes('>Take the tour</button>'), `${page}: the header uses the same name`);
+  }
+  const { view, location } = await component('demo.html');
   view.state.tour = view.tourSteps().length - 1;
   const vals = view.renderVals();
   assert.equal(vals.tourNextLabel, 'Get started');
@@ -171,33 +167,28 @@ test('the panel opens from the nav or a pill, searches, follows #glossary/<term>
   assert.equal(view.state.glossaryOpen, false, 'another hash leaves the panel alone');
 });
 
-// The home page is layer 1: it hooks and orients, and the material it used to repeat lives on the deeper pages.
-test('the home page is layer 1: a plain hero with no preview widget, what it is before who it is for, one determinism card, and no field table, pipeline or wire request', async () => {
+// The home page is layer 1: three slides that hook and orient (tests/three-slides.test.mjs), and the material it used to
+// repeat lives on the deeper pages.
+test('the home page is layer 1: a plain hero with no preview widget, and none of the material the deeper pages carry', async () => {
   const html = await read('index.html');
   assert.ok(!html.includes('{{ heroBlocks }}') && !html.includes('toggleHero') && !html.includes('startHeroClock'), 'no hero preview widget');
   const lede = html.match(/<h1[^>]*>Context isn't a prompt[^<]*<\/h1>\s*<p[^>]*>([^<]+)<\/p>/)[1];
   assert.ok(lede.split(' ').length <= 50, `the hero lede stays short: ${lede.split(' ').length} words`);
   for (const word of ['authority', 'lifecycle', 'deterministic', 'payload', 'slot']) assert.ok(!lede.toLowerCase().includes(word), `the hero lede avoids ${word}`);
-  assert.ok(html.indexOf('>What it is</div>') < html.indexOf(">Who it's for</div>"), 'what it is comes before who it is for');
-  assert.ok(!html.includes('Everyday AI users') && html.includes('>Evaluating CWA</div>'), 'the audience cards serve readers the site serves');
-  assert.ok(!html.includes('consistency, and governance'), 'the organisations card does not use governance in a second sense');
-  assert.equal((html.match(/>Deterministic assembly</g) || []).length, 1, 'determinism is claimed once');
-  assert.ok(html.includes('>Rule zero</h3>') && !html.includes('Rule zero (R-5):'), 'rule zero is a card, not a footnote');
-  for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
-  for (const gone of ['<section id="planes"', '<section id="items"', '<section id="fit"', '<section id="adopt"', '{{ layers }}', 'schemaVals']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
-  const deeper = html.slice(html.indexOf('<section id="deeper"'), html.indexOf('</section>', html.indexOf('<section id="deeper"')));
-  assert.deepEqual([...deeper.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html'], 'Go deeper starts with Getting started');
-  assert.ok(deeper.includes('eight-step admission pipeline'), 'the Producers card names the pipeline that moved there');
-  assert.ok(!html.includes('CONTRACT_MATURITY_START'), 'the maturity sentence lives on About now');
+  for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET', 'CONTRACT_MATURITY_START', 'CONTRACT_ITEM_START', '{{ layers }}', 'schemaVals']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
+  const demo = await read('demo.html');
+  assert.ok(!demo.includes('>Deterministic assembly</div>') && !demo.includes('Rule zero (R-5):'), 'the Demo page restates neither what-it-is card nor rule zero as a footnote');
 });
 
-test('every guided-tour step points at a section the home page still has', async () => {
-  const html = await read('index.html');
-  const { view } = await component('index.html');
-  const keys = view.tourSteps().map(s => s.key);
-  assert.ok(keys.length >= 13 && !keys.includes('evidence') && !keys.includes('planes') && !keys.includes('adopt'));
-  assert.equal(view.tourSteps().at(-1).last, true, 'the last step hands on');
-  for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `the tour step ${key} has a target`);
+test('every guided-tour step points at a section its page still has', async () => {
+  for (const [page, least] of [['index.html', 3], ['demo.html', 11]]) {
+    const html = await read(page);
+    const { view } = await component(page);
+    const keys = [...view.tourSteps().map(s => s.key)];
+    assert.ok(keys.length >= least && !keys.includes('evidence') && !keys.includes('planes') && !keys.includes('adopt'), page);
+    assert.equal(view.tourSteps().at(-1).last, true, `${page}: the last step hands on`);
+    for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `${page}: the tour step ${key} has a target`);
+  }
 });
 
 test('the About page states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {

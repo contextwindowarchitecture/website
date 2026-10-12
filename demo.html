@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Demo — Context Window Architecture</title>
+<meta name="description" content="Seven systems assembled under CWA: the failure shapes an unowned payload produces, a live assembly you can pull slots out of and squeeze, and where the assembler goes inside an agent framework." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --sans: 'Space Grotesk', Helvetica, Arial, sans-serif;
+    --mono: 'IBM Plex Mono', monospace;
+    --pill: 999px;
+    --bg: oklch(0.985 0.004 90);
+    --surface: oklch(0.955 0.005 90);
+    --fg: oklch(0.20 0.010 80);
+    --muted: oklch(0.52 0.010 80);
+    --line: oklch(0.885 0.006 90);
+    --accent: oklch(0.55 0.20 38);
+    --accent-soft: oklch(0.94 0.035 45);
+    --p-gov: oklch(0.55 0.17 38);
+    --p-state: oklch(0.53 0.14 250);
+    --p-evid: oklch(0.52 0.13 155);
+    --p-inter: oklch(0.54 0.15 310);
+  }
+  html[data-theme="dark"] {
+    --bg: oklch(0.175 0.008 80);
+    --surface: oklch(0.215 0.008 80);
+    --fg: oklch(0.955 0.004 90);
+    --muted: oklch(0.68 0.010 85);
+    --line: oklch(0.305 0.008 80);
+    --accent: oklch(0.74 0.17 45);
+    --accent-soft: oklch(0.30 0.045 45);
+    --p-gov: oklch(0.76 0.15 45);
+    --p-state: oklch(0.76 0.12 250);
+    --p-evid: oklch(0.76 0.13 155);
+    --p-inter: oklch(0.76 0.13 310);
+  }
+  html { background: var(--bg); scroll-behavior: smooth; overflow-x: hidden; }
+  @media (max-width: 1200px) {
+    #hdrmenu { display: inline-block !important; }
+    #sitenav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0 !important; margin: 0 !important; padding: 6px 32px 14px; font-size: 16px !important; background: var(--bg); border-bottom: 1px solid var(--line); }
+    #sitenav[data-open="true"] { display: flex !important; }
+    #sitenav a { padding: 13px 0 !important; border-bottom: 1px solid var(--line) !important; }
+    #sitenav a:last-child { border-bottom: 0 !important; }
+    #sitenav a[aria-current="page"] { border-left: 3px solid var(--accent); padding-left: 12px !important; }
+    #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
+  }
+  @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
+  @media (max-width: 620px) { #hdrtour { display: none !important; } }
+  @media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
+  @media (max-width: 860px) {
+    #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }
+    #unitrow > div { position: static !important; }
+    #ctarow > a { justify-self: start; }
+    .g6, .g6p { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+    .g6p > div { grid-column: 1 !important; }
+  }
+  @media (max-width: 620px) {
+    .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }
+    .g6 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .g6p { display: none !important; }
+    .lyr { grid-template-columns: minmax(0, 1fr) 32px !important; gap: 6px 12px !important; }
+    .lyr > span:first-child { grid-column: 1 / -1; grid-row: 2; }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { color: var(--fg); }
+  ::selection { background: var(--accent); color: var(--bg); }
+  @keyframes cwaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</helmet>
+
+<div style="min-height: 100vh; background: var(--bg); color: var(--fg);">
+
+  <header style="position: sticky; top: 0; z-index: 50; background: color-mix(in oklab, var(--bg) 88%, transparent); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line);">
+    <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
+      <a href="./index.html" style="display: flex; align-items: center; gap: 10px; min-height: 24px; color: var(--fg);">
+        <span style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 18px; height: 18px;">
+          <span style="background: var(--p-gov);"></span><span style="background: var(--p-state);"></span><span style="background: var(--p-evid);"></span><span style="background: var(--p-inter);"></span>
+        </span>
+        <span style="font-weight: 700; letter-spacing: -0.02em; font-size: 16px;">CWA</span>
+      </a>
+      <nav id="sitenav" data-open="{{ menuOpen }}" style="display: flex; gap: 24px; margin-left: 8px; font-size: 14px; font-weight: 500;">
+        <a href="./demo.html" aria-current="page" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">Demo</a>
+        <a href="./start.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Start</a>
+        <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
+        <a href="./evidence.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Placement</a>
+        <a href="./producers.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Producers</a>
+        <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
+        <a href="./about.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">About</a>
+        <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
+      </nav>
+      <div style="flex: 1;"></div>
+      <button id="hdrtour" onClick="{{ startTour }}" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 9px 18px; border: 0; cursor: pointer; font-family: inherit; white-space: nowrap;" style-hover="background: var(--fg);">Take the tour</button>
+      <button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}" style="display: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ menuLabel }}</button>
+      <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
+      <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
+    </div>
+  </header>
+
+
+  <section style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Demo</div>
+      <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Watch what goes wrong. Then watch it assemble.</h1>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Seven systems, from a support agent to a clinical triage assistant, each assembled from the same four planes and eleven slots. Open a failure shape to see the system that reproduces it as the unassembled blob, then watch the assembler admit, fit and render the same request, pull a slot out, and squeeze the budget until something has to give. The simulation uses estimated tokens and illustrative outcomes, not model evaluations.</p>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+        <span>This page assumes you know:</span>
+        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
+        </sc-for>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
+        <button onClick="{{ startTour }}" style="font-size: 16px; font-weight: 600; font-family: inherit; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px; border: 0; cursor: pointer;" style-hover="background: var(--fg);">Take the tour</button>
+        <a href="#assemble" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Skip to the simulator</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="problem" data-tour="problem" style="border-top: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The problem</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">What goes wrong when nobody owns the payload.</h2>
+      <p style="margin: 0 0 40px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Every model call is assembled by a function, and in most systems that function has no name. It has grown arguments for a year, it concatenates whatever the route happens to hold, and it knows nothing about who is allowed to direct the model, how old each piece is, what to shorten when the window is full, or what it sent last time. The failures this produces are not random: they repeat, they have recognisable shapes, and they can be named.</p>
+      <div class="g2c" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <a href="#assemble/clinical-triage/blob" onClick="{{ fmOpen2 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">01</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Authority inversion</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">A protocol document outranks the never-diagnose rule, and the assistant names a condition.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Clinical triage →</span>
+          </span>
+        </a>
+        <a href="#assemble/code-review-bot/blob" onClick="{{ fmOpen1 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">02</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Instruction-shaped evidence</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">A lint config or a runbook reads as a command, and the bot starts rewriting style or proposing failover.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Code review bot →</span>
+          </span>
+        </a>
+        <a href="#assemble/weekly-brief/blob" onClick="{{ fmOpen3 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">03</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Stale-as-current</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">Last week’s brief is indistinguishable from this week’s data, so old numbers ship as current.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Weekly brief →</span>
+          </span>
+        </a>
+        <a href="#assemble/language-tutor/blob" onClick="{{ fmOpen6 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">04</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Memory that never expires</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">Corrections from weeks ago become live instructions.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Language tutor →</span>
+          </span>
+        </a>
+        <a href="#assemble/support-agent/blob" onClick="{{ fmOpen0 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">05</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Displacement under budget</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">History is unbounded, so by turn thirty the price rule has been pushed out of the window.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Support agent →</span>
+          </span>
+        </a>
+        <a href="#assemble/voice-ordering/blob" onClick="{{ fmOpen4 }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">06</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Redundant re-reading</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">The whole menu is re-read on every turn; the reply lands late.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">Reproduce · Voice ordering →</span>
+          </span>
+        </a>
+        <a href="#assemble/support-agent/no-query" onClick="{{ fmOpenTrigger }}" style="background: var(--bg); padding: 22px 24px; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 14px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">07</span>
+          <span style="display: block; min-width: 0;">
+            <span style="display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.015em; margin-bottom: 6px;">Missing trigger</span>
+            <span style="display: block; font-size: 15px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">The query is buried or absent, so the turn returns a summary, or nothing.</span>
+            <span style="display: block; font-family: var(--mono); font-size: 11px; color: var(--accent); margin-top: 10px;">See the refusal · Support agent, query removed →</span>
+          </span>
+        </a>
+        <div style="background: var(--fg); color: var(--bg); padding: 22px 24px; display: flex; flex-direction: column; justify-content: center; gap: 10px;">
+          <div style="font-size: clamp(20px, 2.2vw, 26px); line-height: 1.25; letter-spacing: -0.02em; font-weight: 600; text-wrap: pretty;">These are assembly errors, and in most systems today nothing owns the assembly step that would catch them.</div>
+          <div style="font-size: 14.5px; line-height: 1.5; opacity: 0.72; text-wrap: pretty;">Each card opens the demo on the system that reproduces it, shown as the unassembled blob.</div>
+        </div>
+      </div>
+      <p style="margin: 22px 0 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Where an item sits in the window matters too, and that question has evidence of its own: <a href="./evidence.html">Why placement is a profile, not a rule</a>.</p>
+    </div>
+  </section>
+
+
+  <section id="assemble" style="border-top: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 80px 32px 96px;">
+      <div data-tour="intro">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget in tier order, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
+      </div>
+
+      <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
+        <sc-for list="{{ ucTabs }}" as="tab" hint-placeholder-count="4">
+          <button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}" style="{{ tab.style }}">{{ tab.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px;">
+        <span data-tour="play" style="display: flex; gap: 10px;"><button onClick="{{ togglePlay }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ playLabel }}</button>
+        <button data-tour="badbtn" onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
+        <span style="width: 1px; height: 22px; background: var(--line); margin: 0 4px;"></span>
+        <span data-tour="budget" style="display: flex; align-items: center; gap: 10px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Input budget</span>
+        <span style="display: flex; gap: 6px;">
+          <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
+            <button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}" style="{{ b.style }}">{{ b.label }}</button>
+          </sc-for>
+        </span></span>
+      </div>
+
+      <div data-tour="fill" style="border: 1px solid var(--line); background: var(--bg); padding: 16px 18px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; gap: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">
+          <span>Window fill</span>
+          <span style="color: var(--fg);">{{ tokenLabel }}</span>
+        </div>
+        <div style="display: flex; gap: 2px; height: 16px; background: var(--surface); border: 1px solid var(--line); overflow: hidden;">
+          <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="0">
+            <div style="{{ seg.style }}" title="{{ seg.title }}"></div>
+          </sc-for>
+        </div>
+        <div style="{{ evictionStyle }}">{{ evictionLabel }}</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--muted);">
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Protected</span> · instructions, capabilities, task state, output contract, query</span>
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Compressible</span> · memory, history, knowledge, tool results</span>
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Droppable</span> · examples, user facts</span>
+        </div>
+      </div>
+
+      <div class="g2" style="display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 28px; align-items: start;">
+        <div data-tour="slots" style="border: 1px solid var(--line); background: var(--bg); padding: 18px;">
+          <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;">{{ announce }}</div>
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
+            <span>Slots</span>
+            <span>{{ usedLabel }}</span>
+          </div>
+          <sc-if value="{{ isGood }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 14px;">Click a slot to remove it →</div>
+          </sc-if>
+          <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 14px;">Nothing to click — the slots no longer exist</div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="11">
+              <button onClick="{{ slot.click }}" title="{{ slot.title }}" style="{{ slot.rowStyle }}">
+                <span style="{{ slot.dotStyle }}"></span>
+                <span style="min-width: 0;">
+                  <span style="display: block; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ slot.name }}</span>
+                  <span style="display: block; font-family: var(--mono); font-size: 10.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ slot.id }}</span>
+                </span>
+                <span style="{{ slot.tagStyle }}">{{ slot.tag }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-tour="payload" style="border: 1px solid var(--line); background: var(--bg); padding: 18px; min-height: 540px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">
+            <span>{{ ucName }}</span>
+            <span>{{ progress }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+            <sc-for list="{{ payload }}" as="line" hint-placeholder-count="6">
+              <div style="{{ line.style }}">
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;">
+                  <span style="{{ line.tagStyle }}">{{ line.tag }}</span>
+                  <span style="white-space: nowrap;">{{ line.tokens }}</span>
+                </div>
+                <div style="font-family: var(--mono); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;">{{ line.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
+            <span>{{ renderedLabel }}</span>
+            <span>trace {{ traceId }}</span>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
+        <div data-tour="badpanel" style="border: 1px solid var(--fg); background: var(--bg); padding: 26px 28px; margin-top: 14px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Symptom you'll actually see</div>
+          <p style="margin: 0 0 22px; font-size: 20px; line-height: 1.45; font-weight: 500; max-width: 70ch; text-wrap: pretty;">{{ ucSymptom }}</p>
+          <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; border-top: 1px solid var(--line); padding-top: 20px;">
+            <sc-for list="{{ badNotes }}" as="n" hint-placeholder-count="3">
+              <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ n.text }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasRemoved }}" hint-placeholder-val="{{ false }}">
+        <div data-tour="removed" style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 22px 24px; margin-top: 14px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);">What breaks without it</span>
+            <button onClick="{{ restoreAll }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); background: transparent; border: 1px solid var(--fg); border-radius: var(--pill); padding: 8px 15px; cursor: pointer;">Restore all slots</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ removed }}" as="r" hint-placeholder-count="1">
+              <div class="rm" style="display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: baseline;">
+                <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); text-decoration: line-through;">{{ r.tag }}</span>
+                <span style="font-size: 17px; line-height: 1.5; text-wrap: pretty;">{{ r.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <div class="g2c" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; margin-top: 28px;">
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">What this one teaches</div>
+          <p style="margin: 0; font-size: 17px; line-height: 1.55; text-wrap: pretty;">{{ ucNote }}</p>
+        </div>
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">Decisions it forces</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ ucQuestions }}" as="q" hint-placeholder-count="2">
+              <div style="display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; font-size: 17px; line-height: 1.5;">
+                <span style="color: var(--accent);">?</span>
+                <span style="text-wrap: pretty;">{{ q.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+
+
+  <section id="harness" data-tour="harness" style="border-top: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Harness engineering</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1.0; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Already using a framework? The assembler goes inside it.</h2>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your framework is the harness: it runs the loop, calls the tools, keeps the state, and retries the failures. It is deliberately unopinionated about the one thing that decides answer quality, which is what actually lands in the window on each pass. CWA fills that gap. Pick your stack:</p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;">
+        <sc-for list="{{ fwTabs }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="border: 1px solid var(--line); background: var(--bg);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
+          <span>Runtime loop · {{ fwName }}</span>
+          <span>Framework territory</span>
+        </div>
+        <div class="g6" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line);">
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">01</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Receive input</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">02</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Plan / route</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">03</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Resolve tools</div>
+          </div>
+          <div style="background: var(--accent); color: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; opacity: 0.75; margin-bottom: 8px;">04 · yours</div>
+            <div style="font-size: 14px; line-height: 1.35; font-weight: 600;">{{ fwSeamStage }}</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">05</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Call model</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">06</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Parse &amp; act ↻</div>
+          </div>
+        </div>
+        <div class="g6p" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));">
+          <div style="grid-column: 4; display: flex; justify-content: center;">
+            <div style="width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 13px solid var(--accent);"></div>
+          </div>
+        </div>
+        <div style="border-top: 1px solid var(--accent); background: var(--accent-soft); padding: 26px 24px 28px;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;">
+            <span>Inside stage 04</span>
+            <span>Your territory · CWA specifies this</span>
+          </div>
+          <div style="font-size: 17px; line-height: 1.5; max-width: 70ch; margin-bottom: 20px; text-wrap: pretty;">The framework hands you an empty array and a place to put a string. Everything below is a decision you are already making — usually implicitly, in one function, with no names for the parts.</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ slotChips }}" as="c" hint-placeholder-count="11">
+              <span style="{{ c.style }}">{{ c.label }}</span>
+            </sc-for>
+          </div>
+          <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--accent); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; overflow-wrap: anywhere; color: var(--fg);">
+            <span style="color: var(--accent);">seam · </span>{{ fwSeam }}
+          </div>
+        </div>
+      </div>
+
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; margin-bottom: 40px;">
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Your harness already owns</div>
+          <sc-for list="{{ fwOwns }}" as="o" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; text-wrap: pretty;">
+              <span style="color: var(--muted);">✓</span><span>{{ o }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">It leaves you a blank</div>
+          <sc-for list="{{ fwBlank }}" as="b" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; text-wrap: pretty;">
+              <span style="color: var(--accent);">→</span><span>{{ b }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">What that costs you</div>
+          <sc-for list="{{ fwCost }}" as="c" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; color: var(--muted); text-wrap: pretty;">
+              <span>✕</span><span>{{ c }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--fg); background: var(--bg); padding: 30px 32px; margin-bottom: 40px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Should you use CWA with {{ fwName }}?</div>
+        <div style="font-size: clamp(20px, 2.4vw, 28px); line-height: 1.35; letter-spacing: -0.02em; max-width: 60ch; text-wrap: pretty;">{{ fwVerdict }}</div>
+      </div>
+
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">You send one fixed prompt with no retrieval and no history. An assembler for a single slot is bureaucracy.</div>
+        </div>
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">You never use more than a fifth of the window. Nothing competes, so nothing needs priority.</div>
+        </div>
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">It's a prototype you'll delete on Friday. Come back when someone asks why it answered that.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+
+  <section style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
+      <h2 style="margin: 0 0 20px; font-size: clamp(30px, 4vw, 52px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Next</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px;">
+        <a href="./start.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Start</span><span style="font-size: 17px; line-height: 1.45;">Six steps from the prompt you send today to a payload with owners, and the scaffold to copy.</span></a>
+        <a href="./spec.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Spec</span><span style="font-size: 17px; line-height: 1.45;">The numbered requirements the simulator follows, and who each one binds.</span></a>
+        <a href="./producers.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Producers</span><span style="font-size: 17px; line-height: 1.45;">What your retriever, memory store and MCP servers must emit for a slot to admit it.</span></a>
+        <a href="./evidence.html" style="color: var(--bg); display: flex; flex-direction: column; gap: 6px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.7;">Placement</span><span style="font-size: 17px; line-height: 1.45;">Why the order the simulator renders in is a profile, not a rule.</span></a>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ tourOn }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 90; pointer-events: none;">
+      <div style="{{ maskT }}"></div>
+      <div style="{{ maskB }}"></div>
+      <div style="{{ maskL }}"></div>
+      <div style="{{ maskR }}"></div>
+      <div style="{{ tourRing }}"></div>
+      <div role="dialog" aria-labelledby="tourtitle" style="{{ tourCard }}">
+        <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">
+          <span>{{ tourKicker }}</span>
+          <span style="color: var(--muted);">{{ tourCount }}</span>
+        </div>
+        <div id="tourtitle" style="font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 10px; text-wrap: pretty;">{{ tourTitle }}</div>
+        <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ tourBody }}</div>
+        <div style="display: flex; gap: 2px; margin: 18px 0 16px;">
+          <sc-for list="{{ tourDots }}" as="d" hint-placeholder-count="11">
+            <div style="{{ d.style }}"></div>
+          </sc-for>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="tournext" onClick="{{ tourNext }}" style="{{ tourNextStyle }}">{{ tourNextLabel }}</button>
+          <button onClick="{{ tourBack }}" style="{{ tourBackStyle }}">Back</button>
+          <div style="flex: 1;"></div>
+          <button onClick="{{ endTour }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; cursor: pointer; padding: 8px 4px;" style-hover="color: var(--fg);">{{ tourSkipLabel }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <footer style="border-top: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+      <span>Context Window Architecture is a context assembler specification, not a library.</span>
+      <div style="display: flex; gap: 20px;">
+        <a href="./spec.html">Spec</a>
+        <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener">GitHub</a>
+        <a href="./llms.txt">llms.txt</a>
+        <a href="./LICENSE">Apache-2.0</a>
+      </div>
+    </div>
+  </footer>
+  <!-- GLOSSARY_START -->
+  <sc-if value="{{ glossaryOn }}" hint-placeholder-val="{{ false }}">
+    <aside id="glossary" role="dialog" aria-labelledby="glossarytitle" onKeyDown="{{ glossaryKey }}" style="position: fixed; top: 0; right: 0; bottom: 0; z-index: 85; width: min(440px, 100%); background: var(--bg); border-left: 1px solid var(--line); display: flex; flex-direction: column;">
+      <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 18px 24px; border-bottom: 1px solid var(--line);">
+        <span id="glossarytitle" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);">Glossary</span>
+        <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">{{ glossaryCount }}</span>
+        <button onClick="{{ closeGlossary }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Close</button>
+      </div>
+      <div style="padding: 16px 24px; border-bottom: 1px solid var(--line);">
+        <input id="glossarysearch" type="search" value="{{ glossaryQuery }}" onChange="{{ setGlossaryQuery }}" placeholder="Search terms, aliases and definitions" aria-label="Search the glossary" autocomplete="off" spellcheck="false" style="width: 100%; padding: 11px 14px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface); color: var(--fg); font-family: var(--sans); font-size: 15px;">
+      </div>
+      <div style="flex: 1; overflow: auto; padding: 0 24px 32px;">
+        <sc-for list="{{ glossaryEntries }}" as="g" hint-placeholder-count="6">
+          <div id="{{ g.id }}" tabindex="-1" style="{{ g.style }}">
+            <div style="font-size: 17px; font-weight: 600; letter-spacing: -0.01em; margin-bottom: 6px;">{{ g.term }}</div>
+            <div style="font-size: 14.5px; line-height: 1.55; text-wrap: pretty;">{{ g.plain }}</div>
+            <div style="{{ g.specStyle }}">{{ g.spec }}</div>
+            <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 10px;">
+              <a href="{{ g.whereHref }}" style="{{ g.whereStyle }}">{{ g.where }}</a>
+              <sc-for list="{{ g.related }}" as="r" hint-placeholder-count="3">
+                <button onClick="{{ r.open }}" style="font-family: var(--mono); font-size: 11px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 4px 10px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ r.term }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="{{ glossaryEmptyStyle }}">{{ glossaryEmpty }}</div>
+      </div>
+    </aside>
+  </sc-if>
+  <!-- GLOSSARY_END -->
+</div>
+</x-dc>
+<noscript>
+  <style>x-dc { display: none; }</style>
+  <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
+</noscript>
+<script type="text/x-dc" data-dc-script>
+const PLANES = [
+  { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
+  { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
+  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved chunks, tool observations, artifacts, and citations. Each arrives as its own evidence item with provenance, freshness, and trust, and is treated as reference material, not instruction." },
+  { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
+];
+
+/* SLOTS repeats the slots of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
+/* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
+const SLOTS = [
+  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Items that aren't verified, or that carry the injection marker, are excluded here.", "authority governing\ntier protected\nlineage verbatim"],
+  ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Unverified user claims remain source-linked memory; only application-confirmed facts enter state.", "authority state\ntier droppable\nscope tenant · user"],
+  ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, and inside its freshness limits. Where the route asks for it, exact duplicates go after conflicts are resolved (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
+  ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When it disagrees with other evidence, the route's fact policy decides; a route that treats state as canonical lists the state producer first (R-11).", "authority state\ntier protected\nowner application"],
+  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries whose expires is at or before assembly_time, or that carry revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns.", "Summarising older turns into memory is the application's job, done before assembly (R-12). Under budget pressure, when the route declares no fitting order, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the turns carry relevance scores or the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nrisk untrusted_content"],
+  ["Capabilities", "governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority (R-15), and permission is decided outside the model.", "authority governing\ntier protected\nallow-list versioned"],
+  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop, and any retrieved chunks a route sends here.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
+  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format.", "A route that wants them places the slot and lists a producer for it; admission applies the same four slot rules as anywhere else (R-3). They defer to instructions and the output contract. They're droppable, so under budget pressure they go before anything compressible.", "authority governing\ntier droppable\nconflict defers"],
+  ["Output contract", "governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates.", "authority governing\ntier protected\nrequired when parser: true"],
+  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it.", "authority user\ntier protected\nrole trigger"]
+];
+
+const UCS = [
+  {
+    label: "Support agent",
+    symptom: "Ada follows the refund document instead of her own price rule — and by turn thirty the \u201cnever quote unverified prices\u201d line has been pushed out of the window altogether.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, Ada would lose her identity and her price rule, and quote numbers she cannot verify.",
+      1: "EU refund terms stop applying automatically; the answer turns generic.",
+      2: "The 30-day policy is gone, so the model invents a refund window.",
+      3: "It forgets eligibility was already checked and restarts the interrogation.",
+      5: "It cannot tell what \u201cit\u201d refers to and asks the customer to repeat themselves.",
+      6: "No tools to call — it can describe a refund it has no way to issue.",
+      7: "The order amount is unknown, so the agent guesses the total or asks again.",
+      9: "The reply arrives as six paragraphs inside a chat bubble built for two lines.",
+      10: "Refused with required_slot_missing. Sent anyway, there is nothing to answer, and the turn would produce a summary of the conversation instead."
+    },
+    name: "Refund request · live chat",
+    picks: [
+      [0, "You are Ada, support for Northwind. Never quote a price you cannot verify with a tool."],
+      [1, "plan=pro · region=EU · tone=concise"],
+      [2, "[refunds-eu:v17#p4 · verified] Pro plans refund in full within 30 days."],
+      [3, "refund_request → eligibility=done, issue=pending"],
+      [5, "user: is my order refundable?"],
+      [6, "lookup_order(id) · issue_refund(id, amount)"],
+      [7, "lookup_order(8821) → { total: 240, days: 12 } · age 0.4s"],
+      [9, "Max 3 sentences. No bullet lists."],
+      [10, "Can you just process it now?"]
+    ],
+    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund policy chunk arrives as an evidence item with a version and a trust tier, rather than as pasted text.",
+    questions: ["The price rule is stated in governance.instructions, but is it also enforced by a tool guard? Language guidance belongs in context; invariants belong in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
+  },
+  {
+    label: "Code review bot",
+    symptom: "The lint config reads as an instruction, so the bot starts rewriting the repo's style instead of reviewing the diff it was given.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, it would review the whole file instead of the diff and fill the PR with noise.",
+      2: "House conventions vanish; it flags style the repo deliberately allows.",
+      6: "It can describe problems but cannot post a single comment.",
+      7: "No diff in the window — it reviews a pull request it has never seen.",
+      8: "Comment tone slides from specific to generic \u201cconsider refactoring\u201d.",
+      9: "Free-form prose comes back and the CI job fails to parse it.",
+      10: "Refused with required_slot_missing. Sent anyway, the job would run with no trigger and return nothing."
+    },
+    name: "Pull request #482 · CI job",
+    picks: [
+      [0, "You review diffs. Comment only on lines that changed."],
+      [2, "repo conventions · eslint config · CODEOWNERS · authority=reference_only"],
+      [6, "fetch_diff(pr) · post_comment(file, line, body)"],
+      [7, "fetch_diff(482) → 3 files, 214 lines changed"],
+      [8, "Two approved review comments from last week."],
+      [9, "JSON array: { file, line, severity, note }"],
+      [10, "Review PR #482."]
+    ],
+    note: "No user facts, no history — a CI job has no conversation and no person. Repo conventions are admitted as reference evidence, which is exactly why they cannot turn into instructions.",
+    questions: ["Are repo conventions evidence, or part of the tool observation?", "What does the fitting policy compress first when the diff is 4,000 lines?"]
+  },
+  {
+    label: "Clinical triage",
+    symptom: "The protocol text outranks the never-diagnose rule and the assistant confidently names a condition.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, the escalation rule would be gone and the assistant would offer a diagnosis instead.",
+      1: "Age and hypertension disappear, so chest pain reads as low risk.",
+      2: "The triage protocol is missing and the advice becomes improvised.",
+      4: "Prior BP history is lost; the pattern across visits goes unnoticed.",
+      5: "The symptom described this morning never reaches the model.",
+      9: "A reassuring essay comes back where a risk tier was required.",
+      10: "Refused with required_slot_missing: there is no question left to triage."
+    },
+    name: "Intake triage · patient portal",
+    picks: [
+      [0, "Triage assistant. Never diagnose. Escalate red-flag symptoms immediately."],
+      [1, "age 61 · known hypertension · EU patient record"],
+      [2, "[protocol:chest-pain:v9 · verified] triage decision steps"],
+      [4, "Two BP checks this year; last visit March, no acute findings."],
+      [5, "patient: pressure in my chest since this morning"],
+      [9, "Return risk tier and next step only. No reassurance."],
+      [10, "Should I just wait until Monday?"]
+    ],
+    note: "History arrives compressed, not verbatim: what matters is the clinical thread, not the wording of a visit in March. That is an interaction.memory admission rule, made once, applied everywhere.",
+    questions: ["What has to be redacted before state.user leaves your network?", "The escalation rule lives in governance so no user can argue it away — what enforces it outside the model?"]
+  },
+  {
+    label: "Weekly brief",
+    symptom: "Last week's brief is indistinguishable from this week's data, so last week's numbers get reported as current.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, citations would stop and numbers would appear with no traceable source row.",
+      2: "No pipeline data — the brief gets written out of thin air.",
+      3: "It restarts at section one and rewrites what was already approved.",
+      8: "Voice drifts away from the house style established last week.",
+      9: "Length and structure wander and the newsletter template breaks.",
+      10: "Refused with required_slot_missing. Sent anyway, with no instruction to generate, the batch job would return an empty brief."
+    },
+    name: "Monday sales brief · scheduled batch",
+    picks: [
+      [0, "Analyst voice. Every number cites the source row."],
+      [2, "pipeline snapshot · 41 open deals · 6 closed lost · freshness Mon 06:00"],
+      [3, "brief week 30 → section 2 of 5 drafted"],
+      [8, "Last week's approved brief, as a style reference."],
+      [9, "800 words. Four headings. No preamble."],
+      [10, "Generate this week's brief."]
+    ],
+    note: "There is no user and no conversation at all. Same schema, five slots filled — six deliberately empty is the correct assembly, not a gap. Last week's brief is admitted as steering, not evidence, which is what keeps its numbers out of this week's.",
+    questions: ["Is last week's brief an example, or is it evidence?", "Where does \u201cdon't repeat last week\u201d actually live — instructions, or a freshness rule on the snapshot?"]
+  },
+  {
+    label: "Voice ordering",
+    symptom: "The entire menu is re-read into the window on every turn; the reply lands two seconds late and the customer starts repeating themselves.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, confirmation discipline would be gone and items would get added twice.",
+      1: "The usual order is forgotten and a regular is treated as a stranger.",
+      3: "It loses the cart and asks the customer to start over.",
+      5: "The correction \u201cmake that iced\u201d is never heard.",
+      6: "It agrees to the order but nothing reaches the kitchen.",
+      7: "It cannot state the total, so the lane stalls at the window.",
+      9: "The reply comes back with bullet symbols the speech engine reads aloud.",
+      10: "Refused with required_slot_missing: there is nothing to respond to."
+    },
+    name: "Drive-thru lane 3 · realtime voice",
+    picks: [
+      [0, "Order taker. Confirm every item once. Never upsell twice."],
+      [1, "loyalty member · usual order: large oat latte"],
+      [3, "order → 2 items confirmed, payment pending"],
+      [5, "customer: uh — make that iced"],
+      [6, "add_item(sku, mods) · price_order(cart)"],
+      [7, "price_order(cart) → $11.40"],
+      [9, "One short sentence. Speakable. No symbols or lists."],
+      [10, "And a hash brown."]
+    ],
+    note: "No retrieval and no memory. The menu is small enough to sit in instructions, and the latency budget is measured in hundreds of milliseconds — every model token the assembler skips is time the customer doesn't wait.",
+    questions: ["Where does the menu live once it grows to 400 items with regional pricing?", "What is the token ceiling before the pause before speech becomes audible?"]
+  },
+  {
+    label: "Incident copilot",
+    symptom: "The runbook reads as a command rather than a reference, and the copilot proposes a failover step as though it had been told to run one.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, the confirmation gate would disappear and it would propose running failover unprompted.",
+      2: "The runbook is gone and the copilot improvises during a sev-1.",
+      3: "It forgets mitigation was proposed and loops back to diagnosis.",
+      4: "The first forty minutes are lost; it re-suggests what already failed.",
+      6: "It can advise but cannot page anyone or read a single metric.",
+      7: "p99 latency is unknown, so severity becomes guesswork.",
+      9: "A wall of prose lands in the incident channel with no owners.",
+      10: "Refused with required_slot_missing: there is no question to answer."
+    },
+    name: "INC-2291 · production sev-1",
+    picks: [
+      [0, "Incident copilot. Never run a mutating command without explicit confirmation."],
+      [2, "[runbook:db-failover:v4 · reference_only] steps and rollback"],
+      [3, "INC-2291 → cause identified, mitigation proposed, comms pending"],
+      [4, "First 40 minutes: latency spike traced to replica lag in eu-west."],
+      [6, "query_metrics · page_oncall · run_runbook_step"],
+      [7, "query_metrics(p99, 5m) → 4.2s and rising · age 8s"],
+      [9, "Next three actions as bullets, each with an owner."],
+      [10, "What do we do next?"]
+    ],
+    note: "Forty minutes of chatter compresses into one memory line while raw tool output stays verbatim. The runbook is admitted as reference_only, so its imperatives never become the copilot's instructions.",
+    questions: ["The confirmation gate lives in governance — does it survive compaction, and is it also enforced by the tool layer?", "When metrics refresh every ten seconds, what freshness rule evicts the stale observation?"]
+  },
+  {
+    label: "Language tutor",
+    symptom: "Old corrections become live instructions, so the tutor keeps correcting things the learner fixed weeks ago.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, corrections would pile up and bury the learner in red ink.",
+      1: "B1 level unknown, so replies swing to native-speed Spanish.",
+      4: "Past sessions vanish and the same subjunctive lesson repeats forever.",
+      5: "The sentence being corrected is not in the window.",
+      8: "Correction style turns clinical instead of encouraging.",
+      9: "It answers in English and corrects five things at once.",
+      10: "Refused with required_slot_missing: there is nothing to check."
+    },
+    name: "Spanish B1 · session 27",
+    picks: [
+      [0, "Patient tutor. Correct one thing, then keep the conversation moving."],
+      [1, "level B1 · 34-day streak · shaky on the subjunctive"],
+      [4, "Earlier sessions: preterite mastered, avoids the formal register. · expires 2026-12-20"],
+      [5, "learner: si tuviera tiempo, iría contigo"],
+      [8, "Two past corrections written in the tone we want."],
+      [9, "Reply in Spanish. One correction maximum."],
+      [10, "Is that right?"]
+    ],
+    note: "No tools and nothing retrieved — but memory and user facts carry the whole experience. Completely different system, same schema. Memory entries carry an expires deadline, which is what stops old corrections from outliving their usefulness.",
+    questions: ["What earns a place in memory versus a disposable session log — and who can revoke it?", "Is proficiency a stored fact in state.user, or inferred fresh each turn from history?"]
+  }
+];
+
+const SLOT_TOKENS = [240, 90, 1500, 160, 320, 850, 400, 600, 450, 70, 40];
+/* Slot indexes in shedding order (README Fitting): no route priorities, so by slot name. */
+const DROPPABLE = [8, 1];
+const COMPRESSIBLE = [2, 7, 5, 4];
+const PROTECTED = [0, 3, 6, 9, 10];
+const REQUIRED = [0, 10];
+const EVIDENCE = [2, 7];
+const COMPRESS = 0.4;
+const BUDGETS = [8192, 4096, 2048, 1024];
+
+
+
+// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
+const PREREQUISITES = ["plane","slot","item","tier","assembler","trace"];
+
+class Component extends DCLogic {
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
+
+  componentWillUnmount() {
+    this.glossaryUnmount();
+    clearInterval(this._t); clearInterval(this._track);
+    if (this._hash) window.removeEventListener("hashchange", this._hash);
+    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
+    if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
+  }
+
+  offMap(uc) { return (this.state.off || {})[uc] || {}; }
+  activePicks(uc) { const off = this.offMap(uc); return UCS[uc].picks.filter(p => !off[p[0]]); }
+
+  toggleSlot(layer) {
+    const uc = this.state.uc;
+    const cur = Object.assign({}, this.offMap(uc));
+    const removing = !cur[layer];
+    if (removing) cur[layer] = true; else delete cur[layer];
+    const off = Object.assign({}, this.state.off || {});
+    off[uc] = cur;
+    const admitted = UCS[uc].picks.filter(p => !cur[p[0]]).length;
+    // What a screen reader hears: the slot, what happened to it, and the payload's count or its refusal (R-4).
+    const announce = removing && REQUIRED.includes(layer)
+      ? SLOTS[layer][0] + " removed. The assembly is refused with required_slot_missing: " + SLOTS[layer][1] + " is never omitted (R-4)."
+      : SLOTS[layer][0] + (removing ? " removed from" : " added back to") + " the payload. " + admitted + " of 11 admitted.";
+    this.setState({ off, playing: false, step: 99, hold: 0, announce });
+  }
+
+  openFailure(i) { this.setState({ uc: i, bad: true, off: {}, budget: 0, playing: false, step: 99, hold: 0 }); }
+
+  restoreSlots() {
+    const off = Object.assign({}, this.state.off || {});
+    delete off[this.state.uc];
+    this.setState({ off, step: 99, announce: "All slots restored. " + UCS[this.state.uc].picks.length + " of 11 admitted." });
+  }
+
+  startClock() {
+    clearInterval(this._t);
+    this._t = setInterval(() => {
+      if (!this.state.playing) return;
+      const n = this.activePicks(this.state.uc).length;
+      if (this.state.step < n) this.setState(s => ({ step: s.step + 1 }));
+      else if (this.state.hold < 5) this.setState(s => ({ hold: s.hold + 1 }));
+      else this.setState(s => ({ uc: (s.uc + 1) % UCS.length, step: 0, hold: 0 }));
+    }, 620);
+  }
+
+  componentDidMount() {
+    this.glossaryMount();
+    let t = "light";
+    try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
+    this.applyTheme(t);
+    let still = false;
+    try { still = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    // A visitor who asked for less motion gets the demo complete and still, with Play to run it.
+    if (still) this.setState({ playing: false, step: 99 });
+    this.startClock();
+    this._hash = () => this.applyHash();
+    window.addEventListener("hashchange", this._hash);
+    this.applyHash();
+    // The home page's last tour step opens this page at #tour, so the tour carries on here once the page has rendered.
+    if ((location.hash || "") === "#tour") setTimeout(() => this.startTour(), 0);
+  }
+
+  applyHash() {
+    const parts = (location.hash || "").replace(/^#/, "").split("/");
+    if (parts.length < 2) return;
+    const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let patch = null;
+    if (parts[0] === "assemble") {
+      const uc = UCS.findIndex(u => slug(u.label) === parts[1]);
+      if (uc >= 0) {
+        patch = { uc, budget: 0, hold: 0, playing: false, step: 99, bad: parts[2] === "blob", off: parts[2] === "no-query" ? { [uc]: { 10: true } } : {} };
+      }
+    }
+    if (!patch) return;
+    this.setState(patch, () => {
+      const el = document.getElementById(parts[0]);
+      if (el) { const sc = document.scrollingElement || document.documentElement; sc.scrollTop = sc.scrollTop + el.getBoundingClientRect().top - 68; }
+    });
+  }
+
+  ucTabStyle(active) {
+    return "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " +
+      (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer; background: " +
+      (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
+  }
+
+  applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    try { localStorage.setItem("cwa-theme", t); } catch (e) {}
+    this.setState({ theme: t });
+  }
+
+
+  color(i) { return PLANES[SLOTS[i][2]].color; }
+  dot(i, extra) { return "display: block; width: 10px; height: 10px; flex: none; background: " + this.color(i) + ";" + (extra || ""); }
+  chip(i, extra) {
+    return "font-family: var(--mono); font-size: 11px; padding: 6px 9px; border: 1px solid " + this.color(i) + "; color: var(--fg); background: color-mix(in oklab, " + this.color(i) + " 10%, transparent);" + (extra || "");
+  }
+
+  frameworks() {
+    return [
+      {
+        label: "OpenAI Agents SDK", name: "the Agents SDK", stage: "Build each model call's input",
+        seam: "RunConfig(call_model_input_filter=lambda call: ModelInputData(input=[*system, *messages], instructions=None))  # both from assemble_context(call)",
+        owns: ["The agent loop, tool calls and retries", "Handoffs between agents", "Sessions, tracing and guardrails", "Structured output parsing"],
+        blank: ["What the instructions callable returns", "The input list you pass to Runner.run()", "What your context object carries", "What tool results look like coming back"],
+        cost: ["Instructions grow into one 900-line string nobody edits", "Session history replays raw and crowds out evidence", "A bad handoff is unattributable — you can't tell which item caused it"],
+        verdict: "Yes, through RunConfig's call_model_input_filter rather than the instructions callable. Whatever instructions returns takes the system role, which only governance may take, so the filter replaces each model call's input with the system entries as system items and the one user message, and leaves instructions empty. Give the agent only the tools the grant lists. The dynamic instructions callable was already a context assembler without a spec; CWA moves it to the hook that runs before every model call and gives it typed slots, a fitting policy and a trace."
+      },
+      {
+        label: "LangChain / LangGraph", name: "LangGraph", stage: "Build state[\"messages\"]",
+        seam: "def call_model(state): messages, trace = assemble_context(state)",
+        owns: ["Graph topology and control flow", "Checkpointing and durable state", "Streaming, retries, interrupts", "Tool binding and routing"],
+        blank: ["The node that turns state into messages", "How reducers accumulate history", "Where retrieved documents get placed and with what authority", "Which prompt template wins on each branch"],
+        cost: ["Prompt templates fork per branch and drift apart", "Retrieval dumps land next to instructions with equal weight", "Message reducers append forever until the window blows"],
+        verdict: "Yes. A graph gives you order of operations — it says nothing about order of context. CWA is the missing half: the same slots, assembled by the same policy, at every node. Your checkpoint is already state.task."
+      },
+      {
+        label: "Claude Agent SDK", name: "the Claude Agent SDK", stage: "System prompt + tool results",
+        seam: "systemPrompt + CLAUDE.md + every tool result you return",
+        owns: ["The full agentic loop and subagents", "MCP servers and tool permissions", "Automatic compaction", "File and shell access"],
+        blank: ["What goes in the system prompt vs CLAUDE.md", "How much each tool returns, and in what shape", "What survives a compaction pass", "Where task state is written down"],
+        cost: ["CLAUDE.md becomes a junk drawer of unowned rules", "One chatty tool floods the window mid-task", "Compaction drops the half you needed, silently"],
+        verdict: "Yes — most of all here. Compaction decides what survives; CWA's tiers decide what it is choosing between. Items that know their own tier and expiry compact predictably."
+      },
+      {
+        label: "Vercel AI SDK", name: "the AI SDK", stage: "Build system + messages",
+        seam: "streamText({ system, messages, tools })  // system + messages come from assemble_context()",
+        owns: ["Streaming and provider routing", "Tool calling and multi-step runs", "UI state and React bindings", "Structured generation"],
+        blank: ["The system string, character for character", "Every message you push into the array", "How RAG chunks enter the conversation", "What persists between requests"],
+        cost: ["The system prompt is concatenated inline in a route handler", "Retrieved chunks get faked as user turns", "Nobody can see the final payload without a console.log"],
+        verdict: "Yes. The SDK is deliberately unopinionated about content — that's why it's pleasant to use. CWA is the opinion you're expected to bring, and it lives in one module beside your route."
+      },
+      {
+        label: "We rolled our own", name: "your own harness", stage: "build_messages()",
+        seam: "def build_messages(user, query, docs, history) -> list[Message]   # rename it assemble_context",
+        owns: ["Exactly as much as you wrote", "Your own loop, your own retries", "Your own memory store", "Your own evals, if you got to them"],
+        blank: ["All of it — which is the point", "The function that grew arguments for a year", "Truncation rules written under deadline", "The order, which is currently historical accident"],
+        cost: ["One function nobody wants to touch", "Truncation by slicing the middle out of history", "Every new feature adds a parameter and a conditional"],
+        verdict: "Yes, and it's the cheapest adoption of the five. You already have an assembler. CWA names its parts, gives it a fitting policy and a trace, and turns the function nobody touches into the one everybody can read."
+      }
+    ];
+  }
+
+  fwVals(out) {
+    const fws = this.frameworks();
+    const i = Math.min(this.state.fw || 0, fws.length - 1);
+    const f = fws[i];
+    out.fwTabs = fws.map((x, k) => ({
+      label: x.label,
+      pressed: k === i ? "true" : "false",
+      on: () => this.setState({ fw: k }),
+      style: "font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; padding: 10px 16px; border-radius: var(--pill); cursor: pointer; font-weight: 500; border: 1px solid " +
+        (k === i ? "var(--accent); background: var(--accent); color: var(--bg);" : "var(--line); background: transparent; color: var(--muted);")
+    }));
+    out.fwName = f.name; out.fwSeamStage = f.stage; out.fwSeam = f.seam;
+    out.fwOwns = f.owns; out.fwBlank = f.blank; out.fwCost = f.cost; out.fwVerdict = f.verdict;
+    out.slotChips = SLOTS.map((s, k) => ({ label: s[1], style: this.chip(k) }));
+  }
+
+  tourSteps() {
+    const reset = () => this.setState({ bad: false, off: {}, budget: 0, uc: 0, step: 0, hold: 0, playing: true });
+    const pickRemovable = () => {
+      const cand = UCS[this.state.uc].picks.map(p => p[0]).filter(i => i !== 0 && i !== 9 && i !== 10);
+      return cand.length ? cand[Math.floor(cand.length / 2)] : null;
+    };
+    return [
+      { key: "problem", kicker: "Guided tour", title: "Start with what goes wrong",
+        body: "Seven failure modes, each reproduced by a demo tab: authority inversion, stale-as-current, displacement under budget, instruction-shaped evidence. Named, so they can be filed as bugs instead of argued about.", act: reset },
+      { key: "intro", kicker: "The assembly", title: "One request, one assembly run",
+        body: "CWA gives you four planes and eleven typed slots. No system fills them all. What makes a system work is which items get admitted, how they're fitted to the budget, and the order they're rendered in.", act: reset },
+      { key: "tabs", kicker: "The systems", title: "Seven very different systems",
+        body: "A support agent, a code reviewer, a clinical triage assistant. Identical vocabulary, completely different assembly runs. Switch tabs whenever you like — the tour keeps up.",
+        act: () => this.setState({ uc: 0, step: 0, hold: 0, playing: true, bad: false }) },
+      { key: "play", kicker: "Controls", title: "Freeze it to read it",
+        body: "The demo cycles on its own. We've paused it here so the whole payload is on screen — press Play again any time.", act: () => this.setState({ playing: false, step: 99 }) },
+      { key: "slots", kicker: "The slots", title: "Colour is the plane",
+        body: "Lit rows are in this payload; faded rows exist in the schema but this system doesn't need them. The swatch says which plane a slot belongs to — governance, state, evidence, interaction.",
+        act: () => this.setState({ playing: false, step: 99 }) },
+      { key: "payload", kicker: "The payload", title: "Every item is attributable",
+        body: "Each block names its slot, its cost, and where it came from. The footer names the profile that ordered it and the trace that recorded it.", act: () => this.setState({ playing: false, step: 99 }) },
+      { key: "budget", kicker: "The budget", title: "Real windows are finite",
+        body: "We just squeezed this one to 2k. The assembler now has to fit — and it does so by tier: drop droppable, then compress or omit compressible, keep protected intact.", act: () => this.setState({ budget: 2, playing: false, step: 99 }) },
+      { key: "fill", kicker: "Fitting", title: "Dropped, compressed, or refused",
+        body: "The bar is the window; the line beneath names what was dropped and what was compressed. Squeeze to 1k and watch the assembler refuse rather than answer without its evidence.",
+        act: () => this.setState({ budget: 2, playing: false, step: 99 }) },
+      { key: "removed", kicker: "Consequences", title: "Pull a slot out yourself",
+        body: "We removed one for you. The panel spells out exactly what the model can no longer do without it. Click any slot on the left to try your own.",
+        act: () => { const li = pickRemovable(); if (li !== null) this.toggleSlot(li); this.setState({ budget: 0 }); } },
+      { key: "badpanel", kicker: "The counter-example", title: "Same context, no assembler",
+        body: "Nothing was removed here — everything was fused into one blob. No authority, no provenance, no tiers. This is the failure CWA exists to prevent.",
+        act: () => this.setState({ off: {}, bad: true, playing: false, step: 99, budget: 0 }) },
+      { key: "harness", kicker: "Last step", title: "You don't replace your framework",
+        body: "Your harness runs the loop; stage 04 is the blank it hands you. Pick your stack and the seam is named in your own API, with an honest list of when to skip CWA entirely. Then take the six steps on Getting started.", act: () => {}, last: true }
+    ];
+  }
+
+  startTour() {
+    try { this._tourReturn = document.activeElement; } catch (e) {}
+    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
+    this._tourKeys = e => {
+      if (e.key === "Escape") this.endTour();
+      else if (e.key === "ArrowRight" || e.key === "Enter") this.tourGo(1);
+      else if (e.key === "ArrowLeft") this.tourGo(-1);
+    };
+    document.addEventListener("keydown", this._tourKeys);
+    this._tourScroll = () => this.measureTour();
+    window.addEventListener("scroll", this._tourScroll, { passive: true });
+    window.addEventListener("resize", this._tourScroll);
+    this.setState({ tour: 0 }, () => { this.enterStep(); this.focusTour(); });
+  }
+
+  endTour() {
+    clearInterval(this._track);
+    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
+    if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
+    this.setState({ tour: null, trect: null, playing: true }, () => { try { this._tourReturn && this._tourReturn.focus(); } catch (e) {} });
+  }
+
+  tourGo(d) {
+    if (this.state.tour === null || this.state.tour === undefined) return;
+    const n = this.tourSteps().length;
+    const i = this.state.tour + d;
+    if (i < 0) return;
+    if (i >= n) { this.endTour(); return; }
+    this.setState({ tour: i }, () => { this.enterStep(); this.focusTour(); });
+  }
+
+  // Focus follows the card: Next is where a keyboard or screen-reader user continues from.
+  focusTour() { try { const next = document.getElementById("tournext"); if (next) next.focus({ preventScroll: true }); } catch (e) {} }
+
+  enterStep() {
+    const st = this.tourSteps()[this.state.tour];
+    if (!st) return;
+    if (st.act) st.act();
+    clearInterval(this._track);
+    setTimeout(() => {
+      const el = document.querySelector('[data-tour="' + st.key + '"]');
+      if (el) {
+        const sc = document.scrollingElement || document.documentElement;
+        const r = el.getBoundingClientRect();
+        const target = Math.max(0, sc.scrollTop + r.top - Math.max(96, (window.innerHeight - Math.min(r.height, 460)) / 2));
+        try { window.scrollTo({ top: target, behavior: "smooth" }); } catch (e) { window.scrollTo(0, target); }
+        setTimeout(() => {
+          if (Math.abs(sc.scrollTop - target) > 4) sc.scrollTop = target;
+          if (Math.abs(sc.scrollTop - target) > 4) document.body.scrollTop = target;
+        }, 260);
+      }
+      let n = 0;
+      this._track = setInterval(() => { this.measureTour(); if (++n > 22) clearInterval(this._track); }, 55);
+    }, 90);
+  }
+
+  measureTour() {
+    if (this.state.tour === null || this.state.tour === undefined) return;
+    const st = this.tourSteps()[this.state.tour];
+    const el = st && document.querySelector('[data-tour="' + st.key + '"]');
+    if (!el) { if (this.state.trect) this.setState({ trect: null }); return; }
+    const r = el.getBoundingClientRect();
+    const p = this.state.trect;
+    if (p && Math.abs(p.t - r.top) < 0.6 && Math.abs(p.l - r.left) < 0.6 && Math.abs(p.h - r.height) < 0.6) return;
+    this.setState({ trect: { t: r.top, l: r.left, w: r.width, h: r.height } });
+  }
+
+  tourVals(out) {
+    const i = this.state.tour;
+    out.tourOn = i !== null && i !== undefined;
+    out.startTour = () => this.startTour();
+    out.endTour = () => this.endTour();
+    if (!out.tourOn) return;
+    const steps = this.tourSteps();
+    const st = steps[i];
+    const W = window.innerWidth, H = window.innerHeight;
+    const raw = this.state.trect;
+    const r = raw && raw.t < H - 40 && raw.t + raw.h > 40 ? raw : null;
+    const CW = Math.min(400, W - 40), CH = 300;
+    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+    let top, left;
+    if (!r) { top = (H - CH) / 2; left = (W - CW) / 2; }
+    else if (H - (r.t + r.h) > CH + 26) { top = r.t + r.h + 18; left = clamp(r.l, 20, W - CW - 20); }
+    else if (r.t > CH + 26) { top = r.t - CH - 18; left = clamp(r.l, 20, W - CW - 20); }
+    else if (W - (r.l + r.w) > CW + 44) { left = r.l + r.w + 20; top = clamp(r.t, 92, H - CH - 20); }
+    else if (r.l > CW + 44) { left = r.l - CW - 20; top = clamp(r.t, 92, H - CH - 20); }
+    else { left = W - CW - 24; top = H - CH - 24; }
+    top = clamp(top, 16, Math.max(16, H - CH - 16));
+    left = clamp(left, 16, Math.max(16, W - CW - 16));
+    const dim = "position: absolute; background: oklch(0 0 0 / 0.58); pointer-events: none; transition: all 200ms cubic-bezier(.2,.8,.25,1);";
+    if (r) {
+      const x0 = Math.max(0, r.l - 8), y0 = Math.max(0, r.t - 8);
+      const x1 = Math.min(W, r.l + r.w + 8), y1 = Math.min(H, r.t + r.h + 8);
+      out.tourRing = "position: absolute; left: " + x0 + "px; top: " + y0 + "px; width: " + (x1 - x0) + "px; height: " + (y1 - y0) + "px; border: 2px solid var(--accent); pointer-events: none; transition: all 220ms cubic-bezier(.2,.8,.25,1);";
+      out.maskT = dim + "left: 0; right: 0; top: 0; height: " + y0 + "px;";
+      out.maskB = dim + "left: 0; right: 0; top: " + y1 + "px; bottom: 0;";
+      out.maskL = dim + "left: 0; width: " + x0 + "px; top: " + y0 + "px; height: " + (y1 - y0) + "px;";
+      out.maskR = dim + "left: " + x1 + "px; right: 0; top: " + y0 + "px; height: " + (y1 - y0) + "px;";
+    } else {
+      out.tourRing = "display: none;";
+      out.maskT = dim + "inset: 0;";
+      out.maskB = "display: none;"; out.maskL = "display: none;"; out.maskR = "display: none;";
+    }
+    out.tourCard = "position: absolute; box-sizing: border-box; left: " + Math.round(left) + "px; top: " + Math.round(top) + "px; width: " + CW +
+      "px; pointer-events: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--fg); padding: 22px 24px; box-shadow: 0 18px 50px oklch(0 0 0 / 0.35); transition: left 220ms cubic-bezier(.2,.8,.25,1), top 220ms cubic-bezier(.2,.8,.25,1);";
+    out.tourKicker = i === 0 || st.last ? st.kicker : "Step " + i + " · " + st.kicker; out.tourTitle = st.title; out.tourBody = st.body;
+    out.tourCount = (i + 1) + " / " + steps.length;
+    out.tourDots = steps.map((s, k) => ({ style: "flex: 1; height: 3px; background: " + (k <= i ? "var(--accent)" : "var(--line)") + "; transition: background 220ms ease;" }));
+    out.tourNext = st.last ? () => { this.endTour(); window.location.assign("./start.html"); } : () => this.tourGo(1);
+    out.tourBack = () => this.tourGo(-1);
+    out.tourNextLabel = st.last ? "Get started" : "Next";
+    out.tourSkipLabel = st.last ? "Close" : "Skip tour";
+    out.tourNextStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: var(--accent); border: 0; border-radius: var(--pill); padding: 11px 20px; cursor: pointer;";
+    out.tourBackStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 10px 18px; cursor: pointer; visibility: " + (i === 0 ? "hidden" : "visible") + ";";
+  }
+
+
+  // GLOSSARY_GLUE_START
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
+  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  glossaryMount() {
+    this._glossaryHash = () => this.glossaryHash();
+    try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
+    import("./site/glossary.js")
+      .then(m => { this._glossary = m; return m.load(); })
+      .then(g => { this.setState({ glossary: g }); this.glossaryHash(); }, () => this.setState({ glossaryError: "The glossary could not load. Reload the page to retry." }))
+      .catch(() => {});
+  }
+  glossaryUnmount() { try { if (this._glossaryHash) window.removeEventListener("hashchange", this._glossaryHash); } catch (e) {} }
+  glossaryHash() {
+    const m = (location.hash || "").match(/^#glossary(?:\/([a-z0-9-]+))?$/);
+    if (m) this.openGlossary(m[1] || null);
+  }
+  openGlossary(term) {
+    if (!this.state.glossaryOpen) { try { this._glossaryReturn = document.activeElement; } catch (e) {} }
+    this.setState({ glossaryOpen: true, glossaryTerm: term || null, glossaryQuery: term ? "" : (this.state.glossaryQuery || "") }, () => {
+      try { const el = document.getElementById(term ? "glossary-" + term : "glossarysearch"); if (el) el.focus({ preventScroll: true }); } catch (e) {}
+    });
+  }
+  closeGlossary() {
+    this.setState({ glossaryOpen: false, glossaryTerm: null }, () => { try { this._glossaryReturn && this._glossaryReturn.focus(); } catch (e) {} });
+    try { if (/^#glossary/.test(location.hash || "")) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
+  }
+  glossaryVals() {
+    const g = this.state.glossary, open = !!this.state.glossaryOpen, query = this.state.glossaryQuery || "", term = this.state.glossaryTerm;
+    const entries = g ? this._glossary.search(g.entries, query) : [];
+    const none = !!g && !!query && entries.length === 0;
+    return {
+      glossaryOn: open, glossaryOpen: open ? "true" : "false", glossaryQuery: query,
+      glossaryCount: g ? (query ? entries.length + " of " + g.entries.length + " terms" : g.entries.length + " terms") : (this.state.glossaryError || "Loading\u2026"),
+      glossaryEmpty: none ? "No term matches " + query + "." : "",
+      glossaryEmptyStyle: none ? "padding: 18px 0; font-size: 14.5px; color: var(--muted);" : "display: none;",
+      toggleGlossary: () => open ? this.closeGlossary() : this.openGlossary(null),
+      closeGlossary: () => this.closeGlossary(),
+      setGlossaryQuery: e => this.setState({ glossaryQuery: e.target.value, glossaryTerm: null }),
+      glossaryKey: e => { if (e.key === "Escape") { e.preventDefault(); this.closeGlossary(); } },
+      glossaryEntries: entries.map(e => ({
+        id: "glossary-" + e.id, term: e.term, plain: e.plain,
+        spec: e.spec ? "\u201C" + e.spec + "\u201D" : "",
+        specStyle: e.spec ? "margin-top: 8px; padding-left: 12px; border-left: 2px solid var(--line); font-size: 13.5px; line-height: 1.55; color: var(--muted);" : "display: none;",
+        where: e.where ? "Defined on " + e.where.label + " \u2192" : "", whereHref: this._glossary.whereHref(e),
+        whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
+        related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
+        style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
+      })),
+      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+    };
+  }
+  // GLOSSARY_GLUE_END
+
+  renderVals() {
+    const fmt = n => n.toLocaleString("en-US");
+    const uc = UCS[this.state.uc];
+    const off = this.offMap(this.state.uc);
+    const allPicks = uc.picks;
+    const picks = allPicks.filter(p => !off[p[0]]);
+    const step = Math.min(this.state.step, picks.length);
+    const removed = allPicks.filter(p => off[p[0]]).map(p => ({
+      tag: SLOTS[p[0]][1],
+      text: (uc.drops && uc.drops[p[0]]) || "That slot's contribution is simply absent from the payload."
+    }));
+    const budget = BUDGETS[this.state.budget || 0];
+    const evicted = {}, compressed = {};
+    const tok = i => compressed[i] ? Math.round(SLOT_TOKENS[i] * COMPRESS) : SLOT_TOKENS[i];
+    const has = i => picks.some(p => p[0] === i);
+    // Refusals in reasons.json order (README Refusals). Each system's route is taken to require evidence when the
+    // system uses an evidence slot, and every compressible item to carry one summary variant.
+    let planned = picks.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0);
+    const missing = REQUIRED.filter(i => !has(i));
+    let refusal = null;
+    const shed = [];
+    if (missing.length) refusal = "required_slot_missing";
+    else if (picks.filter(p => PROTECTED.includes(p[0])).reduce((t, p) => t + SLOT_TOKENS[p[0]], 0) > budget) refusal = "protected_content_over_budget";
+    else {
+      // R-16 and README Fitting steps 4 and 5: omit droppable items, then compress each compressible slot, then omit each one.
+      for (const li of DROPPABLE) { if (planned <= budget) break; if (has(li)) { evicted[li] = true; shed.push(li); planned -= SLOT_TOKENS[li]; } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { compressed[li] = true; planned -= SLOT_TOKENS[li] - Math.round(SLOT_TOKENS[li] * COMPRESS); } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { planned -= tok(li); delete compressed[li]; evicted[li] = true; shed.push(li); } }
+      if (allPicks.some(p => EVIDENCE.includes(p[0])) && !EVIDENCE.some(i => has(i) && !evicted[i])) refusal = "evidence_required";
+    }
+    const refused = refusal !== null;
+    const evictedNames = shed.map(i => SLOTS[i][1]);
+    const compressedNames = COMPRESSIBLE.filter(i => compressed[i]).map(i => SLOTS[i][1]);
+    // R-17: a refused assembly renders no payload.
+    const shown = refused ? [] : picks.slice(0, step).filter(p => !evicted[p[0]]);
+    const usedTokens = shown.reduce((t, p) => t + tok(p[0]), 0);
+    const segments = shown.map(p => ({
+      style: "flex: 0 0 " + Math.min(100, (tok(p[0]) / budget) * 100) + "%; min-width: 2px; transition: flex-basis 320ms ease; background: " + this.color(p[0]) + (compressed[p[0]] ? "; opacity: 0.5" : "") + ";",
+      title: SLOTS[p[0]][1] + " — ~" + tok(p[0]) + " tokens" + (compressed[p[0]] ? " (compressed)" : "")
+    }));
+    const rowBase = "width: 100%; text-align: left; font-family: inherit; color: inherit; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 14px; border: 1px solid ";
+    const slots = SLOTS.map((l, i) => {
+      const pi = picks.findIndex(p => p[0] === i);
+      const inCase = allPicks.some(p => p[0] === i);
+      const used = pi >= 0;
+      const on = used && pi < step;
+      let rowStyle, tag, tagColor;
+      if (inCase && off[i]) { rowStyle = rowBase + "var(--accent); border-style: dashed; background: transparent; opacity: 0.7; transition: all 300ms ease;"; tag = "removed by you"; tagColor = "var(--accent)"; }
+      else if (used && evicted[i]) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; text-decoration: line-through; transition: all 300ms ease;"; tag = "dropped · budget"; tagColor = "var(--fg)"; }
+      else if (used && refused) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; transition: all 300ms ease;"; tag = "not rendered"; tagColor = "var(--muted)"; }
+      else if (on && compressed[i]) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 8%, transparent); transition: all 300ms ease;"; tag = "compressed"; tagColor = "var(--fg)"; }
+      else if (on) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 12%, transparent); transition: all 300ms ease;"; tag = "in payload"; tagColor = this.color(i); }
+      else if (used) { rowStyle = rowBase + "var(--line); background: transparent; transition: all 300ms ease;"; tag = "queued"; tagColor = "var(--muted)"; }
+      else { rowStyle = rowBase + "transparent; background: transparent; opacity: 0.34; transition: all 300ms ease;"; tag = "not used"; tagColor = "var(--muted)"; }
+      return {
+        id: l[1], name: l[0],
+        rowStyle: rowStyle + (inCase ? " cursor: pointer;" : " cursor: default;"),
+        dotStyle: this.dot(i), tag,
+        click: inCase ? () => this.toggleSlot(i) : () => {},
+        title: inCase ? (off[i] ? "Click to add this slot back" : "Click to remove this slot") : "This system doesn't use this slot",
+        tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: " + tagColor + ";"
+      };
+    });
+    const refusalText = {
+      required_slot_missing: missing.map(i => SLOTS[i][1]).join(" and ") + " has no admitted item, and the assembler never omits it (R-4). No payload is rendered, and the trace keeps every admission decision (R-17).",
+      protected_content_over_budget: "The protected items alone do not fit the budget, so nothing is shed and no payload is rendered (R-17).",
+      evidence_required: "Fitting left no evidence item, on a route that requires evidence (R-12). No payload is rendered, and the trace keeps every fitting decision (R-17)."
+    };
+    const payload = refused ? [{
+      tag: "refused · " + refusal, tagStyle: "color: var(--accent);", tokens: "no payload", text: refusalText[refusal],
+      style: "border: 1px solid var(--accent); border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both;"
+    }] : shown.map(p => ({
+      tag: SLOTS[p[0]][1] + (compressed[p[0]] ? " · compressed" : ""),
+      tagStyle: "color: " + this.color(p[0]) + ";",
+      tokens: "~" + fmt(tok(p[0])) + " tok",
+      text: compressed[p[0]] ? "[summary, source-linked] " + p[1] : p[1],
+      style: "border: 1px solid var(--line); border-left: 3px solid " + this.color(p[0]) + "; background: var(--surface); padding: 10px 14px; animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both;" + (compressed[p[0]] ? " opacity: 0.8;" : "")
+    }));
+    const evBase = "font-family: var(--mono); font-size: 11px; line-height: 1.5; margin-top: 10px; color: ";
+    let evictionLabel, evictionStyle = evBase + "var(--muted);";
+    if (refusal === "evidence_required") {
+      const omittedEvidence = EVIDENCE.some(i => evicted[i]);
+      evictionLabel = "Refused · evidence_required: " + (evictedNames.length ? "after dropping " + evictedNames.join(", ") + " for budget, " : "") + "no evidence item is left. " +
+        (omittedEvidence ? "The omitted evidence had shorter variants that still did not fit, so the recovery action is retrieve_narrower: the application retrieves narrower before building a new snapshot (R-12)."
+          : "No evidence item was omitted for budget, so the recovery action is request_context: the application asks for more context before building a new snapshot (R-12).");
+      evictionStyle = evBase + "var(--accent);";
+    } else if (refused) {
+      evictionLabel = "Refused · " + refusal + ", before fitting, so nothing was dropped or compressed (README Refusals).";
+      evictionStyle = evBase + "var(--accent);";
+    } else if (evictedNames.length || compressedNames.length) {
+      evictionLabel = (evictedNames.length ? "Dropped: " + evictedNames.join(", ") + ". " : "") + (compressedNames.length ? "Compressed with source links: " + compressedNames.join(", ") + ". " : "") + "Protected slots untouched.";
+    } else evictionLabel = "Everything fits, so nothing had to be dropped or compressed.";
+
+    const out = {
+      slots, payload,
+      ucName: uc.name, ucNote: uc.note,
+      ucQuestions: uc.questions.map(t => ({ text: t })),
+      usedLabel: picks.length + " of 11 admitted",
+      removed, hasRemoved: removed.length > 0,
+      restoreAll: () => this.restoreSlots(),
+      progress: refused ? "refused · no payload" : shown.length + " / " + (picks.length - evictedNames.length) + " items",
+      segments,
+      tokenLabel: refused ? "no payload · budget " + fmt(budget) + " tokens" : "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
+      evictionLabel, evictionStyle,
+      renderedLabel: refused ? "no payload · refused" : "↓ rendered by policy-first-chat/v1",
+      traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
+      budgets: BUDGETS.map((b, i) => {
+        const label = b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k";
+        const active = i === (this.state.budget || 0);
+        return { label, pressed: active ? "true" : "false", style: this.ucTabStyle(active), select: () => this.setState({ budget: i, announce: "Input budget set to " + label + " tokens." }) };
+      }),
+      playLabel: this.state.playing ? "Pause" : "Play",
+      togglePlay: () => this.setState(s => ({ playing: !s.playing, announce: s.playing ? "Paused." : "Playing." })),
+      ucTabs: UCS.map((u, i) => ({ label: u.label, pressed: i === this.state.uc ? "true" : "false", style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true, announce: "Showing " + u.label + "." }) })),
+      announce: this.state.announce || "",
+      fmOpen0: () => this.openFailure(0), fmOpen1: () => this.openFailure(1), fmOpen2: () => this.openFailure(2), fmOpen3: () => this.openFailure(3),
+      fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
+      fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 }),
+      themeLabel: this.state.theme === "dark" ? "Light" : "Dark",
+      toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
+      menuOpen: this.state.menu ? "true" : "false",
+      menuLabel: this.state.menu ? "Close" : "Menu",
+      toggleMenu: () => this.setState(s => ({ menu: !s.menu }))
+    };
+
+    out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
+    out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
+    out.badBtnStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.bad ? "var(--fg)" : "var(--line)") + "; background: " + (this.state.bad ? "var(--fg)" : "transparent") + "; color: " + (this.state.bad ? "var(--bg)" : "var(--muted)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer;";
+    out.badPressed = this.state.bad ? "true" : "false";
+    out.toggleBad = () => this.setState(s => ({ bad: !s.bad, playing: false, step: 99, announce: s.bad ? "Showing the assembled request." : "Showing the unassembled blob." }));
+    out.ucSymptom = uc.symptom;
+    out.badNotes = [
+      { text: "An undelimited blob obscures provenance and instruction boundaries, increasing the risk that the model follows instruction-shaped evidence. Platform role precedence still applies." },
+      { text: "History is unbounded and untiered: as the session grows, the oldest turns push the newest constraints out of the window." },
+      { text: "Nothing has provenance or freshness, so when the answer is wrong there is no trace to say which item did it." }
+    ];
+
+    if (this.state.bad) {
+      const hasHistory = allPicks.some(p => p[0] === 5);
+      const queryPick = allPicks.find(p => p[0] === 10);
+      const merged = allPicks.filter(p => p[0] !== 5 && p[0] !== 10);
+      const mergedTokens = Math.round(merged.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0) * 1.15);
+      const tailTokens = hasHistory ? 3200 : 2400;
+      const badStyle = "border: 1px solid var(--fg); border-left: 3px solid var(--fg); background: var(--surface); padding: 12px 14px;";
+      const blocks = [
+        { tag: "One prose blob — " + merged.length + " slots concatenated, no authority", tagStyle: "color: var(--muted);", tokens: "~" + fmt(mergedTokens) + " tok", text: merged.map(p => p[1]).join("  "), style: badStyle },
+        { tag: queryPick ? "The query, buried mid-window" : "No clear trigger", tagStyle: "color: var(--muted);", tokens: "~40 tok", text: queryPick ? queryPick[1] : "(the request is somewhere in the blob above)", style: badStyle }
+      ];
+      blocks.push(hasHistory
+        ? { tag: "Chat history, unbounded — 84 turns verbatim", tagStyle: "color: var(--muted);", tokens: "~" + fmt(tailTokens) + " tok", text: "…every turn since the session opened, oldest first, nothing summarised and nothing trimmed.", style: badStyle }
+        : { tag: "Tool output, re-appended on every loop", tagStyle: "color: var(--muted);", tokens: "~" + fmt(tailTokens) + " tok", text: "…the same result pasted again each iteration, three copies deep and growing.", style: badStyle });
+      const badTotal = mergedTokens + tailTokens + 40;
+      out.payload = blocks;
+      out.segments = blocks.map((b, k) => ({ style: "flex: 0 0 " + ((k === 0 ? mergedTokens : k === 1 ? 40 : tailTokens) / budget) * 100 + "%; min-width: 2px; background: " + (k % 2 ? "color-mix(in oklab, var(--fg) 55%, var(--bg))" : "var(--fg)") + ";", title: b.tag }));
+      out.tokenLabel = "~" + fmt(badTotal) + " / " + fmt(budget) + " tokens";
+      out.progress = "3 blobs · no structure";
+      out.evictionStyle = evBase + "var(--muted);";
+      out.evictionLabel = badTotal > budget ? "Over budget by " + fmt(badTotal - budget) + " tokens, and nothing can be dropped or compressed cleanly — the items are fused together." : "It fits, but nothing in here can be measured, tiered, traced, or swapped independently.";
+      out.usedLabel = "structure lost";
+      out.hasRemoved = false;
+      out.renderedLabel = "↓ rendered by none"; out.traceId = "none";
+      out.slots = SLOTS.map((l, i) => {
+        const inCase = allPicks.some(p => p[0] === i);
+        let tag, style;
+        if (!inCase) { tag = "not used"; style = rowBase + "transparent; background: transparent; opacity: 0.3;"; }
+        else if (i === 5 || i === 10) { tag = "misordered"; style = rowBase + "var(--fg); border-style: dashed; background: transparent;"; }
+        else { tag = "merged into the blob"; style = rowBase + "var(--line); background: transparent; opacity: 0.7;"; }
+        return { id: l[1], name: l[0], tag, rowStyle: style + " cursor: default;", dotStyle: this.dot(i, " opacity: 0.4;"), title: "Structure is lost without an assembler", click: () => {}, tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: var(--muted);" };
+      });
+    }
+    this.fwVals(out);
+    this.tourVals(out);
+    return Object.assign(out, this.glossaryVals());
+  }
+}
+</script>
+</body>
+</html>

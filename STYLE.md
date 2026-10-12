@@ -88,7 +88,7 @@ a:hover { color: var(--fg); }
 }
 ```
 
-The landing page uses `overflow-x: hidden` on `html` instead of `scroll-padding-top`. The `.thumbnail` WebP and the `__bundler_thumbnail` SVG template in `index.html` use rounded hex approximations of these tokens (`#faf8f5`, `#c9502a`, `#4a72b8`, `#3f8a5c`, `#8a5aa6`). They are for the canvas thumbnail only and are not tokens.
+The landing page uses `overflow-x: hidden` and `scroll-snap-type: y proximity` on `html` instead of `scroll-padding-top`. The `.thumbnail` WebP and the `__bundler_thumbnail` SVG template in `index.html` use rounded hex approximations of these tokens (`#faf8f5`, `#c9502a`, `#4a72b8`, `#3f8a5c`, `#8a5aa6`). They are for the canvas thumbnail only and are not tokens.
 
 ## 3. Colour usage
 
@@ -238,7 +238,7 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 | `720px` | Assembler matrix (`.im`, `.mx`) drops secondary columns. Getting started step rows (`.steprow`) drop to two columns, the step text under its title; the walkthrough card (`#walkcard`) pads `18px 16px` |
 | `620px` | Header gutter to `20px`, header gap to `14px`, "Take the tour" hidden. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
 
-On the landing page every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid there has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
+On the landing and Demo pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on either page has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
 Layers: the header sits at `z-index: 50`, the guided tour overlay and the step walkthrough at `90`. Nothing else is layered.
 
@@ -350,11 +350,15 @@ The Getting started page's six steps each open a modal walkthrough of the Ada ex
 
 Every page's nav ends with a `Glossary` button (a `<button>` styled as a nav link, `font: inherit`) that slides out `<aside id="glossary">`: fixed to the right edge, `min(440px, 100%)` wide, `--bg` with a `--line` left border, `z-index: 85` (above the header, below the tour). It is `role="dialog"`, named by its accent kicker, and not modal: the page stays readable behind it. A header row holds the kicker, a muted count and a ghost Close; a search field (`type="search"`, pill-shaped on `--surface`) filters the entries; each entry is a `17px` 600 term, a `14.5px` plain definition, the specification's own sentence as a `13.5px` muted quote with a `2px` `--line` left border, a mono accent "Defined on … →" link and related-term pills. The entry a pill or a `#glossary/<term>` link opened gets a `3px` `--accent` left border. Escape and Close return focus to the control that opened the panel.
 
-Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page's strip sits under its hero's router lines and reads "The words this site uses:". The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
+Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page's strip sits on its third slide, under the lede, and reads "The words this site uses:". The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
+
+### Slides (landing page)
+
+The landing page is three slides, each a `<section>` with `data-slide="n"` and a `data-tour` key: `min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;`, with `scroll-snap-type: y proximity` on `html` so a wheel settles on a slide without trapping the reader. Inside, a `1180px` container with `64px 32px 40px` padding holds a `.g2` grid, text left and the slide's one figure right (`minmax(0, 1fr) 300px` or `580px`), then a counter row: a `--line` top border, `margin-top: 48px; padding-top: 14px`, mono `12px` muted, "01 / 03" on the left and the next slide's name as an accent link on the right. The figure is the payload drawn as bars in a bordered window (`300px` by `360px`, `padding: 12px`, `gap: 8px`): `--line` bars for the string nobody owns, plane colours once it is named, a `--p-gov` dashed bar on `--accent-soft` below the window for an item pushed out, and on the last slide plane-coloured bands with their names in `--bg` mono at `10px`, a fill bar in `--fg`, `--muted`, `--line` and `--surface`, and a dashed-top mono trace line. Figures are `aria-hidden`; the sentence beside each carries the meaning. The last slide ends on a `.g3` hairline grid of three doors, each a clickable cell with an accent label, a `17px` 600 title ending in an arrow, and muted `13.5px` copy.
 
 ### Icons and logo
 
-Icons are the three 18px line icons in the landing hero: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`. Match this stroke and size if you add another; do not introduce filled or two-tone icons. The logo mark is the 2 by 2 plane grid described in section 3, followed by the wordmark "CWA". There is no image, no favicon link and no Open Graph image on any page.
+No page carries an icon today. If you add one, make it an 18px line icon: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`; do not introduce filled or two-tone icons. The logo mark is the 2 by 2 plane grid described in section 3, followed by the wordmark "CWA". There is no image, no favicon link and no Open Graph image on any page.
 
 ## 7. Motion and interaction states
 
