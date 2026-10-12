@@ -112,12 +112,13 @@ test('the Demo page holds the failure cards, the simulator and harness engineeri
   assert.deepEqual(anchored.window.scrolls, [8000 - 68, 8000 - 68], 'a plain anchor jumps to its section once the page has rendered, and again once it has settled');
 });
 
-test('every page lists Demo first in its nav, and llms.txt follows the moves', async () => {
+test('the nav is Home, Spec, Assembler, Placement and the Glossary on every page; Demo, Getting started, Producers and About are reached from the pages, and llms.txt follows the moves', async () => {
   for (const page of PAGES) {
-    const links = [...header(await read(page)).matchAll(/<a href="\.\/([a-z]+\.html)"( aria-current="page")?/g)];
-    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(['demo.html', 'start.html', 'spec.html', 'evidence.html', 'producers.html', 'assembler.html', 'about.html']), page);
-    assert.deepEqual(links.filter(m => m[2]).map(m => m[1]), page === 'index.html' ? [] : [page], `${page}: only its own link is current`);
+    const nav = header(await read(page)).match(/<nav id="sitenav"[\s\S]*?<\/nav>/)[0];
+    assert.deepEqual([...nav.matchAll(/<a href="\.\/([a-z]+\.html)"[^>]*>([^<]+)<\/a>|<button id="navglossary"[^>]*>([^<]+)<\/button>/g)].map(m => m[2] ?? m[3]), ['Home', 'Spec', 'Assembler', 'Placement', 'Glossary'], page);
   }
+  const index = await read('index.html');
+  assert.ok(index.includes('href="./demo.html"') && index.includes('href="./start.html"'), 'the home page still reaches Demo and Getting started');
   const llms = await read('llms.txt');
   assert.match(llms, /^- \[Demo\]\(https:\/\/contextwindowarchitecture\.io\/demo\.html\)/m);
   assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/demo\.html#harness\)/m);

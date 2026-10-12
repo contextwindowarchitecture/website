@@ -40,9 +40,10 @@ test('where the header hides the nav row, every page offers a menu button that o
     assert.ok(header.includes('<button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}"'), `${page}: the menu button controls the nav`);
     assert.ok(html.includes('#hdrmenu { display: inline-block !important; }'), `${page}: the menu button shows where the nav row is hidden`);
     assert.ok(html.includes('#sitenav[data-open="true"] { display: flex !important; }'), `${page}: the open nav is shown`);
+    const NAV = ['index.html', 'spec.html', 'assembler.html', 'evidence.html'];
     const links = [...header.matchAll(/<a href="\.\/([a-z]+\.html)"( aria-current="page")?/g)];
-    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(['demo.html', 'start.html', 'spec.html', 'evidence.html', 'producers.html', 'assembler.html', 'about.html']), `${page}: the home link and the nav list every page`);
-    assert.deepEqual(links.filter(m => m[2]).map(m => m[1]), page === 'index.html' ? [] : [page], `${page}: only its own link is current`);
+    assert.deepEqual(links.map(m => m[1]), (page === 'index.html' ? [] : ['index.html']).concat(NAV), `${page}: the logo links home and the nav lists Home, Spec, Assembler and Placement`);
+    assert.deepEqual(links.filter(m => m[2]).map(m => m[1]), NAV.includes(page) ? [page] : [], `${page}: only its own link is current`);
     const view = await component(page);
     assert.equal(view.renderVals().menuOpen, 'false');
     assert.equal(view.renderVals().menuLabel.toLowerCase(), 'menu');

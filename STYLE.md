@@ -257,7 +257,7 @@ Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), "Take the 
 
 ### Navigation
 
-Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page marks its own link `aria-current="page"`.
+The nav lists Home, Spec, Assembler and Placement, then the Glossary button; Demo, Getting started, Producers and About are reached from the pages that send readers there, not from the nav. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
 
 Narrow (1200px and below): the same `<nav id="sitenav">` becomes an absolutely positioned column under the header, `padding: 6px 32px 14px`, `font-size: 16px`, `background: var(--bg)`, with each link `padding: 13px 0` and a `--line` bottom border. The current page gets `border-left: 3px solid var(--accent); padding-left: 12px`. The `#hdrmenu` button toggles `data-open` and `aria-expanded`, and its label reads "Menu" or "Close".
 
