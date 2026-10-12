@@ -184,22 +184,23 @@ test('the home page is layer 1: a plain hero with no preview widget, what it is 
   assert.equal((html.match(/>Deterministic assembly</g) || []).length, 1, 'determinism is claimed once');
   assert.ok(html.includes('>Rule zero</h3>') && !html.includes('Rule zero (R-5):'), 'rule zero is a card, not a footnote');
   for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
-  assert.ok(html.includes('href="./producers.html#minimum"'), 'the unit points to the field list on Producers');
+  for (const gone of ['<section id="planes"', '<section id="items"', '<section id="fit"', '<section id="adopt"', '{{ layers }}', 'schemaVals']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
   const deeper = html.slice(html.indexOf('<section id="deeper"'), html.indexOf('</section>', html.indexOf('<section id="deeper"')));
   assert.deepEqual([...deeper.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html'], 'Go deeper starts with Getting started');
   assert.ok(deeper.includes('eight-step admission pipeline'), 'the Producers card names the pipeline that moved there');
-  assert.ok(html.includes('>Try the draft. Four assemblers pass every published case.</h2>'), 'the closing heading fits a draft');
+  assert.ok(!html.includes('CONTRACT_MATURITY_START'), 'the maturity sentence lives on About now');
 });
 
 test('every guided-tour step points at a section the home page still has', async () => {
   const html = await read('index.html');
   const { view } = await component('index.html');
   const keys = view.tourSteps().map(s => s.key);
-  assert.ok(keys.length >= 14 && !keys.includes('evidence'));
+  assert.ok(keys.length >= 13 && !keys.includes('evidence') && !keys.includes('planes') && !keys.includes('adopt'));
+  assert.equal(view.tourSteps().at(-1).last, true, 'the last step hands on');
   for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `the tour step ${key} has a target`);
 });
 
-test('the closing call to action states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {
+test('the About page states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {
   const { caseDigestsNow, implementations, tally, maturitySentence } = await import('../scripts/conformance-reports.mjs');
   const date = (await read('CHANGES.md')).match(/^## (\d{4}-\d{2}-\d{2})/m)[1];
   const digests = await caseDigestsNow(new URL('../', import.meta.url).pathname);
@@ -215,8 +216,10 @@ test('the closing call to action states the draft\'s maturity as the build compu
   }
   const sentence = maturitySentence(date, runs);
   assert.ok(sentence.startsWith(`Draft of ${date}. `) && runs.every(r => sentence.includes(r.label)) && sentence.includes(`${published.length} published cases`), sentence);
-  const html = await read('index.html');
-  assert.ok(html.includes(`<!-- CONTRACT_MATURITY_START -->${sentence}<!-- CONTRACT_MATURITY_END -->`), 'the page carries the sentence the build writes');
+  const html = await read('about.html');
+  assert.ok(html.includes(`<!-- CONTRACT_MATURITY_START -->${sentence}<!-- CONTRACT_MATURITY_END -->`), 'the About page carries the sentence the build writes');
+  assert.ok(html.includes('>Try the draft. Four assemblers pass every published case.</h2>'), 'under a heading that fits a draft');
+  assert.ok(html.includes('<section id="fit"') && html.includes('>It augments what you already use.</h2>'), 'About says where CWA fits');
   assert.equal(maturitySentence('2026-01-01', [{ label: 'Python', total: 10, passed: 10 }, { label: 'Go', total: 10, passed: 9 }]),
     'Draft of 2026-01-01. Two assemblers, in Python and Go, pass between 9 and 10 of 10 published cases, rejections included, and the Assembler page shows which; none has a versioned release yet, and we want to hear what they must do.');
 });

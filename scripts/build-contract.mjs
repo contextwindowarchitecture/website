@@ -67,7 +67,6 @@ outputs.set('producers.html', setConstant(producers, 'STAGES', model.stages).rep
   .replace(/const FAILURES = \[[\s\S]*?\n\];/, `const FAILURES = ${JSON.stringify(failures, null, 2)};`)
   .replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
     `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`));
-const index = await fs.readFile('index.html', 'utf8');
 // The Getting started page's sample request shows examples/messages-payload.json one member at a time, each text as the
 // model receives it, coloured by the plane of the slot the snapshot's profile placed it from.
 const payloadBytes = await fs.readFile('examples/messages-payload.json');
@@ -94,8 +93,6 @@ const messagesGroup = '          <div>\n' + `            ${memberLabel(`messages
 const payloadTokens = [...payload.system, ...payload.tools].map(e => e.text).concat(payload.messages[0].content)
   .reduce((sum, text) => sum + Math.floor((Buffer.byteLength(text, 'utf8') + 3) / 4), 0);
 const payloadHash = createHash('sha256').update(payloadBytes).digest('hex').slice(0, 12);
-outputs.set('index.html', index.replace(/<!-- CONTRACT_ITEM_START -->[\s\S]*?<!-- CONTRACT_ITEM_END -->/,
-  `<!-- CONTRACT_ITEM_START -->\n<pre style="padding: 20px 18px; overflow: auto; margin: 0;">${itemPreview}</pre>\n<!-- CONTRACT_ITEM_END -->`));
 const start = await fs.readFile('start.html', 'utf8');
 outputs.set('start.html', start
   .replace(/<!-- CONTRACT_PAYLOAD_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_END -->/,
@@ -103,7 +100,8 @@ outputs.set('start.html', start
   .replace(/<!-- CONTRACT_PAYLOAD_COUNT_START -->[\s\S]*?<!-- CONTRACT_PAYLOAD_COUNT_END -->/,
     `<!-- CONTRACT_PAYLOAD_COUNT_START --><span>${payloadSnapshot.tokenizer} · ${payloadTokens} input tokens</span><span style="text-transform: none;">sha256 · ${payloadHash}…</span><!-- CONTRACT_PAYLOAD_COUNT_END -->`));
 
-if (!/<!-- CONTRACT_MATURITY_START -->/.test(index)) throw new Error('index.html has no maturity block to write.');
+const about = await fs.readFile('about.html', 'utf8');
+if (!/<!-- CONTRACT_MATURITY_START -->/.test(about)) throw new Error('about.html has no maturity block to write.');
 
 const ajv = new Ajv({ allErrors: true, strict: true, code: { source: true, esm: true } });
 addFormats(ajv);
@@ -170,8 +168,8 @@ const conformance = runs.map(({ label, source, report, outcomes }) => ({
   sha: source.commit, tags: source.tags, contractRepository: report.contract.repository ?? 'contextwindowarchitecture/website', contractSha: ranAt(report), total: published.length,
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
-// The landing page's closing sentence states the draft's maturity from the same counts, so it cannot drift from them.
-outputs.set('index.html', outputs.get('index.html').replace(/<!-- CONTRACT_MATURITY_START -->[\s\S]*?<!-- CONTRACT_MATURITY_END -->/,
+// The About page's status sentence states the draft's maturity from the same counts, so it cannot drift from them.
+outputs.set('about.html', about.replace(/<!-- CONTRACT_MATURITY_START -->[\s\S]*?<!-- CONTRACT_MATURITY_END -->/,
   () => `<!-- CONTRACT_MATURITY_START -->${maturitySentence(changes.groups[0].date, conformance.map(c => ({ label: c.label, total: c.total, passed: c.passed })))}<!-- CONTRACT_MATURITY_END -->`));
 for (const page of ['spec.html', 'assembler.html']) {
   const html = await fs.readFile(page, 'utf8');

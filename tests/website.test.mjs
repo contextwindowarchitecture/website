@@ -70,7 +70,7 @@ test('the landing page stacks its fixed multi-column grids on narrow viewports',
   const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
     .map(m => ({ tag: m[1], tracks: m[2] }))
     .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[2-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
-  assert.ok(fixed.length >= 15, `found ${fixed.length} fixed multi-column grids`);
+  assert.ok(fixed.length >= 12, `found ${fixed.length} fixed multi-column grids`);
   for (const g of fixed) assert.ok(hooks.some(h => g.tag.includes(h)), `a "${g.tracks}" grid stacks on narrow viewports: ${g.tag.slice(0, 80)}`);
 });
 
@@ -436,9 +436,9 @@ test('the migrator places what a user or model turn says by its speaker, never b
   }
 });
 
-test('downloads and the static landing-page item preview use canonical examples', async () => {
-  const html = await fs.readFile(new URL('../index.html', import.meta.url), 'utf8');
-  assert.ok(!html.includes('const SCAFFOLDS ='));
+test('downloads and the static Producers item preview use canonical examples', async () => {
+  assert.ok(!(await fs.readFile(new URL('../index.html', import.meta.url), 'utf8')).includes('const SCAFFOLDS ='));
+  const html = await fs.readFile(new URL('../producers.html', import.meta.url), 'utf8');
   const preview = html.match(/<!-- CONTRACT_ITEM_START -->\s*<pre[^>]*>([\s\S]*?)<\/pre>/)[1];
   const item = JSON.parse(preview.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&'));
   assert.deepEqual(item, contract.ITEM_EXAMPLE);

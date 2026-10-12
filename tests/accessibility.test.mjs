@@ -130,14 +130,13 @@ test('the assembler demo announces what a visitor changed through a live region,
   assert.ok(demo.includes('<button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}"'), 'system tabs');
   assert.ok(demo.includes('<button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}"'), 'budget buttons');
   assert.ok(demo.includes('onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}"'), 'the blob toggle');
-  assert.ok(html.includes('<button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}"') && html.includes('<button onClick="{{ setSlotsMode }}" aria-pressed="{{ slotsPressed }}"'), 'the schema tabs');
   assert.ok(html.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"'), 'the framework tabs');
   const { view } = await component('index.html');
   let vals = view.renderVals();
   assert.equal(vals.announce, '');
   assert.deepEqual([...vals.ucTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false', 'false', 'false']);
   assert.deepEqual([...vals.budgets].map(b => b.pressed), ['true', 'false', 'false', 'false']);
-  assert.deepEqual([vals.badPressed, vals.planesPressed, vals.slotsPressed], ['false', 'true', 'false']);
+  assert.equal(vals.badPressed, 'false');
   vals.slots[1].click();
   assert.equal(view.renderVals().announce, 'User facts removed from the payload. 8 of 11 admitted.');
   view.renderVals().slots[1].click();
@@ -156,8 +155,6 @@ test('the assembler demo announces what a visitor changed through a live region,
   assert.deepEqual([view.renderVals().badPressed, view.renderVals().announce], ['true', 'Showing the unassembled blob.']);
   view.renderVals().togglePlay();
   assert.equal(view.renderVals().announce, 'Playing.');
-  view.renderVals().setSlotsMode();
-  assert.deepEqual([view.renderVals().planesPressed, view.renderVals().slotsPressed], ['false', 'true']);
   assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
 });
 

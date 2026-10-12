@@ -182,6 +182,12 @@
       <span>If you are building, start with <a href="./start.html">Getting started</a>.</span>
       <span>What CWA is not: <a href="./about.html">About</a>.</span>
     </div>
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 22px 0 0; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+        <span>The words this site uses:</span>
+        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
+          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
+        </sc-for>
+      </div>
   </section>
 
   <section id="problem" data-tour="problem" style="border-top: 1px solid var(--line); background: var(--surface);">
@@ -422,121 +428,7 @@
     </div>
   </section>
 
-  <section id="planes" data-tour="planes" style="border-top: 1px solid var(--line);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
-      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px;">
-        <div>
-          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The schema</div>
-          <h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Four planes. Eleven slots. Any number of items.</h2>
-        </div>
-        <div style="display: flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface);">
-          <button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}" style="{{ tabPlanes }}">Planes</button>
-          <button onClick="{{ setSlotsMode }}" aria-pressed="{{ slotsPressed }}" style="{{ tabSlots }}">Slots</button>
-        </div>
-      </div>
-      <p style="margin: 0 0 20px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 44px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-        <span>The words this site uses:</span>
-        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
-          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
-        </sc-for>
-      </div>
 
-      <sc-if value="{{ isPlanesMode }}" hint-placeholder-val="{{ true }}">
-        <div class="g4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-          <sc-for list="{{ planes }}" as="pl" hint-placeholder-count="4">
-            <div style="background: var(--bg); padding: 26px 24px 28px; display: flex; flex-direction: column; gap: 18px;">
-              <div style="{{ pl.barStyle }}"></div>
-              <div>
-                <div style="font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 8px;">{{ pl.name }}</div>
-                <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">{{ pl.answers }}</div>
-              </div>
-              <p style="margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ pl.blurb }}</p>
-              <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px;">
-                <sc-for list="{{ pl.slots }}" as="s" hint-placeholder-count="3">
-                  <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 8px 10px; background: var(--surface);">
-                    <span style="font-size: 15px; font-weight: 500;">{{ s.name }}</span>
-                    <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ s.id }}</span>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
-
-      <sc-if value="{{ isSlotsMode }}" hint-placeholder-val="{{ false }}">
-        <div style="border-top: 1px solid var(--line);">
-          <sc-for list="{{ layers }}" as="layer" hint-placeholder-count="11">
-            <div style="border-bottom: 1px solid var(--line);">
-              <button class="lyr" onClick="{{ layer.toggle }}" style="width: 100%; display: grid; grid-template-columns: 250px minmax(0, 1fr) 40px; align-items: center; gap: 16px; padding: 20px 8px; background: transparent; border: 0; cursor: pointer; text-align: left; color: var(--fg); font-family: inherit;" style-hover="background: var(--surface);">
-                <span style="display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 0;"><span style="{{ layer.dotStyle }}"></span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ layer.id }}</span></span>
-                <span style="font-size: clamp(20px, 2.4vw, 30px); font-weight: 600; letter-spacing: -0.025em;">{{ layer.name }}</span>
-                <span style="justify-self: end; font-family: var(--mono); font-size: 20px; color: var(--muted);">{{ layer.sign }}</span>
-              </button>
-              <div style="{{ layer.detailStyle }}">
-                <div class="lyrd" style="display: grid; grid-template-columns: 250px minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 0 8px 26px;">
-                  <div style="font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--muted);">{{ layer.meta }}</div>
-                  <div>
-                    <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Holds</div>
-                    <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ layer.purpose }}</p>
-                  </div>
-                  <div>
-                    <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Admission rule</div>
-                    <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ layer.value }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
-    </div>
-  </section>
-
-  <section id="items" data-tour="items" style="border-top: 1px solid var(--line); background: var(--surface);">
-    <div id="unitrow" class="g2" style="max-width: 1180px; margin: 0 auto; padding: 88px 32px; display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 56px; align-items: start;">
-      <div>
-        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The unit</div>
-        <h2 style="margin: 0 0 20px; font-size: clamp(30px, 3.6vw, 46px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">A slot holds items, not a paragraph.</h2>
-        <p style="margin: 0 0 24px; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Real systems put three retrieved chunks, two tool observations, and a memory summary plus a task episode into the same request. Each one is a separate item with its own metadata, and without that metadata even a clean slot order produces unpredictable payloads.</p>
-        <p style="margin: 0 0 18px; font-size: 15.5px; line-height: 1.6; color: var(--muted); text-wrap: pretty;">Every item carries its source and version, its authority, when it was true and when it expires, its scope, its budget and tier, and the fields that say how it may be handled. The Producers page lists all fourteen, with the slot defaults that fill the ones a producer omits.</p>
-        <a href="./producers.html#minimum" style="font-family: var(--mono); font-size: 12px; color: var(--accent);">The minimum item →</a>
-      </div>
-      <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 13px; line-height: 1.8; position: sticky; top: 100px;">
-        <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">
-          <span>context_item.yaml · JSON syntax, valid YAML</span>
-          <span style="color: var(--p-evid);">evidence.knowledge</span>
-        </div>
-        <!-- CONTRACT_ITEM_START -->
-<pre style="padding: 20px 18px; overflow: auto; margin: 0;">{
-  "id": "refunds-eu:v17#p4",
-  "slot": "evidence.knowledge",
-  "source": "policy-corpus",
-  "source_version": "2026-09-10",
-  "authority": "reference_only",
-  "trust": "verified",
-  "freshness": "2026-09-12T15:30:00Z",
-  "expires": "2026-12-12T15:30:00Z",
-  "scope": {
-    "tenant": "acme",
-    "task": "refund_request"
-  },
-  "relevance": 0.91,
-  "token_budget": 420,
-  "tier": "compressible",
-  "variants": [],
-  "conflict_policy": "defers",
-  "injection_risk": "untrusted_content",
-  "lineage": "verbatim",
-  "eligibility": "support-chat/illustrative/v1: tenant acme; rerank at least 0.5",
-  "body": "Pro plans refund in full within 30 days of purchase."
-}</pre>
-<!-- CONTRACT_ITEM_END -->
-        <div style="padding: 12px 18px; border-top: 1px solid var(--line); font-size: 11.5px; line-height: 1.55; color: var(--muted); white-space: normal;">The item schema defines metadata; the route profile defines placement. Where items go is a profile decision with evidence behind it: <a href="./evidence.html">Why placement is a profile, not a rule</a>.</div>
-      </div>
-    </div>
-  </section>
 
   <section id="deeper" data-tour="deeper" style="border-top: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
@@ -578,35 +470,6 @@
     </div>
   </section>
 
-  <section id="fit" style="border-top: 1px solid var(--line); background: var(--surface);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Where it fits</div>
-      <h2 style="margin: 0 0 16px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 22ch;">It augments what you already use.</h2>
-      <p style="margin: 0 0 48px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your existing tools supply the materials, and CWA is the assembly step between them and the model.</p>
-      <div class="g2c" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-        <a href="./producers.html" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
-          <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">RAG</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Retrieval produces candidates for the Evidence plane. CWA decides which are admitted, where they're placed, and what they may never overrule.</p>
-          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
-        </a>
-        <a href="./producers.html" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
-          <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">Model Context Protocol</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">MCP is the transport for tools and resources. CWA governs what it returns — tool specs proposed to the route's capability policy and admitted into Governance, observations in Evidence, each with freshness and authority.</p>
-          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
-        </a>
-        <a href="#harness" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
-          <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">Agent frameworks</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Frameworks orchestrate the loop. CWA assembles the payload each step of that loop actually sends, and emits the trace for it.</p>
-          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
-        </a>
-        <a href="./start.html" style="background: var(--bg); padding: 34px; display: block; color: var(--fg);" style-hover="background: var(--accent-soft);">
-          <div style="font-size: 24px; font-weight: 600; letter-spacing: -0.02em; margin-bottom: 10px;">Prompt engineering</div>
-          <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">Prompting is craft at the sentence level and CWA is structure at the payload level, so you need both.</p>
-          <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">Read →</span>
-        </a>
-      </div>
-    </div>
-  </section>
 
   <section id="harness" data-tour="harness" style="border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
@@ -733,16 +596,6 @@
     </div>
   </section>
 
-  <section id="adopt" data-tour="adopt" style="border-top: 1px solid var(--line); background: var(--fg); color: var(--bg);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
-      <h2 style="margin: 0 0 24px; font-size: clamp(38px, 6vw, 84px); line-height: 0.95; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch;">Try the draft. Four assemblers pass every published case.</h2>
-      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; opacity: 0.72; max-width: 54ch; text-wrap: pretty;">Name the slots you already send, give every item an authority and a source, and see how much of your payload had no owner. <!-- CONTRACT_MATURITY_START -->Draft of 2026-10-07. Four assemblers, in Python, TypeScript, Go and Rust, each pass all 90 published cases, rejections included; none has a versioned release yet, and we want to hear what they must do.<!-- CONTRACT_MATURITY_END --> That report is what an assembler's conformance claim rests on, while a producer's or an application's rests on its word, and an application must render with a renderer the published cases cover (<a href="./spec.html#s1">§1</a>).</p>
-      <div style="display: flex; flex-wrap: wrap; gap: 12px;">
-        <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 16px; font-weight: 600; color: var(--fg); background: var(--bg); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--accent); color: var(--bg);">View on GitHub</a>
-        <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--bg);">Read the spec</a>
-      </div>
-    </div>
-  </section>
 
   <sc-if value="{{ tourOn }}" hint-placeholder-val="{{ false }}">
     <div style="position: fixed; inset: 0; z-index: 90; pointer-events: none;">
@@ -1047,7 +900,7 @@ const BUDGETS = [8192, 4096, 2048, 1024];
 const PREREQUISITES = ["plane","slot","item","assembler","trace"];
 
 class Component extends DCLogic {
-  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, mode: "planes", open: { 0: true }, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
 
   componentWillUnmount() {
     this.glossaryUnmount();
@@ -1141,10 +994,6 @@ class Component extends DCLogic {
     this.setState({ theme: t });
   }
 
-  tab(active) {
-    return "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; background: " +
-      (active ? "var(--fg)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
-  }
 
   color(i) { return PLANES[SLOTS[i][2]].color; }
   dot(i, extra) { return "display: block; width: 10px; height: 10px; flex: none; background: " + this.color(i) + ";" + (extra || ""); }
@@ -1245,19 +1094,12 @@ class Component extends DCLogic {
       { key: "badpanel", kicker: "The counter-example", title: "Same context, no assembler",
         body: "Nothing was removed here — everything was fused into one blob. No authority, no provenance, no tiers. This is the failure CWA exists to prevent.",
         act: () => this.setState({ off: {}, bad: true, playing: false, step: 99, budget: 0 }) },
-      { key: "planes", kicker: "The schema", title: "Planes first, slots second",
-        body: "A plane says why context exists. A slot is a typed collection inside it. Newcomers learn four words; implementers use eleven identifiers.",
-        act: () => this.setState({ bad: false, off: {}, playing: true, step: 0, hold: 0, budget: 0, mode: "planes" }) },
-      { key: "items", kicker: "The unit", title: "Items carry their own metadata",
-        body: "Every item carries its own metadata: provenance, authority, freshness, scope, budget and tier, and the fields that say how it may be handled. This is what makes the assembly deterministic rather than merely ordered.", act: () => {} },
       { key: "deeper", kicker: "Go deeper", title: "The spec and the contract have their own pages",
         body: "Twenty-six numbered requirements on the Spec page; what a retriever, memory store or MCP server has to emit on the Producers page, with its checks shown on examples. This page keeps the argument.", act: () => {} },
       { key: "harness", kicker: "Where it fits", title: "You don't replace your framework",
         body: "Your harness runs the loop; stage 04 is the blank it hands you. Pick your stack and the seam is named in your own API — plus an honest list of when to skip CWA entirely.", act: () => {} },
-      { key: "scaffold", kicker: "Take it with you", title: "Six steps and five files",
-        body: "The Getting started page walks from your current prompt to a payload with owners, with a sample prompt split into slots and the scaffold files to copy.", act: () => {} },
-      { key: "adopt", kicker: "Last step", title: "Start with one slot",
-        body: "Name the slots you already send, give each item an authority and a source, and hand the snapshot to one of the four assemblers that pass the published cases. The Getting started page takes you there in six steps.", act: () => {}, last: true }
+      { key: "scaffold", kicker: "Last step", title: "Six steps and five files",
+        body: "The Getting started page walks from your current prompt to a payload with owners, with a sample prompt split into slots and the scaffold files to copy. Name the slots you already send, and hand the snapshot to one of the four assemblers that pass the published cases.", act: () => {}, last: true }
     ];
   }
 
@@ -1377,13 +1219,6 @@ class Component extends DCLogic {
     out.tourBackStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 10px 18px; cursor: pointer; visibility: " + (i === 0 ? "hidden" : "visible") + ";";
   }
 
-  schemaVals(out) {
-    out.planes = PLANES.map((pl, k) => ({
-      name: pl.name, answers: pl.answers, blurb: pl.blurb,
-      barStyle: "height: 6px; width: 48px; background: " + pl.color + ";",
-      slots: SLOTS.filter(s => s[2] === k).map(s => ({ name: s[0], id: s[1] }))
-    }));
-  }
 
   // GLOSSARY_GLUE_START
   // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
@@ -1445,18 +1280,7 @@ class Component extends DCLogic {
     const rootStyle = document.documentElement.style;
     if (accent && accent !== ACCENT_DEFAULT) rootStyle.setProperty("--accent", accent);
     else rootStyle.removeProperty("--accent");
-    const mode = this.state.mode;
     const fmt = n => n.toLocaleString("en-US");
-    const layers = SLOTS.map((l, i) => {
-      const open = !!this.state.open[i];
-      return {
-        id: l[1], name: l[0], purpose: l[3], value: l[4], meta: l[5],
-        dotStyle: this.dot(i),
-        sign: open ? "−" : "+",
-        detailStyle: "display: " + (open ? "block" : "none") + "; animation: cwaRise 260ms ease both; white-space: pre-line;",
-        toggle: () => this.setState(s => ({ open: Object.assign({}, s.open, { [i]: !s.open[i] }) }))
-      };
-    });
     const uc = UCS[this.state.uc];
     const off = this.offMap(this.state.uc);
     const allPicks = uc.picks;
@@ -1549,7 +1373,7 @@ class Component extends DCLogic {
     } else evictionLabel = "Everything fits, so nothing had to be dropped or compressed.";
 
     const out = {
-      layers, slots, payload,
+      slots, payload,
       ucName: uc.name, ucNote: uc.note,
       ucQuestions: uc.questions.map(t => ({ text: t })),
       usedLabel: picks.length + " of 11 admitted",
@@ -1569,12 +1393,7 @@ class Component extends DCLogic {
       playLabel: this.state.playing ? "Pause" : "Play",
       togglePlay: () => this.setState(s => ({ playing: !s.playing, announce: s.playing ? "Paused." : "Playing." })),
       ucTabs: UCS.map((u, i) => ({ label: u.label, pressed: i === this.state.uc ? "true" : "false", style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true, announce: "Showing " + u.label + "." }) })),
-      isPlanesMode: mode === "planes", isSlotsMode: mode === "slots",
-      planesPressed: mode === "planes" ? "true" : "false", slotsPressed: mode === "slots" ? "true" : "false",
       announce: this.state.announce || "",
-      tabPlanes: this.tab(mode === "planes"), tabSlots: this.tab(mode === "slots"),
-      setPlanesMode: () => this.setState({ mode: "planes" }),
-      setSlotsMode: () => this.setState({ mode: "slots" }),
       fmOpen0: () => this.openFailure(0), fmOpen1: () => this.openFailure(1), fmOpen2: () => this.openFailure(2), fmOpen3: () => this.openFailure(3),
       fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
       fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 }),
@@ -1630,7 +1449,6 @@ class Component extends DCLogic {
         return { id: l[1], name: l[0], tag, rowStyle: style + " cursor: default;", dotStyle: this.dot(i, " opacity: 0.4;"), title: "Structure is lost without an assembler", click: () => {}, tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: var(--muted);" };
       });
     }
-    this.schemaVals(out);
     this.fwVals(out);
     this.tourVals(out);
     return Object.assign(out, this.glossaryVals());
