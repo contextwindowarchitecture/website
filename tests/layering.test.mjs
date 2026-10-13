@@ -181,8 +181,8 @@ test('the Assembler page speaks of released assemblers with no hand-written date
   assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
 });
 
-// Viability, the benchmark site, is the one nav link that leaves CWA. A plain click first says it is data heavy and
-// not needed to use or understand CWA, counts down, and goes unless the reader chooses to stay.
+// Viability, the benchmark site, is the one nav link that asks before it leaves CWA. A plain click first says it is
+// data heavy and not needed to use or understand CWA, counts down, and goes unless the reader chooses to stay.
 const VIABILITY = 'https://benchmark.contextwindowarchitecture.io';
 
 test('every page asks before Viability leaves for the benchmark site, with the same modal box and logic', async () => {
