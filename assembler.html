@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Reference assemblers — Context Window Architecture</title>
-<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, with a conformance matrix of every requirement and the published cases each one passes." />
+<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, each passing every published case, and the live assembly simulator: seven systems assembled, fitted and rendered under the same rules." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -22,6 +22,7 @@
   a { color: var(--accent); text-decoration: none; }
   a:hover { color: var(--fg); }
   ::selection { background: var(--accent); color: var(--bg); }
+  @keyframes cwaRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
   @media (max-width: 1200px) {
     #hdrmenu { display: inline-block !important; }
     #sitenav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0 !important; margin: 0 !important; padding: 6px 32px 14px; font-size: 16px !important; background: var(--bg); border-bottom: 1px solid var(--line); }
@@ -32,7 +33,8 @@
     #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
-  @media (max-width: 860px) { .mx { grid-template-columns: 44px minmax(0, 1fr) !important; row-gap: 6px !important; } .mx-group, .mx-hide-sm { display: none !important; } .mx-ss { grid-column: 2; } }
+  @media (max-width: 860px) { .g2, .g3 { grid-template-columns: minmax(0, 1fr) !important; } }
+  @media (max-width: 620px) { .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; } }
   @media (max-width: 720px) { .im { grid-template-columns: 84px minmax(0, 1.2fr) minmax(0, 1fr) !important; gap: 8px 10px !important; padding-left: 14px !important; padding-right: 14px !important; } .im-hide-sm { display: none; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -96,28 +98,145 @@
     </div>
   </section>
 
-  <section style="border-bottom: 1px solid var(--line); background: var(--surface);">
+  <section id="assemble" style="border-bottom: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
-      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Conformance matrix</div>
-      <h2 style="margin: 0 0 24px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">{{ counts }}</h2>
-      <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">A case is a <a href="./conformance/README.md">published</a> snapshot with the trace and payload a conformant assembler must produce; {{ publishedCount }} are published, rejections included, and a case may exercise several rules. The scope says how much of a rule an assembler can verify: <span style="color: var(--fg);">assembler</span> rows in full, <span style="color: var(--fg);">boundary</span> rows where the snapshot is handed over, with the rest on producers or the application, and <span style="color: var(--fg);">application</span> rows not at all, so they are documented. Hover a cell for the count, and a row for what the assembler checks.</p>
-      <div style="display: flex; flex-wrap: wrap; gap: 8px 24px; margin: 0 0 14px; font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--muted);">
-        <span><span aria-hidden="true" style="display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 8px; box-sizing: border-box; background: var(--p-evid); border: 1.5px solid var(--p-evid);"></span>proven · passes every published case that exercises the rule</span>
-        <span><span aria-hidden="true" style="display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 8px; box-sizing: border-box; border: 1.5px solid var(--accent);"><span style="display: block; width: 50%; height: 100%; background: var(--accent);"></span></span>partly · passes some, or a case changed since its run</span>
-        <span><span aria-hidden="true" style="display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 8px; box-sizing: border-box; border: 1.5px solid var(--muted);"></span>not exercised · no published case yet</span>
-        <span><span aria-hidden="true" style="display: inline-block; width: 12px; height: 2px; vertical-align: 4px; margin-right: 8px; background: var(--muted);"></span>not testable in assembly · an application rule, documented</span>
+      <div data-tour="intro">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget in tier order, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
-      <div role="table" aria-label="Conformance matrix by requirement and implementation" style="border: 1px solid var(--line); background: var(--bg);">
-        <div role="row" class="mx mx-group" style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 120px repeat(4, 76px); gap: 12px; padding: 10px 18px 0; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);"><span></span><span></span><span></span><span role="columnheader" class="mx-hide-sm" style="grid-column: span 4; text-align: center; color: var(--fg);">Proven by</span></div>
-        <div role="row" class="mx" style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 120px repeat(4, 76px); gap: 12px; padding: 6px 18px 10px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); align-items: baseline;"><span role="columnheader">rule</span><span role="columnheader">requirement</span><span role="columnheader" class="mx-ss">scope</span><sc-for list="{{ implementationLabels }}" as="l" hint-placeholder-count="4"><span role="columnheader" class="mx-hide-sm" style="text-align: center;">{{ l.label }}</span></sc-for></div>
-        <sc-for list="{{ matrix }}" as="r" hint-placeholder-count="26">
-          <a role="row" href="{{ r.href }}" title="{{ r.note }}" class="mx" style="display: grid; grid-template-columns: 56px minmax(0, 1fr) 120px repeat(4, 76px); gap: 12px; padding: 9px 18px; border-bottom: 1px solid var(--line); align-items: baseline; color: var(--fg);" style-hover="background: var(--surface);">
-            <span role="cell" style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ r.id }}</span>
-            <span role="cell" style="font-size: 14px; line-height: 1.4; min-width: 0; text-wrap: pretty;">{{ r.summary }}</span>
-            <span role="cell" class="mx-ss" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; color: {{ r.scopeColor }};">{{ r.scope }}</span>
-            <sc-for list="{{ r.cells }}" as="c" hint-placeholder-count="4"><span role="cell" class="mx-hide-sm" title="{{ c.title }}" aria-label="{{ c.title }}" style="text-align: center;"><span aria-hidden="true" style="{{ c.glyph }}"><span style="{{ c.inner }}"></span></span></span></sc-for>
-          </a>
+
+      <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
+        <sc-for list="{{ ucTabs }}" as="tab" hint-placeholder-count="4">
+          <button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}" style="{{ tab.style }}">{{ tab.label }}</button>
         </sc-for>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px;">
+        <span data-tour="play" style="display: flex; gap: 10px;"><button onClick="{{ togglePlay }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ playLabel }}</button>
+        <button data-tour="badbtn" onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
+        <span style="width: 1px; height: 22px; background: var(--line); margin: 0 4px;"></span>
+        <span data-tour="budget" style="display: flex; align-items: center; gap: 10px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Input budget</span>
+        <span style="display: flex; gap: 6px;">
+          <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
+            <button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}" style="{{ b.style }}">{{ b.label }}</button>
+          </sc-for>
+        </span></span>
+      </div>
+
+      <div data-tour="fill" style="border: 1px solid var(--line); background: var(--bg); padding: 16px 18px; margin-bottom: 14px;">
+        <div style="display: flex; justify-content: space-between; gap: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">
+          <span>Window fill</span>
+          <span style="color: var(--fg);">{{ tokenLabel }}</span>
+        </div>
+        <div style="display: flex; gap: 2px; height: 16px; background: var(--surface); border: 1px solid var(--line); overflow: hidden;">
+          <sc-for list="{{ segments }}" as="seg" hint-placeholder-count="0">
+            <div style="{{ seg.style }}" title="{{ seg.title }}"></div>
+          </sc-for>
+        </div>
+        <div style="{{ evictionStyle }}">{{ evictionLabel }}</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 18px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; color: var(--muted);">
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Protected</span> · instructions, capabilities, task state, output contract, query</span>
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Compressible</span> · memory, history, knowledge, tool results</span>
+          <span><span style="color: var(--fg); text-transform: uppercase; letter-spacing: 0.12em;">Droppable</span> · examples, user facts</span>
+        </div>
+      </div>
+
+      <div class="g2" style="display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 28px; align-items: start;">
+        <div data-tour="slots" style="border: 1px solid var(--line); background: var(--bg); padding: 18px;">
+          <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;">{{ announce }}</div>
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
+            <span>Slots</span>
+            <span>{{ usedLabel }}</span>
+          </div>
+          <sc-if value="{{ isGood }}" hint-placeholder-val="{{ true }}">
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--accent); margin-bottom: 14px;">Click a slot to remove it →</div>
+          </sc-if>
+          <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 14px;">Nothing to click — the slots no longer exist</div>
+          </sc-if>
+          <div style="display: flex; flex-direction: column; gap: 4px;">
+            <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="11">
+              <button onClick="{{ slot.click }}" title="{{ slot.title }}" style="{{ slot.rowStyle }}">
+                <span style="{{ slot.dotStyle }}"></span>
+                <span style="min-width: 0;">
+                  <span style="display: block; font-size: 15px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ slot.name }}</span>
+                  <span style="display: block; font-family: var(--mono); font-size: 10.5px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ slot.id }}</span>
+                </span>
+                <span style="{{ slot.tagStyle }}">{{ slot.tag }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div data-tour="payload" style="border: 1px solid var(--line); background: var(--bg); padding: 18px; min-height: 540px; display: flex; flex-direction: column;">
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">
+            <span>{{ ucName }}</span>
+            <span>{{ progress }}</span>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+            <sc-for list="{{ payload }}" as="line" hint-placeholder-count="6">
+              <div style="{{ line.style }}">
+                <div style="display: flex; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 5px;">
+                  <span style="{{ line.tagStyle }}">{{ line.tag }}</span>
+                  <span style="white-space: nowrap;">{{ line.tokens }}</span>
+                </div>
+                <div style="font-family: var(--mono); font-size: 13px; line-height: 1.5; overflow-wrap: anywhere;">{{ line.text }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 14px; border-top: 1px solid var(--line); padding-top: 12px;">
+            <span>{{ renderedLabel }}</span>
+            <span>trace {{ traceId }}</span>
+          </div>
+        </div>
+      </div>
+
+      <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
+        <div data-tour="badpanel" style="border: 1px solid var(--fg); background: var(--bg); padding: 26px 28px; margin-top: 14px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Symptom you'll actually see</div>
+          <p style="margin: 0 0 22px; font-size: 20px; line-height: 1.45; font-weight: 500; max-width: 70ch; text-wrap: pretty;">{{ ucSymptom }}</p>
+          <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; border-top: 1px solid var(--line); padding-top: 20px;">
+            <sc-for list="{{ badNotes }}" as="n" hint-placeholder-count="3">
+              <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ n.text }}</div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ hasRemoved }}" hint-placeholder-val="{{ false }}">
+        <div data-tour="removed" style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 22px 24px; margin-top: 14px;">
+          <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);">What breaks without it</span>
+            <button onClick="{{ restoreAll }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); background: transparent; border: 1px solid var(--fg); border-radius: var(--pill); padding: 8px 15px; cursor: pointer;">Restore all slots</button>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 12px;">
+            <sc-for list="{{ removed }}" as="r" hint-placeholder-count="1">
+              <div class="rm" style="display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 16px; align-items: baseline;">
+                <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); text-decoration: line-through;">{{ r.tag }}</span>
+                <span style="font-size: 17px; line-height: 1.5; text-wrap: pretty;">{{ r.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <div class="g2c" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; margin-top: 28px;">
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">What this one teaches</div>
+          <p style="margin: 0; font-size: 17px; line-height: 1.55; text-wrap: pretty;">{{ ucNote }}</p>
+        </div>
+        <div style="background: var(--bg); padding: 26px 28px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">Decisions it forces</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <sc-for list="{{ ucQuestions }}" as="q" hint-placeholder-count="2">
+              <div style="display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; font-size: 17px; line-height: 1.5;">
+                <span style="color: var(--accent);">?</span>
+                <span style="text-wrap: pretty;">{{ q.text }}</span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -169,372 +288,225 @@
   <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
 </noscript>
 <script type="text/x-dc" data-dc-script>
-const RULES = [
-  [
-    "MUST",
-    "One slot and one authority role per item",
-    "assembler",
-    "Admission checks each item's slot and authority.",
-    "implemented",
-    1,
-    [
-      1,
-      1,
-      1,
-      1
-    ]
-  ],
-  [
-    "MUST",
-    "Required fields and canonical JSON shape",
-    "assembler",
-    "Schema validation with format checking; timestamps compared at full precision.",
-    "implemented",
-    9,
-    [
-      9,
-      9,
-      9,
-      9
-    ]
-  ],
-  [
-    "SHOULD",
-    "Declared policy defaults, filled and traced",
-    "assembler",
-    "Fills slot defaults and versioned route overrides, records defaults_filled, and applies the four slot-level eligibility rules as the complete predicate.",
-    "implemented",
-    5,
-    [
-      5,
-      5,
-      5,
-      5
-    ]
-  ],
-  [
-    "MUST",
-    "Slots that are never omitted",
-    "boundary",
-    "Refuses with required_slot_missing. Declaring parser: true on every route whose response a parser consumes is the application's.",
-    "boundary-checked",
-    8,
-    [
-      8,
-      8,
-      8,
-      8
-    ]
-  ],
-  [
-    "MUST NOT",
-    "Rule zero: enforce outside the model",
-    "application",
-    "Application guards enforce invariants. Nothing observable in assembly can prove it.",
-    "documented",
-    0,
-    [
-      0,
-      0,
-      0,
-      0
-    ]
-  ],
-  [
-    "MUST",
-    "Separate instruction authority from factual precedence",
-    "assembler",
-    "Classifies each declared group as instruction or fact and resolves it by authority or route policy; only governing and user items are instruction peers, and trust and the injection marker never change that.",
-    "implemented",
-    7,
-    [
-      7,
-      7,
-      7,
-      7
-    ]
-  ],
-  [
-    "MUST NOT",
-    "No slot overrides platform roles; no authority from wording",
-    "assembler",
-    "Only governance takes the system and tool roles, the query is the only live user turn, history renders as a transcript in the order turns were said, and item bodies are escaped inside xml: wrappers; cwa-messages/v1 hands system and tools text over unescaped.",
-    "implemented",
-    11,
-    [
-      11,
-      11,
-      11,
-      11
-    ]
-  ],
-  [
-    "MUST",
-    "State is application-written and current",
-    "boundary",
-    "Checks producer kind and state age. Writing state stays with the application.",
-    "boundary-checked",
-    1,
-    [
-      1,
-      1,
-      1,
-      1
-    ]
-  ],
-  [
-    "MUST",
-    "Memory lifetime and producer exclusion reporting",
-    "boundary",
-    "Excludes expired and revoked memory and merges producer exclusions. Reporting them is the producer's duty.",
-    "boundary-checked",
-    4,
-    [
-      4,
-      4,
-      4,
-      4
-    ]
-  ],
-  [
-    "MUST",
-    "User and fetched content is marked, never elevated, kept out of governance",
-    "boundary",
-    "Checks the marker in the five slots that require it, keeps unverified or marked items out of governance, and renders every body whole. Marking user-controlled and fetched content is the producer's duty, and delimiting material pasted into a body is the application's job.",
-    "boundary-checked",
-    4,
-    [
-      4,
-      4,
-      4,
-      4
-    ]
-  ],
-  [
-    "MUST",
-    "Explicit conflict groups and traceable resolution",
-    "boundary",
-    "Resolves the groups it is given. It cannot detect a conflict the application did not declare.",
-    "boundary-checked",
-    17,
-    [
-      17,
-      17,
-      17,
-      17
-    ]
-  ],
-  [
-    "MUST NOT",
-    "Never answer from nothing",
-    "boundary",
-    "Refuses with evidence_required and a recovery action. Retrieving and summarizing before the snapshot is frozen, and freezing a new one for any retry, are the application's.",
-    "boundary-checked",
-    9,
-    [
-      9,
-      9,
-      9,
-      9
-    ]
-  ],
-  [
-    "MUST NOT",
-    "Retrievers emit one scored item per chunk, never a blob",
-    "boundary",
-    "Gates retrieval producers to the evidence slots, requires the slot's authority, a score on every knowledge item and wherever the route sets a threshold, and that a reported near-duplicate names a candidate the producer kept. It cannot tell whether a producer merged chunks or dropped one silently.",
-    "boundary-checked",
-    8,
-    [
-      8,
-      8,
-      8,
-      8
-    ]
-  ],
-  [
-    "MUST NOT",
-    "Memory producers suppress and report expired or revoked items",
-    "boundary",
-    "Re-excludes expired or revoked memory as a backstop. Suppressing and reporting them is the producer's duty.",
-    "boundary-checked",
-    1,
-    [
-      1,
-      1,
-      1,
-      1
-    ]
-  ],
-  [
-    "MUST",
-    "Authenticated capability admission; MCP output is evidence",
-    "boundary",
-    "Checks the authenticated emitter and capability grant. The application authenticates, and tool guards enforce calls.",
-    "boundary-checked",
-    7,
-    [
-      7,
-      7,
-      7,
-      7
-    ]
-  ],
-  [
-    "MUST",
-    "Account for rendered tokens; shed in tier order",
-    "boundary",
-    "Counts rendered tokens and sheds in tier order. Setting budget.input from the model's context limit, with a tokenizer that counts or estimates the model's tokens, is the application's.",
-    "boundary-checked",
-    35,
-    [
-      35,
-      35,
-      35,
-      35
-    ]
-  ],
-  [
-    "MUST",
-    "Refused assembly has no rendered payload",
-    "assembler",
-    "Refused assemblies have no payload, and their traces carry result: null and no included items. Invalid snapshots are rejected before assembly, with no payload and no trace.",
-    "implemented",
-    48,
-    [
-      48,
-      48,
-      48,
-      48
-    ]
-  ],
-  [
-    "MUST NOT",
-    "Precomputed variants; no model calls during assembly",
-    "boundary",
-    "Selects only supplied variants and never calls a model. It cannot verify a variant's fidelity.",
-    "boundary-checked",
-    12,
-    [
-      12,
-      12,
-      12,
-      12
-    ]
-  ],
-  [
-    "MUST",
-    "Draft profiles versus evaluated profiles",
-    "boundary",
-    "Rejects a profile written for another spec. Evaluation and promotion happen outside assembly: the Python assembler's registry hands a deployment only an evaluated profile, which no case covers.",
-    "boundary-checked",
-    1,
-    [
-      1,
-      1,
-      1,
-      1
-    ]
-  ],
-  [
-    "MUST",
-    "Profile version and mandatory-slot validation",
-    "boundary",
-    "Rejects a profile that doesn't place a required slot, and refuses the assembly when admitted protected content has no placement. Raising the version for every change is the application's; the Python assembler's registry pins content by digest, outside assembly and the cases.",
-    "boundary-checked",
-    14,
-    [
-      14,
-      14,
-      14,
-      14
-    ]
-  ],
-  [
-    "MUST",
-    "Trace JSON matches the published schema",
-    "assembler",
-    "Traces are checked against the schema and the reason registry, and must match every published case field for field.",
-    "implemented",
-    61,
-    [
-      61,
-      61,
-      61,
-      61
-    ]
-  ],
-  [
-    "MUST",
-    "Provenance, snapshot digest and filled defaults in the trace",
-    "assembler",
-    "Emits source_version, eligibility, excluded slots, snapshot_digest and defaults_filled, and stage timings when the caller lends a clock.",
-    "implemented",
-    24,
-    [
-      24,
-      24,
-      24,
-      24
-    ]
-  ],
-  [
-    "MUST",
-    "Determinism includes the clock and policy snapshot",
-    "boundary",
-    "Snapshot replay across processes, hash seeds, time zones and locales, with ordering, blank strings, timestamps and the digest pinned for every language. Making every external read and model call before the snapshot is frozen is the application's.",
-    "boundary-checked",
-    5,
-    [
-      5,
-      5,
-      5,
-      5
-    ]
-  ],
-  [
-    "MUST",
-    "Route-requested exact deduplication",
-    "assembler",
-    "Excludes exact duplicate bodies in the slots a route opts in, after conflicts, keeping protected and grouped items.",
-    "implemented",
-    7,
-    [
-      7,
-      7,
-      7,
-      7
-    ]
-  ],
-  [
-    "MUST",
-    "Route-requested supersession of stale observations",
-    "assembler",
-    "Keeps only the latest observation per producer and source in the slots a route opts in, after conflicts, keeping protected and grouped items.",
-    "implemented",
-    4,
-    [
-      4,
-      4,
-      4,
-      4
-    ]
-  ],
-  [
-    "MUST",
-    "Route-requested source diversity",
-    "assembler",
-    "Keeps at most max_per_source items per producer and source in the slots a route opts in, after dedupe, keeping protected and grouped items.",
-    "implemented",
-    4,
-    [
-      4,
-      4,
-      4,
-      4
-    ]
-  ]
+const PLANES = [
+  { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
+  { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
+  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved chunks, tool observations, artifacts, and citations. Each arrives as its own evidence item with provenance, freshness, and trust, and is treated as reference material, not instruction." },
+  { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
 ];
+
+/* SLOTS repeats the slots of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
+/* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
+const SLOTS = [
+  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Items that aren't verified, or that carry the injection marker, are excluded here.", "authority governing\ntier protected\nlineage verbatim"],
+  ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Unverified user claims remain source-linked memory; only application-confirmed facts enter state.", "authority state\ntier droppable\nscope tenant · user"],
+  ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, and inside its freshness limits. Where the route asks for it, exact duplicates go after conflicts are resolved (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
+  ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When it disagrees with other evidence, the route's fact policy decides; a route that treats state as canonical lists the state producer first (R-11).", "authority state\ntier protected\nowner application"],
+  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries whose expires is at or before assembly_time, or that carry revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
+  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns.", "Summarising older turns into memory is the application's job, done before assembly (R-12). Under budget pressure, when the route declares no fitting order, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the turns carry relevance scores or the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nrisk untrusted_content"],
+  ["Capabilities", "governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority (R-15), and permission is decided outside the model.", "authority governing\ntier protected\nallow-list versioned"],
+  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop, and any retrieved chunks a route sends here.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
+  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format.", "A route that wants them places the slot and lists a producer for it; admission applies the same four slot rules as anywhere else (R-3). They defer to instructions and the output contract. They're droppable, so under budget pressure they go before anything compressible.", "authority governing\ntier droppable\nconflict defers"],
+  ["Output contract", "governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates.", "authority governing\ntier protected\nrequired when parser: true"],
+  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it.", "authority user\ntier protected\nrole trigger"]
+];
+
+const UCS = [
+  {
+    label: "Support agent",
+    symptom: "Ada follows the refund document instead of her own price rule — and by turn thirty the \u201cnever quote unverified prices\u201d line has been pushed out of the window altogether.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, Ada would lose her identity and her price rule, and quote numbers she cannot verify.",
+      1: "EU refund terms stop applying automatically; the answer turns generic.",
+      2: "The 30-day policy is gone, so the model invents a refund window.",
+      3: "It forgets eligibility was already checked and restarts the interrogation.",
+      5: "It cannot tell what \u201cit\u201d refers to and asks the customer to repeat themselves.",
+      6: "No tools to call — it can describe a refund it has no way to issue.",
+      7: "The order amount is unknown, so the agent guesses the total or asks again.",
+      9: "The reply arrives as six paragraphs inside a chat bubble built for two lines.",
+      10: "Refused with required_slot_missing. Sent anyway, there is nothing to answer, and the turn would produce a summary of the conversation instead."
+    },
+    name: "Refund request · live chat",
+    picks: [
+      [0, "You are Ada, support for Northwind. Never quote a price you cannot verify with a tool."],
+      [1, "plan=pro · region=EU · tone=concise"],
+      [2, "[refunds-eu:v17#p4 · verified] Pro plans refund in full within 30 days."],
+      [3, "refund_request → eligibility=done, issue=pending"],
+      [5, "user: is my order refundable?"],
+      [6, "lookup_order(id) · issue_refund(id, amount)"],
+      [7, "lookup_order(8821) → { total: 240, days: 12 } · age 0.4s"],
+      [9, "Max 3 sentences. No bullet lists."],
+      [10, "Can you just process it now?"]
+    ],
+    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund policy chunk arrives as an evidence item with a version and a trust tier, rather than as pasted text.",
+    questions: ["The price rule is stated in governance.instructions, but is it also enforced by a tool guard? Language guidance belongs in context; invariants belong in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
+  },
+  {
+    label: "Code review bot",
+    symptom: "The lint config reads as an instruction, so the bot starts rewriting the repo's style instead of reviewing the diff it was given.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, it would review the whole file instead of the diff and fill the PR with noise.",
+      2: "House conventions vanish; it flags style the repo deliberately allows.",
+      6: "It can describe problems but cannot post a single comment.",
+      7: "No diff in the window — it reviews a pull request it has never seen.",
+      8: "Comment tone slides from specific to generic \u201cconsider refactoring\u201d.",
+      9: "Free-form prose comes back and the CI job fails to parse it.",
+      10: "Refused with required_slot_missing. Sent anyway, the job would run with no trigger and return nothing."
+    },
+    name: "Pull request #482 · CI job",
+    picks: [
+      [0, "You review diffs. Comment only on lines that changed."],
+      [2, "repo conventions · eslint config · CODEOWNERS · authority=reference_only"],
+      [6, "fetch_diff(pr) · post_comment(file, line, body)"],
+      [7, "fetch_diff(482) → 3 files, 214 lines changed"],
+      [8, "Two approved review comments from last week."],
+      [9, "JSON array: { file, line, severity, note }"],
+      [10, "Review PR #482."]
+    ],
+    note: "No user facts, no history — a CI job has no conversation and no person. Repo conventions are admitted as reference evidence, which is exactly why they cannot turn into instructions.",
+    questions: ["Are repo conventions evidence, or part of the tool observation?", "What does the fitting policy compress first when the diff is 4,000 lines?"]
+  },
+  {
+    label: "Clinical triage",
+    symptom: "The protocol text outranks the never-diagnose rule and the assistant confidently names a condition.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, the escalation rule would be gone and the assistant would offer a diagnosis instead.",
+      1: "Age and hypertension disappear, so chest pain reads as low risk.",
+      2: "The triage protocol is missing and the advice becomes improvised.",
+      4: "Prior BP history is lost; the pattern across visits goes unnoticed.",
+      5: "The symptom described this morning never reaches the model.",
+      9: "A reassuring essay comes back where a risk tier was required.",
+      10: "Refused with required_slot_missing: there is no question left to triage."
+    },
+    name: "Intake triage · patient portal",
+    picks: [
+      [0, "Triage assistant. Never diagnose. Escalate red-flag symptoms immediately."],
+      [1, "age 61 · known hypertension · EU patient record"],
+      [2, "[protocol:chest-pain:v9 · verified] triage decision steps"],
+      [4, "Two BP checks this year; last visit March, no acute findings."],
+      [5, "patient: pressure in my chest since this morning"],
+      [9, "Return risk tier and next step only. No reassurance."],
+      [10, "Should I just wait until Monday?"]
+    ],
+    note: "History arrives compressed, not verbatim: what matters is the clinical thread, not the wording of a visit in March. That is an interaction.memory admission rule, made once, applied everywhere.",
+    questions: ["What has to be redacted before state.user leaves your network?", "The escalation rule lives in governance so no user can argue it away — what enforces it outside the model?"]
+  },
+  {
+    label: "Weekly brief",
+    symptom: "Last week's brief is indistinguishable from this week's data, so last week's numbers get reported as current.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, citations would stop and numbers would appear with no traceable source row.",
+      2: "No pipeline data — the brief gets written out of thin air.",
+      3: "It restarts at section one and rewrites what was already approved.",
+      8: "Voice drifts away from the house style established last week.",
+      9: "Length and structure wander and the newsletter template breaks.",
+      10: "Refused with required_slot_missing. Sent anyway, with no instruction to generate, the batch job would return an empty brief."
+    },
+    name: "Monday sales brief · scheduled batch",
+    picks: [
+      [0, "Analyst voice. Every number cites the source row."],
+      [2, "pipeline snapshot · 41 open deals · 6 closed lost · freshness Mon 06:00"],
+      [3, "brief week 30 → section 2 of 5 drafted"],
+      [8, "Last week's approved brief, as a style reference."],
+      [9, "800 words. Four headings. No preamble."],
+      [10, "Generate this week's brief."]
+    ],
+    note: "There is no user and no conversation at all. Same schema, five slots filled — six deliberately empty is the correct assembly, not a gap. Last week's brief is admitted as steering, not evidence, which is what keeps its numbers out of this week's.",
+    questions: ["Is last week's brief an example, or is it evidence?", "Where does \u201cdon't repeat last week\u201d actually live — instructions, or a freshness rule on the snapshot?"]
+  },
+  {
+    label: "Voice ordering",
+    symptom: "The entire menu is re-read into the window on every turn; the reply lands two seconds late and the customer starts repeating themselves.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, confirmation discipline would be gone and items would get added twice.",
+      1: "The usual order is forgotten and a regular is treated as a stranger.",
+      3: "It loses the cart and asks the customer to start over.",
+      5: "The correction \u201cmake that iced\u201d is never heard.",
+      6: "It agrees to the order but nothing reaches the kitchen.",
+      7: "It cannot state the total, so the lane stalls at the window.",
+      9: "The reply comes back with bullet symbols the speech engine reads aloud.",
+      10: "Refused with required_slot_missing: there is nothing to respond to."
+    },
+    name: "Drive-thru lane 3 · realtime voice",
+    picks: [
+      [0, "Order taker. Confirm every item once. Never upsell twice."],
+      [1, "loyalty member · usual order: large oat latte"],
+      [3, "order → 2 items confirmed, payment pending"],
+      [5, "customer: uh — make that iced"],
+      [6, "add_item(sku, mods) · price_order(cart)"],
+      [7, "price_order(cart) → $11.40"],
+      [9, "One short sentence. Speakable. No symbols or lists."],
+      [10, "And a hash brown."]
+    ],
+    note: "No retrieval and no memory. The menu is small enough to sit in instructions, and the latency budget is measured in hundreds of milliseconds — every model token the assembler skips is time the customer doesn't wait.",
+    questions: ["Where does the menu live once it grows to 400 items with regional pricing?", "What is the token ceiling before the pause before speech becomes audible?"]
+  },
+  {
+    label: "Incident copilot",
+    symptom: "The runbook reads as a command rather than a reference, and the copilot proposes a failover step as though it had been told to run one.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, the confirmation gate would disappear and it would propose running failover unprompted.",
+      2: "The runbook is gone and the copilot improvises during a sev-1.",
+      3: "It forgets mitigation was proposed and loops back to diagnosis.",
+      4: "The first forty minutes are lost; it re-suggests what already failed.",
+      6: "It can advise but cannot page anyone or read a single metric.",
+      7: "p99 latency is unknown, so severity becomes guesswork.",
+      9: "A wall of prose lands in the incident channel with no owners.",
+      10: "Refused with required_slot_missing: there is no question to answer."
+    },
+    name: "INC-2291 · production sev-1",
+    picks: [
+      [0, "Incident copilot. Never run a mutating command without explicit confirmation."],
+      [2, "[runbook:db-failover:v4 · reference_only] steps and rollback"],
+      [3, "INC-2291 → cause identified, mitigation proposed, comms pending"],
+      [4, "First 40 minutes: latency spike traced to replica lag in eu-west."],
+      [6, "query_metrics · page_oncall · run_runbook_step"],
+      [7, "query_metrics(p99, 5m) → 4.2s and rising · age 8s"],
+      [9, "Next three actions as bullets, each with an owner."],
+      [10, "What do we do next?"]
+    ],
+    note: "Forty minutes of chatter compresses into one memory line while raw tool output stays verbatim. The runbook is admitted as reference_only, so its imperatives never become the copilot's instructions.",
+    questions: ["The confirmation gate lives in governance — does it survive compaction, and is it also enforced by the tool layer?", "When metrics refresh every ten seconds, what freshness rule evicts the stale observation?"]
+  },
+  {
+    label: "Language tutor",
+    symptom: "Old corrections become live instructions, so the tutor keeps correcting things the learner fixed weeks ago.",
+    drops: {
+      0: "Refused with required_slot_missing. Sent anyway, corrections would pile up and bury the learner in red ink.",
+      1: "B1 level unknown, so replies swing to native-speed Spanish.",
+      4: "Past sessions vanish and the same subjunctive lesson repeats forever.",
+      5: "The sentence being corrected is not in the window.",
+      8: "Correction style turns clinical instead of encouraging.",
+      9: "It answers in English and corrects five things at once.",
+      10: "Refused with required_slot_missing: there is nothing to check."
+    },
+    name: "Spanish B1 · session 27",
+    picks: [
+      [0, "Patient tutor. Correct one thing, then keep the conversation moving."],
+      [1, "level B1 · 34-day streak · shaky on the subjunctive"],
+      [4, "Earlier sessions: preterite mastered, avoids the formal register. · expires 2026-12-20"],
+      [5, "learner: si tuviera tiempo, iría contigo"],
+      [8, "Two past corrections written in the tone we want."],
+      [9, "Reply in Spanish. One correction maximum."],
+      [10, "Is that right?"]
+    ],
+    note: "No tools and nothing retrieved — but memory and user facts carry the whole experience. Completely different system, same schema. Memory entries carry an expires deadline, which is what stops old corrections from outliving their usefulness.",
+    questions: ["What earns a place in memory versus a disposable session log — and who can revoke it?", "Is proficiency a stored fact in state.user, or inferred fresh each turn from history?"]
+  }
+];
+
+const SLOT_TOKENS = [240, 90, 1500, 160, 320, 850, 400, 600, 450, 70, 40];
+/* Slot indexes in shedding order (README Fitting): no route priorities, so by slot name. */
+const DROPPABLE = [8, 1];
+const COMPRESSIBLE = [2, 7, 5, 4];
+const PROTECTED = [0, 3, 6, 9, 10];
+const REQUIRED = [0, 10];
+const EVIDENCE = [2, 7];
+const COMPRESS = 0.4;
+const BUDGETS = [8192, 4096, 2048, 1024];
+
+
+
 const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-python","sha":"31f82710fdfb766b06f194b9224e26670d10c07c","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/contextwindowarchitecture","contractSha":"c252494af79720d23c95d54c0cf9c638d3e43557","total":90,"passed":90,"stale":0},{"label":"TypeScript","name":"@contextwindowarchitecture/assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-typescript","sha":"c533e4455073a27a2d5a4c65a3ddd62effa3795e","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/contextwindowarchitecture","contractSha":"c252494af79720d23c95d54c0cf9c638d3e43557","total":90,"passed":90,"stale":0},{"label":"Go","name":"github.com/contextwindowarchitecture/assembler-go","version":"0.0.1","repository":"contextwindowarchitecture/assembler-go","sha":"fdd7e2fc74e53cdcd5da43541ee2959a6a68c98d","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/contextwindowarchitecture","contractSha":"c252494af79720d23c95d54c0cf9c638d3e43557","total":90,"passed":90,"stale":0},{"label":"Rust","name":"contextwindowarchitecture-assembler","version":"0.0.1","repository":"contextwindowarchitecture/assembler-rust","sha":"92b4d6f04f9d339d0925676ddbd30a2770a4d385","tags":["draft-release"],"contractRepository":"contextwindowarchitecture/contextwindowarchitecture","contractSha":"c252494af79720d23c95d54c0cf9c638d3e43557","total":90,"passed":90,"stale":0}];
 // Where the published cases live; the table links each implementation's run to the commit its cases came from.
 // The repository each report's cases came from, by the name its column gives it.
@@ -542,22 +514,269 @@ const CONTRACT_NAMES = { "contextwindowarchitecture/website": "website", "contex
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
 const GITHUB = /^[\w.-]+\/[\w.-]+$/;
 // The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
-const PREREQUISITES = ["snapshot","payload","trace","conformance","requirement"];
+const PREREQUISITES = ["plane","slot","snapshot","payload","trace","conformance"];
 
 class Component extends DCLogic {
-  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false };
-  componentWillUnmount() { this.glossaryUnmount(); }
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
+  componentWillUnmount() {
+    this.glossaryUnmount();
+    clearInterval(this._t);
+    if (this._hash) window.removeEventListener("hashchange", this._hash);
+  }
 
   componentDidMount() {
     this.glossaryMount();
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
     this.applyTheme(t);
+    let still = false;
+    try { still = window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch (e) {}
+    // A visitor who asked for less motion gets the simulator complete and still, with Play to run it.
+    if (still) this.setState({ playing: false, step: 99 });
+    this.startClock();
+    this._hash = () => this.applyHash();
+    window.addEventListener("hashchange", this._hash);
+    this.applyHash();
   }
   applyTheme(t) {
     document.documentElement.setAttribute("data-theme", t);
     try { localStorage.setItem("cwa-theme", t); } catch (e) {}
     this.setState({ theme: t });
+  }
+  offMap(uc) { return (this.state.off || {})[uc] || {}; }
+  activePicks(uc) { const off = this.offMap(uc); return UCS[uc].picks.filter(p => !off[p[0]]); }
+
+  toggleSlot(layer) {
+    const uc = this.state.uc;
+    const cur = Object.assign({}, this.offMap(uc));
+    const removing = !cur[layer];
+    if (removing) cur[layer] = true; else delete cur[layer];
+    const off = Object.assign({}, this.state.off || {});
+    off[uc] = cur;
+    const admitted = UCS[uc].picks.filter(p => !cur[p[0]]).length;
+    // What a screen reader hears: the slot, what happened to it, and the payload's count or its refusal (R-4).
+    const announce = removing && REQUIRED.includes(layer)
+      ? SLOTS[layer][0] + " removed. The assembly is refused with required_slot_missing: " + SLOTS[layer][1] + " is never omitted (R-4)."
+      : SLOTS[layer][0] + (removing ? " removed from" : " added back to") + " the payload. " + admitted + " of 11 admitted.";
+    this.setState({ off, playing: false, step: 99, hold: 0, announce });
+  }
+
+  openFailure(i) { this.setState({ uc: i, bad: true, off: {}, budget: 0, playing: false, step: 99, hold: 0 }); }
+
+  restoreSlots() {
+    const off = Object.assign({}, this.state.off || {});
+    delete off[this.state.uc];
+    this.setState({ off, step: 99, announce: "All slots restored. " + UCS[this.state.uc].picks.length + " of 11 admitted." });
+  }
+
+  startClock() {
+    clearInterval(this._t);
+    this._t = setInterval(() => {
+      if (!this.state.playing) return;
+      const n = this.activePicks(this.state.uc).length;
+      if (this.state.step < n) this.setState(s => ({ step: s.step + 1 }));
+      else if (this.state.hold < 5) this.setState(s => ({ hold: s.hold + 1 }));
+      else this.setState(s => ({ uc: (s.uc + 1) % UCS.length, step: 0, hold: 0 }));
+    }, 620);
+  }
+
+  applyHash() {
+    const parts = (location.hash || "").replace(/^#/, "").split("/");
+    if (parts.length < 2) return;
+    const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+    let patch = null;
+    if (parts[0] === "assemble") {
+      const uc = UCS.findIndex(u => slug(u.label) === parts[1]);
+      if (uc >= 0) {
+        patch = { uc, budget: 0, hold: 0, playing: false, step: 99, bad: parts[2] === "blob", off: parts[2] === "no-query" ? { [uc]: { 10: true } } : {} };
+      }
+    }
+    if (!patch) return;
+    this.setState(patch, () => {
+      const el = document.getElementById(parts[0]);
+      if (el) { const top = (window.pageYOffset || 0) + el.getBoundingClientRect().top - 68; try { window.scrollTo({ top, behavior: "instant" }); } catch (e) { (document.scrollingElement || document.documentElement).scrollTop = top; } }
+    });
+  }
+
+  ucTabStyle(active) {
+    return "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " +
+      (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer; background: " +
+      (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
+  }
+
+  color(i) { return PLANES[SLOTS[i][2]].color; }
+  dot(i, extra) { return "display: block; width: 10px; height: 10px; flex: none; background: " + this.color(i) + ";" + (extra || ""); }
+  chip(i, extra) {
+    return "font-family: var(--mono); font-size: 11px; padding: 6px 9px; border: 1px solid " + this.color(i) + "; color: var(--fg); background: color-mix(in oklab, " + this.color(i) + " 10%, transparent);" + (extra || "");
+  }
+
+  // The live assembly simulator, as the home page rendered it.
+  demoVals() {
+    const fmt = n => n.toLocaleString("en-US");
+    const uc = UCS[this.state.uc];
+    const off = this.offMap(this.state.uc);
+    const allPicks = uc.picks;
+    const picks = allPicks.filter(p => !off[p[0]]);
+    const step = Math.min(this.state.step, picks.length);
+    const removed = allPicks.filter(p => off[p[0]]).map(p => ({
+      tag: SLOTS[p[0]][1],
+      text: (uc.drops && uc.drops[p[0]]) || "That slot's contribution is simply absent from the payload."
+    }));
+    const budget = BUDGETS[this.state.budget || 0];
+    const evicted = {}, compressed = {};
+    const tok = i => compressed[i] ? Math.round(SLOT_TOKENS[i] * COMPRESS) : SLOT_TOKENS[i];
+    const has = i => picks.some(p => p[0] === i);
+    // Refusals in reasons.json order (README Refusals). Each system's route is taken to require evidence when the
+    // system uses an evidence slot, and every compressible item to carry one summary variant.
+    let planned = picks.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0);
+    const missing = REQUIRED.filter(i => !has(i));
+    let refusal = null;
+    const shed = [];
+    if (missing.length) refusal = "required_slot_missing";
+    else if (picks.filter(p => PROTECTED.includes(p[0])).reduce((t, p) => t + SLOT_TOKENS[p[0]], 0) > budget) refusal = "protected_content_over_budget";
+    else {
+      // R-16 and README Fitting steps 4 and 5: omit droppable items, then compress each compressible slot, then omit each one.
+      for (const li of DROPPABLE) { if (planned <= budget) break; if (has(li)) { evicted[li] = true; shed.push(li); planned -= SLOT_TOKENS[li]; } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { compressed[li] = true; planned -= SLOT_TOKENS[li] - Math.round(SLOT_TOKENS[li] * COMPRESS); } }
+      for (const li of COMPRESSIBLE) { if (planned <= budget) break; if (has(li)) { planned -= tok(li); delete compressed[li]; evicted[li] = true; shed.push(li); } }
+      if (allPicks.some(p => EVIDENCE.includes(p[0])) && !EVIDENCE.some(i => has(i) && !evicted[i])) refusal = "evidence_required";
+    }
+    const refused = refusal !== null;
+    const evictedNames = shed.map(i => SLOTS[i][1]);
+    const compressedNames = COMPRESSIBLE.filter(i => compressed[i]).map(i => SLOTS[i][1]);
+    // R-17: a refused assembly renders no payload.
+    const shown = refused ? [] : picks.slice(0, step).filter(p => !evicted[p[0]]);
+    const usedTokens = shown.reduce((t, p) => t + tok(p[0]), 0);
+    const segments = shown.map(p => ({
+      style: "flex: 0 0 " + Math.min(100, (tok(p[0]) / budget) * 100) + "%; min-width: 2px; transition: flex-basis 320ms ease; background: " + this.color(p[0]) + (compressed[p[0]] ? "; opacity: 0.5" : "") + ";",
+      title: SLOTS[p[0]][1] + " — ~" + tok(p[0]) + " tokens" + (compressed[p[0]] ? " (compressed)" : "")
+    }));
+    const rowBase = "width: 100%; text-align: left; font-family: inherit; color: inherit; display: grid; grid-template-columns: 10px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 9px 14px; border: 1px solid ";
+    const slots = SLOTS.map((l, i) => {
+      const pi = picks.findIndex(p => p[0] === i);
+      const inCase = allPicks.some(p => p[0] === i);
+      const used = pi >= 0;
+      const on = used && pi < step;
+      let rowStyle, tag, tagColor;
+      if (inCase && off[i]) { rowStyle = rowBase + "var(--accent); border-style: dashed; background: transparent; opacity: 0.7; transition: all 300ms ease;"; tag = "removed by you"; tagColor = "var(--accent)"; }
+      else if (used && evicted[i]) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; text-decoration: line-through; transition: all 300ms ease;"; tag = "dropped · budget"; tagColor = "var(--fg)"; }
+      else if (used && refused) { rowStyle = rowBase + "var(--line); background: transparent; opacity: 0.55; transition: all 300ms ease;"; tag = "not rendered"; tagColor = "var(--muted)"; }
+      else if (on && compressed[i]) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 8%, transparent); transition: all 300ms ease;"; tag = "compressed"; tagColor = "var(--fg)"; }
+      else if (on) { rowStyle = rowBase + this.color(i) + "; background: color-mix(in oklab, " + this.color(i) + " 12%, transparent); transition: all 300ms ease;"; tag = "in payload"; tagColor = this.color(i); }
+      else if (used) { rowStyle = rowBase + "var(--line); background: transparent; transition: all 300ms ease;"; tag = "queued"; tagColor = "var(--muted)"; }
+      else { rowStyle = rowBase + "transparent; background: transparent; opacity: 0.34; transition: all 300ms ease;"; tag = "not used"; tagColor = "var(--muted)"; }
+      return {
+        id: l[1], name: l[0],
+        rowStyle: rowStyle + (inCase ? " cursor: pointer;" : " cursor: default;"),
+        dotStyle: this.dot(i), tag,
+        click: inCase ? () => this.toggleSlot(i) : () => {},
+        title: inCase ? (off[i] ? "Click to add this slot back" : "Click to remove this slot") : "This system doesn't use this slot",
+        tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: " + tagColor + ";"
+      };
+    });
+    const refusalText = {
+      required_slot_missing: missing.map(i => SLOTS[i][1]).join(" and ") + " has no admitted item, and the assembler never omits it (R-4). No payload is rendered, and the trace keeps every admission decision (R-17).",
+      protected_content_over_budget: "The protected items alone do not fit the budget, so nothing is shed and no payload is rendered (R-17).",
+      evidence_required: "Fitting left no evidence item, on a route that requires evidence (R-12). No payload is rendered, and the trace keeps every fitting decision (R-17)."
+    };
+    const payload = refused ? [{
+      tag: "refused · " + refusal, tagStyle: "color: var(--accent);", tokens: "no payload", text: refusalText[refusal],
+      style: "border: 1px solid var(--accent); border-left: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both;"
+    }] : shown.map(p => ({
+      tag: SLOTS[p[0]][1] + (compressed[p[0]] ? " · compressed" : ""),
+      tagStyle: "color: " + this.color(p[0]) + ";",
+      tokens: "~" + fmt(tok(p[0])) + " tok",
+      text: compressed[p[0]] ? "[summary, source-linked] " + p[1] : p[1],
+      style: "border: 1px solid var(--line); border-left: 3px solid " + this.color(p[0]) + "; background: var(--surface); padding: 10px 14px; animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both;" + (compressed[p[0]] ? " opacity: 0.8;" : "")
+    }));
+    const evBase = "font-family: var(--mono); font-size: 11px; line-height: 1.5; margin-top: 10px; color: ";
+    let evictionLabel, evictionStyle = evBase + "var(--muted);";
+    if (refusal === "evidence_required") {
+      const omittedEvidence = EVIDENCE.some(i => evicted[i]);
+      evictionLabel = "Refused · evidence_required: " + (evictedNames.length ? "after dropping " + evictedNames.join(", ") + " for budget, " : "") + "no evidence item is left. " +
+        (omittedEvidence ? "The omitted evidence had shorter variants that still did not fit, so the recovery action is retrieve_narrower: the application retrieves narrower before building a new snapshot (R-12)."
+          : "No evidence item was omitted for budget, so the recovery action is request_context: the application asks for more context before building a new snapshot (R-12).");
+      evictionStyle = evBase + "var(--accent);";
+    } else if (refused) {
+      evictionLabel = "Refused · " + refusal + ", before fitting, so nothing was dropped or compressed (README Refusals).";
+      evictionStyle = evBase + "var(--accent);";
+    } else if (evictedNames.length || compressedNames.length) {
+      evictionLabel = (evictedNames.length ? "Dropped: " + evictedNames.join(", ") + ". " : "") + (compressedNames.length ? "Compressed with source links: " + compressedNames.join(", ") + ". " : "") + "Protected slots untouched.";
+    } else evictionLabel = "Everything fits, so nothing had to be dropped or compressed.";
+
+    const out = {
+      slots, payload,
+      ucName: uc.name, ucNote: uc.note,
+      ucQuestions: uc.questions.map(t => ({ text: t })),
+      usedLabel: picks.length + " of 11 admitted",
+      removed, hasRemoved: removed.length > 0,
+      restoreAll: () => this.restoreSlots(),
+      progress: refused ? "refused · no payload" : shown.length + " / " + (picks.length - evictedNames.length) + " items",
+      segments,
+      tokenLabel: refused ? "no payload · budget " + fmt(budget) + " tokens" : "~" + fmt(usedTokens) + " / " + fmt(budget) + " tokens",
+      evictionLabel, evictionStyle,
+      renderedLabel: refused ? "no payload · refused" : "↓ rendered by policy-first-chat/v1",
+      traceId: "ctx_" + (1000 + this.state.uc * 137 + (this.state.budget || 0) * 11 + Object.keys(off).length).toString(36),
+      budgets: BUDGETS.map((b, i) => {
+        const label = b >= 8192 ? "8k" : b >= 4096 ? "4k" : b >= 2048 ? "2k" : "1k";
+        const active = i === (this.state.budget || 0);
+        return { label, pressed: active ? "true" : "false", style: this.ucTabStyle(active), select: () => this.setState({ budget: i, announce: "Input budget set to " + label + " tokens." }) };
+      }),
+      playLabel: this.state.playing ? "Pause" : "Play",
+      togglePlay: () => this.setState(s => ({ playing: !s.playing, announce: s.playing ? "Paused." : "Playing." })),
+      ucTabs: UCS.map((u, i) => ({ label: u.label, pressed: i === this.state.uc ? "true" : "false", style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true, announce: "Showing " + u.label + "." }) })),
+      announce: this.state.announce || "",
+      fmOpen0: () => this.openFailure(0), fmOpen1: () => this.openFailure(1), fmOpen2: () => this.openFailure(2), fmOpen3: () => this.openFailure(3),
+      fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
+      fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 })
+    };
+
+    out.isBad = !!this.state.bad; out.isGood = !this.state.bad;
+    out.badLabel = this.state.bad ? "Show the assembled request" : "Show the unassembled blob";
+    out.badBtnStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid " + (this.state.bad ? "var(--fg)" : "var(--line)") + "; background: " + (this.state.bad ? "var(--fg)" : "transparent") + "; color: " + (this.state.bad ? "var(--bg)" : "var(--muted)") + "; border-radius: var(--pill); padding: 9px 16px; cursor: pointer;";
+    out.badPressed = this.state.bad ? "true" : "false";
+    out.toggleBad = () => this.setState(s => ({ bad: !s.bad, playing: false, step: 99, announce: s.bad ? "Showing the assembled request." : "Showing the unassembled blob." }));
+    out.ucSymptom = uc.symptom;
+    out.badNotes = [
+      { text: "An undelimited blob obscures provenance and instruction boundaries, increasing the risk that the model follows instruction-shaped evidence. Platform role precedence still applies." },
+      { text: "History is unbounded and untiered: as the session grows, the oldest turns push the newest constraints out of the window." },
+      { text: "Nothing has provenance or freshness, so when the answer is wrong there is no trace to say which item did it." }
+    ];
+
+    if (this.state.bad) {
+      const hasHistory = allPicks.some(p => p[0] === 5);
+      const queryPick = allPicks.find(p => p[0] === 10);
+      const merged = allPicks.filter(p => p[0] !== 5 && p[0] !== 10);
+      const mergedTokens = Math.round(merged.reduce((t, p) => t + SLOT_TOKENS[p[0]], 0) * 1.15);
+      const tailTokens = hasHistory ? 3200 : 2400;
+      const badStyle = "border: 1px solid var(--fg); border-left: 3px solid var(--fg); background: var(--surface); padding: 12px 14px;";
+      const blocks = [
+        { tag: "One prose blob — " + merged.length + " slots concatenated, no authority", tagStyle: "color: var(--muted);", tokens: "~" + fmt(mergedTokens) + " tok", text: merged.map(p => p[1]).join("  "), style: badStyle },
+        { tag: queryPick ? "The query, buried mid-window" : "No clear trigger", tagStyle: "color: var(--muted);", tokens: "~40 tok", text: queryPick ? queryPick[1] : "(the request is somewhere in the blob above)", style: badStyle }
+      ];
+      blocks.push(hasHistory
+        ? { tag: "Chat history, unbounded — 84 turns verbatim", tagStyle: "color: var(--muted);", tokens: "~" + fmt(tailTokens) + " tok", text: "…every turn since the session opened, oldest first, nothing summarised and nothing trimmed.", style: badStyle }
+        : { tag: "Tool output, re-appended on every loop", tagStyle: "color: var(--muted);", tokens: "~" + fmt(tailTokens) + " tok", text: "…the same result pasted again each iteration, three copies deep and growing.", style: badStyle });
+      const badTotal = mergedTokens + tailTokens + 40;
+      out.payload = blocks;
+      out.segments = blocks.map((b, k) => ({ style: "flex: 0 0 " + ((k === 0 ? mergedTokens : k === 1 ? 40 : tailTokens) / budget) * 100 + "%; min-width: 2px; background: " + (k % 2 ? "color-mix(in oklab, var(--fg) 55%, var(--bg))" : "var(--fg)") + ";", title: b.tag }));
+      out.tokenLabel = "~" + fmt(badTotal) + " / " + fmt(budget) + " tokens";
+      out.progress = "3 blobs · no structure";
+      out.evictionStyle = evBase + "var(--muted);";
+      out.evictionLabel = badTotal > budget ? "Over budget by " + fmt(badTotal - budget) + " tokens, and nothing can be dropped or compressed cleanly — the items are fused together." : "It fits, but nothing in here can be measured, tiered, traced, or swapped independently.";
+      out.usedLabel = "structure lost";
+      out.hasRemoved = false;
+      out.renderedLabel = "↓ rendered by none"; out.traceId = "none";
+      out.slots = SLOTS.map((l, i) => {
+        const inCase = allPicks.some(p => p[0] === i);
+        let tag, style;
+        if (!inCase) { tag = "not used"; style = rowBase + "transparent; background: transparent; opacity: 0.3;"; }
+        else if (i === 5 || i === 10) { tag = "misordered"; style = rowBase + "var(--fg); border-style: dashed; background: transparent;"; }
+        else { tag = "merged into the blob"; style = rowBase + "var(--line); background: transparent; opacity: 0.7;"; }
+        return { id: l[1], name: l[0], tag, rowStyle: style + " cursor: default;", dotStyle: this.dot(i, " opacity: 0.4;"), title: "Structure is lost without an assembler", click: () => {}, tagStyle: "font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap; color: var(--muted);" };
+      });
+    }
+    return out;
   }
   // GLOSSARY_GLUE_START
   // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
@@ -613,41 +832,12 @@ class Component extends DCLogic {
   // GLOSSARY_GLUE_END
 
   renderVals() {
-    const STATUS_COLOR = { implemented: "var(--p-evid)", "boundary-checked": "var(--p-evid)", "in progress": "var(--accent)", planned: "var(--muted)", documented: "var(--muted)" };
-    const SCOPE = { assembler: ["assembler", "var(--fg)"], boundary: ["boundary", "var(--p-state)"], application: ["application", "var(--accent)"] };
-    // One cell per implementation answers whether the rule is proven for it: every published case exercising the rule
-    // passes (proven), some do or one changed since the run (partly), none exercises it yet, or it cannot be tested.
-    const box = "display: inline-block; width: 12px; height: 12px; box-sizing: border-box; vertical-align: -1px; border: 1.5px solid ";
-    const GLYPH = {
-      proven: [box + "var(--p-evid); background: var(--p-evid);", "display: none;"],
-      partly: [box + "var(--accent);", "display: block; width: 50%; height: 100%; background: var(--accent);"],
-      none: [box + "var(--muted);", "display: none;"],
-      dash: ["display: inline-block; width: 12px; height: 2px; vertical-align: 4px; background: var(--muted);", "display: none;"]
-    };
-    const matrix = RULES.map((r, i) => ({
-      id: "R-" + (i + 1), href: "./spec.html#R-" + (i + 1), kw: r[0], summary: r[1], note: r[3],
-      scope: SCOPE[r[2]][0], scopeColor: SCOPE[r[2]][1],
-      status: r[4], color: STATUS_COLOR[r[4]],
-      cells: CONFORMANCE.map((c, k) => {
-        const state = r[2] === "application" ? "dash" : !r[5] ? "none" : r[6][k] === r[5] ? "proven" : "partly";
-        const title = state === "dash" ? "R-" + (i + 1) + " is an application rule, not testable in assembly"
-          : state === "none" ? "No published case exercises R-" + (i + 1) + " yet"
-          : c.label + " passes " + r[6][k] + " of the " + r[5] + " published cases that exercise R-" + (i + 1);
-        return { state, title, glyph: GLYPH[state][0], inner: GLYPH[state][1] };
-      })
-    }));
-    const checkable = matrix.filter(r => r.scope !== "application");
-    const met = checkable.filter(r => r.status === "implemented" || r.status === "boundary-checked");
     return Object.assign({
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       menuOpen: this.state.menu ? "true" : "false",
       menuLabel: this.state.menu ? "close" : "menu",
       toggleMenu: () => this.setState(s => ({ menu: !s.menu })),
-      matrix,
-      implementationLabels: CONFORMANCE.map(c => ({ label: c.label })),
-      publishedCount: CONFORMANCE.length ? CONFORMANCE[0].total : 0,
-      counts: met.length + " of " + checkable.length + " checkable requirements implemented.",
       implementations: CONFORMANCE.map(c => {
         const github = GITHUB.test(c.repository);
         const repoHref = github ? "https://github.com/" + c.repository : c.repository;
@@ -666,7 +856,7 @@ class Component extends DCLogic {
           caseNote: c.stale ? c.stale + " changed since its run" : ""
         };
       })
-    }, this.glossaryVals());
+    }, this.demoVals(), this.glossaryVals());
   }
 }
 </script>

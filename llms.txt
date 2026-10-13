@@ -55,7 +55,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [conformance/README.md](https://contextwindowarchitecture.io/conformance/README.md): how to run a case, and the algorithm: trace order, timestamps, numbers, ordering, the snapshot digest, refusals, conflicts, supersession, deduplication, source diversity, fitting, snapshot checks, tokenizers and renderers, registry and reporting
 - [Cases](https://github.com/contextwindowarchitecture/contextwindowarchitecture/tree/main/conformance/cases): one directory per case, holding a snapshot, the expected trace and, unless the case expects a refusal, the expected payload bytes
 - [Rejections](https://github.com/contextwindowarchitecture/contextwindowarchitecture/tree/main/conformance/rejections): snapshots that each break one snapshot check, which an assembler rejects before assembly
-- [Assembler page](https://contextwindowarchitecture.io/assembler.html): each implementation's imported report, and a matrix of every requirement's scope and which implementations prove it by the published cases
+- [Assembler page](https://contextwindowarchitecture.io/assembler.html): each implementation's imported report, and the live assembly simulator: seven systems assembled, fitted and rendered under the same rules
 
 ## Implementations
 

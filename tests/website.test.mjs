@@ -473,27 +473,17 @@ test('the Spec page is dated by the newest revision CHANGES.md holds, as SPEC.md
   assert.ok(!html.includes('href="./producers.html">Producer contract') && !html.includes('Live assembler demo'), 'the contents hold the specification only');
 });
 
-test('specification, its Markdown copy, and status matrix share every permanent ID', async () => {
+test('the specification, its Markdown copy, the scope file and the Python status file share every permanent ID', async () => {
   const rules = await component('spec.html', 'RULES');
-  const statuses = await component('assembler.html', 'RULES');
   const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));
   assert.equal(rules.length, requirements.length);
   assert.ok(requirements.some(r => r.id === 'R-24'), 'R-24 is published');
-  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r.slice(0, 2)))), JSON.parse(JSON.stringify(rules.map(r => [r[1], r[2]]))));
   const scopes = JSON.parse(await fs.readFile(new URL('../contract/assembler-scope.json', import.meta.url), 'utf8'));
-  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => [r[2], r[3]]))), scopes.map(s => [s.scope, s.note]));
+  assert.deepEqual(scopes.map(s => s.id), requirements.map(r => r.id));
   const imported = JSON.parse(await fs.readFile(new URL('../implementations/python.status.json', import.meta.url), 'utf8'));
-  assert.deepEqual(JSON.parse(JSON.stringify(statuses.map(r => r[4]))), imported.requirements.map(r => r.status));
-  const view = await component('assembler.html');
-  const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
-  assert.equal(view.renderVals().counts, `${met} of ${scopes.filter(s => s.scope !== 'application').length} checkable requirements implemented.`);
-  const { matrix, implementationLabels } = view.renderVals();
-  assert.deepEqual([...implementationLabels].map(l => l.label), ['Python', 'TypeScript', 'Go', 'Rust']);
-  const expect = (row, i, label, n) => row[2] === 'application' ? ['dash', `R-${i + 1} is an application rule, not testable in assembly`] : !row[5] ? ['none', `No published case exercises R-${i + 1} yet`]
-    : [row[6][n] === row[5] ? 'proven' : 'partly', `${label} passes ${row[6][n]} of the ${row[5]} published cases that exercise R-${i + 1}`];
-  statuses.forEach((row, i) => assert.deepEqual([...matrix[i].cells].map(c => [c.state, c.title]), ['Python', 'TypeScript', 'Go', 'Rust'].map((label, n) => expect(row, i, label, n)), `R-${i + 1}`));
-  assert.ok(statuses.some(r => r[2] === 'application') && matrix.some(r => r.cells[0].state === 'dash'), 'application rules show a dash');
-  assert.equal(view.renderVals().publishedCount, 90);
+  assert.deepEqual(imported.requirements.map(r => r.id), requirements.map(r => r.id));
+  for (const r of imported.requirements) assert.ok(['implemented', 'boundary-checked', 'documented', 'in progress', 'planned'].includes(r.status), `${r.id}: ${r.status}`);
+  assert.ok(!(await fs.readFile(new URL('../assembler.html', import.meta.url), 'utf8')).includes('const RULES'), 'the Assembler page no longer carries requirement rows');
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (const { id } of requirements) assert.ok(markdown.includes(`### ${id}:`));
 });
@@ -656,8 +646,7 @@ async function caseDigest(dir) {
   return createHash('sha256').update(JSON.stringify(files)).digest('hex');
 }
 
-test('the implementations table and status matrix count, per implementation, the published cases each imported report passes and has run as they are now', async () => {
-  const statuses = await component('assembler.html', 'RULES');
+test('the implementations table counts, per implementation, the published cases each imported report passes and has run as they are now', async () => {
   const published = [];
   for (const dir of ['cases', 'rejections']) {
     const root = new URL(`../conformance/${dir}/`, import.meta.url);
@@ -672,11 +661,6 @@ test('the implementations table and status matrix count, per implementation, the
     const outcomes = new Map([...report.cases.map(c => [c.id, c.outcome === 'passed']), ...(report.rejections ?? []).map(c => [c.id, c.outcome === 'rejected'])]);
     const passing = new Set(published.filter(c => outcomes.get(c.id) && atRun?.[c.id] === c.digest).map(c => c.id));
     const stale = published.filter(c => outcomes.has(c.id) && atRun?.[c.id] !== c.digest).length;
-    statuses.forEach((row, i) => {
-      const tagged = published.filter(c => c.rules.includes(`R-${i + 1}`));
-      assert.equal(row[5], tagged.length, `R-${i + 1} total`);
-      assert.equal(row[6][n], tagged.filter(c => passing.has(c.id)).length, `${label} R-${i + 1}`);
-    });
     const row = implementations[n];
     assert.equal(row.language, label);
     assert.equal(row.name, report.implementation.name, file);

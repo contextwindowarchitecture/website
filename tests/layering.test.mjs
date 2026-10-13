@@ -229,11 +229,10 @@ test('Getting started shows the sample request on the wire, Producers holds the 
   assert.ok(assembler.includes('>Reference assemblers</div>') && !assembler.includes('Updated: 20') && assembler.includes('>Four assemblers, released as drafts.</h1>'), 'assemblers, plural, released, and no date to go stale');
   assert.ok(!assembler.includes('No release yet') && assembler.includes('Status: <span style="color: var(--fg);">released</span>'), 'the page no longer calls the assemblers unreleased');
   assert.ok(!assembler.includes('example.py') && !assembler.includes('One call in, payload and trace out.'), 'the example payload section has gone');
-  const header = assembler.slice(assembler.indexOf('<div role="row" class="mx mx-group"'), assembler.indexOf('<sc-for list="{{ matrix }}"'));
-  assert.ok(header.includes('>Proven by</span>') && header.includes('<sc-for list="{{ implementationLabels }}"') && assembler.includes('<sc-for list="{{ r.cells }}" as="c"'), 'the matrix asks which implementation proves each rule');
-  assert.ok(assembler.includes('title="{{ c.title }}" aria-label="{{ c.title }}"'), 'a cell says its count in words');
-  for (const item of ['proven · passes every published case', 'partly · passes some', 'not exercised · no published case yet', 'not testable in assembly']) assert.ok(assembler.includes(item), `legend: ${item}`);
-  assert.ok(assembler.includes('{{ publishedCount }} are published, rejections included') && !assembler.includes('{{ r.status }}'), 'the primer names the count and the status column has gone');
+  assert.ok(!assembler.includes('Conformance matrix') && !assembler.includes('class="mx'), 'the conformance matrix has gone');
+  const demo = assembler.slice(assembler.indexOf('<section id="assemble"'), assembler.indexOf('</section>', assembler.indexOf('<section id="assemble"')));
+  assert.ok(demo.includes('>Live assembly</div>') && demo.includes(">The slots aren't the point. The assembly is.</h2>") && demo.includes('{{ ucTabs }}') && demo.includes('{{ announce }}'), 'the live assembly simulator sits where the matrix was');
+  assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
   const llms = await read('llms.txt');
   assert.ok(!llms.match(/^- \[Landing page\].*sample request/m) && llms.match(/^- \[Getting started\].*sample request/m), 'llms.txt follows the move');
 });

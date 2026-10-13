@@ -176,12 +176,11 @@ const conformance = runs.map(({ label, source, report, outcomes }) => ({
 // The About page's status sentence states the draft's maturity from the same counts, so it cannot drift from them.
 outputs.set('about.html', about.replace(/<!-- CONTRACT_MATURITY_START -->[\s\S]*?<!-- CONTRACT_MATURITY_END -->/,
   () => `<!-- CONTRACT_MATURITY_START -->${maturitySentence(changes.groups[0].date, conformance.map(c => ({ label: c.label, total: c.total, passed: c.passed })))}<!-- CONTRACT_MATURITY_END -->`));
-for (const page of ['spec.html', 'assembler.html']) {
+// The Assembler page's implementations table; its requirement rows went with the matrix.
+outputs.set('assembler.html', (await fs.readFile('assembler.html', 'utf8')).replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, () => `const CONFORMANCE = ${JSON.stringify(conformance)};`));
+for (const page of ['spec.html']) {
   const html = await fs.readFile(page, 'utf8');
-  const rows = page === 'spec.html' ? rules : rules.map((r, i) => [r[1], r[2], scopes[i].scope, scopes[i].note, statuses[i].status,
-    casesFor(`R-${i + 1}`).length, runs.map(run => casesFor(`R-${i + 1}`).filter(c => run.outcomes.get(c.id) === 'passed').length)]);
-  let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rows, null, 2)};`);
-  if (page === 'assembler.html') updated = updated.replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, `const CONFORMANCE = ${JSON.stringify(conformance)};`);
+  let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rules, null, 2)};`);
   if (page === 'spec.html') {
     // The page names the specification commit it renders, from spec.lock.json.
     const lock = await read('spec.lock.json');

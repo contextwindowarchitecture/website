@@ -95,8 +95,8 @@ test('every page carries a reduced-motion rule, and the Demo page starts its ani
     assert.ok(rule[1].includes('scroll-behavior: auto'), `${page} stops smooth scrolling`);
     assert.ok(rule[1].includes('animation-duration: 0.01ms !important') && rule[1].includes('transition-duration: 0.01ms !important'), `${page} stops animation and transitions`);
   }
-  for (const reduceMotion of [false, true]) {
-    const { view } = await component('demo.html', { reduceMotion, setInterval: () => 0 });
+  for (const page of ['demo.html', 'assembler.html']) for (const reduceMotion of [false, true]) {
+    const { view } = await component(page, { reduceMotion, setInterval: () => 0 });
     view.componentDidMount();
     assert.equal(view.state.playing, !reduceMotion, `the demo ${reduceMotion ? 'starts paused' : 'plays'}`);
     if (reduceMotion) assert.equal(view.state.step, 99, 'the demo shows the whole payload at once');
@@ -123,15 +123,15 @@ for (const page of ['index.html', 'demo.html']) test(`${page}: the guided tour i
   assert.equal(trigger.focused, 1, 'closing returns focus to what opened the tour');
 });
 
-test('the assembler demo announces what a visitor changed through a live region, and marks its pressed controls', async () => {
-  const html = await read('demo.html');
+for (const page of ['demo.html', 'assembler.html']) test(`${page}: the assembler demo announces what a visitor changed through a live region, and marks its pressed controls`, async () => {
+  const html = await read(page);
   const demo = html.slice(html.indexOf('<section id="assemble"'), html.indexOf('</section>', html.indexOf('<section id="assemble"')));
   assert.match(demo, /<div role="status" aria-live="polite" [^>]*>\{\{ announce \}\}<\/div>/);
   assert.ok(demo.includes('<button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}"'), 'system tabs');
   assert.ok(demo.includes('<button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}"'), 'budget buttons');
   assert.ok(demo.includes('onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}"'), 'the blob toggle');
-  assert.ok(html.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"'), 'the framework tabs');
-  const { view } = await component('demo.html');
+  if (page === 'demo.html') assert.ok(html.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"'), 'the framework tabs');
+  const { view } = await component(page);
   let vals = view.renderVals();
   assert.equal(vals.announce, '');
   assert.deepEqual([...vals.ucTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false', 'false', 'false']);
@@ -155,7 +155,7 @@ test('the assembler demo announces what a visitor changed through a live region,
   assert.deepEqual([view.renderVals().badPressed, view.renderVals().announce], ['true', 'Showing the unassembled blob.']);
   view.renderVals().togglePlay();
   assert.equal(view.renderVals().announce, 'Playing.');
-  assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
+  if (page === 'demo.html') assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
 });
 
 test('every page falls back without JavaScript to a note naming SPEC.md and llms.txt, hides the unrendered template, and declares one viewport', async () => {
