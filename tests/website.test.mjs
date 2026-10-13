@@ -488,6 +488,9 @@ test('specification, its Markdown copy, and status matrix share every permanent 
   const view = await component('assembler.html');
   const met = imported.requirements.filter(r => r.status === 'implemented' || r.status === 'boundary-checked').length;
   assert.equal(view.renderVals().counts, `${met} of ${scopes.filter(s => s.scope !== 'application').length} checkable requirements implemented.`);
+  const { matrix, implementationLabels } = view.renderVals();
+  assert.deepEqual([...implementationLabels].map(l => l.label), ['Python', 'TypeScript', 'Go', 'Rust']);
+  assert.deepEqual([...matrix[0].cells].map(c => c.text), statuses[0][5] ? [...statuses[0][6]].map(n => `${n}/${statuses[0][5]}`) : ['–', '–', '–', '–'], 'a cell is passes over the cases exercising the rule');
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (const { id } of requirements) assert.ok(markdown.includes(`### ${id}:`));
 });

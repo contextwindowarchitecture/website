@@ -226,7 +226,11 @@ test('Getting started shows the sample request on the wire, Producers holds the 
   assert.ok(pipeline.includes('When nothing valid is retrieved') && pipeline.includes('href="./spec.html#R-12"'), 'the refusal callout, citing R-12');
   assert.ok(pipeline.includes('Factual precedence is route policy') && pipeline.includes('href="./spec.html#R-11"'), 'the precedence callout, citing R-11');
   const assembler = await read('assembler.html');
-  assert.ok(assembler.includes('>Reference assemblers</div>') && !assembler.includes('Updated: 20') && assembler.includes('reference assemblers: in progress'), 'assemblers, plural, and no date to go stale');
+  assert.ok(assembler.includes('>Reference assemblers</div>') && !assembler.includes('Updated: 20') && assembler.includes('>Four assemblers, released as drafts.</h1>'), 'assemblers, plural, released, and no date to go stale');
+  assert.ok(!assembler.includes('No release yet') && assembler.includes('Status: <span style="color: var(--fg);">released</span>'), 'the page no longer calls the assemblers unreleased');
+  assert.ok(!assembler.includes('example.py') && !assembler.includes('One call in, payload and trace out.'), 'the example payload section has gone');
+  const header = assembler.match(/<div role="row" class="mx"[^>]*>([\s\S]*?)<\/div>/)[1];
+  assert.ok(header.includes('<sc-for list="{{ implementationLabels }}"') && assembler.includes('<sc-for list="{{ r.cells }}" as="c"'), 'the matrix has one column per implementation');
   const llms = await read('llms.txt');
   assert.ok(!llms.match(/^- \[Landing page\].*sample request/m) && llms.match(/^- \[Getting started\].*sample request/m), 'llms.txt follows the move');
 });
