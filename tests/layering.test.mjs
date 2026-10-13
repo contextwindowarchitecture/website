@@ -181,76 +181,96 @@ test('the Assembler page speaks of released assemblers with no hand-written date
   assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
 });
 
-// Viability, the benchmark site, is the one nav link that asks before it leaves CWA. A plain click first says it is
-// data heavy and not needed to use or understand CWA, counts down, and goes unless the reader chooses to stay.
+// Two nav links leave CWA: Examples, the showcase, and Viability, the benchmark site. A plain click on either first
+// says what is there, counts down, and goes unless the reader chooses to stay. One notice serves both.
 const VIABILITY = 'https://benchmark.contextwindowarchitecture.io';
+const EXAMPLES = 'https://examples.contextwindowarchitecture.io';
 
-test('every page asks before Viability leaves for the benchmark site, with the same modal box and logic', async () => {
+test('every page asks before Examples or Viability leaves CWA, with the same modal box and logic', async () => {
   const blocks = new Set(), glue = new Set();
   for (const page of PAGES) {
     const html = await read(page);
-    assert.ok(header(html).includes(`<a href="${VIABILITY}" onClick="{{ openViability }}"`), `${page}: the nav link opens the notice and still names the site`);
-    const block = html.match(/<!-- VIABILITY_START -->[\s\S]*?<!-- VIABILITY_END -->/);
+    assert.ok(header(html).includes(`<a href="${EXAMPLES}" onClick="{{ openExamples }}"`), `${page}: the Examples link opens the notice and still names the site`);
+    assert.ok(header(html).includes(`<a href="${VIABILITY}" onClick="{{ openViability }}"`), `${page}: the Viability link opens the notice and still names the site`);
+    const block = html.match(/<!-- LEAVING_START -->[\s\S]*?<!-- LEAVING_END -->/);
     assert.ok(block, `${page} has the notice`);
     blocks.add(block[0]);
-    assert.ok(block[0].includes('role="dialog" aria-modal="true" aria-labelledby="viabilitytitle" aria-describedby="viabilitybody"'), `${page}: a named, described modal dialog`);
-    assert.ok(block[0].includes('>Stay here</button>') && block[0].includes(`<a id="viabilitygo" href="${VIABILITY}"`), `${page}: a way to stay and a way to go now`);
-    assert.ok(/You don't need any of it to use or understand CWA\./.test(block[0]) && /data heavy/.test(block[0]), `${page}: says it is data heavy and not needed`);
-    const code = html.match(/\/\/ VIABILITY_GLUE_START[\s\S]*?\/\/ VIABILITY_GLUE_END/);
+    assert.ok(block[0].includes('role="dialog" aria-modal="true" aria-labelledby="leavingtitle" aria-describedby="leavingbody"'), `${page}: a named, described modal dialog`);
+    assert.ok(block[0].includes('>Stay here</button>') && block[0].includes('<a id="leavinggo" href="{{ leavingUrl }}"'), `${page}: a way to stay and a way to go now`);
+    assert.ok(!/VIABILITY_START|viabilityVals/.test(html), `${page}: the Viability-only notice is gone`);
+    const code = html.match(/\/\/ LEAVING_GLUE_START[\s\S]*?\/\/ LEAVING_GLUE_END/);
     assert.ok(code, `${page} has the notice glue`);
     glue.add(code[0]);
-    assert.ok(/this\.viabilityVals\(\)\);/.test(html), `${page}: renders the notice's values`);
-    assert.ok(/componentWillUnmount\(\) \{[^}]*this\.viabilityStop\(\);/.test(html), `${page}: stops the countdown when it unmounts`);
+    assert.ok(/this\.leavingVals\(\)\);/.test(html), `${page}: renders the notice's values`);
+    assert.ok(/componentWillUnmount\(\) \{[^}]*this\.leavingStop\(\);/.test(html), `${page}: stops the countdown when it unmounts`);
   }
   assert.equal(blocks.size, 1, 'the notice markup is identical on every page');
   assert.equal(glue.size, 1, 'the notice logic is identical on every page');
 });
 
-test('the Viability notice counts down to the benchmark site, and Stay here, Escape or a click outside keeps the reader', async () => {
-  const ticks = [];
-  const { view, document, byId, location } = await component('spec.html', { setInterval: fn => { ticks.push(fn); return ticks.length; } });
-  byId.viabilitystay = { focused: 0, focus() { this.focused += 1; } };
-  const trigger = document.activeElement;
+test('the notice says what each site holds: Viability is data heavy and not needed, Examples is the showcase', async () => {
+  const { view } = await component('index.html');
+  const click = { button: 0, preventDefault() {} };
+  view.renderVals().openViability(click);
   let vals = view.renderVals();
-  assert.equal(vals.viabilityOn, false, 'closed until the link is clicked');
-
-  let prevented = 0;
-  const click = extra => Object.assign({ button: 0, preventDefault() { prevented += 1; } }, extra);
-  vals.openViability(click({ metaKey: true }));
-  vals.openViability(click({ button: 1 }));
-  assert.deepEqual([prevented, view.renderVals().viabilityOn, ticks.length], [0, false, 0], 'a modified or middle click opens the link as the browser would');
-
-  vals.openViability(click());
+  assert.deepEqual([vals.leavingUrl, vals.leavingGoLabel, vals.leavingCountdown], [VIABILITY, 'Go to Viability now', 'Opening Viability in 20 seconds']);
+  assert.ok(/data heavy/.test(vals.leavingLead) && /You don't need any of it to use or understand CWA\./.test(vals.leavingNote), 'Viability: data heavy and not needed');
+  view.renderVals().leavingStay();
+  view.renderVals().openExamples(click);
   vals = view.renderVals();
-  assert.deepEqual([prevented, vals.viabilityOn, byId.viabilitystay.focused], [1, true, 1], 'a plain click opens the notice and focuses Stay here');
-  assert.equal(vals.viabilityCountdown, 'Opening Viability in 20 seconds');
-  assert.match(vals.viabilityBarStyle, /width: 100%/);
-  for (let i = 0; i < 19; i++) ticks[0]();
-  vals = view.renderVals();
-  assert.equal(vals.viabilityCountdown, 'Opening Viability in 1 second');
-  assert.deepEqual(location.assigned, [], 'not before the count ends');
-  ticks[0]();
-  assert.deepEqual([location.assigned, view.renderVals().viabilityOn], [[VIABILITY], false], 'at zero it goes');
-
-  vals = view.renderVals();
-  vals.openViability(click());
-  view.renderVals().viabilityStay();
-  assert.deepEqual([view.renderVals().viabilityOn, trigger.focused], [false, 1], 'Stay here closes it and returns focus to the link');
-  ticks[1]();
-  assert.deepEqual([view.state.viabilityLeft, location.assigned.length], [0, 1], 'a stale tick after Stay here neither reopens it nor goes');
-
-  view.renderVals().openViability(click());
-  view.renderVals().viabilityKey({ key: 'Escape', preventDefault() {} });
-  assert.equal(view.renderVals().viabilityOn, false, 'Escape stays');
-
-  view.renderVals().openViability(click());
-  const box = {}, backdrop = {};
-  view.renderVals().viabilityBackdrop({ target: box, currentTarget: backdrop });
-  assert.equal(view.renderVals().viabilityOn, true, 'a click inside the box does not close it');
-  view.renderVals().viabilityBackdrop({ target: backdrop, currentTarget: backdrop });
-  assert.equal(view.renderVals().viabilityOn, false, 'a click outside it stays');
-
-  view.renderVals().openViability(click());
-  view.renderVals().viabilityGo({ preventDefault() {} });
-  assert.deepEqual(location.assigned, [VIABILITY, VIABILITY], 'Go to Viability now goes at once');
+  assert.deepEqual([vals.leavingUrl, vals.leavingGoLabel, vals.leavingCountdown], [EXAMPLES, 'Go to Examples now', 'Opening Examples in 20 seconds']);
+  assert.ok(/showcase/.test(vals.leavingLead) && /Compare/.test(vals.leavingLead) && /ranks none of them/.test(vals.leavingNote), 'Examples: the showcase, opening on Compare, ranking no model');
+  assert.match(vals.leavingKicker, /^Examples · /);
+  assert.notEqual(vals.leavingTitle, '');
 });
+
+for (const [name, url, open] of [['Viability', VIABILITY, 'openViability'], ['Examples', EXAMPLES, 'openExamples']]) {
+  test(`the notice counts down to ${name}, and Stay here, Escape or a click outside keeps the reader`, async () => {
+    const ticks = [];
+    const { view, document, byId, location } = await component('spec.html', { setInterval: fn => { ticks.push(fn); return ticks.length; } });
+    byId.leavingstay = { focused: 0, focus() { this.focused += 1; } };
+    const trigger = document.activeElement;
+    let vals = view.renderVals();
+    assert.equal(vals.leavingOn, false, 'closed until the link is clicked');
+
+    let prevented = 0;
+    const click = extra => Object.assign({ button: 0, preventDefault() { prevented += 1; } }, extra);
+    vals[open](click({ metaKey: true }));
+    vals[open](click({ button: 1 }));
+    assert.deepEqual([prevented, view.renderVals().leavingOn, ticks.length], [0, false, 0], 'a modified or middle click opens the link as the browser would');
+
+    vals[open](click());
+    vals = view.renderVals();
+    assert.deepEqual([prevented, vals.leavingOn, byId.leavingstay.focused], [1, true, 1], 'a plain click opens the notice and focuses Stay here');
+    assert.equal(vals.leavingCountdown, `Opening ${name} in 20 seconds`);
+    assert.match(vals.leavingBarStyle, /width: 100%/);
+    for (let i = 0; i < 19; i++) ticks[0]();
+    vals = view.renderVals();
+    assert.equal(vals.leavingCountdown, `Opening ${name} in 1 second`);
+    assert.deepEqual(location.assigned, [], 'not before the count ends');
+    ticks[0]();
+    assert.deepEqual([location.assigned, view.renderVals().leavingOn], [[url], false], 'at zero it goes');
+
+    vals = view.renderVals();
+    vals[open](click());
+    view.renderVals().leavingStay();
+    assert.deepEqual([view.renderVals().leavingOn, trigger.focused], [false, 1], 'Stay here closes it and returns focus to the link');
+    ticks[1]();
+    assert.deepEqual([view.state.leavingLeft, location.assigned.length], [0, 1], 'a stale tick after Stay here neither reopens it nor goes');
+
+    view.renderVals()[open](click());
+    view.renderVals().leavingKey({ key: 'Escape', preventDefault() {} });
+    assert.equal(view.renderVals().leavingOn, false, 'Escape stays');
+
+    view.renderVals()[open](click());
+    const box = {}, backdrop = {};
+    view.renderVals().leavingBackdrop({ target: box, currentTarget: backdrop });
+    assert.equal(view.renderVals().leavingOn, true, 'a click inside the box does not close it');
+    view.renderVals().leavingBackdrop({ target: backdrop, currentTarget: backdrop });
+    assert.equal(view.renderVals().leavingOn, false, 'a click outside it stays');
+
+    view.renderVals()[open](click());
+    view.renderVals().leavingGo({ preventDefault() {} });
+    assert.deepEqual(location.assigned, [url, url], `Go to ${name} now goes at once`);
+  });
+}

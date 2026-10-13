@@ -112,7 +112,7 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
   for (const page of PAGES) {
     const nav = header(await read(page)).match(/<nav id="sitenav"[\s\S]*?<\/nav>/)[0];
     assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>|<button id="navglossary"[^>]*>([^<]+)<\/button>/g)].map(m => m[2] ?? m[3]), ['Home', 'Spec', 'Assembler', 'Placement', 'Examples', 'Viability', 'Glossary'], page);
-    assert.ok(nav.includes('<a href="https://examples.contextwindowarchitecture.io" style='), `${page}: Examples is a plain link to the examples site`);
+    assert.ok(nav.includes('<a href="https://examples.contextwindowarchitecture.io"'), `${page}: Examples opens the examples site`);
     assert.ok(nav.includes('<a href="https://benchmark.contextwindowarchitecture.io"'), `${page}: Viability opens the benchmark site`);
     assert.ok((await read(page)).match(/<footer[\s\S]*?<\/footer>/)?.[0].includes('<a href="./llms.txt">llms.txt</a>'), `${page} has the footer`);
     const head = header(await read(page));

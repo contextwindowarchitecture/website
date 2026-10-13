@@ -57,7 +57,7 @@
         <a href="./spec.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Spec</a>
         <a href="./assembler.html" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Assembler</a>
         <a href="./evidence.html" aria-current="page" style="color: var(--fg); white-space: nowrap; border-bottom: 2px solid var(--accent); padding-bottom: 2px;">Placement</a>
-        <a href="https://examples.contextwindowarchitecture.io" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Examples</a>
+        <a href="https://examples.contextwindowarchitecture.io" onClick="{{ openExamples }}" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Examples</a>
         <a href="https://benchmark.contextwindowarchitecture.io" onClick="{{ openViability }}" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Viability</a>
         <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; line-height: inherit; appearance: none; -webkit-appearance: none; margin: 0; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
       </nav>
@@ -308,31 +308,31 @@
     </aside>
   </sc-if>
   <!-- GLOSSARY_END -->
-  <!-- VIABILITY_START -->
-  <sc-if value="{{ viabilityOn }}" hint-placeholder-val="{{ false }}">
-    <div onClick="{{ viabilityBackdrop }}" style="position: fixed; inset: 0; z-index: 90; background: oklch(0.15 0.010 80 / 0.55); display: flex; align-items: center; justify-content: center; padding: 20px;">
-      <div id="viability" role="dialog" aria-modal="true" aria-labelledby="viabilitytitle" aria-describedby="viabilitybody" onKeyDown="{{ viabilityKey }}" style="width: min(500px, 100%); max-height: calc(100vh - 40px); overflow: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 28px 28px 24px;">
+  <!-- LEAVING_START -->
+  <sc-if value="{{ leavingOn }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ leavingBackdrop }}" style="position: fixed; inset: 0; z-index: 90; background: oklch(0.15 0.010 80 / 0.55); display: flex; align-items: center; justify-content: center; padding: 20px;">
+      <div id="leaving" role="dialog" aria-modal="true" aria-labelledby="leavingtitle" aria-describedby="leavingbody" onKeyDown="{{ leavingKey }}" style="width: min(500px, 100%); max-height: calc(100vh - 40px); overflow: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--line); padding: 28px 28px 24px;">
         <div style="display: flex; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 18px;">
           <span style="display: block; width: 28px; height: 1px; background: var(--accent);"></span>
-          <span>Viability · benchmark data</span>
+          <span>{{ leavingKicker }}</span>
         </div>
-        <h2 id="viabilitytitle" style="margin: 0; font-size: 28px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 700; text-wrap: balance;">Under the hood, in raw numbers</h2>
-        <div id="viabilitybody">
-          <p style="margin: 16px 0 0; font-size: 16px; line-height: 1.55; text-wrap: pretty;">Viability is the benchmark site: run tables, scores and the measurements behind the placement profiles. It is data heavy.</p>
-          <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">You don't need any of it to use or understand CWA. Spec, Assembler and Placement stand on their own; Viability is there if you want to look at the data yourself.</p>
-          <p style="margin: 20px 0 0; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--muted);">{{ viabilityCountdown }}</p>
+        <h2 id="leavingtitle" style="margin: 0; font-size: 28px; line-height: 1.1; letter-spacing: -0.03em; font-weight: 700; text-wrap: balance;">{{ leavingTitle }}</h2>
+        <div id="leavingbody">
+          <p style="margin: 16px 0 0; font-size: 16px; line-height: 1.55; text-wrap: pretty;">{{ leavingLead }}</p>
+          <p style="margin: 12px 0 0; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ leavingNote }}</p>
+          <p style="margin: 20px 0 0; font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; color: var(--muted);">{{ leavingCountdown }}</p>
         </div>
         <div aria-hidden="true" style="height: 2px; margin-top: 10px; background: var(--line);">
-          <div style="{{ viabilityBarStyle }}"></div>
+          <div style="{{ leavingBarStyle }}"></div>
         </div>
         <div style="display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-top: 24px;">
-          <button id="viabilitystay" onClick="{{ viabilityStay }}" style="flex: 1 1 180px; text-align: center; font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 11px 22px; cursor: pointer;" style-hover="border-color: var(--fg);">Stay here</button>
-          <a id="viabilitygo" href="https://benchmark.contextwindowarchitecture.io" onClick="{{ viabilityGo }}" style="flex: 1 1 180px; text-align: center; font-size: 15px; font-weight: 600; color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--pill); padding: 11px 22px;" style-hover="background: var(--fg); border-color: var(--fg); color: var(--bg);">Go to Viability now</a>
+          <button id="leavingstay" onClick="{{ leavingStay }}" style="flex: 1 1 180px; text-align: center; font-family: var(--sans); font-size: 15px; font-weight: 600; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 11px 22px; cursor: pointer;" style-hover="border-color: var(--fg);">Stay here</button>
+          <a id="leavinggo" href="{{ leavingUrl }}" onClick="{{ leavingGo }}" style="flex: 1 1 180px; text-align: center; font-size: 15px; font-weight: 600; color: var(--bg); background: var(--accent); border: 1px solid var(--accent); border-radius: var(--pill); padding: 11px 22px;" style-hover="background: var(--fg); border-color: var(--fg); color: var(--bg);">{{ leavingGoLabel }}</a>
         </div>
       </div>
     </div>
   </sc-if>
-  <!-- VIABILITY_END -->
+  <!-- LEAVING_END -->
 </div>
 </x-dc>
 <noscript>
@@ -343,8 +343,8 @@
 const PREREQUISITES = ["slot","profile","route","renderer","trace"];
 
 class Component extends DCLogic {
-  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, viabilityLeft: 0 };
-  componentWillUnmount() { this.glossaryUnmount(); this.viabilityStop(); }
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
+  componentWillUnmount() { this.glossaryUnmount(); this.leavingStop(); }
 
   componentDidMount() {
     this.glossaryMount();
@@ -409,60 +409,86 @@ class Component extends DCLogic {
     };
   }
   // GLOSSARY_GLUE_END
-  // VIABILITY_GLUE_START
-  // The nav's Viability link leaves for the benchmark site. A plain click first says what is there and that CWA does
-  // not need it, then counts down and goes; Stay here, Escape or a click outside the box keeps the reader on the page.
-  // A modified or middle click opens the link as the browser would.
-  viabilityUrl = "https://benchmark.contextwindowarchitecture.io";
-  viabilitySeconds = 20;
-  viabilityOpen(e) {
+  // LEAVING_GLUE_START
+  // Two nav links leave CWA: Examples for the showcase and Viability for the benchmark site. A plain click on either
+  // first says what is there, then counts down and goes; Stay here, Escape or a click outside the box keeps the reader
+  // on the page. A modified or middle click opens the link as the browser would. One notice serves both sites.
+  leavingSites = {
+    examples: {
+      url: "https://examples.contextwindowarchitecture.io",
+      name: "Examples",
+      kicker: "Examples · showcase",
+      title: "CWA at work, model by model",
+      lead: "Examples is the showcase: five runnable apps, from a help-center bot to a production agent, each run on a list of models given the context CWA decided on. It opens on Compare, two models side by side on one scenario.",
+      note: "It shows what each model did with that context and ranks none of them. Spec, Assembler and Placement say what CWA is; Examples is there to watch it run."
+    },
+    viability: {
+      url: "https://benchmark.contextwindowarchitecture.io",
+      name: "Viability",
+      kicker: "Viability · benchmark data",
+      title: "Under the hood, in raw numbers",
+      lead: "Viability is the benchmark site: run tables, scores and the measurements behind the placement profiles. It is data heavy.",
+      note: "You don't need any of it to use or understand CWA. Spec, Assembler and Placement stand on their own; Viability is there if you want to look at the data yourself."
+    }
+  };
+  leavingSeconds = 20;
+  leavingOpen(site, e) {
     if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
     if (e && e.preventDefault) e.preventDefault();
-    try { this._viabilityReturn = document.activeElement; } catch (err) {}
-    this.viabilityStop();
-    this.setState({ viabilityLeft: this.viabilitySeconds }, () => {
-      try { const el = document.getElementById("viabilitystay"); if (el) el.focus({ preventScroll: true }); } catch (err) {}
+    try { this._leavingReturn = document.activeElement; } catch (err) {}
+    this.leavingStop();
+    this.setState({ leaving: site, leavingLeft: this.leavingSeconds }, () => {
+      try { const el = document.getElementById("leavingstay"); if (el) el.focus({ preventScroll: true }); } catch (err) {}
     });
-    this._viabilityTimer = setInterval(() => {
-      if (!(this.state.viabilityLeft > 0)) { this.viabilityStop(); return; }
-      const left = this.state.viabilityLeft - 1;
-      if (left <= 0) this.viabilityGo();
-      else this.setState({ viabilityLeft: left });
+    this._leavingTimer = setInterval(() => {
+      if (!(this.state.leavingLeft > 0)) { this.leavingStop(); return; }
+      const left = this.state.leavingLeft - 1;
+      if (left <= 0) this.leavingGo();
+      else this.setState({ leavingLeft: left });
     }, 1000);
   }
-  viabilityStop() { if (this._viabilityTimer) { clearInterval(this._viabilityTimer); this._viabilityTimer = null; } }
-  viabilityStay() {
-    this.viabilityStop();
-    this.setState({ viabilityLeft: 0 }, () => { try { this._viabilityReturn && this._viabilityReturn.focus(); } catch (err) {} });
+  leavingStop() { if (this._leavingTimer) { clearInterval(this._leavingTimer); this._leavingTimer = null; } }
+  leavingStay() {
+    this.leavingStop();
+    this.setState({ leavingLeft: 0 }, () => { try { this._leavingReturn && this._leavingReturn.focus(); } catch (err) {} });
   }
-  viabilityGo(e) {
+  leavingGo(e) {
     if (e && e.preventDefault) e.preventDefault();
-    this.viabilityStop();
-    this.setState({ viabilityLeft: 0 });
-    location.assign(this.viabilityUrl);
+    this.leavingStop();
+    const site = this.leavingSites[this.state.leaving];
+    this.setState({ leavingLeft: 0 });
+    if (site) location.assign(site.url);
   }
-  viabilityVals() {
-    const left = this.state.viabilityLeft || 0;
+  leavingVals() {
+    const left = this.state.leavingLeft || 0;
+    const site = this.leavingSites[this.state.leaving] || this.leavingSites.viability;
     return {
-      viabilityOn: left > 0,
-      viabilityCountdown: "Opening Viability in " + left + (left === 1 ? " second" : " seconds"),
-      viabilityBarStyle: "height: 2px; background: var(--accent); width: " + Math.round((left / this.viabilitySeconds) * 100) + "%; transition: width 1s linear;",
-      openViability: e => this.viabilityOpen(e),
-      viabilityStay: () => this.viabilityStay(),
-      viabilityGo: e => this.viabilityGo(e),
-      viabilityBackdrop: e => { if (e && e.target === e.currentTarget) this.viabilityStay(); },
-      viabilityKey: e => {
-        if (e.key === "Escape") { e.preventDefault(); this.viabilityStay(); return; }
+      leavingOn: left > 0,
+      leavingKicker: site.kicker,
+      leavingTitle: site.title,
+      leavingLead: site.lead,
+      leavingNote: site.note,
+      leavingUrl: site.url,
+      leavingGoLabel: "Go to " + site.name + " now",
+      leavingCountdown: "Opening " + site.name + " in " + left + (left === 1 ? " second" : " seconds"),
+      leavingBarStyle: "height: 2px; background: var(--accent); width: " + Math.round((left / this.leavingSeconds) * 100) + "%; transition: width 1s linear;",
+      openExamples: e => this.leavingOpen("examples", e),
+      openViability: e => this.leavingOpen("viability", e),
+      leavingStay: () => this.leavingStay(),
+      leavingGo: e => this.leavingGo(e),
+      leavingBackdrop: e => { if (e && e.target === e.currentTarget) this.leavingStay(); },
+      leavingKey: e => {
+        if (e.key === "Escape") { e.preventDefault(); this.leavingStay(); return; }
         if (e.key !== "Tab") return;
         // Two controls, so focus stays inside the box: Tab from one lands on the other.
-        const stay = document.getElementById("viabilitystay"), go = document.getElementById("viabilitygo");
+        const stay = document.getElementById("leavingstay"), go = document.getElementById("leavinggo");
         if (!stay || !go) return;
         e.preventDefault();
         (document.activeElement === stay ? go : stay).focus();
       }
     };
   }
-  // VIABILITY_GLUE_END
+  // LEAVING_GLUE_END
 
   renderVals() {
     return Object.assign({
@@ -479,7 +505,7 @@ class Component extends DCLogic {
         { n: "05", name: "Measure reuse", text: "Over consecutive turns of a frozen conversation, count how many leading entries, or bytes, of each payload repeat the previous one: what a provider's prompt cache could serve instead of reading it again. Judge reuse beside the outcome metric, never instead of it." },
         { n: "06", name: "Record and version", text: "Publish suite, model version, date, results and a reproducible artifact in the evaluation block. Version any payload configuration change; the trace of every later request names it." }
       ]
-    }, this.glossaryVals(), this.viabilityVals());
+    }, this.glossaryVals(), this.leavingVals());
   }
 }
 </script>

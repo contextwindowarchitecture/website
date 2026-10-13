@@ -238,7 +238,7 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 
 On the landing, Assembler and Placement pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#layout`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on any of those pages has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
-Layers: the header sits at `z-index: 50`, the glossary panel at `85` and the Viability notice at `90`. Nothing else is layered.
+Layers: the header sits at `z-index: 50`, the glossary panel at `85` and the leaving notice at `90`. Nothing else is layered.
 
 ## 6. Components
 
@@ -255,7 +255,7 @@ Order left to right: the logo, nav, spacer (`flex: 1`), menu button (narrow only
 
 ### Navigation
 
-The nav lists Home, Spec, Assembler and Placement, then Examples, a plain link to the examples site (https://examples.contextwindowarchitecture.io), then Viability, which opens the benchmark site, then the Glossary button; those four pages are the whole site. The row is `align-items: center`, and the Glossary button resets `appearance`, `margin` and `line-height` so it sits level with the links in every browser. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
+The nav lists Home, Spec, Assembler and Placement, then Examples, which opens the showcase at examples.contextwindowarchitecture.io, then Viability, which opens the benchmark site, then the Glossary button; those four pages are the whole site. The row is `align-items: center`, and the Glossary button resets `appearance`, `margin` and `line-height` so it sits level with the links in every browser. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
 
 Narrow (1200px and below): the same `<nav id="sitenav">` becomes an absolutely positioned column under the header, `padding: 6px 32px 14px`, `font-size: 16px`, `background: var(--bg)`, with each link `padding: 13px 0` and a `--line` bottom border. The current page gets `border-left: 3px solid var(--accent); padding-left: 12px`. The `#hdrmenu` button toggles `data-open` and `aria-expanded`, and its label reads "Menu" or "Close".
 
@@ -342,9 +342,9 @@ Every page's nav ends with a `Glossary` button (a `<button>` styled as a nav lin
 
 Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page's strip sits at the top of its schema section, which follows the three slides, and reads "The words this site uses:". The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
 
-### Viability notice
+### Leaving notice
 
-Viability, the benchmark site, is the one nav link that asks before it leaves CWA; Examples leaves without asking. Its `<a>` keeps the real `href`, so a modified or middle click opens it as the browser would; a plain click opens a modal notice instead: a fixed backdrop at `z-index: 90`, `oklch(0.15 0.010 80 / 0.55)` in both themes, centring a `min(500px, 100%)` box on `--bg` with a `--line` border and `28px` padding. It is `role="dialog"` with `aria-modal="true"`, named by its `28px` 700 heading and described by its two paragraphs and the mono countdown line. The box says the site is data heavy and that CWA does not need it, then counts down twenty seconds over a `2px` `--accent` bar on a `--line` track and goes. Two equal pill buttons share the footer, wrapping to full width on a phone: a ghost "Stay here", which takes focus on open, and a primary "Go to Viability now". Stay here, Escape and a click on the backdrop close it and return focus to the nav link; Tab stays between the two buttons. `tests/layering.test.mjs` holds every page's notice markup and glue identical.
+Two nav links leave CWA, Examples for the showcase and Viability for the benchmark site, and one notice serves both. Each `<a>` keeps the real `href`, so a modified or middle click opens it as the browser would; a plain click opens a modal notice instead: a fixed backdrop at `z-index: 90`, `oklch(0.15 0.010 80 / 0.55)` in both themes, centring a `min(500px, 100%)` box on `--bg` with a `--line` border and `28px` padding. It is `role="dialog"` with `aria-modal="true"`, named by its `28px` 700 heading and described by its two paragraphs and the mono countdown line. The text comes from a table in the glue, one entry per site: Examples says it is the showcase, opening on Compare and ranking no model; Viability says it is data heavy and that CWA does not need it. Then the box counts down twenty seconds over a `2px` `--accent` bar on a `--line` track and goes. Two equal pill buttons share the footer, wrapping to full width on a phone: a ghost "Stay here", which takes focus on open, and a primary "Go to Examples now" or "Go to Viability now". Stay here, Escape and a click on the backdrop close it and return focus to the nav link; Tab stays between the two buttons. `tests/layering.test.mjs` holds every page's notice markup and glue identical.
 
 ### Slides (landing page)
 
@@ -358,7 +358,7 @@ No page carries an icon today. If you add one, make it an 18px line icon: `viewB
 
 - **Hover is instant.** No page declares a `transition`, so `style-hover` swaps land immediately. Keep it that way for consistency, or add transitions everywhere at once.
 - **The one animation** is `cwaRise` (opacity 0 to 1, `translateY(14px)` to none), applied when the demo inserts a slot row: `animation: cwaRise 280ms cubic-bezier(.2,.8,.25,1) both` for rows, `240ms` for nested detail, `260ms ease` for a revealed paragraph.
-- **The transitions** are `flex-basis 320ms ease` on the budget bar segments in the demo and `width 1s linear` on the Viability notice's countdown bar.
+- **The transitions** are `flex-basis 320ms ease` on the budget bar segments in the demo and `width 1s linear` on the leaving notice's countdown bar.
 - Scrolling is `scroll-behavior: smooth` with an `88px` offset for the sticky header.
 - **Reduced motion.** Every page's `<style>` ends with a `prefers-reduced-motion: reduce` rule that stops smooth scrolling, `cwaRise` and every transition. The landing page also reads the preference on mount: the demo starts complete and still, with Play to run it.
 - **Announcements and states.** The demo's slots panel holds a visually hidden `role="status"` live region that says what a visitor changed: a slot removed or restored, the budget, the system, the blob toggle, play or pause. The system tabs, budget buttons, blob toggle, schema tabs and framework tabs carry `aria-pressed`.
