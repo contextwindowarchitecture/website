@@ -255,7 +255,7 @@ Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), menu butto
 
 ### Navigation
 
-The nav lists Home, Spec, Assembler and Placement, then the Glossary button; those four pages are the whole site. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
+The nav lists Home, Spec, Assembler and Placement, then Viability, which opens the benchmark site, then the Glossary button; those four pages are the whole site. The row is `align-items: center`, and the Glossary button resets `appearance`, `margin` and `line-height` so it sits level with the links in every browser. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
 
 Narrow (1200px and below): the same `<nav id="sitenav">` becomes an absolutely positioned column under the header, `padding: 6px 32px 14px`, `font-size: 16px`, `background: var(--bg)`, with each link `padding: 13px 0` and a `--line` bottom border. The current page gets `border-left: 3px solid var(--accent); padding-left: 12px`. The `#hdrmenu` button toggles `data-open` and `aria-expanded`, and its label reads "Menu" or "Close".
 
@@ -334,7 +334,7 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 ### Footer
 
-`border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Docs, GitHub, Apache-2.0 with `gap: 20px`.
+`border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Spec, GitHub, llms.txt, Apache-2.0 with `gap: 20px`. Every page carries it.
 
 ### Glossary panel and prerequisite strip
 

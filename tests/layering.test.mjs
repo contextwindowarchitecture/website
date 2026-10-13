@@ -89,6 +89,7 @@ test('every page opens the same glossary panel from its nav, and shows a prerequ
     const html = await read(page);
     assert.ok(header(html).includes('<button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary"'), `${page}: the nav opens the glossary`);
     assert.ok(html.includes('#sitenav button {'), `${page}: the narrow nav styles the glossary button`);
+    assert.ok(header(html).includes('<nav id="sitenav" data-open="{{ menuOpen }}" style="display: flex; align-items: center;'), `${page}: the nav centres its items`);
     const block = html.match(/<!-- GLOSSARY_START -->[\s\S]*?<!-- GLOSSARY_END -->/);
     assert.ok(block, `${page} has the panel`);
     blocks.add(block[0]);

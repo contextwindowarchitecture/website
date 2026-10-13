@@ -98,7 +98,9 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
   assert.deepEqual(anchored.window.scrolls, [1000 - 68, 1000 - 68], 'the hero link lands on the simulator once the page has rendered');
   for (const page of PAGES) {
     const nav = header(await read(page)).match(/<nav id="sitenav"[\s\S]*?<\/nav>/)[0];
-    assert.deepEqual([...nav.matchAll(/<a href="\.\/([a-z]+\.html)"[^>]*>([^<]+)<\/a>|<button id="navglossary"[^>]*>([^<]+)<\/button>/g)].map(m => m[2] ?? m[3]), ['Home', 'Spec', 'Assembler', 'Placement', 'Glossary'], page);
+    assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>|<button id="navglossary"[^>]*>([^<]+)<\/button>/g)].map(m => m[2] ?? m[3]), ['Home', 'Spec', 'Assembler', 'Placement', 'Viability', 'Glossary'], page);
+    assert.ok(nav.includes('<a href="https://benchmark.contextwindowarchitecture.io"'), `${page}: Viability opens the benchmark site`);
+    assert.ok((await read(page)).match(/<footer[\s\S]*?<\/footer>/)?.[0].includes('<a href="./llms.txt">llms.txt</a>'), `${page} has the footer`);
   }
   const llms = await read('llms.txt');
   const glossary = JSON.parse(await read('site/glossary.json'));
