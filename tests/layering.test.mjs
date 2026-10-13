@@ -180,3 +180,77 @@ test('the Assembler page speaks of released assemblers with no hand-written date
   assert.ok(demo.includes('>Live assembly</div>') && demo.includes(">The slots aren't the point. The assembly is.</h2>") && demo.includes('{{ ucTabs }}') && demo.includes('{{ announce }}'), 'the live assembly simulator sits where the matrix was');
   assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
 });
+
+// Viability, the benchmark site, is the one nav link that leaves CWA. A plain click first says it is data heavy and
+// not needed to use or understand CWA, counts down, and goes unless the reader chooses to stay.
+const VIABILITY = 'https://benchmark.contextwindowarchitecture.io';
+
+test('every page asks before Viability leaves for the benchmark site, with the same modal box and logic', async () => {
+  const blocks = new Set(), glue = new Set();
+  for (const page of PAGES) {
+    const html = await read(page);
+    assert.ok(header(html).includes(`<a href="${VIABILITY}" onClick="{{ openViability }}"`), `${page}: the nav link opens the notice and still names the site`);
+    const block = html.match(/<!-- VIABILITY_START -->[\s\S]*?<!-- VIABILITY_END -->/);
+    assert.ok(block, `${page} has the notice`);
+    blocks.add(block[0]);
+    assert.ok(block[0].includes('role="dialog" aria-modal="true" aria-labelledby="viabilitytitle" aria-describedby="viabilitybody"'), `${page}: a named, described modal dialog`);
+    assert.ok(block[0].includes('>Stay here</button>') && block[0].includes(`<a id="viabilitygo" href="${VIABILITY}"`), `${page}: a way to stay and a way to go now`);
+    assert.ok(/You don't need any of it to use or understand CWA\./.test(block[0]) && /data heavy/.test(block[0]), `${page}: says it is data heavy and not needed`);
+    const code = html.match(/\/\/ VIABILITY_GLUE_START[\s\S]*?\/\/ VIABILITY_GLUE_END/);
+    assert.ok(code, `${page} has the notice glue`);
+    glue.add(code[0]);
+    assert.ok(/this\.viabilityVals\(\)\);/.test(html), `${page}: renders the notice's values`);
+    assert.ok(/componentWillUnmount\(\) \{[^}]*this\.viabilityStop\(\);/.test(html), `${page}: stops the countdown when it unmounts`);
+  }
+  assert.equal(blocks.size, 1, 'the notice markup is identical on every page');
+  assert.equal(glue.size, 1, 'the notice logic is identical on every page');
+});
+
+test('the Viability notice counts down to the benchmark site, and Stay here, Escape or a click outside keeps the reader', async () => {
+  const ticks = [];
+  const { view, document, byId, location } = await component('spec.html', { setInterval: fn => { ticks.push(fn); return ticks.length; } });
+  byId.viabilitystay = { focused: 0, focus() { this.focused += 1; } };
+  const trigger = document.activeElement;
+  let vals = view.renderVals();
+  assert.equal(vals.viabilityOn, false, 'closed until the link is clicked');
+
+  let prevented = 0;
+  const click = extra => Object.assign({ button: 0, preventDefault() { prevented += 1; } }, extra);
+  vals.openViability(click({ metaKey: true }));
+  vals.openViability(click({ button: 1 }));
+  assert.deepEqual([prevented, view.renderVals().viabilityOn, ticks.length], [0, false, 0], 'a modified or middle click opens the link as the browser would');
+
+  vals.openViability(click());
+  vals = view.renderVals();
+  assert.deepEqual([prevented, vals.viabilityOn, byId.viabilitystay.focused], [1, true, 1], 'a plain click opens the notice and focuses Stay here');
+  assert.equal(vals.viabilityCountdown, 'Opening Viability in 10 seconds');
+  assert.match(vals.viabilityBarStyle, /width: 100%/);
+  for (let i = 0; i < 9; i++) ticks[0]();
+  vals = view.renderVals();
+  assert.equal(vals.viabilityCountdown, 'Opening Viability in 1 second');
+  assert.deepEqual(location.assigned, [], 'not before the count ends');
+  ticks[0]();
+  assert.deepEqual([location.assigned, view.renderVals().viabilityOn], [[VIABILITY], false], 'at zero it goes');
+
+  vals = view.renderVals();
+  vals.openViability(click());
+  view.renderVals().viabilityStay();
+  assert.deepEqual([view.renderVals().viabilityOn, trigger.focused], [false, 1], 'Stay here closes it and returns focus to the link');
+  ticks[1]();
+  assert.deepEqual([view.state.viabilityLeft, location.assigned.length], [0, 1], 'a stale tick after Stay here neither reopens it nor goes');
+
+  view.renderVals().openViability(click());
+  view.renderVals().viabilityKey({ key: 'Escape', preventDefault() {} });
+  assert.equal(view.renderVals().viabilityOn, false, 'Escape stays');
+
+  view.renderVals().openViability(click());
+  const box = {}, backdrop = {};
+  view.renderVals().viabilityBackdrop({ target: box, currentTarget: backdrop });
+  assert.equal(view.renderVals().viabilityOn, true, 'a click inside the box does not close it');
+  view.renderVals().viabilityBackdrop({ target: backdrop, currentTarget: backdrop });
+  assert.equal(view.renderVals().viabilityOn, false, 'a click outside it stays');
+
+  view.renderVals().openViability(click());
+  view.renderVals().viabilityGo({ preventDefault() {} });
+  assert.deepEqual(location.assigned, [VIABILITY, VIABILITY], 'Go to Viability now goes at once');
+});
