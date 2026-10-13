@@ -490,7 +490,11 @@ test('specification, its Markdown copy, and status matrix share every permanent 
   assert.equal(view.renderVals().counts, `${met} of ${scopes.filter(s => s.scope !== 'application').length} checkable requirements implemented.`);
   const { matrix, implementationLabels } = view.renderVals();
   assert.deepEqual([...implementationLabels].map(l => l.label), ['Python', 'TypeScript', 'Go', 'Rust']);
-  assert.deepEqual([...matrix[0].cells].map(c => c.text), statuses[0][5] ? [...statuses[0][6]].map(n => `${n}/${statuses[0][5]}`) : ['–', '–', '–', '–'], 'a cell is passes over the cases exercising the rule');
+  const expect = (row, i, label, n) => row[2] === 'application' ? ['dash', `R-${i + 1} is an application rule, not testable in assembly`] : !row[5] ? ['none', `No published case exercises R-${i + 1} yet`]
+    : [row[6][n] === row[5] ? 'proven' : 'partly', `${label} passes ${row[6][n]} of the ${row[5]} published cases that exercise R-${i + 1}`];
+  statuses.forEach((row, i) => assert.deepEqual([...matrix[i].cells].map(c => [c.state, c.title]), ['Python', 'TypeScript', 'Go', 'Rust'].map((label, n) => expect(row, i, label, n)), `R-${i + 1}`));
+  assert.ok(statuses.some(r => r[2] === 'application') && matrix.some(r => r.cells[0].state === 'dash'), 'application rules show a dash');
+  assert.equal(view.renderVals().publishedCount, 90);
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
   for (const { id } of requirements) assert.ok(markdown.includes(`### ${id}:`));
 });
