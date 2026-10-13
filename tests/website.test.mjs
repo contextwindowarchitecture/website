@@ -447,16 +447,15 @@ test('downloads and the static Producers item preview use canonical examples', a
   assert.equal(view.renderVals().scaffoldName, 'assemble.py');
 });
 
-test('exported profiles pass the same contract as published profile examples', async () => {
-  const profiles = await component('evidence.html', 'PROFILES');
-  const view = await component('evidence.html');
-  for (const profile of profiles) {
-    const exported = JSON.parse(view.yaml(profile));
-    assert.equal(contract.checkProfile(exported).valid, true);
-    assert.equal(exported.evaluation.status, 'unevaluated');
-    const slots = await component('evidence.html', 'SLOTS');
-    assert.deepEqual(exported.placement.map(p => p.slot), Array.from(profile.order, i => slots[i]));
-  }
+test('the Placement page shows the first published profile in its format section, written by the build, and has no explorer', async () => {
+  const html = await fs.readFile(new URL('../evidence.html', import.meta.url), 'utf8');
+  const profiles = JSON.parse(await fs.readFile(new URL('../examples/profiles.json', import.meta.url), 'utf8'));
+  const block = html.match(/<!-- CONTRACT_PROFILE_START -->([\s\S]*?)<!-- CONTRACT_PROFILE_END -->/)[1];
+  assert.ok(block.includes(`<span>profile.yaml</span><span>${profiles[0].id}/v${profiles[0].version}</span>`), 'the panel names the profile');
+  const shown = block.match(/overflow: auto;">([\s\S]*?)<\/div>/)[1].replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&');
+  assert.deepEqual(JSON.parse(shown), profiles[0]);
+  assert.equal(contract.checkProfile(JSON.parse(shown)).valid, true);
+  for (const gone of ['<section id="explorer"', 'href="#explorer"', 'const PROFILES', '{{ a.yaml }}', 'Profile explorer']) assert.ok(!html.includes(gone), `${gone} has left the page`);
 });
 
 // CHANGES.md is the specification's revision history. The Spec page's draft date is written from it, SPEC.md states

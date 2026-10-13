@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Profiles &amp; placement evidence — Context Window Architecture</title>
-<meta name="description" content="Why CWA makes placement a versioned, per-route profile rather than a rule: the serial-position research, provider guidance by model generation, what placement does to prompt caches, the profile format, and an explorer to diff profiles." />
+<meta name="description" content="Why CWA makes placement a versioned, per-route profile rather than a rule: the serial-position research, provider guidance by model generation, what placement does to prompt caches, the profile format, and how to evaluate a profile." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -33,7 +33,6 @@
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
   @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
-  @media (max-width: 860px) { #diff { grid-template-columns: minmax(0, 1fr) !important; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -88,7 +87,6 @@
       <a href="#providers" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Provider guidance</a>
       <a href="#caching" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Prompt caches</a>
       <a href="#format" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile format</a>
-      <a href="#explorer" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Profile explorer</a>
       <a href="#evaluate" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">Evaluating a profile</a>
       <a href="#refs" style="color: var(--muted); padding: 5px 0;" style-hover="color: var(--fg);">References</a>
     </nav>
@@ -140,7 +138,7 @@
         <div style="display: flex; flex-direction: column; gap: 14px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">
           <p style="margin: 0;">Placement decides a second thing: how much of one call's payload the next call repeats byte for byte. Provider prompt caches reuse a request's leading part only up to the first byte that changed. <a href="#cite-6">[6]</a> <a href="#cite-7">[7]</a> A slot whose content changes every turn, placed early, makes everything after it full price on every call.</p>
           <p style="margin: 0;">CWA's part is to make the repeat exact and its boundaries visible. An identical snapshot renders identical bytes (<a href="./spec.html#R-23">R-23</a>). History renders in the order turns were said, so a new turn lands after the earlier ones (<a href="./spec.html#R-7">R-7</a>). The optional <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cwa-message-blocks/v1</span> renderer hands each placed item over as its own content entry, so a breakpoint can follow any item. The application's part is the request: which entry carries a breakpoint, which cache lifetime to pay for, and any cache key. None of it is text, so the count and hash the trace records still describe what the model reads (<a href="./spec.html#s1">§1</a>).</p>
-          <p style="margin: 0;">Attention and caching mostly agree: stable governance goes early and the live query goes last. They disagree in the middle. Long-context guidance puts documents near the top <a href="#cite-4">[4]</a>, while a cache wants per-turn retrieval below the history. <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cache-first-chat/v1</span> is the cache-ordered example; compare it with <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">policy-first-chat/v1</span> in the <a href="#explorer">explorer</a>. Which order wins for a route is an evaluation question, like every other placement choice.</p>
+          <p style="margin: 0;">Attention and caching mostly agree: stable governance goes early and the live query goes last. They disagree in the middle. Long-context guidance puts documents near the top <a href="#cite-4">[4]</a>, while a cache wants per-turn retrieval below the history. <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cache-first-chat/v1</span> is the cache-ordered example; <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">policy-first-chat/v1</span> is the attention-ordered one, and both are published in <a href="./examples/profiles.json">examples/profiles.json</a>. Which order wins for a route is an evaluation question, like every other placement choice.</p>
           <p style="margin: 0;">Some things break reuse even in a stable order: budget pressure that sheds the oldest turn on every call (<a href="./spec.html#R-16">R-16</a>), a different variant chosen for an early item (<a href="./spec.html#R-18">R-18</a>), a governance item at a new <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">source_version</span>, and a surfaced conflict's mark (<a href="./spec.html#R-11">R-11</a>). A history producer that compacts old turns in blocks, rather than dropping one per call, keeps the history's leading part unchanged between compactions.</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
@@ -165,73 +163,74 @@
 
       <section id="format">
         <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile format</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The exports below use JSON syntax, which is valid YAML. It carries the spec it was written for, an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
+        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is a JSON or YAML document. The example below is the first published profile, in JSON syntax, which is valid YAML. It carries the spec it was written for, an id and version, the route it serves, the model family it was evaluated on, an ordered placement with a wrapper rule per slot, the versioned route policy, and an explicit evaluation status (<a href="./spec.html#R-19">R-19</a>). A slot may appear twice; the second occurrence is a reinforcement, rendered again. Omitted slots are not rendered, but required slots and admitted protected items may not be omitted (R-20).</p>
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
-          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>{{ a.id }}</span></div>
-          <div style="padding: 18px; white-space: pre; overflow: auto;">{{ a.yaml }}</div>
+          <!-- CONTRACT_PROFILE_START -->
+          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>policy-first-chat/v1</span></div>
+          <div style="padding: 18px; white-space: pre; overflow: auto;">{
+  "spec": "cwa/draft",
+  "id": "policy-first-chat",
+  "version": 1,
+  "route": "support-chat",
+  "model_family": null,
+  "route_policy_version": "illustrative/v1",
+  "placement": [
+    {
+      "slot": "governance.instructions",
+      "wrap": "system"
+    },
+    {
+      "slot": "state.user",
+      "wrap": "xml:user_profile"
+    },
+    {
+      "slot": "evidence.knowledge",
+      "wrap": "xml:evidence"
+    },
+    {
+      "slot": "state.task",
+      "wrap": "xml:task"
+    },
+    {
+      "slot": "interaction.memory",
+      "wrap": "xml:memory"
+    },
+    {
+      "slot": "interaction.history",
+      "wrap": "xml:history"
+    },
+    {
+      "slot": "governance.capabilities",
+      "wrap": "tools"
+    },
+    {
+      "slot": "evidence.tool_results",
+      "wrap": "xml:observation"
+    },
+    {
+      "slot": "governance.examples",
+      "wrap": "xml:examples"
+    },
+    {
+      "slot": "governance.output_contract",
+      "wrap": "xml:format"
+    },
+    {
+      "slot": "interaction.query",
+      "wrap": "xml:query"
+    }
+  ],
+  "evaluation": {
+    "status": "unevaluated",
+    "suite": null,
+    "date": null,
+    "result": null,
+    "artifact": null
+  }
+}</div>
+          <!-- CONTRACT_PROFILE_END -->
         </div>
         <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. Earlier evaluation summaries are withdrawn because supporting runs are unavailable.</p>
-      </section>
-
-      <section id="explorer">
-        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Tool</div>
-        <h2 style="margin: 0 0 18px; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.02; letter-spacing: -0.035em; font-weight: 700;">Profile explorer</h2>
-        <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Pick two profiles, and each is drawn as the window it produces, in order and coloured by plane. The diff lists what moved, and either can be exported as YAML.</p>
-        <div id="diff" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-          <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile A</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <sc-for list="{{ tabsA }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
-            </div>
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ a.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ a.id }}</span></div>
-              <div style="font-size: 13.5px; color: var(--muted);">route: {{ a.route }} · {{ a.uses }}</div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <sc-for list="{{ a.rows }}" as="r" hint-placeholder-count="11">
-                <div style="display: grid; grid-template-columns: 28px 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; background: {{ r.bg }};">
-                  <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ r.n }}</span>
-                  <span style="width: 8px; height: 18px; background: {{ r.color }};"></span>
-                  <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.slot }}</span>
-                  <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">{{ r.tag }}</span>
-                </div>
-              </sc-for>
-            </div>
-            <p style="margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ a.principle }}</p>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ exportA }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Export A as YAML</button></div>
-          </div>
-          <div style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px; min-width: 0;">
-            <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Profile B</div>
-            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
-              <sc-for list="{{ tabsB }}" as="t" hint-placeholder-count="6"><button onClick="{{ t.select }}" style="{{ t.style }}">{{ t.label }}</button></sc-for>
-            </div>
-            <div>
-              <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 4px;"><span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em;">{{ b.name }}</span><span style="font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap;">{{ b.id }}</span></div>
-              <div style="font-size: 13.5px; color: var(--muted);">route: {{ b.route }} · {{ b.uses }}</div>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 3px;">
-              <sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="11">
-                <div style="display: grid; grid-template-columns: 28px 8px minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 6px 8px; background: {{ r.bg }};">
-                  <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ r.n }}</span>
-                  <span style="width: 8px; height: 18px; background: {{ r.color }};"></span>
-                  <span style="font-family: var(--mono); font-size: 12px; color: var(--fg); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ r.slot }}</span>
-                  <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">{{ r.tag }}</span>
-                </div>
-              </sc-for>
-            </div>
-            <p style="margin: 0; font-size: 14px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ b.principle }}</p>
-            <div style="display: flex; gap: 8px; flex-wrap: wrap;"><button onClick="{{ exportB }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 7px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">Export B as YAML</button></div>
-          </div>
-        </div>
-        <div style="border: 1px solid var(--line); border-top: 0; background: var(--surface); padding: 18px 22px;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">A → B diff · {{ diffSummary }}</div>
-          <div style="display: flex; flex-direction: column; gap: 4px;">
-            <sc-for list="{{ diff }}" as="d" hint-placeholder-count="4">
-              <div style="display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 14px; font-family: var(--mono); font-size: 12px; line-height: 1.6;"><span style="color: {{ d.color }};">{{ d.kind }}</span><span style="color: var(--fg);">{{ d.text }}</span></div>
-            </sc-for>
-          </div>
-        </div>
-        <p style="margin: 18px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Highlighted rows are slots whose position differs between A and B. <span style="color: var(--accent); font-family: var(--mono); font-size: 13px;">↺</span> marks a reinforcement: the slot has already appeared and is rendered again.</p>
       </section>
 
       <section id="evaluate">
@@ -301,482 +300,10 @@
   <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
 </noscript>
 <script type="text/x-dc" data-dc-script>
-const SLOTS = ["governance.instructions", "state.user", "evidence.knowledge", "state.task", "interaction.memory", "interaction.history", "governance.capabilities", "evidence.tool_results", "governance.examples", "governance.output_contract", "interaction.query"];
-const WRAP = ["system", "xml:user_profile", "xml:evidence", "xml:task", "xml:memory", "xml:history", "tools", "xml:observation", "xml:examples", "xml:format", "xml:query"];
-const PLANE = s => s.startsWith("governance") ? "var(--p-gov)" : s.startsWith("state") ? "var(--p-state)" : s.startsWith("evidence") ? "var(--p-evid)" : "var(--p-inter)";
-const PROFILE_CONTRACTS = [
-  {
-    "spec": "cwa/draft",
-    "id": "policy-first-chat",
-    "version": 1,
-    "route": "support-chat",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "state.task",
-        "wrap": "xml:task"
-      },
-      {
-        "slot": "interaction.memory",
-        "wrap": "xml:memory"
-      },
-      {
-        "slot": "interaction.history",
-        "wrap": "xml:history"
-      },
-      {
-        "slot": "governance.capabilities",
-        "wrap": "tools"
-      },
-      {
-        "slot": "evidence.tool_results",
-        "wrap": "xml:observation"
-      },
-      {
-        "slot": "governance.examples",
-        "wrap": "xml:examples"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  },
-  {
-    "spec": "cwa/draft",
-    "id": "document-analysis",
-    "version": 1,
-    "route": "document-qa",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "governance.instructions",
-        "wrap": "xml:instructions"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "state.task",
-        "wrap": "xml:task"
-      },
-      {
-        "slot": "interaction.memory",
-        "wrap": "xml:memory"
-      },
-      {
-        "slot": "interaction.history",
-        "wrap": "xml:history"
-      },
-      {
-        "slot": "governance.examples",
-        "wrap": "xml:examples"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  },
-  {
-    "spec": "cwa/draft",
-    "id": "long-context-reinforced",
-    "version": 1,
-    "route": "long-context-qa",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "evidence.tool_results",
-        "wrap": "xml:observation"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "state.task",
-        "wrap": "xml:task"
-      },
-      {
-        "slot": "interaction.memory",
-        "wrap": "xml:memory"
-      },
-      {
-        "slot": "interaction.history",
-        "wrap": "xml:history"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "governance.instructions",
-        "wrap": "xml:instructions"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  },
-  {
-    "spec": "cwa/draft",
-    "id": "tool-agent",
-    "version": 1,
-    "route": "agent-loop",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "governance.capabilities",
-        "wrap": "tools"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "interaction.memory",
-        "wrap": "xml:memory"
-      },
-      {
-        "slot": "interaction.history",
-        "wrap": "xml:history"
-      },
-      {
-        "slot": "state.task",
-        "wrap": "xml:task"
-      },
-      {
-        "slot": "evidence.tool_results",
-        "wrap": "xml:observation"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  },
-  {
-    "spec": "cwa/draft",
-    "id": "extraction",
-    "version": 1,
-    "route": "extract",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "governance.examples",
-        "wrap": "xml:examples"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  },
-  {
-    "spec": "cwa/draft",
-    "id": "cache-first-chat",
-    "version": 1,
-    "route": "support-chat",
-    "model_family": null,
-    "route_policy_version": "illustrative/v1",
-    "placement": [
-      {
-        "slot": "governance.instructions",
-        "wrap": "system"
-      },
-      {
-        "slot": "governance.capabilities",
-        "wrap": "tools"
-      },
-      {
-        "slot": "governance.examples",
-        "wrap": "xml:examples"
-      },
-      {
-        "slot": "governance.output_contract",
-        "wrap": "xml:format"
-      },
-      {
-        "slot": "state.user",
-        "wrap": "xml:user_profile"
-      },
-      {
-        "slot": "interaction.memory",
-        "wrap": "xml:memory"
-      },
-      {
-        "slot": "interaction.history",
-        "wrap": "xml:history"
-      },
-      {
-        "slot": "evidence.knowledge",
-        "wrap": "xml:evidence"
-      },
-      {
-        "slot": "evidence.tool_results",
-        "wrap": "xml:observation"
-      },
-      {
-        "slot": "state.task",
-        "wrap": "xml:task"
-      },
-      {
-        "slot": "interaction.query",
-        "wrap": "xml:query"
-      }
-    ],
-    "evaluation": {
-      "status": "unevaluated",
-      "suite": null,
-      "date": null,
-      "result": null,
-      "artifact": null
-    }
-  }
-];
-const PROFILES = [
-  {
-    "name": "Policy-first chat",
-    "id": "policy-first-chat/v1",
-    "short": "policy-first",
-    "route": "support-chat",
-    "uses": "Support, assistants, workflows",
-    "order": [
-      0,
-      1,
-      2,
-      3,
-      4,
-      5,
-      6,
-      7,
-      8,
-      9,
-      10
-    ],
-    "principle": "Stable governing instructions sit early, and the live query and fresh task evidence sit late. This is the default profile for this site's examples.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
-  },
-  {
-    "name": "Document analysis",
-    "id": "document-analysis/v1",
-    "short": "document",
-    "route": "document-qa",
-    "uses": "Long reports, contracts, corpora",
-    "order": [
-      0,
-      2,
-      0,
-      1,
-      3,
-      4,
-      5,
-      8,
-      9,
-      10
-    ],
-    "principle": "The instructions open the system text, which a message request always sends first. Documents follow, clearly delimited, and the instructions repeat after them with the examples and the question, near the end.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
-  },
-  {
-    "name": "Long-context reinforced",
-    "id": "long-context-reinforced/v1",
-    "short": "reinforced",
-    "route": "long-context-qa",
-    "uses": "Very long inputs, multi-document synthesis",
-    "order": [
-      0,
-      2,
-      7,
-      1,
-      3,
-      4,
-      5,
-      9,
-      0,
-      10
-    ],
-    "principle": "Instructions appear at both ends of a long window. Evidence and observations come early and delimited, task state, memory and history follow them, and the output contract and the instructions are restated beside the query.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
-  },
-  {
-    "name": "Tool-using agent",
-    "id": "tool-agent/v1",
-    "short": "tool-agent",
-    "route": "agent-loop",
-    "uses": "Multi-step work",
-    "order": [
-      0,
-      6,
-      1,
-      2,
-      4,
-      5,
-      3,
-      7,
-      9,
-      10
-    ],
-    "principle": "Policies and tool contracts early; canonical task state and the freshest observations right next to the live turn.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
-  },
-  {
-    "name": "Structured extraction",
-    "id": "extraction/v1",
-    "short": "extraction",
-    "route": "extract",
-    "uses": "Parsing and classification",
-    "order": [
-      0,
-      9,
-      1,
-      2,
-      8,
-      9,
-      10
-    ],
-    "principle": "Schema and instructions early; source content in a named evidence block; the output schema echoed again beside the task.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published"
-  },
-  {
-    "name": "Cache-first chat",
-    "id": "cache-first-chat/v1",
-    "short": "cache-first",
-    "route": "support-chat",
-    "uses": "Long conversations, agent loops",
-    "order": [
-      0,
-      6,
-      8,
-      9,
-      1,
-      4,
-      5,
-      2,
-      7,
-      3,
-      10
-    ],
-    "principle": "Ordered for prompt caches: what changes least comes first. Governance, the user profile and memory open the payload; history follows and grows at its end; per-turn evidence, observations, task state and the query close it. Retrieved evidence sits late, beside the query, rather than near the top.",
-    "evalNote": "unevaluated · illustrative profile; no reproducible run published",
-    "isNew": true
-  }
-];
-// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
 const PREREQUISITES = ["slot","profile","route","renderer","trace"];
 
 class Component extends DCLogic {
-  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, a: 0, b: 2 };
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false };
   componentWillUnmount() { this.glossaryUnmount(); }
 
   componentDidMount() {
@@ -789,39 +316,6 @@ class Component extends DCLogic {
     document.documentElement.setAttribute("data-theme", t);
     try { localStorage.setItem("cwa-theme", t); } catch (e) {}
     this.setState({ theme: t });
-  }
-  tab(active) {
-    return "font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid " + (active ? "var(--accent)" : "var(--line)") + "; border-radius: var(--pill); padding: 6px 11px; cursor: pointer; background: " + (active ? "var(--accent)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
-  }
-  yaml(p) {
-    return JSON.stringify(PROFILE_CONTRACTS.find(profile => profile.id + "/v" + profile.version === p.id), null, 2);
-  }
-  view(p, other) {
-    const firstPos = (order, i) => order.indexOf(i);
-    const rows = p.order.map((i, k) => {
-      const reinforced = firstPos(p.order, i) < k;
-      const posOther = firstPos(other.order, i);
-      const moved = posOther === -1 || posOther !== firstPos(p.order, i);
-      return { n: String(k + 1).padStart(2, "0"), color: PLANE(SLOTS[i]), slot: SLOTS[i], tag: reinforced ? "↺" : "", bg: moved && !reinforced ? "var(--accent-soft)" : "transparent" };
-    });
-    return { name: p.name, id: p.id, route: p.route, uses: p.uses, principle: p.principle, rows, yaml: this.yaml(p) };
-  }
-  download(name, text) {
-    const url = URL.createObjectURL(new Blob([text], { type: "text/plain" }));
-    const a = document.createElement("a"); a.href = url; a.download = name;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  }
-  diff(A, B) {
-    const out = [];
-    const uniq = o => Array.from(new Set(o));
-    const ua = uniq(A.order), ub = uniq(B.order);
-    ua.forEach(i => { if (!ub.includes(i)) out.push({ kind: "removed", color: "var(--muted)", text: SLOTS[i] + " is not rendered in B" }); });
-    ub.forEach(i => { if (!ua.includes(i)) out.push({ kind: "added", color: "var(--p-evid)", text: SLOTS[i] + " is rendered in B only" }); });
-    ub.forEach(i => { if (ua.includes(i)) { const pa = ua.indexOf(i) + 1, pb = ub.indexOf(i) + 1; if (pa !== pb) out.push({ kind: "moved", color: "var(--accent)", text: SLOTS[i] + ": position " + pa + " → " + pb }); } });
-    const ra = A.order.length - ua.length, rb = B.order.length - ub.length;
-    if (ra !== rb) out.push({ kind: "reinforce", color: "var(--accent)", text: (rb > ra ? "B" : "A") + " repeats " + Math.abs(rb - ra) + " slot" + (Math.abs(rb - ra) === 1 ? "" : "s") + " (" + (rb > ra ? uniq(B.order.filter((x, k) => B.order.indexOf(x) < k)).map(i => SLOTS[i]).join(", ") : uniq(A.order.filter((x, k) => A.order.indexOf(x) < k)).map(i => SLOTS[i]).join(", ")) + ")" });
-    return out.length ? out : [{ kind: "identical", color: "var(--muted)", text: "Same placement." }];
   }
   // GLOSSARY_GLUE_START
   // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
@@ -877,20 +371,12 @@ class Component extends DCLogic {
   // GLOSSARY_GLUE_END
 
   renderVals() {
-    const A = PROFILES[this.state.a], B = PROFILES[this.state.b];
-    const d = this.diff(A, B);
     return Object.assign({
       themeLabel: this.state.theme === "dark" ? "light" : "dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
       menuOpen: this.state.menu ? "true" : "false",
       menuLabel: this.state.menu ? "close" : "menu",
       toggleMenu: () => this.setState(s => ({ menu: !s.menu })),
-      tabsA: PROFILES.map((p, i) => ({ label: p.short + (p.isNew ? " · new" : ""), style: this.tab(i === this.state.a), select: () => this.setState({ a: i }) })),
-      tabsB: PROFILES.map((p, i) => ({ label: p.short + (p.isNew ? " · new" : ""), style: this.tab(i === this.state.b), select: () => this.setState({ b: i }) })),
-      a: this.view(A, B), b: this.view(B, A),
-      exportA: () => this.download(A.id.replace("/", "-") + ".yaml", this.yaml(A)),
-      exportB: () => this.download(B.id.replace("/", "-") + ".yaml", this.yaml(B)),
-      diff: d, diffSummary: d.length + " change" + (d.length === 1 ? "" : "s"),
       protocol: [
         { n: "01", name: "Fix the item set", text: "Freeze a sample of real requests from the route with their admitted items and traces. The same items go through every profile under test." },
         { n: "02", name: "Name the metric", text: "Choose one outcome metric the route already tracks, such as groundedness, task success, tool-call correctness, or schema validity. Placement is judged on that metric, not on preference." },
