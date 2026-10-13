@@ -55,16 +55,20 @@ test('the first slide offers the tour and the demo, the second links each failur
   const third = html.slice(html.indexOf('<section id="assembly"'));
   const doors = third.match(/<div class="g3" style="display: grid; grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[^"]*">([\s\S]*?)\n      <\/div>/)[1];
   assert.deepEqual([...doors.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['demo.html', 'start.html', 'spec.html'], 'evaluating, building, checking');
-  assert.ok(third.includes('<sc-for list="{{ prereq }}" as="p"') && third.includes('The words this site uses:'), 'the prerequisite strip sits on the last slide');
+  const schema = html.slice(html.indexOf('<section id="planes"'));
+  assert.ok(html.indexOf('<section id="planes" data-tour="planes"') > html.indexOf('<section id="assembly"'), 'the schema section follows the third slide');
+  assert.ok(schema.includes('<sc-for list="{{ prereq }}" as="p"') && schema.includes('The words this site uses:') && html.split('The words this site uses:').length === 2, 'the prerequisite strip sits at the top of the schema section');
+  assert.ok(schema.includes('<button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}"') && schema.includes('<sc-for list="{{ layers }}" as="layer"'), 'the planes and slots explorer');
+  assert.ok(third.includes('href="#planes"'), 'the third slide points on to it');
   assert.ok(third.includes('href="./spec.html#s2"'), 'the planes and slots are read on Spec §2');
 });
 
 test('the home tour is one step per slide and hands on to the demo\'s tour; old demo anchors on the home page open the Demo page', async () => {
   const { view, location } = await component('index.html');
-  assert.deepEqual([...view.tourSteps().map(s => s.key)], ['request', 'shapes', 'assembly']);
+  assert.deepEqual([...view.tourSteps().map(s => s.key)], ['request', 'shapes', 'assembly', 'planes']);
   const html = await read('index.html');
   for (const step of view.tourSteps()) assert.ok(html.includes(`data-tour="${step.key}"`), `${step.key} has a target`);
-  view.state.tour = 2;
+  view.state.tour = 3;
   const vals = view.renderVals();
   assert.equal(vals.tourNextLabel, 'Watch it assemble');
   vals.tourNext();
@@ -75,9 +79,11 @@ test('the home tour is one step per slide and hands on to the demo\'s tour; old 
     v.applyHash();
     assert.deepEqual(l.replaced, [hash.startsWith('#spec') ? './spec.html#s5' : './demo.html' + hash], hash);
   }
-  const { view: v, location: l } = await component('index.html', { hash: '#shapes' });
+  const { view: v, location: l, byId, timers, window } = await component('index.html', { hash: '#planes' });
+  byId.planes = { getBoundingClientRect: () => ({ top: 3000 }) };
   v.applyHash();
-  assert.deepEqual(l.replaced, [], 'a slide anchor stays on the page');
+  for (const fn of timers.splice(0)) fn();
+  assert.deepEqual([l.replaced, window.scrolls], [[], [3000 - 68, 3000 - 68]], 'a section anchor stays on the page and is scrolled to once it has rendered');
 });
 
 test('the Demo page holds the failure cards, the simulator and harness engineering, runs the tour from there, and starts it from #tour', async () => {

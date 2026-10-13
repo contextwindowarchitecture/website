@@ -175,7 +175,7 @@ test('the home page is layer 1: a plain hero with no preview widget, and none of
   const lede = html.match(/<h1[^>]*>Context isn't a prompt[^<]*<\/h1>\s*<p[^>]*>([^<]+)<\/p>/)[1];
   assert.ok(lede.split(' ').length <= 50, `the hero lede stays short: ${lede.split(' ').length} words`);
   for (const word of ['authority', 'lifecycle', 'deterministic', 'payload', 'slot']) assert.ok(!lede.toLowerCase().includes(word), `the hero lede avoids ${word}`);
-  for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET', 'CONTRACT_MATURITY_START', 'CONTRACT_ITEM_START', '{{ layers }}', 'schemaVals']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
+  for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET', 'CONTRACT_MATURITY_START', 'CONTRACT_ITEM_START']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
   const demo = await read('demo.html');
   assert.ok(!demo.includes('>Deterministic assembly</div>') && !demo.includes('Rule zero (R-5):'), 'the Demo page restates neither what-it-is card nor rule zero as a footnote');
 });
@@ -185,7 +185,7 @@ test('every guided-tour step points at a section its page still has', async () =
     const html = await read(page);
     const { view } = await component(page);
     const keys = [...view.tourSteps().map(s => s.key)];
-    assert.ok(keys.length >= least && !keys.includes('evidence') && !keys.includes('planes') && !keys.includes('adopt'), page);
+    assert.ok(keys.length >= least && !keys.includes('evidence') && !keys.includes('adopt'), page);
     assert.equal(view.tourSteps().at(-1).last, true, `${page}: the last step hands on`);
     for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `${page}: the tour step ${key} has a target`);
   }
