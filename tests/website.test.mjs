@@ -23,7 +23,7 @@ async function component(page, expression = 'new Component()', globals = {}) {
   return vm.runInNewContext(source + '\n' + expression, { DCLogic, console, Date, setTimeout, clearTimeout, structuredClone, document: documentStub(), ...globals });
 }
 
-const PAGES = ['index.html', 'demo.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
 
 for (const page of PAGES) {
   test(`${page}: embedded component compiles and renders`, async () => {
@@ -55,18 +55,20 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
-for (const [page, least] of [['index.html', 4], ['demo.html', 9]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
+for (const [page, least] of [['index.html', 4], ['assembler.html', 5]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
   const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
-  assert.ok(style.includes('@media (max-width: 860px) {\n    #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }'), 'the hero, two-column sections and three-column cards stack below 860px');
-  assert.ok(style.includes('@media (max-width: 620px) {\n    .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
-  assert.ok(style.includes('@media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }'), 'four-column grids halve below 1000px');
-  assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
+  assert.ok(style.includes('.g2, .g3') && style.includes('{ grid-template-columns: minmax(0, 1fr) !important; }'), 'two-column sections and three-column cards stack below 860px');
+  assert.ok(style.includes('.g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
+  if (page === 'index.html') {
+    assert.ok(style.includes('@media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }'), 'four-column grids halve below 1000px');
+    assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
+  }
   const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
-  const hooks = ['id="hero"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
+  const hooks = ['id="hero"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
   for (const hook of hooks) {
     const selector = hook.replace(/^id="/, '#').replace(/^class="/, '.').replace(/"$/, '');
-    assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);
+    if (markup.includes(hook)) assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);
   }
   const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
     .map(m => ({ tag: m[1], tracks: m[2] }))

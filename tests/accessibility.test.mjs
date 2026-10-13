@@ -4,12 +4,12 @@ import fs from 'node:fs/promises';
 import vm from 'node:vm';
 
 // The site's accessibility floor, WCAG 2.2 AA as the yardstick: every colour the pages use as text clears 4.5:1 on
-// both page backgrounds in both themes; every page carries a reduced-motion rule, and the landing page's demo
-// starts still under it; every page falls back without JavaScript to a note that names the readable files; the guided
-// tour is a labelled dialog that moves focus in and gives it back; the assembler demo announces what a visitor changed
+// both page backgrounds in both themes; every page carries a reduced-motion rule, and the Assembler page's simulator
+// starts still under it; every page falls back without JavaScript to a note that names the readable files; the
+// simulator announces what a visitor changed
 // and marks its pressed tabs; and the header logo meets the 24px target size.
 
-const PAGES = ['index.html', 'demo.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const styleOf = html => html.match(/<style>([\s\S]*?)<\/style>/)[1];
 
@@ -87,7 +87,7 @@ test('STYLE.md lists the token values the pages declare, with their sRGB hex, an
   assert.ok(block.includes('@media (prefers-reduced-motion: reduce)'), 'the block carries the reduced-motion rule');
 });
 
-test('every page carries a reduced-motion rule, and the Demo page starts its animations still under it', async () => {
+test('every page carries a reduced-motion rule, and the Assembler page starts its simulator still under it', async () => {
   for (const page of PAGES) {
     const css = styleOf(await read(page));
     const rule = css.match(/@media \(prefers-reduced-motion: reduce\) \{([\s\S]*?)\n  \}/);
@@ -95,7 +95,7 @@ test('every page carries a reduced-motion rule, and the Demo page starts its ani
     assert.ok(rule[1].includes('scroll-behavior: auto'), `${page} stops smooth scrolling`);
     assert.ok(rule[1].includes('animation-duration: 0.01ms !important') && rule[1].includes('transition-duration: 0.01ms !important'), `${page} stops animation and transitions`);
   }
-  for (const page of ['demo.html', 'assembler.html']) for (const reduceMotion of [false, true]) {
+  for (const page of ['assembler.html']) for (const reduceMotion of [false, true]) {
     const { view } = await component(page, { reduceMotion, setInterval: () => 0 });
     view.componentDidMount();
     assert.equal(view.state.playing, !reduceMotion, `the demo ${reduceMotion ? 'starts paused' : 'plays'}`);
@@ -103,34 +103,13 @@ test('every page carries a reduced-motion rule, and the Demo page starts its ani
   }
 });
 
-for (const page of ['index.html', 'demo.html']) test(`${page}: the guided tour is a dialog named by its title, not modal; opening it and each step focus Next, and closing it returns focus to the trigger`, async () => {
-  const html = await read(page);
-  const card = html.match(/<div ([^>]*)style="\{\{ tourCard \}\}">/);
-  assert.ok(card, 'the tour card');
-  assert.ok(card[1].includes('role="dialog"') && card[1].includes('aria-labelledby="tourtitle"'), card[1]);
-  assert.ok(!card[1].includes('aria-modal'), 'the page stays usable behind the tour, so the dialog is not modal');
-  assert.match(html, /<div id="tourtitle" [^>]*>\{\{ tourTitle \}\}<\/div>/);
-  assert.match(html, /<button id="tournext" onClick="\{\{ tourNext \}\}"/);
-  const { view, document, byId } = await component(page, { setInterval: () => 0 });
-  const trigger = document.activeElement;
-  view.renderVals().startTour();
-  assert.equal(view.renderVals().tourOn, true);
-  assert.equal(byId.tournext.focused, 1, 'opening focuses Next');
-  view.tourGo(1);
-  assert.equal(byId.tournext.focused, 2, 'each step focuses Next again');
-  view.renderVals().endTour();
-  assert.equal(view.renderVals().tourOn, false);
-  assert.equal(trigger.focused, 1, 'closing returns focus to what opened the tour');
-});
-
-for (const page of ['demo.html', 'assembler.html']) test(`${page}: the assembler demo announces what a visitor changed through a live region, and marks its pressed controls`, async () => {
+for (const page of ['assembler.html']) test(`${page}: the simulator announces what a visitor changed through a live region, and marks its pressed controls`, async () => {
   const html = await read(page);
   const demo = html.slice(html.indexOf('<section id="assemble"'), html.indexOf('</section>', html.indexOf('<section id="assemble"')));
   assert.match(demo, /<div role="status" aria-live="polite" [^>]*>\{\{ announce \}\}<\/div>/);
   assert.ok(demo.includes('<button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}"'), 'system tabs');
   assert.ok(demo.includes('<button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}"'), 'budget buttons');
   assert.ok(demo.includes('onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}"'), 'the blob toggle');
-  if (page === 'demo.html') assert.ok(html.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"'), 'the framework tabs');
   const { view } = await component(page);
   let vals = view.renderVals();
   assert.equal(vals.announce, '');
@@ -155,7 +134,6 @@ for (const page of ['demo.html', 'assembler.html']) test(`${page}: the assembler
   assert.deepEqual([view.renderVals().badPressed, view.renderVals().announce], ['true', 'Showing the unassembled blob.']);
   view.renderVals().togglePlay();
   assert.equal(view.renderVals().announce, 'Playing.');
-  if (page === 'demo.html') assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
 });
 
 test('every page falls back without JavaScript to a note naming SPEC.md and llms.txt, hides the unrendered template, and declares one viewport', async () => {

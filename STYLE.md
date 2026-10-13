@@ -142,7 +142,6 @@ The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each p
 | Large section title | sans | `clamp(34px, 4.6vw, 60px)` | 700 | `-0.035em` | `1` | `20ch` | opening section of a page |
 | Section title (h2) | sans | `clamp(28px, 3.6vw, 44px)` | 700 | `-0.035em` | `1.02` | none | the default h2, `margin: 0 0 18px` |
 | Subsection (h3) | sans | `22px` | 600 | `-0.02em` | inherit | none | `margin: 0 0 12px` |
-| Tour title | sans | `20px` | 700 | `-0.02em` | `1.2` | | |
 | Card title | sans | `16px` to `17px` | 600 | `-0.015em` to `-0.02em` | `1.35` | | |
 | Lede | sans | `18px` to `19px` | 400 | none | `1.6` | `64ch` | `color: var(--muted)`, `text-wrap: pretty` |
 | Body | sans | `16px` | 400 | none | `1.6` | `70ch` | `margin: 0 0 24px`, `text-wrap: pretty` |
@@ -151,7 +150,6 @@ The theme is an attribute, `data-theme="light"` or `"dark"`, on `<html>`. Each p
 | Button label | sans | `14px` (header), `16px` (hero and CTA) | 600 | none | | | |
 | Kicker, accent | mono | `12px` | 400 | `0.14em` | | | uppercase, `color: var(--accent)`, `margin-bottom: 14px` or `16px` |
 | Label, muted | mono | `11px` | 400 | `0.12em` | | | uppercase, `color: var(--muted)`, `margin-bottom: 8px` to `14px` |
-| Tour kicker | mono | `10.5px` | 400 | `0.12em` | | | uppercase, accent |
 | Meta row, code, textarea | mono | `12.5px` | 400 | none | `1.6` to `1.7` | | |
 | Footer, ghost button, mono list | mono | `12px` | 400 | `0.05em` on buttons | `1.65` | | |
 | Small mono note | mono | `11.5px` | 400 | `0.04em` | `1.7` | | |
@@ -236,11 +234,11 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 | `1000px` | Docs `#layout` collapses to one column; `#toc` hidden. Landing four-column grids (`.g4`) halve |
 | `860px` | Tool panels (`#tool`) collapse to one column. Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
 | `720px` | The Assembler implementations table (`.im`) drops secondary columns. Getting started step rows (`.steprow`) drop to two columns, the step text under its title; the walkthrough card (`#walkcard`) pads `18px 16px` |
-| `620px` | Header gutter to `20px`, header gap to `14px`, "Take the tour" hidden. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
+| `620px` | Header gutter to `20px`, header gap to `14px`. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
 
-On the landing and Demo pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on either page has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
+On the landing and Assembler pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on either page has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
-Layers: the header sits at `z-index: 50`, the guided tour overlay and the step walkthrough at `90`. Nothing else is layered.
+Layers: the header sits at `z-index: 50`, the step walkthrough at `90`. Nothing else is layered.
 
 ## 6. Components
 
@@ -253,7 +251,7 @@ Snippets are the exact inline styles in use; hover states use the `style-hover` 
   <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
 ```
 
-Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), "Take the tour" primary button, menu button (narrow only), theme toggle, GitHub inverse button. The wordmark is `font-weight: 700; letter-spacing: -0.02em; font-size: 16px` in `--fg`, and the logo link is `min-height: 24px`, the WCAG 2.2 target size.
+Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), menu button (narrow only), theme toggle, GitHub inverse button. The wordmark is `font-weight: 700; letter-spacing: -0.02em; font-size: 16px` in `--fg`, and the logo link is `min-height: 24px`, the WCAG 2.2 target size.
 
 ### Navigation
 
@@ -338,10 +336,6 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 `border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Docs, GitHub, Apache-2.0 with `gap: 20px`.
 
-### Guided tour overlay
-
-A fixed, `inset: 0`, `z-index: 90`, `pointer-events: none` layer holding four mask panels, a ring around the current target and a card. The card uses a `10.5px` accent kicker with a muted step count on the right, a `20px` 700 title, `15px` muted body, and a row of `2px`-gapped dots. The card is `role="dialog"`, named by its title through `aria-labelledby="tourtitle"`, and not modal, because the page stays usable behind it: focus moves to Next (`#tournext`) when the tour opens and on each step, and returns to the button that opened the tour when it closes.
-
 ### Step walkthrough
 
 The Getting started page's six steps each open a modal walkthrough of the Ada example. A fixed, `inset: 0`, `z-index: 90` backdrop in `oklch(0 0 0 / 0.58)` centres a `role="dialog"` card up to `760px` wide, styled like the tour card: accent kicker with the step count, then an `18px` 600 caption, a snippet panel on `--surface` with a muted mono source line, the tour's dots, a primary Next (which becomes "Step N →" and finally "Done"), a ghost Back and a muted Close. Snippet lines are `12.5px` mono; a marked line has a `3px` `--accent` left border on `--accent-soft`. Arrow keys move, Escape and a backdrop click close, focus goes to Next on open and back to the step's button on close. Snippets are read from `examples/messages-*.json` and the system-prompt sample, never typed into the page.
@@ -354,7 +348,7 @@ Under every page's lede sits the prerequisite strip, `12px` mono muted: "This pa
 
 ### Slides (landing page)
 
-The landing page is three slides, each a `<section>` with `data-slide="n"` and a `data-tour` key: `min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;`, with `scroll-snap-type: y proximity` on `html` so a wheel settles on a slide without trapping the reader. Inside, a `1180px` container with `64px 32px 40px` padding holds a `.g2` grid, text left and the slide's one figure right (`minmax(0, 1fr) 300px` or `580px`), then a counter row: a `--line` top border, `margin-top: 48px; padding-top: 14px`, mono `12px` muted, "01 / 03" on the left and the next slide's name as an accent link on the right. The figure is the payload drawn as bars in a bordered window (`300px` by `360px`, `padding: 12px`, `gap: 8px`): `--line` bars for the string nobody owns, plane colours once it is named, a `--p-gov` dashed bar on `--accent-soft` below the window for an item pushed out, and on the last slide plane-coloured bands with their names in `--bg` mono at `10px`, a fill bar in `--fg`, `--muted`, `--line` and `--surface`, and a dashed-top mono trace line. Figures are `aria-hidden`; the sentence beside each carries the meaning. The last slide ends on a `.g3` hairline grid of three doors, each a clickable cell with an accent label, a `17px` 600 title ending in an arrow, and muted `13.5px` copy.
+The landing page is three slides, each a `<section>` with `data-slide="n"`: `min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;`, with `scroll-snap-type: y proximity` on `html` so a wheel settles on a slide without trapping the reader. Inside, a `1180px` container with `64px 32px 40px` padding holds a `.g2` grid, text left and the slide's one figure right (`minmax(0, 1fr) 300px` or `580px`), then a counter row: a `--line` top border, `margin-top: 48px; padding-top: 14px`, mono `12px` muted, "01 / 03" on the left and the next slide's name as an accent link on the right. The figure is the payload drawn as bars in a bordered window (`300px` by `360px`, `padding: 12px`, `gap: 8px`): `--line` bars for the string nobody owns, plane colours once it is named, a `--p-gov` dashed bar on `--accent-soft` below the window for an item pushed out, and on the last slide plane-coloured bands with their names in `--bg` mono at `10px`, a fill bar in `--fg`, `--muted`, `--line` and `--surface`, and a dashed-top mono trace line. Figures are `aria-hidden`; the sentence beside each carries the meaning. The last slide ends on a `.g3` hairline grid of three doors, each a clickable cell with an accent label, a `17px` 600 title ending in an arrow, and muted `13.5px` copy.
 
 ### Icons and logo
 
@@ -398,9 +392,8 @@ The pages are exports from a Claude Design canvas and are rendered by `support.j
 - **Structure:** `<body>` wraps everything in `<x-dc>`, followed by a `<noscript>` block that hides the unrendered template and names `SPEC.md` and `llms.txt`; the `<helmet>` holds the title, meta description, font links and the `<style>` block; the page content follows as ordinary elements.
 - **Inline styles only.** Elements carry `style="…"` with token references. There are no class-based styles, apart from responsive hooks: the Assembler implementations table helpers (`.im` and `.im-hide-sm`) and the landing page's grid hooks (`.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd`, `.rm`), which exist only so a media query can reach many elements at once. A class never carries a style of its own outside a media rule.
 - **Hover** is the `style-hover="…"` attribute, which the runtime turns into a hover rule. There is no `style-focus` or `style-active` in use.
-- **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ tourCard }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`. The runtime passes every prop's default, so the component pins `--accent` inline only when the value differs from `ACCENT_DEFAULT`; a test keeps that constant equal to the `data-props` default and the `:root` token.
+- **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ r.rowStyle }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`. The runtime passes every prop's default, so the component pins `--accent` inline only when the value differs from `ACCENT_DEFAULT`; a test keeps that constant equal to the `data-props` default and the `:root` token.
 - **Responsive rules** go in the page's `<style>` as `@media (max-width: …)` blocks that select by id and end declarations with `!important`, because an inline style would otherwise win.
-- **Tour targets** are marked `data-tour="name"` on the section or panel.
 - **Generated content:** `generated/`, `SPEC.md`, the requirement arrays in the Spec and Assembler pages, the slot defaults in Producers and the profile examples come from `npm run build:contract`. Edit the source under `contract/`, `schema/` and `examples/`, then rebuild; `npm test` fails if a generated file is stale.
 - **Verification:** serve the folder with the `cwa-static` launch configuration (Python's `http.server` on port 8765) rather than opening files, because the runtime needs scripts. Check both themes by toggling `data-theme` on `<html>`, and check 375px and 1024px widths.
 

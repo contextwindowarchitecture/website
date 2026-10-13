@@ -65,7 +65,6 @@
     #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } }
-  @media (max-width: 620px) { #hdrtour { display: none !important; } }
   @media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
   @media (max-width: 860px) {
     #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }
@@ -112,14 +111,13 @@
         <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
       </nav>
       <div style="flex: 1;"></div>
-      <button id="hdrtour" onClick="{{ startTour }}" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 9px 18px; border: 0; cursor: pointer; font-family: inherit; white-space: nowrap;" style-hover="background: var(--fg);">Take the tour</button>
       <button id="hdrmenu" onClick="{{ toggleMenu }}" aria-controls="sitenav" aria-expanded="{{ menuOpen }}" style="display: none; font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ menuLabel }}</button>
       <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 8px 14px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ themeLabel }}</button>
       <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--bg); background: var(--fg); border-radius: var(--pill); padding: 9px 18px;" style-hover="background: var(--accent);">GitHub</a>
     </div>
   </header>
 
-  <section id="top" data-slide="1" data-tour="request" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;">
+  <section id="top" data-slide="1" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;">
     <div style="max-width: 1180px; width: 100%; margin: 0 auto; padding: 64px 32px 40px;">
     <div class="g2" style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 48px 72px; align-items: center;">
       <div>
@@ -130,8 +128,8 @@
         <h1 style="margin: 0; font-size: clamp(42px, 5.6vw, 82px); line-height: 0.94; letter-spacing: -0.045em; font-weight: 700; max-width: 13ch; text-wrap: balance;">Context isn't a prompt. It's an assembled request.</h1>
         <p style="margin: 32px 0 0; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 48ch; text-wrap: pretty;">Every model call is built from pieces: instructions, what the app knows, what it looked up, the conversation, the question. In most systems the step that puts them together has no name.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px;">
-          <button onClick="{{ startTour }}" style="font-size: 16px; font-weight: 600; font-family: inherit; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px; border: 0; cursor: pointer;" style-hover="background: var(--fg);">Take the tour</button>
-          <a href="./demo.html#assemble" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Watch it assemble</a>
+          <a href="./assembler.html#assemble" style="font-size: 16px; font-weight: 600; color: var(--bg); background: var(--accent); border-radius: var(--pill); padding: 15px 26px;" style-hover="background: var(--fg);">Watch it assemble</a>
+          <a href="./spec.html" style="font-size: 16px; font-weight: 600; color: var(--fg); border: 1px solid var(--line); border-radius: var(--pill); padding: 14px 26px;" style-hover="border-color: var(--fg);">Read the spec</a>
         </div>
       </div>
       <div style="display: flex; flex-direction: column; gap: 14px;">
@@ -154,14 +152,14 @@
     </div>
   </section>
 
-  <section id="shapes" data-slide="2" data-tour="shapes" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line); background: var(--surface);">
+  <section id="shapes" data-slide="2" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; width: 100%; margin: 0 auto; padding: 64px 32px 40px;">
     <div class="g2" style="display: grid; grid-template-columns: minmax(0, 1fr) 580px; gap: 48px 64px; align-items: center;">
       <div>
         <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The problem</div>
         <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 18ch; text-wrap: balance;">When nobody owns the payload, the failures have shapes.</h2>
         <p style="margin: 0 0 24px; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 44ch; text-wrap: pretty;">They repeat, they can be named, and every one of them can be reproduced.</p>
-        <a href="./demo.html#problem" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Seven shapes, each one reproducible in the demo →</a>
+        <a href="./assembler.html#assemble" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Watch seven systems assemble, and pull a slot out →</a>
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 20px 24px; align-items: flex-start;">
         <div style="display: flex; flex-direction: column; gap: 14px; width: 260px; max-width: 100%;">
@@ -176,17 +174,17 @@
           </div>
         </div>
         <div style="display: flex; flex-direction: column; gap: 28px; width: 280px; max-width: 100%; padding-top: 48px;">
-          <a href="./demo.html#assemble/clinical-triage/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
+          <a href="./assembler.html#assemble/clinical-triage/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
             <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-evid);">01 · Authority inversion</span>
             <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">A reference document sits above the never-diagnose rule, so the assistant names a condition.</span>
             <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
           </a>
-          <a href="./demo.html#assemble/weekly-brief/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
+          <a href="./assembler.html#assemble/weekly-brief/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
             <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-state);">03 · Stale-as-current</span>
             <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">Last week's brief looks exactly like this week's data, so old numbers ship as current.</span>
             <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
           </a>
-          <a href="./demo.html#assemble/support-agent/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
+          <a href="./assembler.html#assemble/support-agent/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
             <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-gov);">05 · Displacement under budget</span>
             <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">History is unbounded, so by turn thirty the price rule has been pushed out of the window.</span>
             <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
@@ -201,7 +199,7 @@
     </div>
   </section>
 
-  <section id="assembly" data-slide="3" data-tour="assembly" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line);">
+  <section id="assembly" data-slide="3" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line);">
     <div style="max-width: 1180px; width: 100%; margin: 0 auto; padding: 64px 32px 40px;">
     <div class="g2" style="display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 40px 64px; align-items: start;">
       <div>
@@ -229,7 +227,7 @@
     </div>
     <div style="margin-top: 40px;">
       <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-        <a href="./demo.html" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+        <a href="./assembler.html" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">
           <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Evaluating</span>
           <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">Watch it assemble →</span>
           <span style="font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">Seven systems. Pull a slot, squeeze the budget, see what degrades first.</span>
@@ -253,7 +251,7 @@
     </div>
   </section>
 
-  <section id="planes" data-tour="planes" style="border-top: 1px solid var(--line); background: var(--surface);">
+  <section id="planes" style="border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
       <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px;">
         <div>
@@ -324,35 +322,6 @@
       </sc-if>
     </div>
   </section>
-
-  <sc-if value="{{ tourOn }}" hint-placeholder-val="{{ false }}">
-    <div style="position: fixed; inset: 0; z-index: 90; pointer-events: none;">
-      <div style="{{ maskT }}"></div>
-      <div style="{{ maskB }}"></div>
-      <div style="{{ maskL }}"></div>
-      <div style="{{ maskR }}"></div>
-      <div style="{{ tourRing }}"></div>
-      <div role="dialog" aria-labelledby="tourtitle" style="{{ tourCard }}">
-        <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">
-          <span>{{ tourKicker }}</span>
-          <span style="color: var(--muted);">{{ tourCount }}</span>
-        </div>
-        <div id="tourtitle" style="font-size: 20px; line-height: 1.2; letter-spacing: -0.02em; font-weight: 700; margin-bottom: 10px; text-wrap: pretty;">{{ tourTitle }}</div>
-        <div style="font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ tourBody }}</div>
-        <div style="display: flex; gap: 2px; margin: 18px 0 16px;">
-          <sc-for list="{{ tourDots }}" as="d" hint-placeholder-count="4">
-            <div style="{{ d.style }}"></div>
-          </sc-for>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="tournext" onClick="{{ tourNext }}" style="{{ tourNextStyle }}">{{ tourNextLabel }}</button>
-          <button onClick="{{ tourBack }}" style="{{ tourBackStyle }}">Back</button>
-          <div style="flex: 1;"></div>
-          <button onClick="{{ endTour }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 0; cursor: pointer; padding: 8px 4px;" style-hover="color: var(--fg);">{{ tourSkipLabel }}</button>
-        </div>
-      </div>
-    </div>
-  </sc-if>
 
   <footer style="border-top: 1px solid var(--line);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);">
@@ -436,10 +405,7 @@ class Component extends DCLogic {
 
   componentWillUnmount() {
     this.glossaryUnmount();
-    clearInterval(this._track);
     if (this._hash) window.removeEventListener("hashchange", this._hash);
-    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
-    if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
   }
 
   componentDidMount() {
@@ -452,14 +418,16 @@ class Component extends DCLogic {
     this.applyHash();
   }
 
-  // The demo, the failure cards and harness engineering moved to the Demo page, and the spec's old anchors to Spec:
+  // The simulator lives on the Assembler page, where it fits is on About, and the spec's old anchors went to Spec:
   // a link that still names them here opens the page that holds them.
   applyHash() {
     const hash = location.hash || "";
     const parts = hash.replace(/^#/, "").split("/");
     const moved = { spec: "./spec.html", producers: "./producers.html", changelog: "./CHANGES.md", conformance: "./spec.html#s1", "placement-evidence": "./spec.html#s5" };
     if (moved[parts[0]]) { const sub = { governance: "#s3", profiles: "#s5", trace: "#s6" }; location.replace(moved[parts[0]] + (parts[0] === "spec" && sub[parts[1]] ? sub[parts[1]] : "")); return; }
-    if (["assemble", "problem", "harness"].includes(parts[0])) { location.replace("./demo.html" + hash); return; }
+    if (parts[0] === "assemble") { location.replace("./assembler.html" + hash); return; }
+    if (parts[0] === "problem") { location.replace("./assembler.html#assemble"); return; }
+    if (parts[0] === "harness") { location.replace("./about.html#fit"); return; }
     // The page renders after it loads, so a plain anchor such as #planes, which the glossary links, is scrolled to here, once it exists.
     if (parts.length === 1 && parts[0] && parts[0] !== "glossary") for (const wait of [0, 600]) setTimeout(() => {
       const el = document.getElementById(parts[0]);
@@ -474,137 +442,6 @@ class Component extends DCLogic {
     try { localStorage.setItem("cwa-theme", t); } catch (e) {}
     this.setState({ theme: t });
   }
-
-  // One step per slide. The last step opens the Demo page at #tour, where the tour carries on through the simulator.
-  tourSteps() {
-    return [
-      { key: "request", kicker: "Guided tour", title: "Start with what you already send",
-        body: "Every model call is one string built from pieces: instructions, what the app knows, what it looked up, the conversation, the question. Nothing in the string says which piece is which, who may direct the model, or how old anything is.", act: () => {} },
-      { key: "shapes", kicker: "The problem", title: "The failures have shapes",
-        body: "Colour the same string by plane and the faults show: reference material above a rule, last week's data reading as current, a rule pushed out of the window by history. Seven shapes, each one reproducible on the Demo page.", act: () => {} },
-      { key: "assembly", kicker: "What CWA does", title: "Name, fit, and write down why",
-        body: "Four planes and eleven typed slots give every piece an owner. The assembler admits what the request needs, fits it to the budget in tier order, renders it in a profile's order, and emits a trace.", act: () => {} },
-      { key: "planes", kicker: "The schema", title: "Planes first, slots second",
-        body: "A plane says why context exists. A slot is a typed collection inside it. Newcomers learn four words; implementers use eleven identifiers. The tour continues on the Demo page, where you can pull a slot out yourself.", act: () => this.setState({ mode: "planes" }), last: true }
-    ];
-  }
-
-  startTour() {
-    try { this._tourReturn = document.activeElement; } catch (e) {}
-    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
-    this._tourKeys = e => {
-      if (e.key === "Escape") this.endTour();
-      else if (e.key === "ArrowRight" || e.key === "Enter") this.tourGo(1);
-      else if (e.key === "ArrowLeft") this.tourGo(-1);
-    };
-    document.addEventListener("keydown", this._tourKeys);
-    this._tourScroll = () => this.measureTour();
-    window.addEventListener("scroll", this._tourScroll, { passive: true });
-    window.addEventListener("resize", this._tourScroll);
-    this.setState({ tour: 0 }, () => { this.enterStep(); this.focusTour(); });
-  }
-
-  endTour() {
-    clearInterval(this._track);
-    if (this._tourKeys) document.removeEventListener("keydown", this._tourKeys);
-    if (this._tourScroll) { window.removeEventListener("scroll", this._tourScroll); window.removeEventListener("resize", this._tourScroll); }
-    this.setState({ tour: null, trect: null, playing: true }, () => { try { this._tourReturn && this._tourReturn.focus(); } catch (e) {} });
-  }
-
-  tourGo(d) {
-    if (this.state.tour === null || this.state.tour === undefined) return;
-    const n = this.tourSteps().length;
-    const i = this.state.tour + d;
-    if (i < 0) return;
-    if (i >= n) { this.endTour(); return; }
-    this.setState({ tour: i }, () => { this.enterStep(); this.focusTour(); });
-  }
-
-  // Focus follows the card: Next is where a keyboard or screen-reader user continues from.
-  focusTour() { try { const next = document.getElementById("tournext"); if (next) next.focus({ preventScroll: true }); } catch (e) {} }
-
-  enterStep() {
-    const st = this.tourSteps()[this.state.tour];
-    if (!st) return;
-    if (st.act) st.act();
-    clearInterval(this._track);
-    setTimeout(() => {
-      const el = document.querySelector('[data-tour="' + st.key + '"]');
-      if (el) {
-        const sc = document.scrollingElement || document.documentElement;
-        const r = el.getBoundingClientRect();
-        const target = Math.max(0, sc.scrollTop + r.top - Math.max(96, (window.innerHeight - Math.min(r.height, 460)) / 2));
-        try { window.scrollTo({ top: target, behavior: "smooth" }); } catch (e) { window.scrollTo(0, target); }
-        setTimeout(() => {
-          if (Math.abs(sc.scrollTop - target) > 4) sc.scrollTop = target;
-          if (Math.abs(sc.scrollTop - target) > 4) document.body.scrollTop = target;
-        }, 260);
-      }
-      let n = 0;
-      this._track = setInterval(() => { this.measureTour(); if (++n > 22) clearInterval(this._track); }, 55);
-    }, 90);
-  }
-
-  measureTour() {
-    if (this.state.tour === null || this.state.tour === undefined) return;
-    const st = this.tourSteps()[this.state.tour];
-    const el = st && document.querySelector('[data-tour="' + st.key + '"]');
-    if (!el) { if (this.state.trect) this.setState({ trect: null }); return; }
-    const r = el.getBoundingClientRect();
-    const p = this.state.trect;
-    if (p && Math.abs(p.t - r.top) < 0.6 && Math.abs(p.l - r.left) < 0.6 && Math.abs(p.h - r.height) < 0.6) return;
-    this.setState({ trect: { t: r.top, l: r.left, w: r.width, h: r.height } });
-  }
-
-  tourVals(out) {
-    const i = this.state.tour;
-    out.tourOn = i !== null && i !== undefined;
-    out.startTour = () => this.startTour();
-    out.endTour = () => this.endTour();
-    if (!out.tourOn) return;
-    const steps = this.tourSteps();
-    const st = steps[i];
-    const W = window.innerWidth, H = window.innerHeight;
-    const raw = this.state.trect;
-    const r = raw && raw.t < H - 40 && raw.t + raw.h > 40 ? raw : null;
-    const CW = Math.min(400, W - 40), CH = 300;
-    const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-    let top, left;
-    if (!r) { top = (H - CH) / 2; left = (W - CW) / 2; }
-    else if (H - (r.t + r.h) > CH + 26) { top = r.t + r.h + 18; left = clamp(r.l, 20, W - CW - 20); }
-    else if (r.t > CH + 26) { top = r.t - CH - 18; left = clamp(r.l, 20, W - CW - 20); }
-    else if (W - (r.l + r.w) > CW + 44) { left = r.l + r.w + 20; top = clamp(r.t, 92, H - CH - 20); }
-    else if (r.l > CW + 44) { left = r.l - CW - 20; top = clamp(r.t, 92, H - CH - 20); }
-    else { left = W - CW - 24; top = H - CH - 24; }
-    top = clamp(top, 16, Math.max(16, H - CH - 16));
-    left = clamp(left, 16, Math.max(16, W - CW - 16));
-    const dim = "position: absolute; background: oklch(0 0 0 / 0.58); pointer-events: none; transition: all 200ms cubic-bezier(.2,.8,.25,1);";
-    if (r) {
-      const x0 = Math.max(0, r.l - 8), y0 = Math.max(0, r.t - 8);
-      const x1 = Math.min(W, r.l + r.w + 8), y1 = Math.min(H, r.t + r.h + 8);
-      out.tourRing = "position: absolute; left: " + x0 + "px; top: " + y0 + "px; width: " + (x1 - x0) + "px; height: " + (y1 - y0) + "px; border: 2px solid var(--accent); pointer-events: none; transition: all 220ms cubic-bezier(.2,.8,.25,1);";
-      out.maskT = dim + "left: 0; right: 0; top: 0; height: " + y0 + "px;";
-      out.maskB = dim + "left: 0; right: 0; top: " + y1 + "px; bottom: 0;";
-      out.maskL = dim + "left: 0; width: " + x0 + "px; top: " + y0 + "px; height: " + (y1 - y0) + "px;";
-      out.maskR = dim + "left: " + x1 + "px; right: 0; top: " + y0 + "px; height: " + (y1 - y0) + "px;";
-    } else {
-      out.tourRing = "display: none;";
-      out.maskT = dim + "inset: 0;";
-      out.maskB = "display: none;"; out.maskL = "display: none;"; out.maskR = "display: none;";
-    }
-    out.tourCard = "position: absolute; box-sizing: border-box; left: " + Math.round(left) + "px; top: " + Math.round(top) + "px; width: " + CW +
-      "px; pointer-events: auto; background: var(--bg); color: var(--fg); border: 1px solid var(--fg); padding: 22px 24px; box-shadow: 0 18px 50px oklch(0 0 0 / 0.35); transition: left 220ms cubic-bezier(.2,.8,.25,1), top 220ms cubic-bezier(.2,.8,.25,1);";
-    out.tourKicker = i === 0 || st.last ? st.kicker : "Step " + i + " · " + st.kicker; out.tourTitle = st.title; out.tourBody = st.body;
-    out.tourCount = (i + 1) + " / " + steps.length;
-    out.tourDots = steps.map((s, k) => ({ style: "flex: 1; height: 3px; background: " + (k <= i ? "var(--accent)" : "var(--line)") + "; transition: background 220ms ease;" }));
-    out.tourNext = st.last ? () => { this.endTour(); window.location.assign("./demo.html#tour"); } : () => this.tourGo(1);
-    out.tourBack = () => this.tourGo(-1);
-    out.tourNextLabel = st.last ? "Watch it assemble" : "Next";
-    out.tourSkipLabel = st.last ? "Close" : "Skip tour";
-    out.tourNextStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--bg); background: var(--accent); border: 0; border-radius: var(--pill); padding: 11px 20px; cursor: pointer;";
-    out.tourBackStyle = "font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 10px 18px; cursor: pointer; visibility: " + (i === 0 ? "hidden" : "visible") + ";";
-  }
-
 
   tab(active) {
     return "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; background: " +
@@ -706,7 +543,6 @@ class Component extends DCLogic {
       toggleMenu: () => this.setState(s => ({ menu: !s.menu }))
     };
     this.schemaVals(out);
-    this.tourVals(out);
     return Object.assign(out, this.glossaryVals());
   }
 }

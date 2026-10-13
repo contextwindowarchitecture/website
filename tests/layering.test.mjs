@@ -7,7 +7,7 @@ import vm from 'node:vm';
 // lands anywhere can pull back a layer. These tests hold the navigation, the home page's shape, and the glossary to
 // that (docs/plans/layering.md).
 
-const PAGES = ['index.html', 'demo.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const header = html => html.match(/<header[\s\S]*?<\/header>/)[0];
 
@@ -39,21 +39,6 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
   assert.ok(index.includes('<a href="./start.html"') && index.includes('>Building</span>'), 'builders have a door to Getting started');
   assert.match(await read('start.html'), /<a href="\.\/evidence\.html"[^>]*><span[^>]*>Placement<\/span>/, 'the Start page\'s Next card says Placement');
   assert.ok((await read('about.html')).includes('The Placement page cites what is measured and stops there.'), 'About names the Placement page');
-});
-
-test('the tour has one name on the home and Demo pages, and the Demo tour hands on to Getting started', async () => {
-  for (const page of ['index.html', 'demo.html']) {
-    const html = await read(page);
-    assert.ok(!html.includes('Take the guided tour'), `${page}: the tour has one name`);
-    assert.ok(header(html).includes('>Take the tour</button>'), `${page}: the header uses the same name`);
-  }
-  const { view, location } = await component('demo.html');
-  view.state.tour = view.tourSteps().length - 1;
-  const vals = view.renderVals();
-  assert.equal(vals.tourNextLabel, 'Get started');
-  vals.tourNext();
-  assert.deepEqual(location.assigned, ['./start.html']);
-  assert.equal(view.renderVals().tourOn, false);
 });
 
 // The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens, with
@@ -176,19 +161,8 @@ test('the home page is layer 1: a plain hero with no preview widget, and none of
   assert.ok(lede.split(' ').length <= 50, `the hero lede stays short: ${lede.split(' ').length} words`);
   for (const word of ['authority', 'lifecycle', 'deterministic', 'payload', 'slot']) assert.ok(!lede.toLowerCase().includes(word), `the hero lede avoids ${word}`);
   for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET', 'CONTRACT_MATURITY_START', 'CONTRACT_ITEM_START']) assert.ok(!html.includes(gone), `${gone} has left the home page`);
-  const demo = await read('demo.html');
-  assert.ok(!demo.includes('>Deterministic assembly</div>') && !demo.includes('Rule zero (R-5):'), 'the Demo page restates neither what-it-is card nor rule zero as a footnote');
-});
-
-test('every guided-tour step points at a section its page still has', async () => {
-  for (const [page, least] of [['index.html', 3], ['demo.html', 11]]) {
-    const html = await read(page);
-    const { view } = await component(page);
-    const keys = [...view.tourSteps().map(s => s.key)];
-    assert.ok(keys.length >= least && !keys.includes('evidence') && !keys.includes('adopt'), page);
-    assert.equal(view.tourSteps().at(-1).last, true, `${page}: the last step hands on`);
-    for (const key of keys) assert.ok(html.includes(`data-tour="${key}"`), `${page}: the tour step ${key} has a target`);
-  }
+  const assembler = await read('assembler.html');
+  assert.ok(!assembler.includes('>Deterministic assembly</div>') && !assembler.includes('Rule zero (R-5):'), 'the Assembler page restates neither what-it-is card nor rule zero as a footnote');
 });
 
 test('the About page states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {

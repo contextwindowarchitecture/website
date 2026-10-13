@@ -100,23 +100,23 @@
 
   <section id="assemble" style="border-bottom: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
-      <div data-tour="intro">
+      <div>
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
       <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
       <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget in tier order, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
       </div>
 
-      <div data-tour="tabs" style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
         <sc-for list="{{ ucTabs }}" as="tab" hint-placeholder-count="4">
           <button onClick="{{ tab.select }}" aria-pressed="{{ tab.pressed }}" style="{{ tab.style }}">{{ tab.label }}</button>
         </sc-for>
       </div>
 
       <div style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px;">
-        <span data-tour="play" style="display: flex; gap: 10px;"><button onClick="{{ togglePlay }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ playLabel }}</button>
-        <button data-tour="badbtn" onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
+        <span style="display: flex; gap: 10px;"><button onClick="{{ togglePlay }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 9px 16px; cursor: pointer;" style-hover="color: var(--fg); border-color: var(--fg);">{{ playLabel }}</button>
+        <button onClick="{{ toggleBad }}" aria-pressed="{{ badPressed }}" style="{{ badBtnStyle }}">{{ badLabel }}</button></span>
         <span style="width: 1px; height: 22px; background: var(--line); margin: 0 4px;"></span>
-        <span data-tour="budget" style="display: flex; align-items: center; gap: 10px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Input budget</span>
+        <span style="display: flex; align-items: center; gap: 10px;"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">Input budget</span>
         <span style="display: flex; gap: 6px;">
           <sc-for list="{{ budgets }}" as="b" hint-placeholder-count="4">
             <button onClick="{{ b.select }}" aria-pressed="{{ b.pressed }}" style="{{ b.style }}">{{ b.label }}</button>
@@ -124,7 +124,7 @@
         </span></span>
       </div>
 
-      <div data-tour="fill" style="border: 1px solid var(--line); background: var(--bg); padding: 16px 18px; margin-bottom: 14px;">
+      <div style="border: 1px solid var(--line); background: var(--bg); padding: 16px 18px; margin-bottom: 14px;">
         <div style="display: flex; justify-content: space-between; gap: 16px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">
           <span>Window fill</span>
           <span style="color: var(--fg);">{{ tokenLabel }}</span>
@@ -143,7 +143,7 @@
       </div>
 
       <div class="g2" style="display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr); gap: 28px; align-items: start;">
-        <div data-tour="slots" style="border: 1px solid var(--line); background: var(--bg); padding: 18px;">
+        <div style="border: 1px solid var(--line); background: var(--bg); padding: 18px;">
           <div role="status" aria-live="polite" style="position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;">{{ announce }}</div>
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px;">
             <span>Slots</span>
@@ -169,7 +169,7 @@
           </div>
         </div>
 
-        <div data-tour="payload" style="border: 1px solid var(--line); background: var(--bg); padding: 18px; min-height: 540px; display: flex; flex-direction: column;">
+        <div style="border: 1px solid var(--line); background: var(--bg); padding: 18px; min-height: 540px; display: flex; flex-direction: column;">
           <div style="display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">
             <span>{{ ucName }}</span>
             <span>{{ progress }}</span>
@@ -193,7 +193,7 @@
       </div>
 
       <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
-        <div data-tour="badpanel" style="border: 1px solid var(--fg); background: var(--bg); padding: 26px 28px; margin-top: 14px;">
+        <div style="border: 1px solid var(--fg); background: var(--bg); padding: 26px 28px; margin-top: 14px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Symptom you'll actually see</div>
           <p style="margin: 0 0 22px; font-size: 20px; line-height: 1.45; font-weight: 500; max-width: 70ch; text-wrap: pretty;">{{ ucSymptom }}</p>
           <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; border-top: 1px solid var(--line); padding-top: 20px;">
@@ -205,7 +205,7 @@
       </sc-if>
 
       <sc-if value="{{ hasRemoved }}" hint-placeholder-val="{{ false }}">
-        <div data-tour="removed" style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 22px 24px; margin-top: 14px;">
+        <div style="border: 1px solid var(--accent); background: var(--accent-soft); padding: 22px 24px; margin-top: 14px;">
           <div style="display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: center; margin-bottom: 16px;">
             <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg);">What breaks without it</span>
             <button onClick="{{ restoreAll }}" style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--fg); background: transparent; border: 1px solid var(--fg); border-radius: var(--pill); padding: 8px 15px; cursor: pointer;">Restore all slots</button>
@@ -582,7 +582,14 @@ class Component extends DCLogic {
 
   applyHash() {
     const parts = (location.hash || "").replace(/^#/, "").split("/");
-    if (parts.length < 2) return;
+    const scrollTo = id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const top = (window.pageYOffset || 0) + el.getBoundingClientRect().top - 68;
+      try { window.scrollTo({ top, behavior: "instant" }); } catch (e) { (document.scrollingElement || document.documentElement).scrollTop = top; }
+    };
+    // The page renders after it loads, so a plain anchor such as #assemble is scrolled to here, once it exists and again once it has settled.
+    if (parts.length < 2) { if (parts[0] && parts[0] !== "glossary") for (const wait of [0, 600]) setTimeout(() => scrollTo(parts[0]), wait); return; }
     const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     let patch = null;
     if (parts[0] === "assemble") {
@@ -592,10 +599,7 @@ class Component extends DCLogic {
       }
     }
     if (!patch) return;
-    this.setState(patch, () => {
-      const el = document.getElementById(parts[0]);
-      if (el) { const top = (window.pageYOffset || 0) + el.getBoundingClientRect().top - 68; try { window.scrollTo({ top, behavior: "instant" }); } catch (e) { (document.scrollingElement || document.documentElement).scrollTop = top; } }
-    });
+    this.setState(patch, () => scrollTo(parts[0]));
   }
 
   ucTabStyle(active) {
