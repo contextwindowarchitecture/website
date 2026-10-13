@@ -1,6 +1,6 @@
 # CWA for producers
 
-> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
+> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/llms-producers.txt. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
 
 ## What a producer is
 
@@ -239,7 +239,7 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 
 ## Sources
 
-- Producer contract page: https://contextwindowarchitecture.io/producers.html
+- Producer contract page: https://contextwindowarchitecture.io/llms-producers.txt
 - Spec, sections 2 to 4: https://contextwindowarchitecture.io/spec.html
 - Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md)
 - Item schema: [schema/context_item.schema.json](https://contextwindowarchitecture.io/schema/context_item.schema.json)

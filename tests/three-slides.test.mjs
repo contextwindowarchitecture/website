@@ -6,7 +6,7 @@ import vm from 'node:vm';
 // The home page is three slides whose one visual is the payload, which fills, breaks and then holds, followed by the
 // schema section; the simulator lives on the Assembler page, and there is no tour (docs/plans/three-slides.md).
 
-const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'spec.html', 'evidence.html', 'assembler.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const header = html => html.match(/<header[\s\S]*?<\/header>/)[0];
 
@@ -72,9 +72,9 @@ test('there is no tour and no Demo page; old demo anchors on the home page open 
     const html = await read(page);
     assert.ok(!/tour/i.test(html.replace(/contour/gi, '')), `${page} has no tour`);
     assert.ok(!html.includes('demo.html'), `${page} does not link the Demo page`);
-    if (page === 'index.html' || page === 'assembler.html') for (const off of ['start.html', 'producers.html', 'about.html']) assert.ok(!html.includes(`href="./${off}`), `${page} links only pages the nav lists, not ${off}`);
+    for (const off of ['start.html', 'producers.html', 'about.html']) assert.ok(!html.includes(off), `${page} links only pages the nav lists, not ${off}`);
   }
-  assert.equal(await fs.stat(new URL('../demo.html', import.meta.url)).catch(() => null), null, 'no Demo page');
+  for (const off of ['demo.html', 'start.html', 'producers.html', 'about.html']) assert.equal(await fs.stat(new URL('../' + off, import.meta.url)).catch(() => null), null, `${off} is not published`);
   for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5']]) {
     const { view, location } = await component('index.html', { hash });
     view.applyHash();

@@ -232,13 +232,13 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 |---|---|
 | `1200px` | Hide the nav row (`#sitenav`), show the `#hdrmenu` button; the nav opens as a full-width panel under the header |
 | `1000px` | Docs `#layout` collapses to one column; `#toc` hidden. Landing four-column grids (`.g4`) halve |
-| `860px` | Tool panels (`#tool`) collapse to one column. Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
-| `720px` | The Assembler implementations table (`.im`) drops secondary columns. Getting started step rows (`.steprow`) drop to two columns, the step text under its title; the walkthrough card (`#walkcard`) pads `18px 16px` |
+| `860px` | Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
+| `720px` | The Assembler implementations table (`.im`) drops secondary columns. |
 | `620px` | Header gutter to `20px`, header gap to `14px`. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
 
 On the landing and Assembler pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on either page has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
-Layers: the header sits at `z-index: 50`, the step walkthrough at `90`. Nothing else is layered.
+Layers: the header sits at `z-index: 50` and the glossary panel at `85`. Nothing else is layered.
 
 ## 6. Components
 
@@ -255,7 +255,7 @@ Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), menu butto
 
 ### Navigation
 
-The nav lists Home, Spec, Assembler and Placement, then the Glossary button; Demo, Getting started, Producers and About are reached from the pages that send readers there, not from the nav. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
+The nav lists Home, Spec, Assembler and Placement, then the Glossary button; those four pages are the whole site. Desktop: `display: flex; gap: 24px; font-size: 14px; font-weight: 500`, links `color: var(--muted)` hovering to `--fg`, `white-space: nowrap`. Each page in the nav marks its own link `aria-current="page"`.
 
 Narrow (1200px and below): the same `<nav id="sitenav">` becomes an absolutely positioned column under the header, `padding: 6px 32px 14px`, `font-size: 16px`, `background: var(--bg)`, with each link `padding: 13px 0` and a `--line` bottom border. The current page gets `border-left: 3px solid var(--accent); padding-left: 12px`. The `#hdrmenu` button toggles `data-open` and `aria-expanded`, and its label reads "Menu" or "Close".
 
@@ -274,7 +274,7 @@ All buttons are pills. There is no disabled, loading or pressed style.
 | Large inverse (inverted band) | inverse at `font-size: 16px; padding: 15px 26px`, coloured `--bg` fill with `--fg` text | `background: var(--accent); color: var(--bg)` |
 | Outline on the inverted band | `font-size: 16px; font-weight: 600; color: var(--bg); border: 1px solid color-mix(in oklab, var(--bg) 40%, transparent); border-radius: var(--pill); padding: 14px 26px;` | `border-color: var(--bg)` |
 
-A `<button>` always sets `font-family: inherit` (or `var(--mono)` for ghosts) because the browser default would not. Labels are sentence case: "Take the tour", "Watch it assemble", "Getting started →".
+A `<button>` always sets `font-family: inherit` (or `var(--mono)` for ghosts) because the browser default would not. Labels are sentence case: "Watch it assemble", "Read the spec", "Read the 26 requirements →".
 
 ### Links
 
@@ -336,10 +336,6 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 `border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Docs, GitHub, Apache-2.0 with `gap: 20px`.
 
-### Step walkthrough
-
-The Getting started page's six steps each open a modal walkthrough of the Ada example. A fixed, `inset: 0`, `z-index: 90` backdrop in `oklch(0 0 0 / 0.58)` centres a `role="dialog"` card up to `760px` wide, styled like the tour card: accent kicker with the step count, then an `18px` 600 caption, a snippet panel on `--surface` with a muted mono source line, the tour's dots, a primary Next (which becomes "Step N →" and finally "Done"), a ghost Back and a muted Close. Snippet lines are `12.5px` mono; a marked line has a `3px` `--accent` left border on `--accent-soft`. Arrow keys move, Escape and a backdrop click close, focus goes to Next on open and back to the step's button on close. Snippets are read from `examples/messages-*.json` and the system-prompt sample, never typed into the page.
-
 ### Glossary panel and prerequisite strip
 
 Every page's nav ends with a `Glossary` button (a `<button>` styled as a nav link, `font: inherit`) that slides out `<aside id="glossary">`: fixed to the right edge, `min(440px, 100%)` wide, `--bg` with a `--line` left border, `z-index: 85` (above the header, below the tour). It is `role="dialog"`, named by its accent kicker, and not modal: the page stays readable behind it. A header row holds the kicker, a muted count and a ghost Close; a search field (`type="search"`, pill-shaped on `--surface`) filters the entries; each entry is a `17px` 600 term, a `14.5px` plain definition, the specification's own sentence as a `13.5px` muted quote with a `2px` `--line` left border, a mono accent "Defined on … →" link and related-term pills. The entry a pill or a `#glossary/<term>` link opened gets a `3px` `--accent` left border. Escape and Close return focus to the control that opened the panel.
@@ -394,7 +390,7 @@ The pages are exports from a Claude Design canvas and are rendered by `support.j
 - **Hover** is the `style-hover="…"` attribute, which the runtime turns into a hover rule. There is no `style-focus` or `style-active` in use.
 - **Bindings** use `{{ name }}` for text, attributes and whole style strings (`style="{{ r.rowStyle }}"`), `<sc-for list="{{ items }}" as="d">` for repetition, and `onClick="{{ handler }}"` for events. Landing-page component logic lives in the `<script type="text/x-dc" data-dc-script>` block, which also declares canvas props such as `accent`. The runtime passes every prop's default, so the component pins `--accent` inline only when the value differs from `ACCENT_DEFAULT`; a test keeps that constant equal to the `data-props` default and the `:root` token.
 - **Responsive rules** go in the page's `<style>` as `@media (max-width: …)` blocks that select by id and end declarations with `!important`, because an inline style would otherwise win.
-- **Generated content:** `generated/`, `SPEC.md`, the requirement arrays in the Spec and Assembler pages, the slot defaults in Producers and the profile examples come from `npm run build:contract`. Edit the source under `contract/`, `schema/` and `examples/`, then rebuild; `npm test` fails if a generated file is stale.
+- **Generated content:** `generated/`, `SPEC.md`, the requirement arrays in the Spec page, the implementations table on the Assembler page and the profile examples come from `npm run build:contract`. Edit the source under `contract/`, `schema/` and `examples/`, then rebuild; `npm test` fails if a generated file is stale.
 - **Verification:** serve the folder with the `cwa-static` launch configuration (Python's `http.server` on port 8765) rather than opening files, because the runtime needs scripts. Check both themes by toggling `data-theme` on `<html>`, and check 375px and 1024px widths.
 
 ```mermaid
@@ -417,7 +413,7 @@ These are how the site behaves today. They are recorded so that a matching page 
 
 ## 11. Checklist for a new page or section
 
-1. Copy the `<helmet>` and the `<noscript>` block from `about.html`: fonts, the token block, the nav media queries, `scroll-padding-top`, the reduced-motion rule. Set the `<title>` as "Name — Context Window Architecture" and a one-sentence meta description.
+1. Copy the `<helmet>` and the `<noscript>` block from `evidence.html`: fonts, the token block, the nav media queries, `scroll-padding-top`, the reduced-motion rule. Set the `<title>` as "Name — Context Window Architecture" and a one-sentence meta description.
 2. Copy the header and footer unchanged, and set `aria-current="page"` on this page's nav link.
 3. Open with a kicker, a fluid h1 with `text-wrap: balance`, and an 18px muted lede at `64ch`.
 4. Build the body from sections separated by `border-top: 1px solid var(--line)`, alternating `--bg` and `--surface`, each in a `1180px` container with `72px 32px 88px` padding.

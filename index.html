@@ -532,7 +532,7 @@ class Component extends DCLogic {
   applyHash() {
     const hash = location.hash || "";
     const parts = hash.replace(/^#/, "").split("/");
-    const moved = { spec: "./spec.html", producers: "./producers.html", changelog: "./CHANGES.md", conformance: "./spec.html#s1", "placement-evidence": "./spec.html#s5" };
+    const moved = { spec: "./spec.html", producers: "./llms-producers.txt", changelog: "./CHANGES.md", conformance: "./spec.html#s1", "placement-evidence": "./spec.html#s5" };
     if (moved[parts[0]]) { const sub = { governance: "#s3", profiles: "#s5", trace: "#s6" }; location.replace(moved[parts[0]] + (parts[0] === "spec" && sub[parts[1]] ? sub[parts[1]] : "")); return; }
     if (parts[0] === "assemble") { location.replace("./assembler.html" + hash); return; }
     if (parts[0] === "problem") { location.replace("./assembler.html#assemble"); return; }

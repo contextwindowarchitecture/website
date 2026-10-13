@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { checkItem, checkTrace, checkProfile, checkProducerBatch, checkConflictGroup, checkConflictGroups, compareInstants, checkSnapshot, REASONS } from '../contract.js';
 import { validateItemSchema, validateTraceSchema, validateSnapshotSchema, validateRoutePolicySchema, validateRegistryLockSchema, validateConformanceReportSchema } from '../generated/schema-validators.js';
-import { SCAFFOLDS } from '../scaffolds.js';
+import { ITEM_SCHEMA, ITEM_EXAMPLE } from '../generated/contract-data.js';
 
 const read = async path => JSON.parse(await fs.readFile(new URL('../' + path, import.meta.url), 'utf8'));
 const item = await read('examples/context-item.json');
@@ -21,10 +21,10 @@ const TOKENIZERS = {
   'estimate-utf8/v1': text => Math.floor((Buffer.byteLength(text, 'utf8') + 3) / 4),
 };
 
-test('downloaded item and schema are the canonical published data', async () => {
-  const example = JSON.parse(SCAFFOLDS.find(s => s.filename === 'context_item.yaml').text);
+test('the generated item and schema are the canonical published data', async () => {
+  const example = JSON.parse(JSON.stringify(ITEM_EXAMPLE));
   assert.deepEqual(example, item);
-  assert.deepEqual(JSON.parse(SCAFFOLDS.find(s => s.filename.endsWith('.schema.json')).text), await read('schema/context_item.schema.json'));
+  assert.deepEqual(JSON.parse(JSON.stringify(ITEM_SCHEMA)), await read('schema/context_item.schema.json'));
   assert.equal(checkItem(example, context).valid, true);
 });
 

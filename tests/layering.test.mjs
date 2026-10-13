@@ -7,7 +7,7 @@ import vm from 'node:vm';
 // lands anywhere can pull back a layer. These tests hold the navigation, the home page's shape, and the glossary to
 // that (docs/plans/layering.md).
 
-const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'spec.html', 'evidence.html', 'assembler.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const header = html => html.match(/<header[\s\S]*?<\/header>/)[0];
 
@@ -28,7 +28,7 @@ async function component(page, { setInterval = () => 0 } = {}) {
   return { view, document, byId, location };
 }
 
-test('the nav calls the placement page Placement, the spec page is Spec everywhere, and the home page routes builders to Getting started', async () => {
+test('the nav calls the placement page Placement, the spec page is Spec everywhere, and the home page opens doors only to nav pages', async () => {
   for (const page of PAGES) {
     const html = await read(page);
     const nav = header(html).match(/<a href="\.\/evidence\.html"[^>]*>([^<]+)<\/a>/);
@@ -37,8 +37,6 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
   }
   const index = await read('index.html');
   assert.ok(!index.includes('<a href="./start.html"') && index.includes('>Evaluating</span>') && index.includes('>Checking</span>'), 'the home page opens doors only to pages the nav lists');
-  assert.match(await read('start.html'), /<a href="\.\/evidence\.html"[^>]*><span[^>]*>Placement<\/span>/, 'the Start page\'s Next card says Placement');
-  assert.ok((await read('about.html')).includes('The Placement page cites what is measured and stops there.'), 'About names the Placement page');
 });
 
 // The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens, with
@@ -114,7 +112,7 @@ test('every page opens the same glossary panel from its nav, and shows a prerequ
 });
 
 test('the panel opens from the nav or a pill, searches, follows #glossary/<term>, and returns focus when it closes', async () => {
-  const { view, document, byId, location } = await component('producers.html');
+  const { view, document, byId, location } = await component('evidence.html');
   view._glossary = glossaryModule;
   view.state.glossary = glossaryModule.index(GLOSSARY);
   byId['glossary-tier'] = { focused: 0, focus() { this.focused += 1; } };
@@ -165,40 +163,13 @@ test('the home page is layer 1: a plain hero with no preview widget, and none of
   assert.ok(!assembler.includes('>Deterministic assembly</div>') && !assembler.includes('Rule zero (R-5):'), 'the Assembler page restates neither what-it-is card nor rule zero as a footnote');
 });
 
-test('the About page states the draft\'s maturity as the build computes it from the implementations\' reports', async () => {
-  const { caseDigestsNow, implementations, tally, maturitySentence } = await import('../scripts/conformance-reports.mjs');
-  const date = (await read('CHANGES.md')).match(/^## (\d{4}-\d{2}-\d{2})/m)[1];
-  const digests = await caseDigestsNow(new URL('../', import.meta.url).pathname);
-  const published = [];
-  for (const dir of ['cases', 'rejections']) {
-    const root = new URL(`../conformance/${dir}/`, import.meta.url);
-    for (const name of await fs.readdir(root)) published.push({ ...JSON.parse(await read(`conformance/${dir}/${name}/case.json`)), digest: digests[name] });
-  }
-  const runs = [];
-  for (const { label, file } of await implementations(new URL('../', import.meta.url).pathname)) {
-    const { cases_at_run: atRun, report } = JSON.parse(await read(file));
-    runs.push({ label, total: published.length, passed: [...tally(report, atRun, published).values()].filter(o => o === 'passed').length });
-  }
-  const sentence = maturitySentence(date, runs);
-  assert.ok(sentence.startsWith(`Draft of ${date}. `) && runs.every(r => sentence.includes(r.label)) && sentence.includes(`${published.length} published cases`), sentence);
-  const html = await read('about.html');
-  assert.ok(html.includes(`<!-- CONTRACT_MATURITY_START -->${sentence}<!-- CONTRACT_MATURITY_END -->`), 'the About page carries the sentence the build writes');
-  assert.ok(html.includes('>Try the draft. Four assemblers pass every published case.</h2>'), 'under a heading that fits a draft');
-  assert.ok(html.includes('<section id="fit"') && html.includes('>It augments what you already use.</h2>'), 'About says where CWA fits');
+test('the maturity sentence the build computes from the implementations\' reports reads as one', async () => {
+  const { maturitySentence } = await import('../scripts/conformance-reports.mjs');
   assert.equal(maturitySentence('2026-01-01', [{ label: 'Python', total: 10, passed: 10 }, { label: 'Go', total: 10, passed: 9 }]),
     'Draft of 2026-01-01. Two assemblers, in Python and Go, pass between 9 and 10 of 10 published cases, rejections included, and the Assembler page shows which; none has a versioned release yet, and we want to hear what they must do.');
 });
 
-test('Getting started shows the sample request on the wire, Producers holds the two evidence callouts, and the Assembler page speaks of assemblers with no hand-written date', async () => {
-  const start = await read('start.html');
-  const wire = start.match(/<section id="wire"[\s\S]*?<\/section>/);
-  assert.ok(wire && wire[0].includes('<!-- CONTRACT_PAYLOAD_START -->') && wire[0].includes('<!-- CONTRACT_PAYLOAD_COUNT_START -->') && wire[0].includes('id="wirerow"'), 'the wire request lives on Getting started');
-  assert.ok(start.indexOf('<section id="wire"') < start.indexOf('<section id="migrate"'), 'after the six steps, before the migrator');
-  assert.ok(start.includes('#wirerow > div { position: static !important; }'), 'its sticky column stacks on narrow screens');
-  const producers = await read('producers.html');
-  const pipeline = producers.slice(producers.indexOf('<section id="pipeline">'), producers.indexOf('<section id="failures">'));
-  assert.ok(pipeline.includes('When nothing valid is retrieved') && pipeline.includes('href="./spec.html#R-12"'), 'the refusal callout, citing R-12');
-  assert.ok(pipeline.includes('Factual precedence is route policy') && pipeline.includes('href="./spec.html#R-11"'), 'the precedence callout, citing R-11');
+test('the Assembler page speaks of released assemblers with no hand-written date, and holds the simulator where the matrix was', async () => {
   const assembler = await read('assembler.html');
   assert.ok(assembler.includes('>Reference assemblers</div>') && !assembler.includes('Updated: 20') && assembler.includes('>Four assemblers, released as drafts.</h1>'), 'assemblers, plural, released, and no date to go stale');
   assert.ok(!assembler.includes('No release yet') && assembler.includes('Status: <span style="color: var(--fg);">released</span>'), 'the page no longer calls the assemblers unreleased');
@@ -207,6 +178,4 @@ test('Getting started shows the sample request on the wire, Producers holds the 
   const demo = assembler.slice(assembler.indexOf('<section id="assemble"'), assembler.indexOf('</section>', assembler.indexOf('<section id="assemble"')));
   assert.ok(demo.includes('>Live assembly</div>') && demo.includes(">The slots aren't the point. The assembly is.</h2>") && demo.includes('{{ ucTabs }}') && demo.includes('{{ announce }}'), 'the live assembly simulator sits where the matrix was');
   assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
-  const llms = await read('llms.txt');
-  assert.ok(!llms.match(/^- \[Landing page\].*sample request/m) && llms.match(/^- \[Getting started\].*sample request/m), 'llms.txt follows the move');
 });

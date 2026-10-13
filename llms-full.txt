@@ -25,7 +25,6 @@ The specification defines three conformance claims, and no others (spec §1):
 
 ### Applications and agents
 
-- [Getting started](https://contextwindowarchitecture.io/start.html): six steps from the prompt you send today to a snapshot an assembler renders, with a worked prompt-to-slots example and the sample request as the model receives it
 - [Integration sketch](https://contextwindowarchitecture.io/site/assembly-sketch.txt): the application's side, which runs the producers and freezes the snapshot, and an outline of what the assembler then does
 - [Payload template](https://contextwindowarchitecture.io/site/payload.txt): the policy-first-chat/v1 profile's slots as cwa-messages/v1 renders them
 - [Agent frameworks](https://contextwindowarchitecture.io/index.html#harness): where the assembler goes in the OpenAI Agents SDK, LangGraph, the Claude Agent SDK, the Vercel AI SDK or a loop of your own, and when to skip CWA
@@ -71,12 +70,10 @@ The specification defines three conformance claims, and no others (spec §1):
 
 ### Optional
 
-- [Producer contract](https://contextwindowarchitecture.io/producers.html): the producer guide as a page, with the item, batch and trace checks shown on editable examples, to see CWA in action rather than to check your own output
 - [Placement evidence](https://contextwindowarchitecture.io/evidence.html): why placement is a profile and not a rule, the profile format, and how to evaluate one
 - [Example item](https://contextwindowarchitecture.io/examples/context-item.json), [producer batch](https://contextwindowarchitecture.io/examples/producer-batch.json), [profiles](https://contextwindowarchitecture.io/examples/profiles.json), [route policies](https://contextwindowarchitecture.io/examples/route-policies.json) and [trace](https://contextwindowarchitecture.io/examples/trace.json)
 - [contract.js](https://contextwindowarchitecture.io/contract.js): the browser module behind the page tools: checkItem, checkProducerBatch, checkSnapshot, checkTrace and checkProfile, local checks only
 - [Glossary](https://contextwindowarchitecture.io/site/glossary.json): every term the site uses, defined in the specification's words, with where each is defined and its related terms
-- [About](https://contextwindowarchitecture.io/about.html): what CWA is and is not, how the specification changes, and how to contribute
 - [Landing page](https://contextwindowarchitecture.io/index.html): three slides: the request as it is sent today, the failure shapes an unowned payload produces, and what CWA does about them, with the schema's planes and slots and where the assembler goes in an agent framework beneath, and doors to the Assembler page's simulator, Getting started and the Spec
 
 ## Conformance (SPEC.md §1)
@@ -132,7 +129,7 @@ A model call is assembled from items. Every item belongs to exactly one slot, an
 
 ## Producers (llms-producers.txt)
 
-> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/producers.html. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
+> How to build a producer for Context Window Architecture (CWA): anything that emits candidate items into a slot, such as a retriever, a memory store, an MCP adapter, a state service, the capability policy, a policy loader or the conversation. It follows the Producers page, https://contextwindowarchitecture.io/llms-producers.txt. Rules are cited by their permanent number (R-n) and are normative in [SPEC.md](https://contextwindowarchitecture.io/SPEC.md), which the Spec page, https://contextwindowarchitecture.io/spec.html, renders. Its list of stages, its tables of slots, authority values and exclusion codes, and its example batch are written from the contract files by `python3 conformance/check.py --write`.
 
 ### What a producer is
 
@@ -371,7 +368,7 @@ Every exclusion lands in the trace as `excluded[] { item_id, reason, stage }`, p
 
 ### Sources
 
-- Producer contract page: https://contextwindowarchitecture.io/producers.html
+- Producer contract page: https://contextwindowarchitecture.io/llms-producers.txt
 - Spec, sections 2 to 4: https://contextwindowarchitecture.io/spec.html
 - Requirements: [SPEC.md](https://contextwindowarchitecture.io/SPEC.md)
 - Item schema: [schema/context_item.schema.json](https://contextwindowarchitecture.io/schema/context_item.schema.json)

@@ -9,7 +9,7 @@ import vm from 'node:vm';
 // simulator announces what a visitor changed
 // and marks its pressed tabs; and the header logo meets the 24px target size.
 
-const PAGES = ['index.html', 'start.html', 'spec.html', 'producers.html', 'evidence.html', 'assembler.html', 'about.html'];
+const PAGES = ['index.html', 'spec.html', 'evidence.html', 'assembler.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
 const styleOf = html => html.match(/<style>([\s\S]*?)<\/style>/)[1];
 
