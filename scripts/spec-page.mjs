@@ -5,16 +5,16 @@
 // A changed block is re-rendered inside its own element. An added block is a new paragraph, or sub-heading, set as the
 // nearest paragraph, or sub-heading, on the page is set; a removed block's element goes. The blocks between SPEC.md's
 // generated markers are the build's: they come from the contract files, and the sync never writes them. The draft date
-// and the changelog come from CHANGES.md, also through the build.
+// comes from CHANGES.md, also through the build. SPEC.md's Future work is not rendered.
 import fs from 'node:fs/promises';
-import { specBlocks, specBody } from './spec-markdown.mjs';
+import { specBlocks, specBody, specText } from './spec-markdown.mjs';
 
 const GENERATED = /<!-- generated:(\w+) -->\n\n([\s\S]*?)\n\n<!-- \/generated:\1 -->/g;
 const escapeHtml = text => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
 /** SPEC.md's blocks from its requirement index on: { md } for prose, { md, gen } for a block between markers. */
 export function markdownBlocks(markdown) {
-  const body = markdown.slice(markdown.indexOf('## Requirement index\n'));
+  const body = specText(markdown);
   const out = [];
   const prose = text => text.split('\n\n').map(b => b.trim()).filter(Boolean).forEach(md => out.push(md === '## Requirement index' ? { md, kind: 'index' } : { md }));
   let at = 0;

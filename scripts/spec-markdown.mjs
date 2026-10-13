@@ -1,4 +1,5 @@
-// The Spec page read back as Markdown: its requirement index, sections 1 to 6 and Future work, block by block. SPEC.md
+// The Spec page read back as Markdown: its requirement index and sections 1 to 6, block by block; SPEC.md's Future work
+// stays in SPEC.md. SPEC.md
 // is the normative text and the page renders it, so this is the check that the page says what SPEC.md says
 // (tests/website.test.mjs) and the reading scripts/spec-page.mjs syncs the page against. Prose is taken from the page's
 // markup in the order it stands there, and each list a template fills in is written from the values the page's
@@ -19,8 +20,14 @@ const table = (head, rows) => [head, head.map(() => '---'), ...rows]
 // SPEC.md marks each block written from the contract files, so a reader knows not to edit it there.
 export const MARKER = /^<!-- \/?generated:(\w+) -->\n\n/gm;
 export const marked = (name, md) => `<!-- generated:${name} -->\n\n${md}\n\n<!-- /generated:${name} -->`;
-/** SPEC.md from its requirement index on, without its markers: what the page, read back, must equal. */
-export const specBody = markdown => markdown.slice(markdown.indexOf('## Requirement index\n')).replace(MARKER, '');
+/** SPEC.md from its requirement index to its Future work, markers included: the part of it the page renders. */
+export function specText(markdown) {
+  const from = markdown.slice(markdown.indexOf('## Requirement index\n'));
+  const end = from.indexOf('\n## Future work');
+  return end >= 0 ? from.slice(0, end + 1) : from;
+}
+/** That text without its markers: what the page, read back, must equal. */
+export const specBody = markdown => specText(markdown).replace(MARKER, '').replace(/\n+$/, '\n');
 
 /** The page's markup as a tree, each element with where it starts and ends in the whole page. */
 function parse(html, base) {
@@ -120,7 +127,6 @@ export function specBlocks({ html, requirements, site }) {
       else {
         const said = text(child);
         if (/^\d+$/.test(said)) section.number = said;
-        else if (section.future && !out.length) out.push({ md: `## ${said}`, kind: 'heading', node: child });
         else if (/^\d+\.\d+ /.test(said)) out.push({ md: `### ${said}`, kind: 'subheading', node: child });
         else if (said.length <= LABEL_LENGTH && child === elements[0] && elements.length > 1) out.push({ md: `**${said}**`, kind: 'label', node: child });
         else if (said) out.push({ md: said, kind: 'line', node: child });
@@ -130,9 +136,9 @@ export function specBlocks({ html, requirements, site }) {
   };
 
   const date = html.match(/Specification · draft · (\d{4}-\d{2}-\d{2})/)[1];
-  const sections = [...html.matchAll(/<section id="(s\d+|future)"[^>]*>[\s\S]*?<\/section>/g)]
-    .map(m => blocks(parse(m[0], m.index).children[0], [], { future: m[1] === 'future' }).map(b => ({ ...b, section: m[1] })));
-  if (sections.length < 2 || sections.at(-1)[0]?.md !== '## Future work · non-normative') throw new Error('spec.html needs its numbered sections and then Future work.');
+  const sections = [...html.matchAll(/<section id="(s\d+)"[^>]*>[\s\S]*?<\/section>/g)]
+    .map(m => blocks(parse(m[0], m.index).children[0], [], {}).map(b => ({ ...b, section: m[1] })));
+  if (sections.length < 2) throw new Error('spec.html needs its numbered sections.');
   return { date, blocks: [{ md: '## Requirement index', kind: 'index' }, { md: lists.index(vals.index), gen: 'index' }, ...sections.flat()] };
 }
 

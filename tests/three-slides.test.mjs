@@ -124,5 +124,5 @@ test('the nav is Home, Spec, Assembler, Placement and the Glossary on every page
   assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/demo\.html#harness\)/m);
   assert.match(llms, /^- \[Landing page\]\(https:\/\/contextwindowarchitecture\.io\/index\.html\): three slides/m);
   assert.ok((await read('about.html')).includes('href="./demo.html#harness"'), 'the Agent frameworks card on About points at Demo');
-  assert.ok((await read('spec.html')).includes('<a href="./demo.html#assemble">Live assembler demo →</a>'), 'the Spec page\'s cross link points at Demo');
+  assert.ok(!(await read('spec.html')).includes('Live assembler demo'), 'the Spec page holds the specification only, with no cross link to the demo');
 });

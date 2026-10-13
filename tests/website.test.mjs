@@ -413,8 +413,7 @@ test('every page that speaks of the licence names Apache-2.0 and links it, and n
   assert.match(await fs.readFile(new URL('LICENSE', root), 'utf8'), /Apache License\s+Version 2\.0/);
   for (const page of pages) {
     const html = await fs.readFile(new URL(page, root), 'utf8');
-    // The spec page's changelog records what pages used to say, so it may quote a waiver it removed.
-    const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>|<section id="changelog"[\s\S]*?<\/section>/g, '').replace(/<[^>]+>/g, ' ');
+    const text = html.replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ');
     assert.doesNotMatch(text, /without attribution|no attribution|no licen[cs]e|public domain/i, page);
     if (/\blicen[cs]e\b|Apache/i.test(text)) assert.ok(html.includes('href="./LICENSE"'), `${page} speaks of the licence without linking it`);
   }
@@ -460,29 +459,19 @@ test('exported profiles pass the same contract as published profile examples', a
   }
 });
 
-// CHANGES.md is the specification's revision history. The Spec page's changelog and draft date are written from it,
-// and SPEC.md states the same date.
-test('the Spec page shows the changelog CHANGES.md holds, newest first, and its draft date is the newest revision\'s', async () => {
+// CHANGES.md is the specification's revision history. The Spec page's draft date is written from it, SPEC.md states
+// the same date, and the page shows no changelog: the history reads in CHANGES.md.
+test('the Spec page is dated by the newest revision CHANGES.md holds, as SPEC.md is, and carries no changelog or future work', async () => {
   const changes = await fs.readFile(new URL('../CHANGES.md', import.meta.url), 'utf8');
   const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
   const markdown = await fs.readFile(new URL('../SPEC.md', import.meta.url), 'utf8');
-  const unescape = md => md.replace(/\\([\\*<])/g, '$1');
-  const decodeEntities = text => text.replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
-  const groups = changes.split(/^## /m).slice(1).map(block => {
-    const [heading, ...lines] = block.trim().split('\n');
-    return { heading: unescape(heading), bullets: lines.filter(Boolean).map(line => unescape(line.replace(/^- /, ''))) };
-  });
-  const section = html.slice(html.indexOf('<section id="changelog"'), html.indexOf('</section>', html.indexOf('<section id="changelog"')));
-  const shown = [...section.matchAll(/draft<br \/>([^<]+)<\/div>\s*<ul[^>]*>([\s\S]*?)<\/ul>/g)].map(([, heading, ul]) => ({
-    heading: decodeEntities(heading), bullets: [...ul.matchAll(/<li>([\s\S]*?)<\/li>/g)].map(m => decodeEntities(m[1])) }));
-  assert.ok(groups.length > 10);
-  assert.deepEqual(shown, groups);
-  const history = unescape(changes.match(/^\*\*Draft history\.\*\* (.*)$/m)[1]);
-  assert.ok(decodeEntities(section).includes(`<strong>Draft history.</strong> ${history}</p>`), 'the draft history paragraph');
-  const dates = groups.map(g => g.heading.slice(0, 10));
+  const dates = changes.split(/^## /m).slice(1).map(block => block.slice(0, 10));
+  assert.ok(dates.length > 10);
   assert.deepEqual(dates, [...dates].sort().reverse(), 'newest first');
   assert.ok(html.includes(`Specification · draft · ${dates[0]}<`), 'the page is dated by the newest revision');
   assert.ok(markdown.includes(`\nDraft of ${dates[0]}, `), 'SPEC.md states the same date');
+  for (const gone of ['<section id="changelog"', '<section id="future"', 'href="#changelog"', 'href="#future"', 'Draft history', 'Future work']) assert.ok(!html.includes(gone), `${gone} is not on the page`);
+  assert.ok(!html.includes('href="./producers.html">Producer contract') && !html.includes('Live assembler demo'), 'the contents hold the specification only');
 });
 
 test('specification, its Markdown copy, and status matrix share every permanent ID', async () => {
@@ -522,12 +511,12 @@ const specSource = async () => ({
 // SPEC.md is the normative text and the Spec page renders it: the page, read back as Markdown, is SPEC.md from its
 // requirement index on, byte for byte once SPEC.md's generated markers are set aside, and carries the same draft date.
 // An edit to either one alone fails here: SPEC.md's until a sync, the page's for good.
-test('the Spec page, read back, says exactly what SPEC.md says, from its requirement index to Future work', async () => {
+test('the Spec page, read back, says exactly what SPEC.md says from its requirement index to section 6; Future work stays in SPEC.md', async () => {
   const { specMarkdown, specBody } = await import('../scripts/spec-markdown.mjs');
   const { pageMatches } = await import('../scripts/spec-page.mjs');
   const source = await specSource();
   const body = specBody(source.markdown);
-  assert.ok(body.startsWith('## Requirement index\n') && body.includes('\n## 6 ') && body.includes('\n## Future work · non-normative\n'));
+  assert.ok(body.startsWith('## Requirement index\n') && body.includes('\n## 6 ') && !body.includes('Future work') && source.markdown.includes('\n## Future work · non-normative\n'));
   assert.equal(specMarkdown(source), body);
   assert.equal(pageMatches(source), true);
   const sentence = await plainParagraph(source);

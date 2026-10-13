@@ -311,7 +311,7 @@ class Component extends DCLogic {
       process: [
         { n: "01", name: "Proposal", text: "An issue titled with the rule it touches (R-n, or 'new rule'). States the problem seen in a real route, the proposed text, and which conformance test would change." },
         { n: "02", name: "Draft", text: "A pull request against the canonical requirements, schemas, or Spec-page definitions; regenerate and check the published artifacts. Draft rules are marked draft in the index until the revision ships." },
-        { n: "03", name: "Revision", text: "Accepted drafts are batched into a dated revision of the current version (draft → draft, later date). The changelog lists every rule touched." },
+        { n: "03", name: "Revision", text: "Accepted drafts are batched into a dated revision of the current version (draft → draft, later date). CHANGES.md lists every rule touched." },
         { n: "04", name: "Version", text: "Versions start at v1 with the first release. After that, a version bump (v1 → v2) happens when a MUST changes meaning or a rule is withdrawn. Profiles and traces name the version they conform to." }
       ],
       ways: [
