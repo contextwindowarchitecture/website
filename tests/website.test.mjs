@@ -54,17 +54,22 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
-for (const [page, least] of [['index.html', 4], ['assembler.html', 5]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
+for (const [page, least] of [['index.html', 4], ['assembler.html', 5], ['evidence.html', 2]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
   const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
-  assert.ok(style.includes('.g2, .g3') && style.includes('{ grid-template-columns: minmax(0, 1fr) !important; }'), 'two-column sections and three-column cards stack below 860px');
-  assert.ok(style.includes('.g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
+  if (page === 'evidence.html') {
+    assert.ok(style.includes('@media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; }'), 'the docs body collapses to one column below 1000px');
+    assert.ok(style.includes('@media (max-width: 620px) { .rm { grid-template-columns: minmax(0, 1fr) !important; } }'), 'protocol rows stack below 620px');
+  } else {
+    assert.ok(style.includes('.g2, .g3') && style.includes('{ grid-template-columns: minmax(0, 1fr) !important; }'), 'two-column sections and three-column cards stack below 860px');
+    assert.ok(style.includes('.g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
+  }
   if (page === 'index.html') {
     assert.ok(style.includes('@media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }'), 'four-column grids halve below 1000px');
     assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
   }
   const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
-  const hooks = ['id="hero"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
+  const hooks = ['id="hero"', 'id="layout"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
   for (const hook of hooks) {
     const selector = hook.replace(/^id="/, '#').replace(/^class="/, '.').replace(/"$/, '');
     if (markup.includes(hook)) assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);

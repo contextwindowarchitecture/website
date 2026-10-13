@@ -234,9 +234,9 @@ Inline styles cannot respond to width, so each page keeps a short list of `@medi
 | `1000px` | Docs `#layout` collapses to one column; `#toc` hidden. Landing four-column grids (`.g4`) halve |
 | `860px` | Landing `#hero`, two-column sections (`.g2`), three-column cards (`.g3`) and the accordion detail (`.lyrd`) stack; the six-stage loop (`.g6`, `.g6p`) goes to three per row; the sticky columns in `#unitrow` and `#wirerow` stop sticking |
 | `720px` | The Assembler implementations table (`.im`) drops secondary columns. |
-| `620px` | Header gutter to `20px`, header gap to `14px`. Landing card pairs (`.g2c`), four-column grids (`.g4`) and removed-slot rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
+| `620px` | Header gutter to `20px`, header gap to `14px`. Landing card pairs (`.g2c`), four-column grids (`.g4`), removed-slot rows and the Placement protocol rows (`.rm`) stack; the loop goes to two per row and its pointer row hides; the accordion header (`.lyr`) moves the slot id under the name |
 
-On the landing and Assembler pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on either page has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
+On the landing, Assembler and Placement pages every fixed multi-column grid carries one of these hooks: the ids `#hero`, `#layout`, `#unitrow`, `#wirerow` and `#ctarow`, or the classes `.g2`, `.g2c`, `.g3`, `.g4`, `.g6`, `.g6p`, `.lyr`, `.lyrd` and `.rm`. A test in `tests/website.test.mjs` fails when a fixed grid on any of those pages has no hook or a hook has no rule, so reuse a hook when adding a grid rather than inventing one. Grids built with `repeat(auto-fit, minmax(…))` need no hook.
 
 Layers: the header sits at `z-index: 50`, the glossary panel at `85` and the Viability notice at `90`. Nothing else is layered.
 

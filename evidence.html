@@ -36,6 +36,7 @@
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } #logo-light, #logo-dark { width: 81px !important; height: 30px !important; } }
   @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
+  @media (max-width: 620px) { .rm { grid-template-columns: minmax(0, 1fr) !important; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     *, ::before, ::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
@@ -143,7 +144,7 @@
           <p style="margin: 0;">Attention and caching mostly agree: stable governance goes early and the live query goes last. They disagree in the middle. Long-context guidance puts documents near the top <a href="#cite-4">[4]</a>, while a cache wants per-turn retrieval below the history. <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cache-first-chat/v1</span> is the cache-ordered example; <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">policy-first-chat/v1</span> is the attention-ordered one, and both are published in <a href="./examples/profiles.json">examples/profiles.json</a>. Which order wins for a route is an evaluation question, like every other placement choice.</p>
           <p style="margin: 0;">Some things break reuse even in a stable order: budget pressure that sheds the oldest turn on every call (<a href="./spec.html#R-16">R-16</a>), a different variant chosen for an early item (<a href="./spec.html#R-18">R-18</a>), a governance item at a new <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">source_version</span>, and a surfaced conflict's mark (<a href="./spec.html#R-11">R-11</a>). A history producer that compacts old turns in blocks, rather than dropping one per call, keeps the history's leading part unchanged between compactions.</p>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 24px;">
           <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · assembler</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Identical bytes for an identical snapshot (<a href="./spec.html#R-23">R-23</a>), and history in the order turns were said (<a href="./spec.html#R-7">R-7</a>).</div></div>
           <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · profile</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Slot order: what changes least comes first.</div></div>
           <div style="background: var(--bg); padding: 18px 20px;"><div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Owner · renderer</div><div style="font-size: 15px; line-height: 1.55; text-wrap: pretty;">Where content entries begin: one per placed item under <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">cwa-message-blocks/v1</span>.</div></div>
@@ -240,7 +241,7 @@
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A profile is promoted by evidence from its own route, not by argument. The protocol is short and the trace makes it cheap: freeze the assembly snapshot, model configuration, and scoring protocol. Inspect changes in inclusion, repetition, wrappers and token counts as well as order. Deterministic requests do not make model responses deterministic or isolate placement as the sole cause of an outcome difference.</p>
         <div style="border: 1px solid var(--line);">
           <sc-for list="{{ protocol }}" as="p" hint-placeholder-count="6">
-            <div style="display: grid; grid-template-columns: 32px 200px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 32px 200px minmax(0, 1fr); gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ p.n }}</span>
               <span style="font-size: 15px; font-weight: 600;">{{ p.name }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ p.text }}</span>
