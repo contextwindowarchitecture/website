@@ -998,7 +998,7 @@ class Component extends DCLogic {
   // not need it, then counts down and goes; Stay here, Escape or a click outside the box keeps the reader on the page.
   // A modified or middle click opens the link as the browser would.
   viabilityUrl = "https://benchmark.contextwindowarchitecture.io";
-  viabilitySeconds = 10;
+  viabilitySeconds = 20;
   viabilityOpen(e) {
     if (e && (e.button > 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey)) return;
     if (e && e.preventDefault) e.preventDefault();

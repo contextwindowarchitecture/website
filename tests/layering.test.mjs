@@ -223,9 +223,9 @@ test('the Viability notice counts down to the benchmark site, and Stay here, Esc
   vals.openViability(click());
   vals = view.renderVals();
   assert.deepEqual([prevented, vals.viabilityOn, byId.viabilitystay.focused], [1, true, 1], 'a plain click opens the notice and focuses Stay here');
-  assert.equal(vals.viabilityCountdown, 'Opening Viability in 10 seconds');
+  assert.equal(vals.viabilityCountdown, 'Opening Viability in 20 seconds');
   assert.match(vals.viabilityBarStyle, /width: 100%/);
-  for (let i = 0; i < 9; i++) ticks[0]();
+  for (let i = 0; i < 19; i++) ticks[0]();
   vals = view.renderVals();
   assert.equal(vals.viabilityCountdown, 'Opening Viability in 1 second');
   assert.deepEqual(location.assigned, [], 'not before the count ends');
