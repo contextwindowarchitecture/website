@@ -36,7 +36,7 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
     assert.ok(!html.includes('>Docs</a>') && !html.includes('Read the docs'), `${page}: the spec page is called Spec`);
   }
   const index = await read('index.html');
-  assert.ok(index.includes('<a href="./start.html"') && index.includes('>Building</span>'), 'builders have a door to Getting started');
+  assert.ok(!index.includes('<a href="./start.html"') && index.includes('>Evaluating</span>') && index.includes('>Checking</span>'), 'the home page opens doors only to pages the nav lists');
   assert.match(await read('start.html'), /<a href="\.\/evidence\.html"[^>]*><span[^>]*>Placement<\/span>/, 'the Start page\'s Next card says Placement');
   assert.ok((await read('about.html')).includes('The Placement page cites what is measured and stops there.'), 'About names the Placement page');
 });

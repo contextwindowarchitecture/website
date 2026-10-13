@@ -62,8 +62,8 @@ test('the first slide offers the simulator and the spec, the second links each f
   assert.deepEqual([...second.matchAll(/<a href="\.\/assembler\.html#assemble\/([a-z-]+)\/blob"/g)].map(m => m[1]), ['clinical-triage', 'weekly-brief', 'support-agent'], 'three shapes, each reproducible');
   assert.ok(second.includes('href="./assembler.html#assemble"'), 'and the way to all seven');
   const third = html.slice(html.indexOf('<section id="assembly"'), html.indexOf('<section id="planes"'));
-  const doors = third.match(/<div class="g3" style="display: grid; grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[^"]*">([\s\S]*?)\n      <\/div>/)[1];
-  assert.deepEqual([...doors.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['assembler.html', 'start.html', 'spec.html'], 'evaluating, building, checking');
+  const doors = third.match(/<div class="g2c" style="display: grid; grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);[^"]*">([\s\S]*?)\n      <\/div>/)[1];
+  assert.deepEqual([...doors.matchAll(/<a href="\.\/([a-z]+\.html)"/g)].map(m => m[1]), ['assembler.html', 'spec.html'], 'evaluating, checking: only pages the nav lists');
   assert.ok(third.includes('href="./spec.html#s2"') && third.includes('href="#planes"'), 'the planes and slots are read on Spec §2 and on the schema section below');
 });
 
@@ -72,6 +72,7 @@ test('there is no tour and no Demo page; old demo anchors on the home page open 
     const html = await read(page);
     assert.ok(!/tour/i.test(html.replace(/contour/gi, '')), `${page} has no tour`);
     assert.ok(!html.includes('demo.html'), `${page} does not link the Demo page`);
+    if (page === 'index.html' || page === 'assembler.html') for (const off of ['start.html', 'producers.html', 'about.html']) assert.ok(!html.includes(`href="./${off}`), `${page} links only pages the nav lists, not ${off}`);
   }
   assert.equal(await fs.stat(new URL('../demo.html', import.meta.url)).catch(() => null), null, 'no Demo page');
   for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5']]) {
