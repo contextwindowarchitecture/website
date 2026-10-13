@@ -44,11 +44,24 @@ test('the home page is three slides, each a full-height section with one heading
   assert.ok(html.indexOf('<section id="planes"') > html.indexOf('<section id="assembly"'), 'the schema section follows the third slide');
   assert.ok(schema.includes('<sc-for list="{{ prereq }}" as="p"') && schema.includes('The words this site uses:') && html.split('The words this site uses:').length === 2, 'the prerequisite strip sits at the top of the schema section');
   assert.ok(schema.includes('<button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}"') && schema.includes('<sc-for list="{{ layers }}" as="layer"'), 'the planes and slots explorer');
-  const harness = html.slice(html.indexOf('<section id="harness"'));
-  assert.ok(html.indexOf('<section id="harness"') > html.indexOf('<section id="planes"'), 'harness engineering follows the schema section');
+  assert.ok(!html.includes('<section id="harness"') && !html.includes('frameworks()') && !html.includes('.g6'), 'harness engineering has moved to the Assembler page');
+  const { view, location } = await component('index.html', { hash: '#harness' });
+  view.applyHash();
+  assert.deepEqual(location.replaced, ['./assembler.html#harness'], 'an old link to the home page section opens it on the Assembler page');
+  assert.equal(view.renderVals().fwTabs, undefined);
+});
+
+test('harness engineering sits on the Assembler page below the simulator, with its framework picker', async () => {
+  const html = await read('assembler.html');
+  const at = id => html.indexOf(`<section id="${id}"`);
+  assert.ok(at('assemble') > 0 && at('harness') > at('assemble') && html.lastIndexOf('</section>', at('harness')) > at('assemble'), 'harness engineering follows the simulator');
+  assert.ok(at('harness') < html.indexOf('>Tell us what it must do.</h2>'), 'and comes before the closing band');
+  const harness = html.slice(at('harness'), html.indexOf('</section>', at('harness')));
   assert.ok(harness.includes('>Already using a framework? The assembler goes inside it.</h2>') && harness.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"') && harness.includes('{{ fwVerdict }}'), 'the framework picker');
-  const { view } = await component('index.html');
+  assert.ok(html.includes('.g6, .g6p { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }') && html.includes('.g6p { display: none !important; }'), 'the runtime loop folds on narrow screens');
+  const { view } = await component('assembler.html');
   assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
+  assert.equal(view.renderVals().slotChips.length, 11);
   view.renderVals().fwTabs[2].on();
   assert.equal(view.renderVals().fwName, 'the Claude Agent SDK');
 });
@@ -109,9 +122,10 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
   }
   const llms = await read('llms.txt');
   const glossary = JSON.parse(await read('site/glossary.json'));
-  assert.deepEqual(glossary.find(e => e.id === 'harness').where, { page: 'index.html', anchor: 'harness', label: 'harness engineering' });
-  assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/index\.html#harness\)/m);
+  assert.deepEqual(glossary.find(e => e.id === 'harness').where, { page: 'assembler.html', anchor: 'harness', label: 'harness engineering' });
+  assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html#harness\)/m);
   assert.ok(!llms.includes('demo.html'), 'llms.txt no longer lists the Demo page');
   assert.match(llms, /^- \[Landing page\]\(https:\/\/contextwindowarchitecture\.io\/index\.html\): three slides/m);
-  assert.match(llms, /^- \[Assembler page\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html\): .*live assembly simulator/m);
+  assert.match(llms, /^- \[Assembler page\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html\): .*live assembly simulator.*agent framework/m);
+  assert.doesNotMatch(llms.match(/^- \[Landing page\].*$/m)[0], /framework/, 'the landing page entry no longer promises the frameworks section');
 });

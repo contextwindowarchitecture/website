@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Reference assemblers — Context Window Architecture</title>
-<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, each passing every published case, and the live assembly simulator: seven systems assembled, fitted and rendered under the same rules." />
+<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, each passing every published case, the live assembly simulator (seven systems assembled, fitted and rendered under the same rules), and where the assembler goes in an agent framework." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -36,8 +36,8 @@
     #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } #logo-light, #logo-dark { width: 81px !important; height: 30px !important; } }
-  @media (max-width: 860px) { .g2, .g3 { grid-template-columns: minmax(0, 1fr) !important; } }
-  @media (max-width: 620px) { .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; } }
+  @media (max-width: 860px) { .g2, .g3 { grid-template-columns: minmax(0, 1fr) !important; } .g6, .g6p { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; } .g6p > div { grid-column: 1 !important; } }
+  @media (max-width: 620px) { .g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; } .g6 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } .g6p { display: none !important; } }
   @media (max-width: 720px) { .im { grid-template-columns: 84px minmax(0, 1.2fr) minmax(0, 1fr) !important; gap: 8px 10px !important; padding-left: 14px !important; padding-right: 14px !important; } .im-hide-sm { display: none; } }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -238,6 +238,120 @@
               </div>
             </sc-for>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="harness" style="border-bottom: 1px solid var(--line);">
+    <div style="max-width: 1180px; margin: 0 auto; padding: 96px 32px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Harness engineering</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1.0; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Already using a framework? The assembler goes inside it.</h2>
+      <p style="margin: 0 0 40px; font-size: 19px; line-height: 1.6; color: var(--muted); max-width: 62ch; text-wrap: pretty;">Your framework is the harness: it runs the loop, calls the tools, keeps the state, and retries the failures. It is deliberately unopinionated about the one thing that decides answer quality, which is what actually lands in the window on each pass. CWA fills that gap. Pick your stack:</p>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px;">
+        <sc-for list="{{ fwTabs }}" as="t" hint-placeholder-count="5">
+          <button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}" style="{{ t.style }}">{{ t.label }}</button>
+        </sc-for>
+      </div>
+
+      <div style="border: 1px solid var(--line); background: var(--bg);">
+        <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid var(--line); font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted);">
+          <span>Runtime loop · {{ fwName }}</span>
+          <span>Framework territory</span>
+        </div>
+        <div class="g6" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1px; background: var(--line);">
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">01</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Receive input</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">02</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Plan / route</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">03</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Resolve tools</div>
+          </div>
+          <div style="background: var(--accent); color: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; opacity: 0.75; margin-bottom: 8px;">04 · yours</div>
+            <div style="font-size: 14px; line-height: 1.35; font-weight: 600;">{{ fwSeamStage }}</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">05</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Call model</div>
+          </div>
+          <div style="background: var(--bg); padding: 18px 16px;">
+            <div style="font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 8px;">06</div>
+            <div style="font-size: 14px; line-height: 1.35; color: var(--muted);">Parse &amp; act ↻</div>
+          </div>
+        </div>
+        <div class="g6p" style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr));">
+          <div style="grid-column: 4; display: flex; justify-content: center;">
+            <div style="width: 0; height: 0; border-left: 13px solid transparent; border-right: 13px solid transparent; border-top: 13px solid var(--accent);"></div>
+          </div>
+        </div>
+        <div style="border-top: 1px solid var(--accent); background: var(--accent-soft); padding: 26px 24px 28px;">
+          <div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;">
+            <span>Inside stage 04</span>
+            <span>Your territory · CWA specifies this</span>
+          </div>
+          <div style="font-size: 17px; line-height: 1.5; max-width: 70ch; margin-bottom: 20px; text-wrap: pretty;">The framework hands you an empty array and a place to put a string. Everything below is a decision you are already making — usually implicitly, in one function, with no names for the parts.</div>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+            <sc-for list="{{ slotChips }}" as="c" hint-placeholder-count="11">
+              <span style="{{ c.style }}">{{ c.label }}</span>
+            </sc-for>
+          </div>
+          <div style="margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--accent); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; overflow-wrap: anywhere; color: var(--fg);">
+            <span style="color: var(--accent);">seam · </span>{{ fwSeam }}
+          </div>
+        </div>
+      </div>
+
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; margin-bottom: 40px;">
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Your harness already owns</div>
+          <sc-for list="{{ fwOwns }}" as="o" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; text-wrap: pretty;">
+              <span style="color: var(--muted);">✓</span><span>{{ o }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">It leaves you a blank</div>
+          <sc-for list="{{ fwBlank }}" as="b" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; text-wrap: pretty;">
+              <span style="color: var(--accent);">→</span><span>{{ b }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <div style="background: var(--bg); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">What that costs you</div>
+          <sc-for list="{{ fwCost }}" as="c" hint-placeholder-count="4">
+            <div style="display: flex; gap: 10px; font-size: 15px; line-height: 1.45; padding: 6px 0; color: var(--muted); text-wrap: pretty;">
+              <span>✕</span><span>{{ c }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--fg); background: var(--bg); padding: 30px 32px; margin-bottom: 40px;">
+        <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px;">Should you use CWA with {{ fwName }}?</div>
+        <div style="font-size: clamp(20px, 2.4vw, 28px); line-height: 1.35; letter-spacing: -0.02em; max-width: 60ch; text-wrap: pretty;">{{ fwVerdict }}</div>
+      </div>
+
+      <div class="g3" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">You send one fixed prompt with no retrieval and no history. An assembler for a single slot is bureaucracy.</div>
+        </div>
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">You never use more than a fifth of the window. Nothing competes, so nothing needs priority.</div>
+        </div>
+        <div style="background: var(--surface); padding: 24px 22px;">
+          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">Skip it if</div>
+          <div style="font-size: 16px; line-height: 1.45; text-wrap: pretty;">It's a prototype you'll delete on Friday. Come back when someone asks why it answered that.</div>
         </div>
       </div>
     </div>
@@ -626,6 +740,70 @@ class Component extends DCLogic {
     return "font-family: var(--mono); font-size: 11px; padding: 6px 9px; border: 1px solid " + this.color(i) + "; color: var(--fg); background: color-mix(in oklab, " + this.color(i) + " 10%, transparent);" + (extra || "");
   }
 
+  frameworks() {
+    return [
+      {
+        label: "OpenAI Agents SDK", name: "the Agents SDK", stage: "Build each model call's input",
+        seam: "RunConfig(call_model_input_filter=lambda call: ModelInputData(input=[*system, *messages], instructions=None))  # both from assemble_context(call)",
+        owns: ["The agent loop, tool calls and retries", "Handoffs between agents", "Sessions, tracing and guardrails", "Structured output parsing"],
+        blank: ["What the instructions callable returns", "The input list you pass to Runner.run()", "What your context object carries", "What tool results look like coming back"],
+        cost: ["Instructions grow into one 900-line string nobody edits", "Session history replays raw and crowds out evidence", "A bad handoff is unattributable — you can't tell which item caused it"],
+        verdict: "Yes, through RunConfig's call_model_input_filter rather than the instructions callable. Whatever instructions returns takes the system role, which only governance may take, so the filter replaces each model call's input with the system entries as system items and the one user message, and leaves instructions empty. Give the agent only the tools the grant lists. The dynamic instructions callable was already a context assembler without a spec; CWA moves it to the hook that runs before every model call and gives it typed slots, a fitting policy and a trace."
+      },
+      {
+        label: "LangChain / LangGraph", name: "LangGraph", stage: "Build state[\"messages\"]",
+        seam: "def call_model(state): messages, trace = assemble_context(state)",
+        owns: ["Graph topology and control flow", "Checkpointing and durable state", "Streaming, retries, interrupts", "Tool binding and routing"],
+        blank: ["The node that turns state into messages", "How reducers accumulate history", "Where retrieved documents get placed and with what authority", "Which prompt template wins on each branch"],
+        cost: ["Prompt templates fork per branch and drift apart", "Retrieval dumps land next to instructions with equal weight", "Message reducers append forever until the window blows"],
+        verdict: "Yes. A graph gives you order of operations — it says nothing about order of context. CWA is the missing half: the same slots, assembled by the same policy, at every node. Your checkpoint is already state.task."
+      },
+      {
+        label: "Claude Agent SDK", name: "the Claude Agent SDK", stage: "System prompt + tool results",
+        seam: "systemPrompt + CLAUDE.md + every tool result you return",
+        owns: ["The full agentic loop and subagents", "MCP servers and tool permissions", "Automatic compaction", "File and shell access"],
+        blank: ["What goes in the system prompt vs CLAUDE.md", "How much each tool returns, and in what shape", "What survives a compaction pass", "Where task state is written down"],
+        cost: ["CLAUDE.md becomes a junk drawer of unowned rules", "One chatty tool floods the window mid-task", "Compaction drops the half you needed, silently"],
+        verdict: "Yes — most of all here. Compaction decides what survives; CWA's tiers decide what it is choosing between. Items that know their own tier and expiry compact predictably."
+      },
+      {
+        label: "Vercel AI SDK", name: "the AI SDK", stage: "Build system + messages",
+        seam: "streamText({ system, messages, tools })  // system + messages come from assemble_context()",
+        owns: ["Streaming and provider routing", "Tool calling and multi-step runs", "UI state and React bindings", "Structured generation"],
+        blank: ["The system string, character for character", "Every message you push into the array", "How RAG chunks enter the conversation", "What persists between requests"],
+        cost: ["The system prompt is concatenated inline in a route handler", "Retrieved chunks get faked as user turns", "Nobody can see the final payload without a console.log"],
+        verdict: "Yes. The SDK is deliberately unopinionated about content — that's why it's pleasant to use. CWA is the opinion you're expected to bring, and it lives in one module beside your route."
+      },
+      {
+        label: "We rolled our own", name: "your own harness", stage: "build_messages()",
+        seam: "def build_messages(user, query, docs, history) -> list[Message]   # rename it assemble_context",
+        owns: ["Exactly as much as you wrote", "Your own loop, your own retries", "Your own memory store", "Your own evals, if you got to them"],
+        blank: ["All of it — which is the point", "The function that grew arguments for a year", "Truncation rules written under deadline", "The order, which is currently historical accident"],
+        cost: ["One function nobody wants to touch", "Truncation by slicing the middle out of history", "Every new feature adds a parameter and a conditional"],
+        verdict: "Yes, and it's the cheapest adoption of the five. You already have an assembler. CWA names its parts, gives it a fitting policy and a trace, and turns the function nobody touches into the one everybody can read."
+      }
+    ];
+  }
+
+  // Harness engineering: the framework picker below the simulator.
+  fwVals() {
+    const out = {};
+    const fws = this.frameworks();
+    const i = Math.min(this.state.fw || 0, fws.length - 1);
+    const f = fws[i];
+    out.fwTabs = fws.map((x, k) => ({
+      label: x.label,
+      pressed: k === i ? "true" : "false",
+      on: () => this.setState({ fw: k }),
+      style: "font-family: var(--mono); font-size: 12px; letter-spacing: 0.04em; padding: 10px 16px; border-radius: var(--pill); cursor: pointer; font-weight: 500; border: 1px solid " +
+        (k === i ? "var(--accent); background: var(--accent); color: var(--bg);" : "var(--line); background: transparent; color: var(--muted);")
+    }));
+    out.fwName = f.name; out.fwSeamStage = f.stage; out.fwSeam = f.seam;
+    out.fwOwns = f.owns; out.fwBlank = f.blank; out.fwCost = f.cost; out.fwVerdict = f.verdict;
+    out.slotChips = SLOTS.map((s, k) => ({ label: s[1], style: this.chip(k) }));
+    return out;
+  }
+
   // The live assembly simulator, as the home page rendered it.
   demoVals() {
     const fmt = n => n.toLocaleString("en-US");
@@ -872,7 +1050,7 @@ class Component extends DCLogic {
           caseNote: c.stale ? c.stale + " changed since its run" : ""
         };
       })
-    }, this.demoVals(), this.glossaryVals());
+    }, this.demoVals(), this.fwVals(), this.glossaryVals());
   }
 }
 </script>
