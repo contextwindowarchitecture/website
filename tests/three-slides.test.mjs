@@ -101,6 +101,11 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
     assert.deepEqual([...nav.matchAll(/<a href="([^"]+)"[^>]*>([^<]+)<\/a>|<button id="navglossary"[^>]*>([^<]+)<\/button>/g)].map(m => m[2] ?? m[3]), ['Home', 'Spec', 'Assembler', 'Placement', 'Viability', 'Glossary'], page);
     assert.ok(nav.includes('<a href="https://benchmark.contextwindowarchitecture.io"'), `${page}: Viability opens the benchmark site`);
     assert.ok((await read(page)).match(/<footer[\s\S]*?<\/footer>/)?.[0].includes('<a href="./llms.txt">llms.txt</a>'), `${page} has the footer`);
+    const head = header(await read(page));
+    assert.ok(head.includes('<img id="logo-light" src="./site/logo-light.png" alt="Context Window Architecture" width="108" height="40"') && head.includes('<img id="logo-dark" src="./site/logo-dark.png" alt="Context Window Architecture" width="108" height="40"'), `${page}: the header shows the organisation's logo, one file per theme`);
+    assert.ok(!head.includes('var(--p-gov)') && !head.includes('>CWA</span>'), `${page}: the plane-grid mark and wordmark are gone from the header`);
+    assert.ok((await read(page)).includes('html[data-theme="dark"] #logo-dark { display: block !important; }'), `${page}: the dark theme swaps the logo`);
+    assert.ok((await read(page)).includes('#logo-light, #logo-dark { width: 81px !important; height: 30px !important; }'), `${page}: the logo shrinks on narrow screens so the header fits`);
   }
   const llms = await read('llms.txt');
   const glossary = JSON.parse(await read('site/glossary.json'));

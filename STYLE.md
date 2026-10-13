@@ -114,7 +114,7 @@ The four plane colours are the site's only other chroma and always mean the plan
 
 Where they appear, and nowhere else:
 
-- The logo mark: a 2 by 2 grid, 18px square, 2px gap, in the order governance, state, evidence, interaction.
+- The plane mark on the home page's third slide: a 2 by 2 grid in the order governance, state, evidence, interaction.
 - Legend swatches: an 8px by 18px vertical bar next to a label.
 - Slot rows in the assembler demo: a 3px left border on the full row, a 2px left border on nested detail, and the slot label text.
 - Comment lines in the rendered payload view, and segments of the budget bar.
@@ -251,7 +251,7 @@ Snippets are the exact inline styles in use; hover states use the `style-hover` 
   <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
 ```
 
-Order left to right: logo mark and wordmark, nav, spacer (`flex: 1`), menu button (narrow only), theme toggle, GitHub inverse button. The wordmark is `font-weight: 700; letter-spacing: -0.02em; font-size: 16px` in `--fg`, and the logo link is `min-height: 24px`, the WCAG 2.2 target size.
+Order left to right: the logo, nav, spacer (`flex: 1`), menu button (narrow only), theme toggle, GitHub inverse button. The logo link is `min-height: 24px`, the WCAG 2.2 target size.
 
 ### Navigation
 
@@ -348,7 +348,7 @@ The landing page is three slides, each a `<section>` with `data-slide="n"`: `min
 
 ### Icons and logo
 
-No page carries an icon today. If you add one, make it an 18px line icon: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`; do not introduce filled or two-tone icons. The logo mark is the 2 by 2 plane grid described in section 3, followed by the wordmark "CWA". There is no image, no favicon link and no Open Graph image on any page.
+No page carries an icon today. If you add one, make it an 18px line icon: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`; do not introduce filled or two-tone icons. The logo is the organisation's wordmark, `site/logo-light.png` (black) in the light theme and `site/logo-dark.png` (white) in the dark theme, both from the contextwindowarchitecture/.github profile, shown at 108 by 40px in the header link with `alt="Context Window Architecture"`; a page rule under `html[data-theme="dark"]` swaps the two. They are the only images on the site; there is no favicon link and no Open Graph image on any page.
 
 ## 7. Motion and interaction states
 
