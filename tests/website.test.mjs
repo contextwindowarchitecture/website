@@ -54,12 +54,18 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
-for (const [page, least] of [['index.html', 4], ['assembler.html', 5], ['evidence.html', 2]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
+for (const [page, least] of [['index.html', 4], ['assembler.html', 5], ['evidence.html', 2], ['spec.html', 8]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
   const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
   if (page === 'evidence.html') {
     assert.ok(style.includes('@media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; }'), 'the docs body collapses to one column below 1000px');
     assert.ok(style.includes('@media (max-width: 620px) { .rm { grid-template-columns: minmax(0, 1fr) !important; } }'), 'protocol rows stack below 620px');
+  } else if (page === 'spec.html') {
+    assert.ok(style.includes('@media (max-width: 620px) { .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'labelled rows stack below 620px');
+    assert.ok(style.includes('.pln { grid-template-columns: 6px minmax(0, 1fr) !important;'), 'plane rows keep their colour bar and put the slots under the name below 620px');
+    assert.ok(/<span style="overflow-wrap: anywhere;"><a href="https:\/\/github\.com\/[\w.-]+\/[\w.-]+" target="_blank" rel="noopener">/.test(html), 'the repository name in the meta row wraps');
+    const statements = [...html.matchAll(/<div style="([^"]*)"><sc-for list="\{\{ r\.segs \}\}"/g)].map(m => m[1]);
+    assert.ok(statements.length >= 5 && statements.every(s => s.includes('overflow-wrap: anywhere;')), 'requirement statements break long paths such as schema/conflict_group.schema.json');
   } else {
     assert.ok(style.includes('.g2, .g3') && style.includes('{ grid-template-columns: minmax(0, 1fr) !important; }'), 'two-column sections and three-column cards stack below 860px');
     assert.ok(style.includes('.g2c, .g4, .rm { grid-template-columns: minmax(0, 1fr) !important; }'), 'card pairs, four-column grids and removed-slot rows stack below 620px');
@@ -69,14 +75,14 @@ for (const [page, least] of [['index.html', 4], ['assembler.html', 5], ['evidenc
     assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
   }
   const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
-  const hooks = ['id="hero"', 'id="layout"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="rm"'];
+  const hooks = ['id="hero"', 'id="layout"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="pln"', 'class="rm"'];
   for (const hook of hooks) {
     const selector = hook.replace(/^id="/, '#').replace(/^class="/, '.').replace(/"$/, '');
     if (markup.includes(hook)) assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);
   }
   const fixed = [...markup.matchAll(/<\w+ ([^>]*?grid-template-columns: ([^;"]+)[^>]*)>/g)]
     .map(m => ({ tag: m[1], tracks: m[2] }))
-    .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[2-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
+    .filter(g => !g.tracks.includes('auto-fit') && (/repeat\(\d/.test(g.tracks) || (g.tracks.match(/minmax\(/g) || []).length >= 2 || /\b[1-9]\d\dpx/.test(g.tracks) || g.tracks.endsWith(' auto')));
   assert.ok(fixed.length >= least, `found ${fixed.length} fixed multi-column grids`);
   for (const g of fixed) assert.ok(hooks.some(h => g.tag.includes(h)), `a "${g.tracks}" grid stacks on narrow viewports: ${g.tag.slice(0, 80)}`);
 });

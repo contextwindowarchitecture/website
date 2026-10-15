@@ -38,6 +38,7 @@
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } #logo-light, #logo-dark { width: 81px !important; height: 30px !important; } }
   @media (max-width: 620px) { #hdrgh { display: none !important; } #sitenav #navgh { display: flex !important; } #sitenav #navgh a { padding: 13px 0 !important; border: 0 !important; } }
   @media (max-width: 1000px) { #layout { grid-template-columns: minmax(0, 1fr) !important; } #toc { display: none !important; } }
+  @media (max-width: 620px) { .rm { grid-template-columns: minmax(0, 1fr) !important; } .pln { grid-template-columns: 6px minmax(0, 1fr) !important; row-gap: 12px !important; } .pln > :first-child { grid-row: span 2; } .pln > :last-child { grid-column: 2; } }
   :target { scroll-margin-top: 88px; }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
@@ -92,7 +93,7 @@
       </div>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
-        <span><a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/16de4be0534583f135a597171c927d42c87ee82c">16de4be</a>.</span>
+        <span style="overflow-wrap: anywhere;"><a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/16de4be0534583f135a597171c927d42c87ee82c">16de4be</a>.</span>
       </div>
     </div>
   </section>
@@ -143,7 +144,7 @@
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">A model call is assembled from <strong>items</strong>. Every item belongs to exactly one <strong>slot</strong>; slots are grouped into four <strong>planes</strong>. The planes answer four different questions and are never merged. An item in one of the two evidence slots is an <strong>evidence item</strong>, and the piece of a document a retriever pulls is a <strong>chunk</strong>.</p>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ planes }}" as="p" hint-placeholder-count="4">
-            <div style="display: grid; grid-template-columns: 6px 150px minmax(0, 1fr); gap: 0 18px; padding: 16px 18px; border-bottom: 1px solid var(--line); align-items: start;">
+            <div class="pln" style="display: grid; grid-template-columns: 6px 150px minmax(0, 1fr); gap: 0 18px; padding: 16px 18px; border-bottom: 1px solid var(--line); align-items: start;">
               <span style="width: 6px; height: 100%; min-height: 40px; background: {{ p.color }};"></span>
               <div>
                 <div style="font-size: 16px; font-weight: 600;">{{ p.name }}</div>
@@ -160,7 +161,7 @@
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">2.1 Slots</div>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ slots }}" as="s" hint-placeholder-count="11">
-            <div style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 6px 18px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 6px 18px; padding: 14px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12.5px; color: {{ s.color }};">{{ s.id }}</span>
               <div style="min-width: 0;">
                 <div style="font-size: 14.5px; line-height: 1.5;">{{ s.holds }}</div>
@@ -187,7 +188,7 @@
         </div>
         <div style="border: 1px solid var(--line); margin-bottom: 28px;">
           <sc-for list="{{ itemFields }}" as="f" hint-placeholder-count="9">
-            <div style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; padding: 11px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 14px; padding: 11px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">{{ f.key }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ f.text }}</span>
             </div>
@@ -197,7 +198,7 @@
           <sc-for list="{{ rulesModel }}" as="r" hint-placeholder-count="4">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
             </div>
           </sc-for>
         </div>
@@ -213,7 +214,7 @@
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">3.1 Instruction authority and data roles</div>
         <div style="border: 1px solid var(--line); margin-bottom: 14px;">
           <sc-for list="{{ authority }}" as="a" hint-placeholder-count="7">
-            <div style="display: grid; grid-template-columns: 32px 190px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 32px 190px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12px; color: var(--accent);">{{ a.n }}</span>
               <span><span style="display: block; font-size: 15px; font-weight: 600;">{{ a.name }}</span><span style="display: block; font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 2px;">{{ a.value }}</span></span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ a.text }}</span>
@@ -236,7 +237,7 @@
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">3.3 Conflict resolution · instruction rules and factual route policy</div>
         <div style="border: 1px solid var(--line); margin-bottom: 14px;">
           <sc-for list="{{ conflicts }}" as="c" hint-placeholder-count="6">
-            <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-size: 14.5px; font-weight: 600; text-wrap: pretty;">{{ c.when }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">→ {{ c.then }}</span>
             </div>
@@ -248,7 +249,7 @@
           <sc-for list="{{ rulesGov }}" as="r" hint-placeholder-count="7">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
             </div>
           </sc-for>
         </div>
@@ -260,7 +261,7 @@
         <p style="margin: 0 0 24px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Evidence goes through eight steps between the source and the payload. The first four are the producer's, and they're done before assembly starts. The last four are the assembler's, and everything it leaves out shows up in the trace with a reason code.</p>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ stages }}" as="s" hint-placeholder-count="8">
-            <div style="display: grid; grid-template-columns: 32px 140px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 32px 140px minmax(0, 1fr); gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-family: var(--mono); font-size: 12px; color: var(--p-evid);">{{ s.n }}</span>
               <span style="font-size: 15px; font-weight: 600;">{{ s.name }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ s.text }}</span>
@@ -273,7 +274,7 @@
           <sc-for list="{{ rulesFit }}" as="r" hint-placeholder-count="7">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
             </div>
           </sc-for>
         </div>
@@ -353,7 +354,7 @@
           <sc-for list="{{ rulesProf }}" as="r" hint-placeholder-count="2">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
             </div>
           </sc-for>
         </div>
@@ -373,7 +374,7 @@
         <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;">6.1 Tests the trace makes possible</div>
         <div style="border: 1px solid var(--line); margin-bottom: 24px;">
           <sc-for list="{{ tests }}" as="t" hint-placeholder-count="9">
-            <div style="display: grid; grid-template-columns: 190px minmax(0, 1fr) 60px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
+            <div class="rm" style="display: grid; grid-template-columns: 190px minmax(0, 1fr) 60px; gap: 14px; padding: 12px 18px; border-bottom: 1px solid var(--line); align-items: baseline;">
               <span style="font-size: 15px; font-weight: 600;">{{ t.name }}</span>
               <span style="font-size: 14px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">{{ t.text }}</span>
               <a href="{{ t.href }}" style="font-family: var(--mono); font-size: 12px; color: var(--accent); text-align: right;">{{ t.rule }}</a>
@@ -384,7 +385,7 @@
           <sc-for list="{{ rulesTrace }}" as="r" hint-placeholder-count="3">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg);"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
             </div>
           </sc-for>
         </div>
