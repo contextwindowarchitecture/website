@@ -274,3 +274,34 @@ for (const [name, url, open] of [['Viability', VIABILITY, 'openViability'], ['Ex
     assert.deepEqual(location.assigned, [url, url], `Go to ${name} now goes at once`);
   });
 }
+
+// The header's right end links to GitHub with three line icons in place of the old GitHub button: the organisation,
+// the spec repository to star, and a pre-titled issue that a workflow in contextwindowarchitecture/.github answers with an invitation. A phone header has
+// no room for them, so below 620px the same three move into the menu panel with their names.
+const ORG = 'https://github.com/contextwindowarchitecture';
+const GITHUB_LINKS = [
+  [ORG, 'GitHub organization', 'GitHub'],
+  [ORG + '/contextwindowarchitecture', 'Star the spec on GitHub', 'Star'],
+  [ORG + '/.github/issues/new?title=Join%20the%20organization', 'Join the GitHub organization', 'Join'],
+];
+
+test('every page links to GitHub from three header icons, which move into the menu on phones', async () => {
+  const headers = new Set();
+  for (const page of PAGES) {
+    const html = await read(page);
+    const head = header(html);
+    assert.ok(!head.includes('>GitHub</a>'), `${page}: the GitHub button is gone`);
+    const icons = head.match(/<div id="hdrgh"[\s\S]*?<\/div>/)?.[0];
+    assert.ok(icons, `${page}: the header has the icon group`);
+    assert.ok(head.indexOf('{{ themeLabel }}') < head.indexOf('<div id="hdrgh"'), `${page}: the icons follow the theme toggle`);
+    const links = [...icons.matchAll(/<a href="([^"]+)" target="_blank" rel="noopener" aria-label="([^"]+)" title="\2"[^>]*><svg [^>]*aria-hidden="true"/g)].map(m => [m[1], m[2]]);
+    assert.deepEqual(links, GITHUB_LINKS.map(([href, label]) => [href, label]), `${page}: organisation, star, join, each named for screen readers`);
+    const panel = head.match(/<div id="navgh" style="display: none;[\s\S]*?<\/div>/)?.[0];
+    assert.ok(panel && head.match(/<nav id="sitenav"[\s\S]*?<\/nav>/)[0].includes(panel), `${page}: the menu panel holds a hidden copy`);
+    assert.deepEqual([...panel.matchAll(/<a href="([^"]+)"[^>]*><svg [^>]*aria-hidden="true"[\s\S]*?<\/svg><span>([^<]+)<\/span><\/a>/g)].map(m => [m[1], m[2]]), GITHUB_LINKS.map(([href, , text]) => [href, text]), `${page}: the panel names each link`);
+    assert.ok(html.includes('@media (max-width: 620px) { #hdrgh { display: none !important; } #sitenav #navgh { display: flex !important; }'), `${page}: phones swap the icons into the panel`);
+    headers.add(icons + panel);
+  }
+  assert.equal(headers.size, 1, 'the icons are identical on every page');
+  assert.match(await read('THIRD_PARTY_NOTICES.md'), /## Feather[\s\S]*Cole Bemis/, 'the Feather licence travels with its icons');
+});

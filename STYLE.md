@@ -251,7 +251,7 @@ Snippets are the exact inline styles in use; hover states use the `style-hover` 
   <div id="hdrrow" style="max-width: 1180px; margin: 0 auto; padding: 0 32px; height: 68px; display: flex; align-items: center; gap: 28px;">
 ```
 
-Order left to right: the logo, nav, spacer (`flex: 1`), menu button (narrow only), theme toggle, GitHub inverse button. The logo link is `min-height: 24px`, the WCAG 2.2 target size.
+Order left to right: the logo, nav, spacer (`flex: 1`), menu button (narrow only), theme toggle, then `#hdrgh`: three GitHub icon links, `gap: 8px`, each a `36px` circle with a `--line` border and a `--muted` icon that hover to `--fg`, like the theme toggle. They open the organisation, the spec repository (to star it) and a new issue titled "Join the organization" in contextwindowarchitecture/.github, which a workflow there answers with an invitation, and each carries an `aria-label` and a matching `title`. Below 620px the header has no room for them: `#hdrgh` hides and `#navgh`, the last row of the menu panel, shows the same three links with their names (GitHub, Star, Join). The logo link is `min-height: 24px`, the WCAG 2.2 target size.
 
 ### Navigation
 
@@ -352,7 +352,7 @@ The landing page is three slides, each a `<section>` with `data-slide="n"`: `min
 
 ### Icons and logo
 
-No page carries an icon today. If you add one, make it an 18px line icon: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`; do not introduce filled or two-tone icons. The logo is the organisation's wordmark, `site/logo-light.png` (black) in the light theme and `site/logo-dark.png` (white) in the dark theme, both from the contextwindowarchitecture/.github profile, shown at 108 by 40px in the header link with `alt="Context Window Architecture"`; a page rule under `html[data-theme="dark"]` swaps the two. They are the only images on the site; there is no favicon link and no Open Graph image on any page.
+The only icons are the three GitHub links in the header, Feather's `github`, `star` and `user-plus` paths (MIT, credited in THIRD_PARTY_NOTICES.md), coloured like the header controls rather than `--accent`. If you add another, make it an 18px line icon: `viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"`, coloured `--accent`, `flex: none`; do not introduce filled or two-tone icons. The logo is the organisation's wordmark, `site/logo-light.png` (black) in the light theme and `site/logo-dark.png` (white) in the dark theme, both from the contextwindowarchitecture/.github profile, shown at 108 by 40px in the header link with `alt="Context Window Architecture"`; a page rule under `html[data-theme="dark"]` swaps the two. They are the only images on the site; there is no favicon link and no Open Graph image on any page.
 
 ## 7. Motion and interaction states
 

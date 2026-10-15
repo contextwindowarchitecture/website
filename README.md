@@ -80,4 +80,4 @@ The suite does **not** implement or certify an assembler, detect semantic contra
 
 ## License
 
-Apache License 2.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). This covers the specification, schemas, conformance cases and site. The generated validator bundles MIT-licensed code listed in `THIRD_PARTY_NOTICES.md`.
+Apache License 2.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE). This covers the specification, schemas, conformance cases and site. The generated validator and the header's GitHub icons include MIT-licensed code listed in `THIRD_PARTY_NOTICES.md`.
