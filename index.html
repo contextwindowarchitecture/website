@@ -62,13 +62,14 @@
     #hdrmenu { display: inline-block !important; }
     #sitenav { display: none !important; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; gap: 0 !important; margin: 0 !important; padding: 6px 32px 14px; font-size: 16px !important; background: var(--bg); border-bottom: 1px solid var(--line); }
     #sitenav[data-open="true"] { display: flex !important; }
+    #sitenav { align-items: stretch !important; max-height: calc(100vh - 68px); max-height: calc(100dvh - 68px); overflow-y: auto; overscroll-behavior: contain; }
     #sitenav a { padding: 13px 0 !important; border-bottom: 1px solid var(--line) !important; }
     #sitenav a:last-child { border-bottom: 0 !important; }
     #sitenav a[aria-current="page"] { border-left: 3px solid var(--accent); padding-left: 12px !important; }
     #sitenav button { display: block; width: 100%; text-align: left; padding: 13px 0 !important; font-size: 16px !important; }
   }
   @media (max-width: 620px) { #hdrrow { padding: 0 20px !important; gap: 14px !important; } #sitenav { padding-left: 20px; padding-right: 20px; } #logo-light, #logo-dark { width: 81px !important; height: 30px !important; } }
-  @media (max-width: 620px) { #hdrgh { display: none !important; } #sitenav #navgh { display: flex !important; } #sitenav #navgh a { padding: 0 !important; border: 0 !important; } }
+  @media (max-width: 620px) { #hdrgh { display: none !important; } #sitenav #navgh { display: flex !important; } #sitenav #navgh a { padding: 13px 0 !important; border: 0 !important; } }
   @media (max-width: 1000px) { .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; } }
   @media (max-width: 860px) {
     #hero, .g2, .g3, .lyrd { grid-template-columns: minmax(0, 1fr) !important; }
@@ -109,7 +110,7 @@
         <a href="https://examples.contextwindowarchitecture.io" onClick="{{ openExamples }}" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Examples</a>
         <a href="https://benchmark.contextwindowarchitecture.io" onClick="{{ openViability }}" style="color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);">Viability</a>
         <button id="navglossary" onClick="{{ toggleGlossary }}" aria-expanded="{{ glossaryOpen }}" aria-controls="glossary" style="font: inherit; line-height: inherit; appearance: none; -webkit-appearance: none; margin: 0; color: var(--muted); background: transparent; border: 0; padding: 0; cursor: pointer; white-space: nowrap;" style-hover="color: var(--fg);">Glossary</button>
-        <div id="navgh" style="display: none; align-items: center; gap: 24px; padding-top: 13px; border-top: 1px solid var(--line);">
+        <div id="navgh" style="display: none; align-items: center; gap: 24px; border-top: 1px solid var(--line);">
           <a href="https://github.com/contextwindowarchitecture" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex: none;"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg><span>GitHub</span></a>
           <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex: none;"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg><span>Star</span></a>
           <a href="https://github.com/contextwindowarchitecture/.github/issues/new?title=Join%20the%20organization" target="_blank" rel="noopener" style="display: flex; align-items: center; gap: 8px; color: var(--muted); white-space: nowrap;" style-hover="color: var(--fg);"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display: block; flex: none;"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg><span>Join</span></a>
@@ -433,12 +434,14 @@ class Component extends DCLogic {
   state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, mode: "planes", open: { 0: true }, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
 
   componentWillUnmount() {
+    this.menuUnmount();
     this.glossaryUnmount();
     this.leavingStop();
     if (this._hash) window.removeEventListener("hashchange", this._hash);
   }
 
   componentDidMount() {
+    this.menuMount();
     this.glossaryMount();
     let t = "light";
     try { t = localStorage.getItem("cwa-theme") || "light"; } catch (e) {}
@@ -511,7 +514,8 @@ class Component extends DCLogic {
     });
   }
   closeGlossary() {
-    this.setState({ glossaryOpen: false, glossaryTerm: null }, () => { try { this._glossaryReturn && this._glossaryReturn.focus(); } catch (e) {} });
+    // A trigger the phone menu hid when it closed hands focus to the Menu button instead.
+    this.setState({ glossaryOpen: false, glossaryTerm: null }, () => { try { const r = this._glossaryReturn, back = r && r.offsetParent === null ? document.getElementById("hdrmenu") : r; back && back.focus(); } catch (e) {} });
     try { if (/^#glossary/.test(location.hash || "")) history.replaceState(null, "", location.pathname + location.search); } catch (e) {}
   }
   glossaryVals() {
@@ -581,7 +585,8 @@ class Component extends DCLogic {
   leavingStop() { if (this._leavingTimer) { clearInterval(this._leavingTimer); this._leavingTimer = null; } }
   leavingStay() {
     this.leavingStop();
-    this.setState({ leavingLeft: 0 }, () => { try { this._leavingReturn && this._leavingReturn.focus(); } catch (err) {} });
+    // A link the phone menu hid when it closed hands focus to the Menu button instead.
+    this.setState({ leavingLeft: 0 }, () => { try { const r = this._leavingReturn, back = r && r.offsetParent === null ? document.getElementById("hdrmenu") : r; back && back.focus(); } catch (err) {} });
   }
   leavingGo(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -620,6 +625,38 @@ class Component extends DCLogic {
     };
   }
   // LEAVING_GLUE_END
+  // MENU_GLUE_START
+  // Below 1200px the nav is a panel under the header that the Menu button opens. It closes the way a phone menu does:
+  // when a link or the Glossary button in it is chosen, on a tap outside the panel, on Escape (focus goes back to the
+  // button), and when the window widens enough to show the nav row again.
+  menuMount() {
+    this._menuClick = e => {
+      if (!this.state.menu) return;
+      const t = e.target, nav = document.getElementById("sitenav"), button = document.getElementById("hdrmenu");
+      if (button && button.contains(t)) return;
+      if (nav && nav.contains(t) && !(t.closest && t.closest("a, button"))) return;
+      this.setState({ menu: false });
+    };
+    this._menuKey = e => {
+      if (e.key !== "Escape" || !this.state.menu) return;
+      this.setState({ menu: false });
+      try { document.getElementById("hdrmenu").focus(); } catch (err) {}
+    };
+    this._menuWide = e => { if (!e.matches && this.state.menu) this.setState({ menu: false }); };
+    document.addEventListener("click", this._menuClick);
+    document.addEventListener("keydown", this._menuKey);
+    try { this._menuQuery = window.matchMedia("(max-width: 1200px)"); this._menuQuery.addEventListener("change", this._menuWide); } catch (err) {}
+  }
+  menuUnmount() {
+    document.removeEventListener("click", this._menuClick);
+    document.removeEventListener("keydown", this._menuKey);
+    try { this._menuQuery.removeEventListener("change", this._menuWide); } catch (err) {}
+  }
+  menuVals() {
+    const open = !!this.state.menu;
+    return { menuOpen: open ? "true" : "false", menuLabel: open ? "Close" : "Menu", toggleMenu: () => this.setState(s => ({ menu: !s.menu })) };
+  }
+  // MENU_GLUE_END
 
   renderVals() {
     // Only an overridden accent is pinned inline on <html>. Pinning the default would beat the
@@ -648,12 +685,9 @@ class Component extends DCLogic {
       setSlotsMode: () => this.setState({ mode: "slots" }),
       themeLabel: this.state.theme === "dark" ? "Light" : "Dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
-      menuOpen: this.state.menu ? "true" : "false",
-      menuLabel: this.state.menu ? "Close" : "Menu",
-      toggleMenu: () => this.setState(s => ({ menu: !s.menu }))
     };
     this.schemaVals(out);
-    return Object.assign(out, this.glossaryVals(), this.leavingVals());
+    return Object.assign(out, this.menuVals(), this.glossaryVals(), this.leavingVals());
   }
 }
 </script>

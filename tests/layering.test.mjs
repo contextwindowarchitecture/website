@@ -20,12 +20,14 @@ async function component(page, { setInterval = () => 0 } = {}) {
   const byId = { tournext: focusable(), glossarysearch: focusable() };
   const document = {
     documentElement: { style: { setProperty() {}, removeProperty() {}, getPropertyValue: () => '' }, setAttribute() {} },
-    activeElement: focusable(), getElementById: id => byId[id] ?? null, querySelector: () => null, addEventListener() {}, removeEventListener() {},
+    activeElement: focusable(), getElementById: id => byId[id] ?? null, querySelector: () => null,
+    listeners: {}, addEventListener(type, fn) { (this.listeners[type] ??= []).push(fn); }, removeEventListener(type, fn) { this.listeners[type] = (this.listeners[type] ?? []).filter(f => f !== fn); },
   };
   const location = { hash: '', pathname: '/' + page, search: '', assigned: [], assign(url) { this.assigned.push(url); } };
-  const window = { location, matchMedia: () => ({ matches: false }), addEventListener() {}, removeEventListener() {}, innerWidth: 1280, innerHeight: 800, scrollTo() {} };
+  const media = { listeners: [], matches: false, addEventListener(type, fn) { this.listeners.push(fn); }, removeEventListener(type, fn) { this.listeners = this.listeners.filter(f => f !== fn); } };
+  const window = { location, matchMedia: () => media, addEventListener() {}, removeEventListener() {}, innerWidth: 1280, innerHeight: 800, scrollTo() {} };
   const view = vm.runInNewContext(source + '\nnew Component()', { DCLogic, console, Date, setTimeout, clearTimeout, setInterval, clearInterval() {}, structuredClone, document, window, location, history: { replaceState() {} } });
-  return { view, document, byId, location };
+  return { view, document, byId, location, media };
 }
 
 test('the nav calls the placement page Placement, the spec page is Spec everywhere, and the home page opens doors only to nav pages', async () => {
@@ -304,4 +306,48 @@ test('every page links to GitHub from three header icons, which move into the me
   }
   assert.equal(headers.size, 1, 'the icons are identical on every page');
   assert.match(await read('THIRD_PARTY_NOTICES.md'), /## Feather[\s\S]*Cole Bemis/, 'the Feather licence travels with its icons');
+});
+
+// Below 1200px the nav is a panel under the header. It reads as one left-aligned column, fits the screen and scrolls
+// inside itself, and closes the way a phone menu does: on choosing anything in it, on a tap outside it, on Escape, and
+// when the window widens back to the nav row. The menu logic is one block, identical on every page.
+test('the phone menu panel is one left-aligned column that closes the way a phone menu does', async () => {
+  const glue = new Set();
+  for (const page of PAGES) {
+    const html = await read(page);
+    assert.ok(html.includes('#sitenav { align-items: stretch !important; max-height: calc(100vh - 68px); max-height: calc(100dvh - 68px); overflow-y: auto; overscroll-behavior: contain; }'), `${page}: the panel stretches its rows and scrolls inside the screen`);
+    assert.ok(html.includes('#sitenav #navgh a { padding: 13px 0 !important; border: 0 !important; }'), `${page}: the GitHub row's links are as tall as the others`);
+    const code = html.match(/\/\/ MENU_GLUE_START[\s\S]*?\/\/ MENU_GLUE_END/);
+    assert.ok(code, `${page} has the menu glue`);
+    glue.add(code[0]);
+    assert.ok(!/menuLabel: this\.state\.menu/.test(html), `${page}: the labels come from the shared glue`);
+    assert.ok(/componentDidMount\(\) \{\s*this\.menuMount\(\);/.test(html) && /componentWillUnmount\(\) \{\s*this\.menuUnmount\(\);/.test(html), `${page}: mounts and unmounts the menu`);
+
+    const { view, document, byId, media } = await component(page);
+    view.componentDidMount();
+    const vals = () => view.renderVals();
+    assert.deepEqual([vals().menuLabel, vals().themeLabel], ['Menu', 'Dark'], `${page}: the header labels read the same on every page`);
+    const button = { focused: 0, focus() { this.focused += 1; } };
+    byId.hdrmenu = Object.assign(button, { contains: t => t === button });
+    byId.sitenav = { contains: t => !!t.inNav };
+    const link = { inNav: true, closest: () => ({}) }, gap = { inNav: true, closest: () => null }, outside = { closest: () => null };
+    const click = target => { for (const fn of document.listeners.click) fn({ target }); };
+    const open = () => { vals().toggleMenu(); click(button); assert.equal(vals().menuOpen, 'true', `${page}: the button opens the panel`); assert.equal(vals().menuLabel, 'Close'); };
+    open(); click(gap); assert.equal(vals().menuOpen, 'true', `${page}: a tap on the panel between rows keeps it open`);
+    click(link); assert.equal(vals().menuOpen, 'false', `${page}: choosing a link or Glossary closes it`);
+    open(); click(outside); assert.equal(vals().menuOpen, 'false', `${page}: a tap outside closes it`);
+    open(); for (const fn of document.listeners.keydown) fn({ key: 'Escape' });
+    assert.equal(vals().menuOpen, 'false', `${page}: Escape closes it`);
+    assert.equal(button.focused, 1, `${page}: and hands focus back to the button`);
+    open(); for (const fn of media.listeners) fn({ matches: false });
+    assert.equal(vals().menuOpen, 'false', `${page}: widening to the nav row closes it`);
+    const hidden = { offsetParent: null, focus() { assert.fail(`${page}: focus went to a hidden menu item`); } };
+    document.activeElement = hidden; vals().toggleGlossary(); vals().closeGlossary();
+    assert.equal(button.focused, 2, `${page}: closing the glossary opened from the menu focuses the Menu button`);
+    document.activeElement = hidden; vals().openExamples({ button: 0, preventDefault() {} }); vals().leavingStay();
+    assert.equal(button.focused, 3, `${page}: staying after Examples from the menu focuses the Menu button`);
+    view.componentWillUnmount();
+    assert.deepEqual([document.listeners.click.length, document.listeners.keydown.length, media.listeners.length], [0, 0, 0], `${page}: unmounting removes the listeners`);
+  }
+  assert.equal(glue.size, 1, 'the menu logic is identical on every page');
 });
