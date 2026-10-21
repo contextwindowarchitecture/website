@@ -36,7 +36,7 @@ export function excerpt(source, prefixes) {
 // Code wraps instead of scrolling sideways: each line is a block of its own, and a long one hangs its continuation
 // four columns in from where its code starts. A blank line keeps its height.
 const codeLines = text => text.split('\n').map(line => {
-  if (line.trim() === '') return '<span style="display: block; height: 1.6em;"></span>';
+  if (line.trim() === '') return '<span style="display: block; height: 1.55em;"></span>';
   const hang = line.match(/^ */)[0].length + 4;
   return `<span style="display: block; padding-left: ${hang}ch; text-indent: -${hang}ch;">${escapeHtml(line)}</span>`;
 }).join('');
@@ -50,12 +50,14 @@ export function panel({ label, meta, text, prose = false }) {
   return '<div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;">' +
     '<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">' +
     `<span>${escapeHtml(label)}</span><span>${escapeHtml(meta)}</span></div>` +
-    `<pre style="padding: 18px; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${prose ? escapeHtml(text.trimEnd()) : codeLines(text.trimEnd())}</pre></div>`;
+    `<pre style="padding: 14px 16px; margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;">${prose ? escapeHtml(text.trimEnd()) : codeLines(text.trimEnd())}</pre></div>`;
 }
 
-// What each code panel shows: the statements build_request() and its CWA counterpart are made of.
-export const BEFORE = { file: '01-docs-qa/before.py', prefixes: ['TOP_K =', 'MAX_HISTORY_MESSAGES =', 'def build_request('] };
-export const AFTER = { file: '01-docs-qa/context.py', prefixes: ['from cwa import', 'def snapshot(', 'def assemble('] };
+// What each code panel shows: build_request() in both apps. The caption names before.py's two limits, TOP_K and
+// MAX_HISTORY_MESSAGES, and a test holds it to them. The CWA version's work moves into context.py, which builds the
+// snapshot; the slide links it.
+export const BEFORE = { file: '01-docs-qa/before.py', prefixes: ['def build_request('] };
+export const AFTER = { file: '01-docs-qa/after.py', prefixes: ['def build_request('] };
 
 // Python's "{:g}": six significant digits, no trailing zeros.
 const g = n => String(Number(n.toPrecision(6)));
@@ -89,18 +91,19 @@ export async function exampleFiles(root = '.') {
   const json = async name => JSON.parse(await text(name));
   const scenario = async (name, files) => Object.fromEntries(await Promise.all(files.map(async f => [f, await json(`01-docs-qa/scenarios/${name}/${f}.json`)])));
   return {
-    lock: JSON.parse(await fs.readFile(path.join(root, LOCK), 'utf8')), before: await text(BEFORE.file), context: await text(AFTER.file),
+    lock: JSON.parse(await fs.readFile(path.join(root, LOCK), 'utf8')), before: await text(BEFORE.file), after: await text(AFTER.file),
     answered: await scenario('01-answer', ['snapshot', 'trace', 'payload']), refused: await scenario('03-off-topic', ['snapshot', 'trace']),
   };
 }
 
 /** Every example block's markup, by name. */
-export function exampleBlocks({ lock, before, context, answered, refused }) {
+export function exampleBlocks({ lock, before, after, answered, refused }) {
   const tree = `https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa`;
   return {
     EXAMPLE_BEFORE: panel({ label: 'before.py', meta: 'build_request()', text: excerpt(before, BEFORE.prefixes) }),
-    EXAMPLE_AFTER: panel({ label: 'context.py', meta: 'snapshot() · assemble()', text: excerpt(context, AFTER.prefixes) }),
-    EXAMPLE_COMMIT: `<a href="${tree}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at ${lock.commit.slice(0, 7)} →</a>`,
+    EXAMPLE_AFTER: panel({ label: 'after.py', meta: 'build_request()', text: excerpt(after, AFTER.prefixes) }),
+    EXAMPLE_COMMIT: `<a href="https://github.com/${lock.repository}/blob/${lock.commit}/01-docs-qa/context.py" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Where the snapshot is built: context.py →</a>` +
+      `<a href="${tree}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at ${lock.commit.slice(0, 7)} →</a>`,
     EXAMPLE_PAYLOAD: panel({ label: 'request · cwa-messages/v1', meta: answered.payload.tools.length ? `${answered.payload.tools.length} tools` : 'no tools on this route',
       text: request(answered.payload), prose: true }),
     EXAMPLE_TRACE: panel({ label: 'trace', meta: 'as after.py prints it', text: report(answered.snapshot, answered.trace) }),

@@ -48,17 +48,24 @@ test('an excerpt is the named top-level statements in source order, each whole, 
   assert.throws(() => blocks.panel({ label: 'x', meta: '', text: 'a {{ b }}' }), /template binding/);
 });
 
-test('the code slide shows build_request() from before.py and its CWA counterpart from context.py, as vendored', async () => {
+test('the code slide shows build_request() from before.py and after.py, as vendored, and links where the snapshot is built', async () => {
   const html = await read('index.html');
   const lock = JSON.parse(await read(LOCK));
   const before = shown(html, 'EXAMPLE_BEFORE'), after = shown(html, 'EXAMPLE_AFTER');
-  assert.equal(before, blocks.excerpt(await vendored(blocks.BEFORE.file), blocks.BEFORE.prefixes));
+  const beforeSource = await vendored(blocks.BEFORE.file);
+  assert.equal(before, blocks.excerpt(beforeSource, blocks.BEFORE.prefixes));
   assert.equal(after, blocks.excerpt(await vendored(blocks.AFTER.file), blocks.AFTER.prefixes));
-  assert.ok(before.startsWith('TOP_K = 5\nMAX_HISTORY_MESSAGES = 6\n\ndef build_request('), 'the five articles and six messages the caption names');
-  assert.ok(after.includes('def snapshot(') && after.includes('def assemble(') && after.includes('cwa_assemble(Snapshot.from_json(document))'));
+  assert.ok(before.startsWith('def build_request(conversation: Conversation)') && after.startsWith('def build_request(conversation: Conversation)'), 'the same function in both apps');
+  assert.ok(after.includes('context.snapshot(conversation)') && after.includes('context.assemble(document)'));
   const code = html.slice(html.indexOf('<section id="code"'), html.indexOf('</section>', html.indexOf('<section id="code"')));
-  assert.ok(code.includes(`<a href="https://github.com/contextwindowarchitecture/examples/tree/${lock.commit}/01-docs-qa" target="_blank" rel="noopener"`) && code.includes(`at ${lock.commit.slice(0, 7)} →</a>`), 'the whole app, at the locked commit');
+  // The caption names before.py's limits, which the excerpt uses by name only.
+  assert.match(beforeSource, /^TOP_K = 5$/m);
+  assert.match(beforeSource, /^MAX_HISTORY_MESSAGES = 6$/m);
+  assert.ok(before.includes('TOP_K') && before.includes('MAX_HISTORY_MESSAGES'));
   assert.ok(code.includes('>Paste the top five articles into the system prompt, keep the last six messages, send.</p>'));
+  const app = `https://github.com/contextwindowarchitecture/examples/tree/${lock.commit}/01-docs-qa`;
+  assert.ok(code.includes(`<a href="https://github.com/contextwindowarchitecture/examples/blob/${lock.commit}/01-docs-qa/context.py" target="_blank" rel="noopener"`) && code.includes('>Where the snapshot is built: context.py →</a>'), 'context.py, at the locked commit');
+  assert.ok(code.includes(`<a href="${app}" target="_blank" rel="noopener"`) && code.includes(`at ${lock.commit.slice(0, 7)} →</a>`), 'the whole app, at the locked commit');
   assert.equal([...code.matchAll(/<pre /g)].length, 2, 'two panels');
 });
 
@@ -138,7 +145,7 @@ test('nothing on the home page scrolls sideways: code wraps under a hanging inde
     }
   }
   assert.ok(!html.includes('tabindex="0"'), 'no panel needs a keyboard to scroll it');
-  assert.ok(blocks.panel({ label: 'x', meta: '', text: '  a\n\nb' }).includes('<span style="display: block; padding-left: 6ch; text-indent: -6ch;">  a</span><span style="display: block; height: 1.6em;"></span><span style="display: block; padding-left: 4ch; text-indent: -4ch;">b</span>'));
+  assert.ok(blocks.panel({ label: 'x', meta: '', text: '  a\n\nb' }).includes('<span style="display: block; padding-left: 6ch; text-indent: -6ch;">  a</span><span style="display: block; height: 1.55em;"></span><span style="display: block; padding-left: 4ch; text-indent: -4ch;">b</span>'));
 });
 
 test('a measured share is its fraction to two places, and a row of several arms shows their range', () => {
