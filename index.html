@@ -331,10 +331,6 @@ Why didn't I get my password reset email?
 /* The Claude Design "accent" prop's default. It must match the data-props default above and the :root --accent token, so the standalone runtime, which passes the default when nothing was overridden, can be told apart from a real override. */
 const ACCENT_DEFAULT = "oklch(0.55 0.20 38)";
 
-// The home page has no prerequisite strip: each slide links its one new term where it first appears (STYLE.md, Term
-// links). The glossary glue, the same on every page, still reads this list.
-const PREREQUISITES = [];
-
 class Component extends DCLogic {
   state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
 
@@ -387,8 +383,8 @@ class Component extends DCLogic {
   }
 
   // GLOSSARY_GLUE_START
-  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
-  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts. #glossary/<term> opens the panel
+  // at a term from any page; a term link in the text is such a link (STYLE.md, Term links).
   glossaryMount() {
     this._glossaryHash = () => this.glossaryHash();
     try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
@@ -443,8 +439,7 @@ class Component extends DCLogic {
         whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
         related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
         style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
-      })),
-      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+      }))
     };
   }
   // GLOSSARY_GLUE_END

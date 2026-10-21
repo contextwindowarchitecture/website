@@ -85,13 +85,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Reference assemblers</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Four assemblers, released as drafts.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Reference implementations of the specification, one per language in the table below, each covering the four steps the spec gives the assembler (<a href="./spec.html#s4">section 4</a>): admit, resolve, fit, and render with a trace. They exist to prove the spec is buildable and to give conformance tests something to run against. Each is released at its repository's <span style="font-family: var(--mono); font-size: 15px;">draft-release</span> tag, the release that moves with the draft, and this page tracks their status against every requirement.</p>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-        <span>This page assumes you know:</span>
-        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
-          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
-        </sc-for>
-      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Four open-source <a class="term" href="#glossary/assembler" style="color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;" style-hover="color: var(--accent);">assemblers</a> implement the specification, in Python, TypeScript, Go and Rust. Each is released at its repository's <span style="font-family: var(--mono); font-size: 15px;">draft-release</span> tag, which moves with the draft. The table shows how many of the published conformance cases each one passes.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">released</span> · tag <span style="color: var(--fg);">draft-release</span></span>
         <span>Spec target: <span style="color: var(--fg);">draft</span></span>
@@ -676,9 +670,6 @@ const CONFORMANCE = [{"label":"Python","name":"contextwindowarchitecture-assembl
 const CONTRACT_NAMES = { "contextwindowarchitecture/website": "website", "contextwindowarchitecture/contextwindowarchitecture": "spec" };
 // scripts/conformance-reports.mjs names a GitHub repository as owner/repo and any other host as a URL.
 const GITHUB = /^[\w.-]+\/[\w.-]+$/;
-// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
-const PREREQUISITES = ["plane","slot","snapshot","payload","trace","conformance"];
-
 class Component extends DCLogic {
   state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0, uc: 0, step: 0, hold: 0, playing: true, announce: "" };
   componentWillUnmount() {
@@ -1013,8 +1004,8 @@ class Component extends DCLogic {
     return out;
   }
   // GLOSSARY_GLUE_START
-  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
-  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts. #glossary/<term> opens the panel
+  // at a term from any page; a term link in the text is such a link (STYLE.md, Term links).
   glossaryMount() {
     this._glossaryHash = () => this.glossaryHash();
     try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
@@ -1069,8 +1060,7 @@ class Component extends DCLogic {
         whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
         related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
         style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
-      })),
-      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+      }))
     };
   }
   // GLOSSARY_GLUE_END

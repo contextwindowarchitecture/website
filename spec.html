@@ -85,12 +85,6 @@
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-07</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
       <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page renders SPEC.md, the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-        <span>This page assumes you know:</span>
-        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
-          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
-        </sc-for>
-      </div>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span style="overflow-wrap: anywhere;"><a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/16de4be0534583f135a597171c927d42c87ee82c">16de4be</a>.</span>
@@ -932,9 +926,6 @@ const RULES = [
 ];
 const KW = /(MUST NOT|MUST|SHOULD NOT|SHOULD|MAY)/g;
 
-// The terms this page assumes, as glossary ids; the strip under the lede shows them and the glossary defines them.
-const PREREQUISITES = ["plane","slot","item","producer","assembler","requirement"];
-
 class Component extends DCLogic {
   state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
   componentWillUnmount() { this.menuUnmount(); this.glossaryUnmount(); this.leavingStop(); }
@@ -956,8 +947,8 @@ class Component extends DCLogic {
     return text.split(KW).filter(s => s !== "").map(s => ({ text: s, style: set.has(s) ? "color: var(--accent); font-weight: 600;" : "" }));
   }
   // GLOSSARY_GLUE_START
-  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
-  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts. #glossary/<term> opens the panel
+  // at a term from any page; a term link in the text is such a link (STYLE.md, Term links).
   glossaryMount() {
     this._glossaryHash = () => this.glossaryHash();
     try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
@@ -1012,8 +1003,7 @@ class Component extends DCLogic {
         whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
         related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
         style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
-      })),
-      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+      }))
     };
   }
   // GLOSSARY_GLUE_END

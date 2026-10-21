@@ -1,6 +1,6 @@
 // The site's glossary: every term the pages use, defined in the specification's own words, loaded from
 // site/glossary.json beside this module. Each page's component imports this module when it mounts and renders the
-// glossary panel and its prerequisite strip from what it returns.
+// glossary panel from what it returns.
 
 /** The entries, with an index by id. */
 export function index(entries) {

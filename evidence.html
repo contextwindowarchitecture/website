@@ -83,13 +83,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--p-evid); margin-bottom: 16px;">Profiles &amp; placement evidence</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Why placement is a profile, not a rule.</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA fixes what the slots mean and refuses to fix where they go. This page is the justification: what the research measures, how provider guidance differs, what placement does to prompt caches, what a profile has to carry, and how to evaluate one. Normative text is in <a href="./spec.html#s5">Spec §5</a>.</p>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 22px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-        <span>This page assumes you know:</span>
-        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
-          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
-        </sc-for>
-      </div>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA fixes what each slot means, not where it goes in the request. Where an item sits changes whether a model uses it, and the effect differs by model and task. So placement is a <a class="term" href="#glossary/profile" style="color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;" style-hover="color: var(--accent);">profile</a>: versioned, chosen per route, and evaluated before use. The rules are in <a href="./spec.html#s5">Spec §5</a>.</p>
     </div>
   </section>
 
@@ -351,8 +345,6 @@
   <p style="max-width: 64ch; margin: 48px auto; padding: 0 32px; font-family: var(--sans); font-size: 16px; line-height: 1.6; color: var(--fg);">This page's navigation, examples and tools run in the browser and need JavaScript. The specification reads without it: <a href="./SPEC.md">SPEC.md</a> is the normative text, and <a href="./llms.txt">llms.txt</a> lists every published file.</p>
 </noscript>
 <script type="text/x-dc" data-dc-script>
-const PREREQUISITES = ["slot","profile","route","renderer","trace"];
-
 class Component extends DCLogic {
   state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
   componentWillUnmount() { this.menuUnmount(); this.glossaryUnmount(); this.leavingStop(); }
@@ -370,8 +362,8 @@ class Component extends DCLogic {
     this.setState({ theme: t });
   }
   // GLOSSARY_GLUE_START
-  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts; until then the strip shows
-  // each prerequisite's id as words. #glossary/<term> opens the panel at a term from any page.
+  // The glossary panel: site/glossary.js loads site/glossary.json when the page mounts. #glossary/<term> opens the panel
+  // at a term from any page; a term link in the text is such a link (STYLE.md, Term links).
   glossaryMount() {
     this._glossaryHash = () => this.glossaryHash();
     try { window.addEventListener("hashchange", this._glossaryHash); } catch (e) {}
@@ -426,8 +418,7 @@ class Component extends DCLogic {
         whereStyle: e.where ? "font-family: var(--mono); font-size: 12px; color: var(--accent); margin-right: 6px;" : "display: none;",
         related: (e.related || []).map(id => ({ term: g.byId.get(id).term, open: () => this.openGlossary(id) })),
         style: "padding: 18px 0; border-bottom: 1px solid var(--line);" + (term === e.id ? " border-left: 3px solid var(--accent); padding-left: 12px;" : "")
-      })),
-      prereq: PREREQUISITES.map(id => ({ term: g && g.byId.get(id) ? g.byId.get(id).term : id.replace(/-/g, " "), open: () => this.openGlossary(id) }))
+      }))
     };
   }
   // GLOSSARY_GLUE_END

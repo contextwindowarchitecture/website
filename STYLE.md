@@ -341,11 +341,11 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 `border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Spec, GitHub, llms.txt, Apache-2.0 with `gap: 20px`. Every page carries it.
 
-### Glossary panel and prerequisite strip
+### Glossary panel
 
 Every page's nav ends with a `Glossary` button (a `<button>` styled as a nav link, `font: inherit`) that slides out `<aside id="glossary">`: fixed to the right edge, `min(440px, 100%)` wide, `--bg` with a `--line` left border, `z-index: 85` (above the header, below the tour). It is `role="dialog"`, named by its accent kicker, and not modal: the page stays readable behind it. A header row holds the kicker, a muted count and a ghost Close; a search field (`type="search"`, pill-shaped on `--surface`) filters the entries; each entry is a `17px` 600 term, a `14.5px` plain definition, the specification's own sentence as a `13.5px` muted quote with a `2px` `--line` left border, a mono accent "Defined on … →" link and related-term pills. The entry a pill or a `#glossary/<term>` link opened gets a `3px` `--accent` left border. Escape and Close return focus to the control that opened the panel.
 
-Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page has no strip: each slide links the one new term it brings in, where it first appears (Term links), and its `PREREQUISITES` list is empty because the glue reads it on every page. The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
+No page opens with a list of terms to learn first. Each page links a term where it first uses it (Term links), and the link opens the panel at that term. The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical and every term link to a glossary entry.
 
 ### Leaving notice
 

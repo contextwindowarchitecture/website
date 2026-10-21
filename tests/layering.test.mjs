@@ -41,8 +41,8 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
   assert.ok(!index.includes('<a href="./start.html"'), 'the home page opens doors only to pages the nav lists');
 });
 
-// The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens, with
-// a prerequisite strip under each page's lede whose pills open the panel at a term.
+// The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens; a
+// term link where a page first uses a term opens the panel at it.
 const GLOSSARY = JSON.parse(await fs.readFile(new URL('../site/glossary.json', import.meta.url), 'utf8'));
 const glossaryModule = await import('../site/glossary.js');
 const normalize = md => md.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*/g, '').replace(/\\([\\*<_])/g, '$1').replace(/`/g, '').replace(/\s+/g, ' ');
@@ -85,7 +85,7 @@ test('the glossary module indexes entries and searches terms, aliases and defini
   assert.throws(() => glossaryModule.index([{ id: 'a', related: ['b'] }]), /relates to b/);
 });
 
-test('every page opens the same glossary panel from its nav, and shows a prerequisite strip whose terms the glossary defines', async () => {
+test('every page opens the same glossary panel from its nav, and links its terms inline instead of listing them first', async () => {
   const blocks = new Set(), glue = new Set();
   for (const page of PAGES) {
     const html = await read(page);
@@ -100,26 +100,15 @@ test('every page opens the same glossary panel from its nav, and shows a prerequ
     const code = html.match(/\/\/ GLOSSARY_GLUE_START[\s\S]*?\/\/ GLOSSARY_GLUE_END/);
     assert.ok(code, `${page} has the glossary glue`);
     glue.add(code[0]);
-    const { view } = await component(page);
-    const ids = view.constructor.name && vm.runInNewContext('PREREQUISITES', { PREREQUISITES: undefined }) === undefined ? null : null; // placeholder to keep vm imported
-    const prereq = html.match(/const PREREQUISITES = (\[[^\]]*\]);/);
-    assert.ok(prereq, `${page} names its prerequisites`);
-    const list = JSON.parse(prereq[1]);
-    // The home page links each slide's new term where it first appears instead (tests/home.test.mjs).
-    if (page === 'index.html') {
-      assert.ok(!html.includes('{{ prereq }}') && list.length === 0 && html.includes('<a class="term" href="#glossary/'), 'the home page has term links, not a strip');
-      continue;
-    }
-    assert.ok(html.includes('<sc-for list="{{ prereq }}" as="p"'), `${page} has the prerequisite strip`);
-    assert.ok(list.length >= 3 && list.length <= 6, `${page}: ${list.length} prerequisites`);
-    for (const id of list) assert.ok(GLOSSARY.some(e => e.id === id), `${page} assumes ${id}, which the glossary defines`);
-    assert.deepEqual([...view.renderVals().prereq].map(p => p.term), list.map(id => id.replace(/-/g, ' ')), `${page}: before the glossary loads the strip shows the ids as words`);
+    // No page opens with a list of terms to learn first: each links a term where it first uses it (STYLE.md, Term links).
+    assert.ok(!html.includes('{{ prereq }}') && !html.includes('This page assumes you know') && !html.includes('const PREREQUISITES'), `${page} has no prerequisite strip`);
+    if (page !== 'spec.html') assert.ok(html.includes('<a class="term" href="#glossary/'), `${page} links its terms`);
   }
   assert.equal(blocks.size, 1, 'the panel markup is identical on every page');
   assert.equal(glue.size, 1, 'the glossary logic is identical on every page');
 });
 
-test('the panel opens from the nav or a pill, searches, follows #glossary/<term>, and returns focus when it closes', async () => {
+test('the panel opens from the nav or a related term, searches, follows #glossary/<term>, and returns focus when it closes', async () => {
   const { view, document, byId, location } = await component('evidence.html');
   view._glossary = glossaryModule;
   view.state.glossary = glossaryModule.index(GLOSSARY);
@@ -146,9 +135,6 @@ test('the panel opens from the nav or a pill, searches, follows #glossary/<term>
   assert.ok(vals.glossaryEntries.find(e => e.id === 'glossary-tier').style.includes('var(--accent)'), 'the opened term is marked');
   vals.glossaryKey({ key: 'Escape', preventDefault() {} });
   assert.deepEqual([view.renderVals().glossaryOn, trigger.focused], [false, 1], 'Escape closes and returns focus');
-  view.renderVals().prereq[0].open();
-  assert.equal(view.state.glossaryOpen, true, 'a prerequisite pill opens the panel');
-  view.renderVals().closeGlossary();
   location.hash = '#glossary/tier';
   view.glossaryHash();
   assert.deepEqual([view.state.glossaryOpen, view.state.glossaryTerm], [true, 'tier'], 'a deep link opens the panel at its term');
@@ -356,4 +342,26 @@ test('the phone menu panel is one left-aligned column that closes the way a phon
     assert.deepEqual([document.listeners.click.length, document.listeners.keydown.length, media.listeners.length], [0, 0, 0], `${page}: unmounting removes the listeners`);
   }
   assert.equal(glue.size, 1, 'the menu logic is identical on every page');
+});
+
+test('on every page, a term link names a glossary entry, is styled as a term, and comes at the term\'s first use only', async () => {
+  const style = 'color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;';
+  for (const page of PAGES) {
+    const html = await read(page);
+    const links = [...html.matchAll(/<a class="term" href="#glossary\/([a-z0-9-]+)" style="([^"]*)"[^>]*>([^<]+)<\/a>/g)];
+    assert.equal(links.length, (html.match(/class="term"/g) || []).length, `${page}: every term link has the recipe's shape`);
+    for (const [, id, css, word] of links) assert.ok(GLOSSARY.some(e => e.id === id) && css.startsWith(style), `${page}: ${word}`);
+    assert.equal(new Set(links.map(m => m[1])).size, links.length, `${page}: a term is linked once`);
+  }
+});
+
+test('the Assembler and Placement ledes are short and say what the page holds', async () => {
+  for (const [page, says] of [['assembler.html', 'Four open-source'], ['evidence.html', 'CWA fixes what each slot means, not where it goes in the request.']]) {
+    const html = await read(page);
+    const lede = html.match(/<h1[^>]*>[^<]*<\/h1>\s*<p[^>]*>([\s\S]*?)<\/p>/)[1].replace(/<[^>]+>/g, '');
+    assert.ok(lede.startsWith(says), page);
+    assert.ok(lede.split(/\s+/).length <= 60, `${page}: ${lede.split(/\s+/).length} words`);
+    for (const sentence of lede.split(/(?<=\.)\s+/)) assert.ok(sentence.split(/\s+/).length <= 25, `${page}: ${sentence}`);
+  }
+  assert.ok(!(await read('assembler.html')).includes('tracks their status against every requirement'), 'the matrix that claim described is gone');
 });
