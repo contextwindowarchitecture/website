@@ -279,7 +279,11 @@ A `<button>` always sets `font-family: inherit` (or `var(--mono)` for ghosts) be
 
 ### Links
 
-Links are `--accent` with no underline and turn `--fg` on hover, everywhere, including in mono meta rows. Cross links at the end of a table of contents or a card end with a spaced arrow: "Producer contract →". The only text decoration on the site is `line-through` on an item the demo has removed.
+Links are `--accent` with no underline and turn `--fg` on hover, everywhere, including in mono meta rows. Cross links at the end of a table of contents or a card end with a spaced arrow: "Producer contract →". The only text decorations on the site are `line-through` on an item the demo has removed and the dotted underline of a term link.
+
+### Term links
+
+A term's first use on a page is a term link, so a reader can tell a word the site defines from ordinary prose: `<a class="term" href="#glossary/<id>">` in the surrounding font, `color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;`, turning `--accent` on hover. The `#glossary/<id>` route, which every page's glossary glue already handles, opens the panel at the term, so a term link adds no code. A slide or section brings in one new term at most; later uses of the term are plain words.
 
 ### Kickers and labels
 
@@ -385,6 +389,11 @@ Selection is `--accent` on `--bg`. Interactive elements set `cursor: pointer`. T
 - Say "assembler", "producer", "slot", "plane", "item", "profile", "trace" exactly as the spec does; the site's vocabulary is the spec's.
 - State draft status plainly in a kicker or a note ("Specification · draft · 2026-09-27", "Status: draft. Not yet stable."). Never inflate conformance or evaluation claims.
 - Mono for anything quoted from a payload, a schema, a file name or a requirement number.
+- Say less. One idea per sentence, and page ledes in sentences of about 25 words at most. Cut a caveat from the sentence it interrupts and give it a short muted line of its own under the claim.
+- One new term per slide or section, defined by the sentence that brings it in and linked as a term link. Never open a page with a list of terms to learn first.
+- No "X isn't A. It's B." slogans. A contrast that states a position, such as "a profile, not a rule", is fine.
+- Show the real thing. A figure is a real request, trace or piece of code, vendored or generated, before it is a diagram. An illustration says it is one.
+- A number carries its caveat on the same screen: the model, the budget and what produced the gain.
 
 ## 9. Authoring conventions
 
