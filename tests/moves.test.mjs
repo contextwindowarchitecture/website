@@ -3,8 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import vm from 'node:vm';
 
-// The home page is three slides whose one visual is the payload, which fills, breaks and then holds, followed by the
-// schema section; the simulator lives on the Assembler page, and there is no tour (docs/plans/three-slides.md).
+// Where the site moved things, and where an old link lands: the simulator and harness engineering live on the Assembler
+// page, the schema on Spec §2, there is no tour and no Demo page, and the nav lists every page there is. The home page's
+// own shape is tests/home.test.mjs.
 
 const PAGES = ['index.html', 'spec.html', 'evidence.html', 'assembler.html'];
 const read = page => fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
@@ -28,26 +29,6 @@ async function component(page, { hash = '' } = {}) {
   return { view, document, byId, location, timers, window };
 }
 
-test('the home page is four slides, each a full-height section with one heading, and nothing else of the old page', async () => {
-  const html = await read('index.html');
-  const slides = [...html.matchAll(/<section id="([a-z]+)" data-slide="(\d)" style="([^"]*)"/g)];
-  assert.deepEqual(slides.map(m => [m[1], m[2]]), [['top', '1'], ['code', '2'], ['sent', '3'], ['measured', '4']]);
-  for (const m of slides) assert.ok(m[3].includes('min-height: calc(100vh - 68px)') && m[3].includes('scroll-snap-align: start'), `${m[1]} fills the viewport and snaps`);
-  assert.ok(html.includes('scroll-snap-type: y proximity'), 'the page snaps between slides');
-  assert.match(html, /<h1[^>]*>Decide what your model sees\. Keep a record of why\.<\/h1>/);
-  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>') && html.includes('>Long conversations push facts out of the window. Protected state keeps them.</h2>'));
-  for (const gone of ['<section id="shapes"', '<section id="assembly"', '<section id="planes"', 'const SLOTS', 'const PLANES', 'The words this site uses:', '{{ layers }}', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
-    assert.ok(!html.includes(gone), `${gone} has left the home page`);
-  }
-  assert.deepEqual([...html.matchAll(/>0(\d) \/ 04</g)].map(m => m[1]), ['1', '2', '3', '4'], 'each slide counts itself');
-  assert.equal(html.indexOf('<section', html.indexOf('<section id="measured"') + 1), -1, 'the measured slide is the last section');
-  assert.ok(!html.includes('<section id="harness"') && !html.includes('frameworks()') && !html.includes('.g6'), 'harness engineering has moved to the Assembler page');
-  const { view, location } = await component('index.html', { hash: '#harness' });
-  view.applyHash();
-  assert.deepEqual(location.replaced, ['./assembler.html#harness'], 'an old link to the home page section opens it on the Assembler page');
-  assert.equal(view.renderVals().fwTabs, undefined);
-});
-
 test('harness engineering sits on the Assembler page below the simulator, with its framework picker', async () => {
   const html = await read('assembler.html');
   const at = id => html.indexOf(`<section id="${id}"`);
@@ -63,18 +44,6 @@ test('harness engineering sits on the Assembler page below the simulator, with i
   assert.equal(view.renderVals().fwName, 'the Claude Agent SDK');
 });
 
-test('the first slide offers the example and the spec, the second shows the example\'s code, and the third what it sent', async () => {
-  const html = await read('index.html');
-  const first = html.slice(html.indexOf('<section id="top"'), html.indexOf('<section id="code"'));
-  assert.deepEqual([...first.matchAll(/<a href="([^"]+)" style="font-size: 16px;[^>]*>(See it on a real app ↓|Read the spec)<\/a>/g)].map(m => [m[2], m[1]]),
-    [['See it on a real app ↓', '#code'], ['Read the spec', './spec.html']]);
-  const second = html.slice(html.indexOf('<section id="code"'), html.indexOf('<section id="sent"'));
-  assert.ok(['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_COMMIT'].every(b => second.includes(`<!-- ${b}_START -->`)), 'the before and after code, and the commit it is from');
-  assert.ok(!html.includes('#assemble/clinical-triage/blob'), 'the failure shapes have left the home page');
-  const third = html.slice(html.indexOf('<section id="sent"'), html.indexOf('<section id="measured"'));
-  assert.ok(['EXAMPLE_PAYLOAD', 'EXAMPLE_TRACE', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#measured"'), 'the request, the trace and the refusal, then the measured slide');
-});
-
 test('there is no tour and no Demo page; old demo anchors on the home page open the page that holds them, and a section anchor scrolls once rendered', async () => {
   for (const page of PAGES) {
     const html = await read(page);
@@ -83,7 +52,7 @@ test('there is no tour and no Demo page; old demo anchors on the home page open 
     for (const off of ['start.html', 'producers.html', 'about.html']) assert.ok(!html.includes(off), `${page} links only pages the nav lists, not ${off}`);
   }
   for (const off of ['demo.html', 'start.html', 'producers.html', 'about.html']) assert.equal(await fs.stat(new URL('../' + off, import.meta.url)).catch(() => null), null, `${off} is not published`);
-  for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5'], ['#planes', './spec.html#s2'], ['#shapes', './assembler.html#assemble']]) {
+  for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5'], ['#planes', './spec.html#s2'], ['#shapes', './assembler.html#assemble'], ['#harness', './assembler.html#harness']]) {
     const { view, location } = await component('index.html', { hash });
     view.applyHash();
     assert.deepEqual(location.replaced, [target], hash);
@@ -123,7 +92,7 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
   assert.deepEqual(glossary.find(e => e.id === 'harness').where, { page: 'assembler.html', anchor: 'harness', label: 'harness engineering' });
   assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html#harness\)/m);
   assert.ok(!llms.includes('demo.html'), 'llms.txt no longer lists the Demo page');
-  assert.match(llms, /^- \[Landing page\]\(https:\/\/contextwindowarchitecture\.io\/index\.html\): three slides/m);
+  assert.match(llms, /^- \[Landing page\]\(https:\/\/contextwindowarchitecture\.io\/index\.html\): four slides/m);
   assert.match(llms, /^- \[Assembler page\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html\): .*live assembly simulator.*agent framework/m);
   assert.doesNotMatch(llms.match(/^- \[Landing page\].*$/m)[0], /framework/, 'the landing page entry no longer promises the frameworks section');
 });

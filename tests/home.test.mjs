@@ -70,7 +70,7 @@ test('the first slide says what CWA is in plain words, brings in the assembler, 
     assert.ok(figure.includes(name) && source.includes(name), `${name} is in the figure and in the example's own code`);
   }
   assert.ok(!top.includes('aria-hidden="true"'), 'the figure is real code, not a picture');
-  assert.match(html, /<title>Context Window Architecture: decide what your model sees<\/title>/);
+  assert.match(html, /<title>Context Window Architecture — decide what your model sees<\/title>/);
 });
 
 test('a term link opens the glossary scrolled to its entry, on every page, and leaves the page where it was', async () => {
@@ -159,4 +159,32 @@ test('the last slide opens two doors: running the example at its locked commit, 
   assert.deepEqual([...doors.matchAll(/<a href="([^"]+)"/g)].map(m => m[1]), [`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, './spec.html']);
   assert.ok(doors.includes('uv run after.py &quot;How do I export all my projects?&quot;') || doors.includes('uv run after.py "How do I export all my projects?"'));
   assert.ok(doors.includes('No API key is needed to see what would be sent.'));
+});
+
+test('the home page is four slides, each a full-height section with one heading, and nothing else of the old page', async () => {
+  const html = await read('index.html');
+  const slides = [...html.matchAll(/<section id="([a-z]+)" data-slide="(\d)" style="([^"]*)"/g)];
+  assert.deepEqual(slides.map(m => [m[1], m[2]]), [['top', '1'], ['code', '2'], ['sent', '3'], ['measured', '4']]);
+  for (const m of slides) assert.ok(m[3].includes('min-height: calc(100vh - 68px)') && m[3].includes('scroll-snap-align: start'), `${m[1]} fills the viewport and snaps`);
+  assert.ok(html.includes('scroll-snap-type: y proximity'), 'the page snaps between slides');
+  assert.match(html, /<h1[^>]*>Decide what your model sees\. Keep a record of why\.<\/h1>/);
+  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>') && html.includes('>Long conversations push facts out of the window. Protected state keeps them.</h2>'));
+  for (const gone of ['<section id="shapes"', '<section id="assembly"', '<section id="planes"', 'const SLOTS', 'const PLANES', 'The words this site uses:', '{{ layers }}', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
+    assert.ok(!html.includes(gone), `${gone} has left the home page`);
+  }
+  assert.deepEqual([...html.matchAll(/>0(\d) \/ 04</g)].map(m => m[1]), ['1', '2', '3', '4'], 'each slide counts itself');
+  assert.equal(html.indexOf('<section', html.indexOf('<section id="measured"') + 1), -1, 'the measured slide is the last section');
+  assert.ok(!html.includes('<section id="harness"') && !html.includes('frameworks()') && !html.includes('.g6'), 'harness engineering has moved to the Assembler page');
+});
+
+test('the first slide offers the example and the spec, the second shows the example\'s code, and the third what it sent', async () => {
+  const html = await read('index.html');
+  const first = html.slice(html.indexOf('<section id="top"'), html.indexOf('<section id="code"'));
+  assert.deepEqual([...first.matchAll(/<a href="([^"]+)" style="font-size: 16px;[^>]*>(See it on a real app ↓|Read the spec)<\/a>/g)].map(m => [m[2], m[1]]),
+    [['See it on a real app ↓', '#code'], ['Read the spec', './spec.html']]);
+  const second = html.slice(html.indexOf('<section id="code"'), html.indexOf('<section id="sent"'));
+  assert.ok(['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_COMMIT'].every(b => second.includes(`<!-- ${b}_START -->`)), 'the before and after code, and the commit it is from');
+  assert.ok(!html.includes('#assemble/clinical-triage/blob'), 'the failure shapes have left the home page');
+  const third = html.slice(html.indexOf('<section id="sent"'), html.indexOf('<section id="measured"'));
+  assert.ok(['EXAMPLE_PAYLOAD', 'EXAMPLE_TRACE', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#measured"'), 'the request, the trace and the refusal, then the measured slide');
 });

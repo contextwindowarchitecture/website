@@ -114,7 +114,6 @@ The four plane colours are the site's only other chroma and always mean the plan
 
 Where they appear, and nowhere else:
 
-- The plane mark on the home page's third slide: a 2 by 2 grid in the order governance, state, evidence, interaction.
 - Legend swatches: an 8px by 18px vertical bar next to a label.
 - Slot rows in the assembler demo: a 3px left border on the full row, a 2px left border on nested detail, and the slot label text.
 - Comment lines in the rendered payload view, and segments of the budget bar.
@@ -170,7 +169,7 @@ Rules that fall out of the table:
 - **Headings are sentence case.** Landing-page headings are full sentences with a period, often two: "Decide what your model sees. Keep a record of why." Docs-page headings are noun phrases without a period: "Placement profiles", "Admission failures".
 - **RFC 2119 keywords** (MUST, MUST NOT, SHOULD, SHOULD NOT, MAY) are set in `color: var(--accent); font-weight: 600` in running text.
 - **Requirements are cited as R-n** and link to `#R-n` on the spec page.
-- **Browser titles** follow "Page name — Context Window Architecture", with a spaced em dash. The landing page reverses it: "Context Window Architecture — a context assembler spec (draft)".
+- **Browser titles** follow "Page name — Context Window Architecture", with a spaced em dash. The landing page reverses it: "Context Window Architecture — decide what your model sees".
 - Numbers in the demo are formatted with `toLocaleString("en-US")`.
 
 ## 5. Layout and spacing
@@ -345,7 +344,7 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 Every page's nav ends with a `Glossary` button (a `<button>` styled as a nav link, `font: inherit`) that slides out `<aside id="glossary">`: fixed to the right edge, `min(440px, 100%)` wide, `--bg` with a `--line` left border, `z-index: 85` (above the header, below the tour). It is `role="dialog"`, named by its accent kicker, and not modal: the page stays readable behind it. A header row holds the kicker, a muted count and a ghost Close; a search field (`type="search"`, pill-shaped on `--surface`) filters the entries; each entry is a `17px` 600 term, a `14.5px` plain definition, the specification's own sentence as a `13.5px` muted quote with a `2px` `--line` left border, a mono accent "Defined on … →" link and related-term pills. The entry a pill or a `#glossary/<term>` link opened gets a `3px` `--accent` left border. Escape and Close return focus to the control that opened the panel.
 
-Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page's strip sits at the top of its schema section, which follows the three slides, and reads "The words this site uses:". The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
+Under every page's lede sits the prerequisite strip, `12px` mono muted: "This page assumes you know:" followed by three to six pills, each a term the glossary defines, opening the panel at that term. The landing page has no strip: each slide links the one new term it brings in, where it first appears (Term links), and its `PREREQUISITES` list is empty because the glue reads it on every page. The terms live in `site/glossary.json`, the logic in `site/glossary.js`, and `tests/layering.test.mjs` holds every page's panel markup and glue identical.
 
 ### Leaving notice
 
@@ -353,7 +352,9 @@ Two nav links leave CWA, Examples for the showcase and Viability for the benchma
 
 ### Slides (landing page)
 
-The landing page is three slides, each a `<section>` with `data-slide="n"`: `min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;`, with `scroll-snap-type: y proximity` on `html` so a wheel settles on a slide without trapping the reader. Inside, a `1180px` container with `64px 32px 40px` padding holds a `.g2` grid, text left and the slide's one figure right (`minmax(0, 1fr) 300px` or `580px`), then a counter row: a `--line` top border, `margin-top: 48px; padding-top: 14px`, mono `12px` muted, "01 / 03" on the left and the next slide's name as an accent link on the right. The figure is the payload drawn as bars in a bordered window (`300px` by `360px`, `padding: 12px`, `gap: 8px`): `--line` bars for the string nobody owns, plane colours once it is named, a `--p-gov` dashed bar on `--accent-soft` below the window for an item pushed out, and on the last slide plane-coloured bands with their names in `--bg` mono at `10px`, a fill bar in `--fg`, `--muted`, `--line` and `--surface`, and a dashed-top mono trace line. Figures are `aria-hidden`; the sentence beside each carries the meaning. The last slide ends on a `.g3` hairline grid of three doors, each a clickable cell with an accent label, a `17px` 600 title ending in an arrow, and muted `13.5px` copy.
+The landing page is four slides, each a `<section>` with `data-slide="n"`: `min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center;`, with `scroll-snap-type: y proximity` on `html` so a wheel settles on a slide without trapping the reader. Inside, a `1180px` container with `64px 32px 40px` padding holds the slide, then a counter row: a `--line` top border, `margin-top: 48px; padding-top: 14px`, mono `12px` muted, "01 / 04" on the left and the next slide's name as an accent link on the right (the last links back to the top).
+
+Every figure is a real artifact, never a drawing: the first slide's Python call beside its text in a `.g2` grid (`minmax(0, 1fr) 440px`); the 01-docs-qa example's `before.py` and `context.py` side by side in a `.g2` grid; the request it sends and the trace `after.py` prints, stacked at full width so the trace's columns fit; and the measured result's rows. All but the first are generated by `npm run build:contract` from `vendor/examples/` and `site/measured.json` (`scripts/example-blocks.mjs`), each a bordered panel with a keyboard-scrollable `<pre>`: code and the trace keep their columns and scroll inside the panel, and the request and the refusal wrap. A measured row is an `.rm` grid of a mono number, `clamp(28px, 3.4vw, 42px)` in a `5.6em` column, accent on the first row, and a `16px` label; the caveat follows the rows on the same slide in muted `13.5px`. The last slide ends on a `.g2c` hairline grid of two doors, each a clickable cell with an accent label, a `17px` 600 title ending in an arrow, and muted `13.5px` copy.
 
 ### Icons and logo
 

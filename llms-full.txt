@@ -74,7 +74,7 @@ The specification defines three conformance claims, and no others (spec §1):
 - [Example item](https://contextwindowarchitecture.io/examples/context-item.json), [producer batch](https://contextwindowarchitecture.io/examples/producer-batch.json), [profiles](https://contextwindowarchitecture.io/examples/profiles.json), [route policies](https://contextwindowarchitecture.io/examples/route-policies.json) and [trace](https://contextwindowarchitecture.io/examples/trace.json)
 - [contract.js](https://contextwindowarchitecture.io/contract.js): the browser module behind the page tools: checkItem, checkProducerBatch, checkSnapshot, checkTrace and checkProfile, local checks only
 - [Glossary](https://contextwindowarchitecture.io/site/glossary.json): every term the site uses, defined in the specification's words, with where each is defined and its related terms
-- [Landing page](https://contextwindowarchitecture.io/index.html): three slides: the request as it is sent today, the failure shapes an unowned payload produces, and what CWA does about them, with the schema's planes and slots beneath, and doors to the Assembler page's simulator, Getting started and the Spec
+- [Landing page](https://contextwindowarchitecture.io/index.html): four slides: what CWA is and the Python call, a help-center bot's request code before and after CWA, what its model receives and what the assembler left out (the trace, and a refused question), and one measured result from the viability benchmark with its caveat, then doors to running the example and to the Spec
 
 ## Conformance (SPEC.md §1)
 

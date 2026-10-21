@@ -158,8 +158,9 @@ test('the panel opens from the nav or a pill, searches, follows #glossary/<term>
   assert.equal(view.state.glossaryOpen, false, 'another hash leaves the panel alone');
 });
 
-// The home page is layer 1: three slides that hook and orient (tests/three-slides.test.mjs), and the material it used to
-// repeat lives on the deeper pages.
+// The home page is layer 1: four slides that show a real app at work and one measured result (tests/home.test.mjs). Its
+// request and trace come from the vendored example, not from a generated payload of its own, and the model, the
+// simulator and the profiles live on the deeper pages.
 test('the home page is layer 1: a plain hero with no preview widget, and none of the material the deeper pages carry', async () => {
   const html = await read('index.html');
   assert.ok(!html.includes('{{ heroBlocks }}') && !html.includes('toggleHero') && !html.includes('startHeroClock'), 'no hero preview widget');
