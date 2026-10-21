@@ -57,3 +57,17 @@ test('the code slide shows build_request() from before.py and its CWA counterpar
   assert.ok(code.includes('>Paste the top five articles into the system prompt, keep the last six messages, send.</p>'));
   assert.equal([...code.matchAll(/<pre tabindex="0" aria-label="[^"]+"/g)].length, 2, 'both panels scroll from the keyboard and are named');
 });
+
+test('a term link opens the glossary scrolled to its entry, on every page, and leaves the page where it was', async () => {
+  const vm = await import('node:vm');
+  for (const page of ['index.html', 'spec.html', 'evidence.html', 'assembler.html']) {
+    const source = (await read(page)).match(/<script type="text\/x-dc"[^>]*>([\s\S]*?)<\/script>/)[1];
+    class DCLogic { props = {}; setState(patch, cb) { Object.assign(this.state, typeof patch === 'function' ? patch(this.state) : patch); if (cb) cb(); } }
+    const list = { offsetTop: 120, scrollTop: 0 };
+    const entry = { offsetTop: 1500, parentElement: list, focused: null, focus(options) { this.focused = options; } };
+    const document = { activeElement: null, documentElement: { style: { setProperty() {}, removeProperty() {} }, setAttribute() {} }, getElementById: id => id === 'glossary-trace' ? entry : null, addEventListener() {}, removeEventListener() {} };
+    const view = vm.runInNewContext(source + '\nnew Component()', { DCLogic, console, document, window: { addEventListener() {}, removeEventListener() {}, matchMedia: () => ({ matches: false }) }, location: { hash: '' }, history: { replaceState() {} }, setTimeout() {}, clearTimeout() {}, setInterval() {}, clearInterval() {} });
+    view.openGlossary('trace');
+    assert.deepEqual([view.state.glossaryOpen, view.state.glossaryTerm, list.scrollTop, entry.focused?.preventScroll], [true, 'trace', 1380, true], page);
+  }
+});

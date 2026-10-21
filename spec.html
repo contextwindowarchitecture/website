@@ -974,7 +974,13 @@ class Component extends DCLogic {
   openGlossary(term) {
     if (!this.state.glossaryOpen) { try { this._glossaryReturn = document.activeElement; } catch (e) {} }
     this.setState({ glossaryOpen: true, glossaryTerm: term || null, glossaryQuery: term ? "" : (this.state.glossaryQuery || "") }, () => {
-      try { const el = document.getElementById(term ? "glossary-" + term : "glossarysearch"); if (el) el.focus({ preventScroll: true }); } catch (e) {}
+      try {
+        const el = document.getElementById(term ? "glossary-" + term : "glossarysearch");
+        if (el) el.focus({ preventScroll: true });
+        // The entries scroll inside the panel: bring the opened term to the top of the list, and leave the page where it is.
+        const list = term && el && el.parentElement;
+        if (list) list.scrollTop = el.offsetTop - list.offsetTop;
+      } catch (e) {}
     });
   }
   closeGlossary() {
