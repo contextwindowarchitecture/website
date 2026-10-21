@@ -84,7 +84,7 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 56px;">
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Specification · draft · 2026-10-07</div>
       <h1 style="margin: 0 0 20px; font-size: clamp(38px, 5.4vw, 72px); line-height: 0.96; letter-spacing: -0.045em; font-weight: 700; max-width: 16ch; text-wrap: balance;">Context Window Architecture</h1>
-      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A specification for assembling every model call from typed slots. This page renders SPEC.md, the normative text, and anything on the landing page, in the producer guide, or in the evidence notes that disagrees with it is wrong. Requirements are numbered from R-1; new ones append, and numbers are permanent and never reused.</p>
+      <p style="margin: 0; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">The rules an assembler, its <a class="term" href="#glossary/producer" style="color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;" style-hover="color: var(--accent);">producers</a> and your application follow, numbered from <a href="#R-1" style="font-family: var(--mono); white-space: nowrap;">R-1</a>. A number is never changed or reused. Where another page disagrees with this one, this page is right.</p>
       <div style="display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 22px; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; color: var(--muted);">
         <span>Status: <span style="color: var(--fg);">draft</span>. Not yet stable.</span>
         <span style="overflow-wrap: anywhere;"><a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture" target="_blank" rel="noopener">contextwindowarchitecture/contextwindowarchitecture</a>. This page renders commit <a href="https://github.com/contextwindowarchitecture/contextwindowarchitecture/commit/16de4be0534583f135a597171c927d42c87ee82c">16de4be</a>.</span>
@@ -192,7 +192,7 @@
           <sc-for list="{{ rulesModel }}" as="r" hint-placeholder-count="4">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
           </sc-for>
         </div>
@@ -243,7 +243,7 @@
           <sc-for list="{{ rulesGov }}" as="r" hint-placeholder-count="7">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
           </sc-for>
         </div>
@@ -268,7 +268,7 @@
           <sc-for list="{{ rulesFit }}" as="r" hint-placeholder-count="7">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
           </sc-for>
         </div>
@@ -348,7 +348,7 @@
           <sc-for list="{{ rulesProf }}" as="r" hint-placeholder-count="2">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
           </sc-for>
         </div>
@@ -379,7 +379,7 @@
           <sc-for list="{{ rulesTrace }}" as="r" hint-placeholder-count="3">
             <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
-              <div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div>
+              <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
           </sc-for>
         </div>

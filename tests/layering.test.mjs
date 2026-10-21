@@ -102,7 +102,7 @@ test('every page opens the same glossary panel from its nav, and links its terms
     glue.add(code[0]);
     // No page opens with a list of terms to learn first: each links a term where it first uses it (STYLE.md, Term links).
     assert.ok(!html.includes('{{ prereq }}') && !html.includes('This page assumes you know') && !html.includes('const PREREQUISITES'), `${page} has no prerequisite strip`);
-    if (page !== 'spec.html') assert.ok(html.includes('<a class="term" href="#glossary/'), `${page} links its terms`);
+    assert.ok(html.includes('<a class="term" href="#glossary/'), `${page} links its terms`);
   }
   assert.equal(blocks.size, 1, 'the panel markup is identical on every page');
   assert.equal(glue.size, 1, 'the glossary logic is identical on every page');

@@ -410,3 +410,23 @@ test('the Spec page and llms.txt link the specification repository', async () =>
   assert.ok((await fs.readFile(new URL('../llms-full.txt', import.meta.url), 'utf8')).includes(`(${REPOSITORY})`), 'llms-full.txt carries the link');
   assert.ok((await fs.readFile(new URL('../README.md', import.meta.url), 'utf8')).includes(`(${REPOSITORY})`), 'the README names where the specification comes from');
 });
+
+// A reader deep in §4 should not have to scroll back to the index to learn what R-16 is about (FEEDBACK.md, Spec).
+test('every rule card on the Spec page names its rule above the text, as contract/requirements.json words it', async () => {
+  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
+  const cards = [...html.matchAll(/<div id="\{\{ r\.id \}\}"[^>]*>([\s\S]*?)\n            <\/div>/g)].map(m => m[1]);
+  assert.equal(cards.length, 5, 'one card template per section that lists rules');
+  for (const card of cards) assert.ok(/<div style="font-size: 15px; font-weight: 600;[^"]*">\{\{ r\.summary \}\}<\/div><div style="font-family: var\(--mono\);[^"]*"><sc-for list="\{\{ r\.segs \}\}"/.test(card), 'the title, then the statement');
+  const requirements = JSON.parse(await fs.readFile(new URL('../contract/requirements.json', import.meta.url), 'utf8'));
+  const view = await component('spec.html');
+  const vals = view.renderVals();
+  const shown = ['rulesModel', 'rulesGov', 'rulesFit', 'rulesProf', 'rulesTrace'].flatMap(list => [...vals[list]]).map(r => [r.id, r.summary]);
+  assert.deepEqual(shown.sort(), requirements.map(r => [r.id, r.summary]).sort(), 'every requirement once, with its own title');
+});
+
+test('the Spec page\'s lede says what the specification is, not how the page was made', async () => {
+  const html = await fs.readFile(new URL('../spec.html', import.meta.url), 'utf8');
+  const lede = html.match(/<h1[^>]*>Context Window Architecture<\/h1>\s*<p[^>]*>([\s\S]*?)<\/p>/)[1].replace(/<[^>]+>/g, '');
+  assert.equal(lede, 'The rules an assembler, its producers and your application follow, numbered from R-1. A number is never changed or reused. Where another page disagrees with this one, this page is right.');
+  assert.ok(!html.includes('the producer guide, or in the evidence notes'), 'no names the nav does not use');
+});
