@@ -38,7 +38,7 @@ test('the nav calls the placement page Placement, the spec page is Spec everywhe
     assert.ok(!html.includes('>Docs</a>') && !html.includes('Read the docs'), `${page}: the spec page is called Spec`);
   }
   const index = await read('index.html');
-  assert.ok(!index.includes('<a href="./start.html"') && index.includes('>Evaluating</span>') && index.includes('>Checking</span>'), 'the home page opens doors only to pages the nav lists');
+  assert.ok(!index.includes('<a href="./start.html"'), 'the home page opens doors only to pages the nav lists');
 });
 
 // The glossary: every term the site uses, defined in the specification's own words, in a panel every page opens, with

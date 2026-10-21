@@ -1,0 +1,6 @@
+refused: evidence_required, recovery request_context. No request is sent.
+  - evidence.knowledge       help:api@5#0                 below_threshold  relevance 0
+  - evidence.knowledge       help:api@5#1                 below_threshold  relevance 1.201
+  - evidence.knowledge       help:api@5#2                 below_threshold  relevance 0
+  - evidence.knowledge       help:api@5#3                 below_threshold  relevance 0
+  - evidence.knowledge       help:notifications@5#1       below_threshold  relevance 1.273

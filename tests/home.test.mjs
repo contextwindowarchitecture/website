@@ -86,3 +86,40 @@ test('a term link opens the glossary scrolled to its entry, on every page, and l
     assert.deepEqual([view.state.glossaryOpen, view.state.glossaryTerm, list.scrollTop, entry.focused?.preventScroll], [true, 'trace', 1380, true], page);
   }
 });
+
+// What `uv run --frozen after.py --provider none --conversation scenarios/<scenario>/conversation.json` printed in the
+// examples checkout at the locked commit, with no model and no key. A vendor that changes a scenario means running it
+// again and replacing the fixture.
+const printed = async name => (await read(`tests/fixtures/${name}.txt`)).trim();
+
+test('the third slide shows exactly what after.py prints: the trace table and the request as sent', async () => {
+  const html = await read('index.html');
+  assert.equal(shown(html, 'EXAMPLE_TRACE') + '\n\n' + shown(html, 'EXAMPLE_PAYLOAD'), await printed('after-01-answer'));
+  const request = shown(html, 'EXAMPLE_PAYLOAD');
+  assert.ok(request.startsWith('── system ──\nYou are the Fernway help assistant.') && /\n── user ──\n<article id="help:sign-in@6#0">\n/.test(request) && request.endsWith('</question>'), 'a system message, then one user message of tagged items');
+  assert.equal(request.match(/── \w+ ──/g).length, 2, 'two messages, nothing else');
+});
+
+test('the third slide\'s captions agree with the scenario, and the refusal is the off-topic run\'s', async () => {
+  const html = await read('index.html');
+  const sent = html.slice(html.indexOf('<section id="sent"'), html.indexOf('</section>', html.indexOf('<section id="sent"')));
+  const snapshot = JSON.parse(await vendored('01-docs-qa/scenarios/01-answer/snapshot.json'));
+  const trace = JSON.parse(await vendored('01-docs-qa/scenarios/01-answer/trace.json'));
+  assert.equal(snapshot.route_policy.slots['evidence.knowledge'].min_relevance, 2);
+  assert.equal(trace.excluded.filter(row => row.reason === 'below_threshold').length, 3);
+  assert.ok(sent.includes("Three articles scored under this route's threshold of 2.0 and stayed out."));
+  assert.deepEqual([...sent.matchAll(/<a class="term" href="#glossary\/([a-z-]+)"/g)].map(m => m[1]), ['trace']);
+  const refused = JSON.parse(await vendored('01-docs-qa/scenarios/03-off-topic/snapshot.json'));
+  const query = refused.batches.flatMap(b => b.items).find(item => item.slot === 'interaction.query');
+  assert.match(query.body, /banana bread/i);
+  assert.ok(sent.includes('Ask it for a banana-bread recipe and nothing reaches the model:'));
+  assert.equal(shown(html, 'EXAMPLE_REFUSAL'), (await printed('after-03-off-topic')).split('\n')[0]);
+  assert.equal(shown(html, 'EXAMPLE_REFUSAL'), 'refused: evidence_required, recovery request_context. No request is sent.');
+});
+
+test('the request and the refusal wrap their prose; the code and trace panels keep their columns', async () => {
+  const html = await read('index.html');
+  const pre = name => html.match(new RegExp(`<!-- ${name}_START -->[\\s\\S]*?<pre [^>]*style="([^"]*)"`))[1];
+  for (const name of ['EXAMPLE_PAYLOAD', 'EXAMPLE_REFUSAL']) assert.ok(pre(name).includes('white-space: pre-wrap; overflow-wrap: anywhere;'), `${name} wraps`);
+  for (const name of ['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_TRACE']) assert.ok(!pre(name).includes('pre-wrap'), `${name} keeps its columns`);
+});
