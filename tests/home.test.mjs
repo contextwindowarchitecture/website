@@ -108,12 +108,35 @@ test('a term link opens the glossary scrolled to its entry, on every page, and l
 // again and replacing the fixture.
 const printed = async name => (await read(`tests/fixtures/${name}.txt`)).trim();
 
-test('the third slide shows exactly what after.py prints: the trace table and the request as sent', async () => {
+test('the third slide draws what the model received from the trace, and shows the request exactly as after.py prints it', async () => {
   const html = await read('index.html');
-  assert.equal(shown(html, 'EXAMPLE_TRACE') + '\n\n' + shown(html, 'EXAMPLE_PAYLOAD'), await printed('after-01-answer'));
+  // The request as sent: the part of after.py's output that follows its trace table.
+  const out = await printed('after-01-answer');
   const request = shown(html, 'EXAMPLE_PAYLOAD');
+  assert.equal(request, out.slice(out.indexOf('── system ──')));
   assert.ok(request.startsWith('── system ──\nYou are the Fernway help assistant.') && /\n── user ──\n<article id="help:sign-in@6#0">\n/.test(request) && request.endsWith('</question>'), 'a system message, then one user message of tagged items');
   assert.equal(request.match(/── \w+ ──/g).length, 2, 'two messages, nothing else');
+  const sent = html.slice(html.indexOf('<section id="sent"'), html.indexOf('</section>', html.indexOf('<section id="sent"')));
+  assert.ok(/<details[^>]*>\s*<summary[^>]*>Show the request as sent<\/summary>[\s\S]*<!-- EXAMPLE_PAYLOAD_START -->/.test(sent), 'the full request is one click away');
+  // The window: one bar per sent item, in render order, with its tag (or id) and tokens; then the fill and what was left out.
+  const window = html.match(/<!-- EXAMPLE_WINDOW_START -->([\s\S]*?)<!-- EXAMPLE_WINDOW_END -->/)[1];
+  const bars = [...window.matchAll(/<div style="height: (\d+)px; background: var\(--p-(\w+)\);[^"]*"><span[^>]*>([^<]+)<\/span><span[^>]*>(\d+) tok<\/span><\/div>/g)].map(m => [decode(m[3]), Number(m[4]), m[2], Number(m[1])]);
+  assert.deepEqual(bars, [
+    ['policy:instructions', 142, 'gov', 28 + Math.round(142 * 0.3)],
+    ['<article id="help:sign-in@6#0">', 58, 'evid', 28 + Math.round(58 * 0.3)],
+    ['<article id="help:sign-in@6#1">', 39, 'evid', 28 + Math.round(39 * 0.3)],
+    ['<question id="turn:s_01answer:0001">', 11, 'inter', 28 + Math.round(11 * 0.3)],
+  ]);
+  const trace = JSON.parse(await vendored('01-docs-qa/scenarios/01-answer/trace.json'));
+  assert.deepEqual(bars.map(b => b[1]).sort(), trace.included.map(r => r.tokens).sort(), 'every sent item, and nothing else');
+  assert.ok(window.includes('>283 of 1,500 tokens<') && window.includes(`width: ${(100 * 283 / 1500).toFixed(1)}%; background: var(--fg);`), 'the budget, and how much of it the request used');
+  const left = [...window.matchAll(/<div style="border: 1px dashed var\(--p-evid\);[^"]*"><span>([^<]+)<\/span><span>([^<]+)<\/span><\/div>/g)].map(m => [m[1], m[2]]);
+  assert.deepEqual(left, [
+    ['help:sign-in@6#3', 'below threshold · relevance 1.839, needs 2.0'],
+    ['help:status-and-uptime@3#0', 'below threshold · relevance 1.636, needs 2.0'],
+    ['help:support@2#1', 'below threshold · relevance 1.754, needs 2.0'],
+  ]);
+  assert.deepEqual(left.map(l => l[0]), trace.excluded.map(r => r.item_id));
 });
 
 test('the third slide\'s captions agree with the scenario, and the refusal is the off-topic run\'s', async () => {
@@ -210,5 +233,5 @@ test('the first slide offers the example and the spec, the second shows the exam
   assert.ok(['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_COMMIT'].every(b => second.includes(`<!-- ${b}_START -->`)), 'the before and after code, and the commit it is from');
   assert.ok(!html.includes('#assemble/clinical-triage/blob'), 'the failure shapes have left the home page');
   const third = html.slice(html.indexOf('<section id="sent"'), html.indexOf('<section id="measured"'));
-  assert.ok(['EXAMPLE_PAYLOAD', 'EXAMPLE_TRACE', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#measured"'), 'the request, the trace and the refusal, then the measured slide');
+  assert.ok(['EXAMPLE_WINDOW', 'EXAMPLE_PAYLOAD', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#measured"'), 'what was received and left out, the request and the refusal, then the measured slide');
 });

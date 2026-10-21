@@ -85,6 +85,47 @@ export function request(payload) {
   return [...payload.system.map(entry => `── system ──\n${entry.text}`), ...payload.messages.map(m => `── ${m.role} ──\n${m.content}`)].join('\n\n');
 }
 
+const PLANE_COLOUR = { governance: 'var(--p-gov)', state: 'var(--p-state)', evidence: 'var(--p-evid)', interaction: 'var(--p-inter)' };
+const mono = 'font-family: var(--mono); font-size: 11px; letter-spacing: 0.04em;';
+const label = text => `<div style="${mono} letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">${text}</div>`;
+
+/**
+ * What the model received, drawn as the old slides drew a request: a window of bars in plane colours, one per item the
+ * trace says was sent, in the order the profile renders them (by placement, then id), each labelled with how it was
+ * wrapped and its tokens; the budget as a fill bar; and each item left out as a dashed bar with its reason. Every
+ * label and size comes from the scenario's snapshot and trace.
+ */
+export function requestWindow({ snapshot, trace }) {
+  const placement = snapshot.profile.placement;
+  const at = slot => placement.findIndex(p => p.slot === slot);
+  const items = new Map(snapshot.batches.flatMap(batch => batch.items).map(item => [item.id, item]));
+  const sent = [...trace.included].sort((a, b) => at(a.slot) - at(b.slot) || (a.item_id < b.item_id ? -1 : a.item_id > b.item_id ? 1 : 0));
+  const wrap = slot => placement[at(slot)].wrap;
+  // A tagged item shows its tag, as the model reads it; a system or tool entry has no tag, so it shows its id.
+  const tag = row => wrap(row.slot).startsWith('xml:') ? `<${wrap(row.slot).slice(4)} id="${row.item_id}">` : row.item_id;
+  const bar = row => `<div style="height: ${28 + Math.round(row.tokens * 0.3)}px; background: ${PLANE_COLOUR[row.slot.split('.')[0]]}; display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 0 10px; ${mono} color: var(--bg);">` +
+    `<span style="overflow-wrap: anywhere;">${escapeHtml(tag(row))}</span><span style="white-space: nowrap;">${row.tokens} tok</span></div>`;
+  // The system entries, then the one user message every other text goes into (cwa-messages/v1).
+  const groups = [['System message', sent.filter(r => wrap(r.slot) === 'system')], ['One user message', sent.filter(r => wrap(r.slot).startsWith('xml:'))]];
+  const { input } = trace.budget, used = trace.result.input_tokens;
+  // Why it was left out, in words: the reason code, and for a relevance threshold the score against it.
+  const why = row => {
+    const item = items.get(row.item_id) ?? {};
+    const floor = snapshot.route_policy.slots?.[row.slot]?.min_relevance;
+    const reason = row.reason.replaceAll('_', ' ');
+    return row.reason === 'below_threshold' && item.relevance != null && floor != null ? `${reason} · relevance ${g(item.relevance)}, needs ${floor.toFixed(1)}` : reason;
+  };
+  return '<div style="display: flex; flex-direction: column; gap: 10px;">' +
+    `<div style="display: flex; justify-content: space-between; gap: 12px;">${label('What the model received')}${label(`${used} of ${input.toLocaleString('en-US')} tokens`)}</div>` +
+    '<div style="border: 1px solid var(--fg); background: var(--bg); padding: 10px; display: flex; flex-direction: column; gap: 6px;">' +
+    groups.filter(([, rows]) => rows.length).map(([name, rows]) => `<div style="${mono} color: var(--muted); padding: 2px 0;">${name}</div>` + rows.map(bar).join('')).join('') + '</div>' +
+    `<div aria-hidden="true" style="display: flex; height: 8px; gap: 1px; background: var(--line);"><div style="width: ${(100 * used / input).toFixed(1)}%; background: var(--fg);"></div><div style="flex: 1; background: var(--surface);"></div></div>` +
+    `<div style="margin-top: 6px;">${label('Left out')}</div>` +
+    trace.excluded.map(row => `<div style="border: 1px dashed ${PLANE_COLOUR[row.slot.split('.')[0]]}; padding: 7px 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; ${mono} color: var(--muted);">` +
+      `<span>${escapeHtml(row.item_id)}</span><span>${escapeHtml(why(row))}</span></div>`).join('') +
+    '</div>';
+}
+
 /** The vendored files and their lock, read from the website at root. */
 export async function exampleFiles(root = '.') {
   const text = name => fs.readFile(path.join(root, DIR, name), 'utf8');
@@ -106,7 +147,7 @@ export function exampleBlocks({ lock, before, after, answered, refused }) {
       `<a href="${tree}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at ${lock.commit.slice(0, 7)} →</a>`,
     EXAMPLE_PAYLOAD: panel({ label: 'request · cwa-messages/v1', meta: answered.payload.tools.length ? `${answered.payload.tools.length} tools` : 'no tools on this route',
       text: request(answered.payload), prose: true }),
-    EXAMPLE_TRACE: panel({ label: 'trace', meta: 'as after.py prints it', text: report(answered.snapshot, answered.trace) }),
+    EXAMPLE_WINDOW: requestWindow(answered),
     EXAMPLE_RUN: door(`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, 'Running it', 'Run it yourself →',
       'Clone the examples, then in 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key is needed to see what would be sent.'),
     EXAMPLE_REFUSAL: `<pre style="padding: 14px 18px; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${escapeHtml(report(refused.snapshot, refused.trace).split('\n')[0])}</pre>`,
