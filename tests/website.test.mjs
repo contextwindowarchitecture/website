@@ -138,7 +138,9 @@ test('the Placement page shows the first published profile in its format section
   const profiles = JSON.parse(await fs.readFile(new URL('../examples/profiles.json', import.meta.url), 'utf8'));
   const block = html.match(/<!-- CONTRACT_PROFILE_START -->([\s\S]*?)<!-- CONTRACT_PROFILE_END -->/)[1];
   assert.ok(block.includes(`<span>profile.yaml</span><span>${profiles[0].id}/v${profiles[0].version}</span>`), 'the panel names the profile');
-  const shown = block.match(/overflow: auto;">([\s\S]*?)<\/div>/)[1].replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&amp;', '&');
+  const pre = block.match(/<pre style="([^"]*)">([\s\S]*?)<\/pre>/);
+  assert.ok(pre[1].includes('white-space: pre-wrap;') && !pre[1].includes('overflow: auto'), 'it wraps instead of scrolling sideways');
+  const shown = [...pre[2].matchAll(/<span style="display: block;[^"]*">([\s\S]*?)<\/span>/g)].map(m => m[1]).join('\n').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
   assert.deepEqual(JSON.parse(shown), profiles[0]);
   assert.equal(contract.checkProfile(JSON.parse(shown)).valid, true);
   for (const gone of ['<section id="explorer"', 'href="#explorer"', 'const PROFILES', '{{ a.yaml }}', 'Profile explorer']) assert.ok(!html.includes(gone), `${gone} has left the page`);

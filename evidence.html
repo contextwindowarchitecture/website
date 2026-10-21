@@ -176,67 +176,7 @@
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75;">
           <!-- CONTRACT_PROFILE_START -->
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>policy-first-chat/v1</span></div>
-          <div style="padding: 18px; white-space: pre; overflow: auto;">{
-  "spec": "cwa/draft",
-  "id": "policy-first-chat",
-  "version": 1,
-  "route": "support-chat",
-  "model_family": null,
-  "route_policy_version": "illustrative/v1",
-  "placement": [
-    {
-      "slot": "governance.instructions",
-      "wrap": "system"
-    },
-    {
-      "slot": "state.user",
-      "wrap": "xml:user_profile"
-    },
-    {
-      "slot": "evidence.knowledge",
-      "wrap": "xml:evidence"
-    },
-    {
-      "slot": "state.task",
-      "wrap": "xml:task"
-    },
-    {
-      "slot": "interaction.memory",
-      "wrap": "xml:memory"
-    },
-    {
-      "slot": "interaction.history",
-      "wrap": "xml:history"
-    },
-    {
-      "slot": "governance.capabilities",
-      "wrap": "tools"
-    },
-    {
-      "slot": "evidence.tool_results",
-      "wrap": "xml:observation"
-    },
-    {
-      "slot": "governance.examples",
-      "wrap": "xml:examples"
-    },
-    {
-      "slot": "governance.output_contract",
-      "wrap": "xml:format"
-    },
-    {
-      "slot": "interaction.query",
-      "wrap": "xml:query"
-    }
-  ],
-  "evaluation": {
-    "status": "unevaluated",
-    "suite": null,
-    "date": null,
-    "result": null,
-    "artifact": null
-  }
-}</div>
+          <pre style="padding: 18px; margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere;"><span style="display: block; padding-left: 4ch; text-indent: -4ch;">{</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;spec&quot;: &quot;cwa/draft&quot;,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;id&quot;: &quot;policy-first-chat&quot;,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;version&quot;: 1,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;route&quot;: &quot;support-chat&quot;,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;model_family&quot;: null,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;route_policy_version&quot;: &quot;illustrative/v1&quot;,</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;placement&quot;: [</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;governance.instructions&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;system&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;state.user&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:user_profile&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;evidence.knowledge&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:evidence&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;state.task&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:task&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;interaction.memory&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:memory&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;interaction.history&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:history&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;governance.capabilities&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;tools&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;evidence.tool_results&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:observation&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;governance.examples&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:examples&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;governance.output_contract&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:format&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    },</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    {</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;slot&quot;: &quot;interaction.query&quot;,</span><span style="display: block; padding-left: 10ch; text-indent: -10ch;">      &quot;wrap&quot;: &quot;xml:query&quot;</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    }</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  ],</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  &quot;evaluation&quot;: {</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    &quot;status&quot;: &quot;unevaluated&quot;,</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    &quot;suite&quot;: null,</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    &quot;date&quot;: null,</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    &quot;result&quot;: null,</span><span style="display: block; padding-left: 8ch; text-indent: -8ch;">    &quot;artifact&quot;: null</span><span style="display: block; padding-left: 6ch; text-indent: -6ch;">  }</span><span style="display: block; padding-left: 4ch; text-indent: -4ch;">}</span></pre>
           <!-- CONTRACT_PROFILE_END -->
         </div>
         <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. Earlier evaluation summaries are withdrawn because supporting runs are unavailable.</p>

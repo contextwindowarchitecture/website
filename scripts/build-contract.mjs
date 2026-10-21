@@ -6,7 +6,7 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { caseDigestsNow, implementations, maturitySentence, ranAt, tally } from './conformance-reports.mjs';
-import { exampleBlocks, exampleFiles, handoffBlocks, measuredBlocks, profileRequestBlock, writeBlocks } from './example-blocks.mjs';
+import { codeLines, exampleBlocks, exampleFiles, handoffBlocks, measuredBlocks, profileRequestBlock, writeBlocks } from './example-blocks.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -84,12 +84,12 @@ outputs.set('generated/schema-validators.js', bundle.outputFiles[0].text);
 // The Placement page's format section shows the first published profile, as the Spec page does.
 const evidence = await fs.readFile('evidence.html', 'utf8');
 const firstProfile = data.PROFILES[0];
-const profileJson = JSON.stringify(firstProfile, null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 if (!/<!-- CONTRACT_PROFILE_START -->/.test(evidence)) throw new Error('evidence.html has no profile block to write.');
 outputs.set('evidence.html', writeBlocks(evidence.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
   () => '<!-- CONTRACT_PROFILE_START -->\n' +
     `          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>${firstProfile.id}/v${firstProfile.version}</span></div>\n` +
-    `          <div style="padding: 18px; white-space: pre; overflow: auto;">${profileJson}</div>\n` +
+    // Like every code panel on the site, it wraps under a hanging indent instead of scrolling sideways.
+    `          <pre style="padding: 18px; margin: 0; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere;">${codeLines(JSON.stringify(firstProfile, null, 2))}</pre>\n` +
     '          <!-- CONTRACT_PROFILE_END -->'),
   // And the request that profile renders: the specification's example, examples/messages-payload.json.
   profileRequestBlock({ profile: firstProfile, snapshot: await read('examples/messages-snapshot.json'), payload: await read('examples/messages-payload.json') }), 'evidence.html'));
@@ -147,7 +147,8 @@ for (const page of ['spec.html']) {
       CONFLICTS: model.conflicts, STAGES: model.stages, ITEM_FIELDS: model.item_fields, TESTS: model.tests })) updated = setConstant(updated, name, value);
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     updated = updated.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
-      `<!-- CONTRACT_PROFILE_START -->\n          <pre style="padding: 18px; overflow: auto; margin: 0;">${profile}</pre>\n          <!-- CONTRACT_PROFILE_END -->`);
+      // The read-back holds this <pre> to plain text, so it wraps without a hanging indent rather than scrolling sideways.
+      `<!-- CONTRACT_PROFILE_START -->\n          <pre style="padding: 18px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;">${profile}</pre>\n          <!-- CONTRACT_PROFILE_END -->`);
   }
   outputs.set(page, updated);
 }

@@ -35,7 +35,7 @@ export function excerpt(source, prefixes) {
 
 // Code wraps instead of scrolling sideways: each line is a block of its own, and a long one hangs its continuation
 // four columns in from where its code starts. A blank line keeps its height.
-const codeLines = text => text.split('\n').map(line => {
+export const codeLines = text => text.split('\n').map(line => {
   if (line.trim() === '') return '<span style="display: block; height: 1.55em;"></span>';
   const hang = line.match(/^ */)[0].length + 4;
   return `<span style="display: block; padding-left: ${hang}ch; text-indent: -${hang}ch;">${escapeHtml(line)}</span>`;
