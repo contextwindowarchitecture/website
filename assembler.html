@@ -1035,8 +1035,11 @@ class Component extends DCLogic {
         const el = document.getElementById(term ? "glossary-" + term : "glossarysearch");
         if (el) el.focus({ preventScroll: true });
         // The entries scroll inside the panel: bring the opened term to the top of the list, and leave the page where it is.
+        // Again after a tick, since a panel the page opened as it loaded may not be laid out yet.
         const list = term && el && el.parentElement;
-        if (list) list.scrollTop = el.offsetTop - list.offsetTop;
+        const toTerm = () => { if (list) list.scrollTop = el.offsetTop - list.offsetTop; };
+        toTerm();
+        setTimeout(toTerm, 0);
       } catch (e) {}
     });
   }

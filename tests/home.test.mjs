@@ -81,9 +81,14 @@ test('a term link opens the glossary scrolled to its entry, on every page, and l
     const list = { offsetTop: 120, scrollTop: 0 };
     const entry = { offsetTop: 1500, parentElement: list, focused: null, focus(options) { this.focused = options; } };
     const document = { activeElement: null, documentElement: { style: { setProperty() {}, removeProperty() {} }, setAttribute() {} }, getElementById: id => id === 'glossary-trace' ? entry : null, addEventListener() {}, removeEventListener() {} };
-    const view = vm.runInNewContext(source + '\nnew Component()', { DCLogic, console, document, window: { addEventListener() {}, removeEventListener() {}, matchMedia: () => ({ matches: false }) }, location: { hash: '' }, history: { replaceState() {} }, setTimeout() {}, clearTimeout() {}, setInterval() {}, clearInterval() {} });
+    const timers = [];
+    const view = vm.runInNewContext(source + '\nnew Component()', { DCLogic, console, document, window: { addEventListener() {}, removeEventListener() {}, matchMedia: () => ({ matches: false }) }, location: { hash: '' }, history: { replaceState() {} }, setTimeout: fn => timers.push(fn), clearTimeout() {}, setInterval() {}, clearInterval() {} });
     view.openGlossary('trace');
     assert.deepEqual([view.state.glossaryOpen, view.state.glossaryTerm, list.scrollTop, entry.focused?.preventScroll], [true, 'trace', 1380, true], page);
+    // A panel the page opened as it loaded lays out after the first try; the second, a tick later, lands on the term.
+    entry.offsetTop = 2600;
+    for (const fn of timers.splice(0)) fn();
+    assert.equal(list.scrollTop, 2480, `${page}: again once the panel is laid out`);
   }
 });
 
