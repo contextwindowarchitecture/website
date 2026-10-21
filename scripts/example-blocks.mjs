@@ -48,8 +48,9 @@ export const codeLines = text => text.split('\n').map(line => {
 export function panel({ label, meta, text, prose = false }) {
   if (text.includes('{{')) throw new Error(`${label}: "{{" would read as a template binding.`);
   return '<div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;">' +
-    '<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">' +
-    `<span>${escapeHtml(label)}</span><span>${escapeHtml(meta)}</span></div>` +
+    // On a narrow screen the two labels wrap as wholes, the second under the first, instead of each breaking in two.
+    '<div style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">' +
+    `<span style="white-space: nowrap;">${escapeHtml(label)}</span><span style="white-space: nowrap;">${escapeHtml(meta)}</span></div>` +
     `<pre style="padding: 14px 16px; margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;">${prose ? escapeHtml(text.trimEnd()) : codeLines(text.trimEnd())}</pre></div>`;
 }
 
