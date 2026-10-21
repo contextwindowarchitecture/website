@@ -9,7 +9,7 @@
 <x-dc>
 <helmet>
 <title>Reference assemblers — Context Window Architecture</title>
-<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, each passing every published case, the live assembly simulator (seven systems assembled, fitted and rendered under the same rules), and where the assembler goes in an agent framework." />
+<meta name="description" content="The CWA reference assemblers in Python, TypeScript, Go and Rust, each released at the draft-release tag, how many published conformance cases each passes, the live assembly simulator (three requests assembled, fitted and rendered under the same rules), and where the assembler goes in an agent framework." />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
@@ -110,8 +110,8 @@
     <div style="max-width: 1180px; margin: 0 auto; padding: 72px 32px 88px;">
       <div>
       <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Live assembly</div>
-      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">The slots aren't the point. The assembly is.</h2>
-      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">CWA gives you four planes and eleven typed slots, and no single request fills them all. The assembler admits the items each request actually needs, fits them to a finite budget in tier order, and renders them in a profile-defined order. This simulation uses estimated tokens and illustrative outcomes, not model evaluations; each system's route is taken to require evidence when the system uses an evidence slot. Remove the instructions or the query and it shows the refusal R-4 requires instead of a payload. A refused assembly has no payload, but its trace still records every decision made before the refusal (R-17); a snapshot that fails its schemas or checks is rejected before assembly, with neither a payload nor a trace. Watch seven very different systems assemble, then pull a slot out or squeeze the budget and see what degrades first.</p>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Three requests, assembled.</h2>
+      <p style="margin: 0 0 36px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">Three very different requests, each built from only the slots it needs. Pull a slot out or squeeze the budget, and see what degrades first.</p>
       </div>
 
       <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; align-items: center;">
@@ -200,6 +200,8 @@
         </div>
       </div>
 
+      <p style="margin: 14px 0 0; font-family: var(--mono); font-size: 12px; line-height: 1.6; color: var(--muted); max-width: 90ch;">An illustration, not a model run: sizes are typical for each slot, not counts of the line shown. Remove the instructions or the query and the assembler refuses, as R-4 requires, with no payload but a trace of what it decided (R-17).</p>
+
       <sc-if value="{{ isBad }}" hint-placeholder-val="{{ false }}">
         <div style="border: 1px solid var(--fg); background: var(--bg); padding: 26px 28px; margin-top: 14px;">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px;">Symptom you'll actually see</div>
@@ -229,22 +231,9 @@
         </div>
       </sc-if>
 
-      <div class="g2c" style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-top: 0; margin-top: 28px;">
-        <div style="background: var(--bg); padding: 26px 28px;">
+      <div style="background: var(--bg); padding: 26px 28px; margin-top: 24px; border: 1px solid var(--line);">
           <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">What this one teaches</div>
           <p style="margin: 0; font-size: 17px; line-height: 1.55; text-wrap: pretty;">{{ ucNote }}</p>
-        </div>
-        <div style="background: var(--bg); padding: 26px 28px;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 12px;">Decisions it forces</div>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
-            <sc-for list="{{ ucQuestions }}" as="q" hint-placeholder-count="2">
-              <div style="display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 10px; font-size: 17px; line-height: 1.5;">
-                <span style="color: var(--accent);">&gt;</span>
-                <span style="text-wrap: pretty;">{{ q.text }}</span>
-              </div>
-            </sc-for>
-          </div>
-        </div>
       </div>
     </div>
   </section>
@@ -468,6 +457,8 @@ const SLOTS = [
   ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it.", "authority user\ntier protected\nrole trigger"]
 ];
 
+// Three requests, each with a failure of its own: the price rule pushed out of the window, a protocol outranking the
+// rule it should serve, and last week's numbers read as current.
 const UCS = [
   {
     label: "Support agent",
@@ -495,33 +486,7 @@ const UCS = [
       [9, "Max 3 sentences. No bullet lists."],
       [10, "Can you just process it now?"]
     ],
-    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund policy chunk arrives as an evidence item with a version and a trust tier, rather than as pasted text.",
-    questions: ["The price rule is stated in governance.instructions, but is it also enforced by a tool guard? Language guidance belongs in context; invariants belong in code.", "If the evidence pipeline admits nothing, does the agent answer, retrieve narrower, or escalate — and does the trace say which?"]
-  },
-  {
-    label: "Code review bot",
-    symptom: "The lint config reads as an instruction, so the bot starts rewriting the repo's style instead of reviewing the diff it was given.",
-    drops: {
-      0: "Refused with required_slot_missing. Sent anyway, it would review the whole file instead of the diff and fill the PR with noise.",
-      2: "House conventions vanish; it flags style the repo deliberately allows.",
-      6: "It can describe problems but cannot post a single comment.",
-      7: "No diff in the window — it reviews a pull request it has never seen.",
-      8: "Comment tone slides from specific to generic \u201cconsider refactoring\u201d.",
-      9: "Free-form prose comes back and the CI job fails to parse it.",
-      10: "Refused with required_slot_missing. Sent anyway, the job would run with no trigger and return nothing."
-    },
-    name: "Pull request #482 · CI job",
-    picks: [
-      [0, "You review diffs. Comment only on lines that changed."],
-      [2, "repo conventions · eslint config · CODEOWNERS · authority=reference_only"],
-      [6, "fetch_diff(pr) · post_comment(file, line, body)"],
-      [7, "fetch_diff(482) → 3 files, 214 lines changed"],
-      [8, "Two approved review comments from last week."],
-      [9, "JSON array: { file, line, severity, note }"],
-      [10, "Review PR #482."]
-    ],
-    note: "No user facts, no history — a CI job has no conversation and no person. Repo conventions are admitted as reference evidence, which is exactly why they cannot turn into instructions.",
-    questions: ["Are repo conventions evidence, or part of the tool observation?", "What does the fitting policy compress first when the diff is 4,000 lines?"]
+    note: "This request carries no memory and no examples, because the conversation is four turns old and the format is trivial. Empty slots would cost tokens and add noise, so they stay empty. The refund policy chunk arrives as an evidence item with a version and a trust tier, rather than as pasted text."
   },
   {
     label: "Clinical triage",
@@ -545,8 +510,7 @@ const UCS = [
       [9, "Return risk tier and next step only. No reassurance."],
       [10, "Should I just wait until Monday?"]
     ],
-    note: "History arrives compressed, not verbatim: what matters is the clinical thread, not the wording of a visit in March. That is an interaction.memory admission rule, made once, applied everywhere.",
-    questions: ["What has to be redacted before state.user leaves your network?", "The escalation rule lives in governance so no user can argue it away — what enforces it outside the model?"]
+    note: "History arrives compressed, not verbatim: what matters is the clinical thread, not the wording of a visit in March. That is an interaction.memory admission rule, made once, applied everywhere."
   },
   {
     label: "Weekly brief",
@@ -568,87 +532,7 @@ const UCS = [
       [9, "800 words. Four headings. No preamble."],
       [10, "Generate this week's brief."]
     ],
-    note: "There is no user and no conversation at all. Same schema, five slots filled — six deliberately empty is the correct assembly, not a gap. Last week's brief is admitted as steering, not evidence, which is what keeps its numbers out of this week's.",
-    questions: ["Is last week's brief an example, or is it evidence?", "Where does \u201cdon't repeat last week\u201d actually live — instructions, or a freshness rule on the snapshot?"]
-  },
-  {
-    label: "Voice ordering",
-    symptom: "The entire menu is re-read into the window on every turn; the reply lands two seconds late and the customer starts repeating themselves.",
-    drops: {
-      0: "Refused with required_slot_missing. Sent anyway, confirmation discipline would be gone and items would get added twice.",
-      1: "The usual order is forgotten and a regular is treated as a stranger.",
-      3: "It loses the cart and asks the customer to start over.",
-      5: "The correction \u201cmake that iced\u201d is never heard.",
-      6: "It agrees to the order but nothing reaches the kitchen.",
-      7: "It cannot state the total, so the lane stalls at the window.",
-      9: "The reply comes back with bullet symbols the speech engine reads aloud.",
-      10: "Refused with required_slot_missing: there is nothing to respond to."
-    },
-    name: "Drive-thru lane 3 · realtime voice",
-    picks: [
-      [0, "Order taker. Confirm every item once. Never upsell twice."],
-      [1, "loyalty member · usual order: large oat latte"],
-      [3, "order → 2 items confirmed, payment pending"],
-      [5, "customer: uh — make that iced"],
-      [6, "add_item(sku, mods) · price_order(cart)"],
-      [7, "price_order(cart) → $11.40"],
-      [9, "One short sentence. Speakable. No symbols or lists."],
-      [10, "And a hash brown."]
-    ],
-    note: "No retrieval and no memory. The menu is small enough to sit in instructions, and the latency budget is measured in hundreds of milliseconds — every model token the assembler skips is time the customer doesn't wait.",
-    questions: ["Where does the menu live once it grows to 400 items with regional pricing?", "What is the token ceiling before the pause before speech becomes audible?"]
-  },
-  {
-    label: "Incident copilot",
-    symptom: "The runbook reads as a command rather than a reference, and the copilot proposes a failover step as though it had been told to run one.",
-    drops: {
-      0: "Refused with required_slot_missing. Sent anyway, the confirmation gate would disappear and it would propose running failover unprompted.",
-      2: "The runbook is gone and the copilot improvises during a sev-1.",
-      3: "It forgets mitigation was proposed and loops back to diagnosis.",
-      4: "The first forty minutes are lost; it re-suggests what already failed.",
-      6: "It can advise but cannot page anyone or read a single metric.",
-      7: "p99 latency is unknown, so severity becomes guesswork.",
-      9: "A wall of prose lands in the incident channel with no owners.",
-      10: "Refused with required_slot_missing: there is no question to answer."
-    },
-    name: "INC-2291 · production sev-1",
-    picks: [
-      [0, "Incident copilot. Never run a mutating command without explicit confirmation."],
-      [2, "[runbook:db-failover:v4 · reference_only] steps and rollback"],
-      [3, "INC-2291 → cause identified, mitigation proposed, comms pending"],
-      [4, "First 40 minutes: latency spike traced to replica lag in eu-west."],
-      [6, "query_metrics · page_oncall · run_runbook_step"],
-      [7, "query_metrics(p99, 5m) → 4.2s and rising · age 8s"],
-      [9, "Next three actions as bullets, each with an owner."],
-      [10, "What do we do next?"]
-    ],
-    note: "Forty minutes of chatter compresses into one memory line while raw tool output stays verbatim. The runbook is admitted as reference_only, so its imperatives never become the copilot's instructions.",
-    questions: ["The confirmation gate lives in governance — does it survive compaction, and is it also enforced by the tool layer?", "When metrics refresh every ten seconds, what freshness rule evicts the stale observation?"]
-  },
-  {
-    label: "Language tutor",
-    symptom: "Old corrections become live instructions, so the tutor keeps correcting things the learner fixed weeks ago.",
-    drops: {
-      0: "Refused with required_slot_missing. Sent anyway, corrections would pile up and bury the learner in red ink.",
-      1: "B1 level unknown, so replies swing to native-speed Spanish.",
-      4: "Past sessions vanish and the same subjunctive lesson repeats forever.",
-      5: "The sentence being corrected is not in the window.",
-      8: "Correction style turns clinical instead of encouraging.",
-      9: "It answers in English and corrects five things at once.",
-      10: "Refused with required_slot_missing: there is nothing to check."
-    },
-    name: "Spanish B1 · session 27",
-    picks: [
-      [0, "Patient tutor. Correct one thing, then keep the conversation moving."],
-      [1, "level B1 · 34-day streak · shaky on the subjunctive"],
-      [4, "Earlier sessions: preterite mastered, avoids the formal register. · expires 2026-12-20"],
-      [5, "learner: si tuviera tiempo, iría contigo"],
-      [8, "Two past corrections written in the tone we want."],
-      [9, "Reply in Spanish. One correction maximum."],
-      [10, "Is that right?"]
-    ],
-    note: "No tools and nothing retrieved — but memory and user facts carry the whole experience. Completely different system, same schema. Memory entries carry an expires deadline, which is what stops old corrections from outliving their usefulness.",
-    questions: ["What earns a place in memory versus a disposable session log — and who can revoke it?", "Is proficiency a stored fact in state.user, or inferred fresh each turn from history?"]
+    note: "There is no user and no conversation at all. Same schema, five slots filled — six deliberately empty is the correct assembly, not a gap. Last week's brief is admitted as steering, not evidence, which is what keeps its numbers out of this week's."
   }
 ];
 
@@ -718,7 +602,6 @@ class Component extends DCLogic {
     this.setState({ off, playing: false, step: 99, hold: 0, announce });
   }
 
-  openFailure(i) { this.setState({ uc: i, bad: true, off: {}, budget: 0, playing: false, step: 99, hold: 0 }); }
 
   restoreSlots() {
     const off = Object.assign({}, this.state.off || {});
@@ -750,8 +633,10 @@ class Component extends DCLogic {
     const slug = s => s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
     let patch = null;
     if (parts[0] === "assemble") {
-      const uc = UCS.findIndex(u => slug(u.label) === parts[1]);
-      if (uc >= 0) {
+      // A link to a system the page no longer shows (voice ordering, the code review bot and others) opens the first.
+      const found = UCS.findIndex(u => slug(u.label) === parts[1]);
+      const uc = found >= 0 ? found : 0;
+      if (parts[1]) {
         patch = { uc, budget: 0, hold: 0, playing: false, step: 99, bad: parts[2] === "blob", off: parts[2] === "no-query" ? { [uc]: { 10: true } } : {} };
       }
     }
@@ -932,7 +817,6 @@ class Component extends DCLogic {
     const out = {
       slots, payload,
       ucName: uc.name, ucNote: uc.note,
-      ucQuestions: uc.questions.map(t => ({ text: t })),
       usedLabel: picks.length + " of 11 admitted",
       removed, hasRemoved: removed.length > 0,
       restoreAll: () => this.restoreSlots(),
@@ -951,9 +835,6 @@ class Component extends DCLogic {
       togglePlay: () => this.setState(s => ({ playing: !s.playing, announce: s.playing ? "Paused." : "Playing." })),
       ucTabs: UCS.map((u, i) => ({ label: u.label, pressed: i === this.state.uc ? "true" : "false", style: this.ucTabStyle(i === this.state.uc), select: () => this.setState({ uc: i, step: 0, hold: 0, playing: true, announce: "Showing " + u.label + "." }) })),
       announce: this.state.announce || "",
-      fmOpen0: () => this.openFailure(0), fmOpen1: () => this.openFailure(1), fmOpen2: () => this.openFailure(2), fmOpen3: () => this.openFailure(3),
-      fmOpen4: () => this.openFailure(4), fmOpen5: () => this.openFailure(5), fmOpen6: () => this.openFailure(6),
-      fmOpenTrigger: () => this.setState({ uc: 0, bad: false, off: { 0: { 10: true } }, budget: 0, playing: false, step: 99, hold: 0 })
     };
 
     out.isBad = !!this.state.bad; out.isGood = !this.state.bad;

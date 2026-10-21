@@ -430,3 +430,18 @@ test('the Spec page\'s lede says what the specification is, not how the page was
   assert.equal(lede, 'The rules an assembler, its producers and your application follow, numbered from R-1. A number is never changed or reused. Where another page disagrees with this one, this page is right.');
   assert.ok(!html.includes('the producer guide, or in the evidence notes'), 'no names the nav does not use');
 });
+
+// The reader feedback of 2026-10-21: seven systems were too many to take in, "Decisions it forces" asked about things
+// the animation never showed, and a one-line chunk labelled ~1,500 tokens looked invented.
+test('the Assembler simulator shows three systems, says its sizes are typical, and asks no unrelated questions', async () => {
+  const html = await fs.readFile(new URL('../assembler.html', import.meta.url), 'utf8');
+  const view = await component('assembler.html');
+  assert.deepEqual([...view.renderVals().ucTabs].map(t => t.label), ['Support agent', 'Clinical triage', 'Weekly brief']);
+  assert.ok(!html.includes('Decisions it forces') && !html.includes('questions:') && !html.includes('ucQuestions'));
+  assert.ok(html.includes('>What this one teaches</div>'));
+  const demo = html.slice(html.indexOf('<section id="assemble"'), html.indexOf('</section>', html.indexOf('<section id="assemble"')));
+  assert.ok(demo.indexOf('sizes are typical for each slot, not counts of the line shown') > demo.indexOf('{{ payload }}') && demo.indexOf('sizes are typical') < demo.indexOf('Symptom you'), 'the note sits under the request it explains');
+  const lede = demo.match(/<h2[^>]*>Three requests, assembled\.<\/h2>\s*<p[^>]*>([^<]+)<\/p>/)[1];
+  assert.ok(lede.split(/\s+/).length <= 30, lede);
+  assert.ok(!html.includes('fmOpen') && !html.includes('openFailure'), 'the failure-card handlers left with the old home page');
+});

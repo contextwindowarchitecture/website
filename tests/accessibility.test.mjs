@@ -113,7 +113,7 @@ for (const page of ['assembler.html']) test(`${page}: the simulator announces wh
   const { view } = await component(page);
   let vals = view.renderVals();
   assert.equal(vals.announce, '');
-  assert.deepEqual([...vals.ucTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false', 'false', 'false']);
+  assert.deepEqual([...vals.ucTabs].map(t => t.pressed), ['true', 'false', 'false']);
   assert.deepEqual([...vals.budgets].map(b => b.pressed), ['true', 'false', 'false', 'false']);
   assert.equal(vals.badPressed, 'false');
   vals.slots[1].click();
@@ -127,9 +127,9 @@ for (const page of ['assembler.html']) test(`${page}: the simulator announces wh
   view.renderVals().budgets[2].select();
   assert.equal(view.renderVals().announce, 'Input budget set to 2k tokens.');
   assert.equal(view.renderVals().budgets[2].pressed, 'true');
-  view.renderVals().ucTabs[2].select();
+  view.renderVals().ucTabs[1].select();
   assert.equal(view.renderVals().announce, 'Showing Clinical triage.');
-  assert.equal(view.renderVals().ucTabs[2].pressed, 'true');
+  assert.equal(view.renderVals().ucTabs[1].pressed, 'true');
   view.renderVals().toggleBad();
   assert.deepEqual([view.renderVals().badPressed, view.renderVals().announce], ['true', 'Showing the unassembled blob.']);
   view.renderVals().togglePlay();

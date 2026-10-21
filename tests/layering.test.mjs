@@ -171,7 +171,7 @@ test('the Assembler page speaks of released assemblers with no hand-written date
   assert.ok(!assembler.includes('example.py') && !assembler.includes('One call in, payload and trace out.'), 'the example payload section has gone');
   assert.ok(!assembler.includes('Conformance matrix') && !assembler.includes('class="mx'), 'the conformance matrix has gone');
   const demo = assembler.slice(assembler.indexOf('<section id="assemble"'), assembler.indexOf('</section>', assembler.indexOf('<section id="assemble"')));
-  assert.ok(demo.includes('>Live assembly</div>') && demo.includes(">The slots aren't the point. The assembly is.</h2>") && demo.includes('{{ ucTabs }}') && demo.includes('{{ announce }}'), 'the live assembly simulator sits where the matrix was');
+  assert.ok(demo.includes('>Live assembly</div>') && demo.includes('>Three requests, assembled.</h2>') && demo.includes('{{ ucTabs }}') && demo.includes('{{ announce }}'), 'the live assembly simulator sits where the matrix was');
   assert.ok(assembler.indexOf('>Reference implementations</div>') < assembler.indexOf('<section id="assemble"') && assembler.indexOf('<section id="assemble"') < assembler.indexOf('>Tell us what it must do.</h2>'), 'after the implementations, before the closing band');
 });
 

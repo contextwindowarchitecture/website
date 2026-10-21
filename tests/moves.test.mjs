@@ -69,7 +69,13 @@ test('there is no tour and no Demo page; old demo anchors on the home page open 
 test('the Assembler page opens a system from a failure link and scrolls to it, and the nav, glossary and llms.txt follow the moves', async () => {
   const opened = await component('assembler.html', { hash: '#assemble/clinical-triage/blob' });
   opened.view.applyHash();
-  assert.deepEqual([opened.view.state.uc, opened.view.state.bad], [2, true], 'a failure link opens its system as the blob');
+  assert.deepEqual([opened.view.state.uc, opened.view.state.bad], [1, true], 'a failure link opens its system as the blob');
+  // The simulator shows three systems; a link to one it no longer shows opens the first, in the view the link asked for.
+  for (const gone of ['voice-ordering', 'code-review-bot', 'incident-copilot', 'language-tutor']) {
+    const old = await component('assembler.html', { hash: `#assemble/${gone}/blob` });
+    old.view.applyHash();
+    assert.deepEqual([old.view.state.uc, old.view.state.bad], [0, true], gone);
+  }
   const anchored = await component('assembler.html', { hash: '#assemble' });
   anchored.byId.assemble = { getBoundingClientRect: () => ({ top: 1000 }) };
   anchored.view.applyHash();
