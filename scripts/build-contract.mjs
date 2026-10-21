@@ -6,6 +6,7 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { caseDigestsNow, implementations, maturitySentence, ranAt, tally } from './conformance-reports.mjs';
+import { exampleBlocks, exampleFiles, writeBlocks } from './example-blocks.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -146,6 +147,8 @@ for (const page of ['spec.html']) {
   }
   outputs.set(page, updated);
 }
+// The home page shows the 01-docs-qa example from the files scripts/vendor-examples.mjs vendors.
+outputs.set('index.html', writeBlocks(await fs.readFile('index.html', 'utf8'), exampleBlocks(await exampleFiles())));
 
 // llms.txt indexes the site for language models. The producer and assembler guides are written by hand around tables
 // generated here, and llms-full.txt joins all three with spec §1, the slots and authority values, every requirement

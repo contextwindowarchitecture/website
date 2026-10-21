@@ -157,51 +157,61 @@
     </div>
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
       <span>01 / 03</span>
-      <a href="#shapes" style="color: var(--accent);">Next · What goes wrong ↓</a>
+      <a href="#code" style="color: var(--accent);">Next · Before and after ↓</a>
     </div>
     </div>
   </section>
 
-  <section id="shapes" data-slide="2" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line); background: var(--surface);">
+  <section id="code" data-slide="2" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line); background: var(--surface);">
     <div style="max-width: 1180px; width: 100%; margin: 0 auto; padding: 64px 32px 40px;">
-    <div class="g2" style="display: grid; grid-template-columns: minmax(0, 1fr) 580px; gap: 48px 64px; align-items: center;">
-      <div>
-        <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The problem</div>
-        <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 18ch; text-wrap: balance;">When nobody owns the payload, the failures have shapes.</h2>
-        <p style="margin: 0 0 24px; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 44ch; text-wrap: pretty;">They repeat, they can be named, and every one of them can be reproduced.</p>
-        <a href="./assembler.html#assemble" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Watch seven systems assemble, and pull a slot out →</a>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 20px 24px; align-items: flex-start;">
-        <div style="display: flex; flex-direction: column; gap: 14px; width: 260px; max-width: 100%;">
-          <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted);">The same request, named</div>
-          <div aria-hidden="true" style="position: relative; width: 260px; max-width: 100%; height: 360px; margin-bottom: 58px; border: 1px solid var(--line); background: var(--bg); padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-          <div style="height: 64px; background: var(--p-evid);"></div>
-          <div style="height: 34px; background: var(--p-gov);"></div>
-          <div style="height: 52px; background: var(--p-state); opacity: 0.35;"></div>
-          <div style="height: 40px; background: var(--p-inter);"></div>
-          <div style="height: 122px; background: var(--p-inter);"></div>
-            <div style="position: absolute; left: 12px; right: 12px; bottom: -58px; height: 40px; border: 1px dashed var(--p-gov); background: var(--accent-soft);"></div>
-          </div>
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">A real app</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 18ch; text-wrap: balance;">The same help-center bot, before and after.</h2>
+      <p style="margin: 0 0 32px; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A small bot answers questions from a product's help articles. <span style="font-family: var(--mono); font-size: 0.9em; color: var(--fg);">before.py</span> builds its request the way most bots do. <span style="font-family: var(--mono); font-size: 0.9em; color: var(--fg);">context.py</span> is the same bot with CWA. The CWA version is longer: it names every source and freezes them into a <a class="term" href="#glossary/snapshot" style="color: var(--fg); text-decoration: underline dotted var(--muted); text-decoration-thickness: 1px; text-underline-offset: 3px;" style-hover="color: var(--accent);">snapshot</a>, everything the decision may read. What that buys is on the next slide.</p>
+      <div class="g2" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; align-items: start;">
+        <div style="min-width: 0;">
+          <!-- EXAMPLE_BEFORE_START --><div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>before.py</span><span>build_request()</span></div><pre tabindex="0" aria-label="before.py: how the bot builds a request without CWA" style="padding: 18px; overflow: auto; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;">TOP_K = 5
+MAX_HISTORY_MESSAGES = 6
+
+def build_request(conversation: Conversation) -&gt; tuple[list[str], list[dict[str, str]]]:
+    _, instructions = corpus.front_matter(INSTRUCTIONS.read_text(encoding=&quot;utf-8&quot;))
+    hits = corpus.retrieve(conversation.question, TOP_K)
+    articles = &quot;\n\n&quot;.join(f&quot;[{hit.node.node_id}] {hit.node.get_content()}&quot; for hit in hits)
+    system = f&quot;{instructions}\n\nHelp-center articles:\n\n{articles}&quot;
+    messages = [{&quot;role&quot;: turn.role, &quot;content&quot;: turn.text} for turn in conversation.turns[-MAX_HISTORY_MESSAGES:]]
+    messages.append({&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: conversation.question})
+    return [system], messages</pre></div><!-- EXAMPLE_BEFORE_END -->
+          <p style="margin: 12px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted);">Paste the top five articles into the system prompt, keep the last six messages, send.</p>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 28px; width: 280px; max-width: 100%; padding-top: 48px;">
-          <a href="./assembler.html#assemble/clinical-triage/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
-            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-evid);">01 · Authority inversion</span>
-            <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">A reference document sits above the never-diagnose rule, so the assistant names a condition.</span>
-            <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
-          </a>
-          <a href="./assembler.html#assemble/weekly-brief/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
-            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-state);">03 · Stale-as-current</span>
-            <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">Last week's brief looks exactly like this week's data, so old numbers ship as current.</span>
-            <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
-          </a>
-          <a href="./assembler.html#assemble/support-agent/blob" style="display: flex; flex-direction: column; gap: 4px; color: var(--fg);">
-            <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--p-gov);">05 · Displacement under budget</span>
-            <span style="font-size: 14.5px; line-height: 1.5; text-wrap: pretty;">History is unbounded, so by turn thirty the price rule has been pushed out of the window.</span>
-            <span style="font-family: var(--mono); font-size: 11px; color: var(--accent);">Reproduce →</span>
-          </a>
+        <div style="min-width: 0;">
+          <!-- EXAMPLE_AFTER_START --><div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>context.py</span><span>snapshot() · assemble()</span></div><pre tabindex="0" aria-label="context.py: how the same bot builds a request with CWA" style="padding: 18px; overflow: auto; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;">from cwa import AssemblyResult, Snapshot
+from cwa import assemble as cwa_assemble
+
+def snapshot(conversation: Conversation) -&gt; dict[str, Any]:
+    &quot;&quot;&quot;Run the producers for this question and freeze what they proposed with the route's policy (snapshot.schema.json).&quot;&quot;&quot;
+    settings = _policy(&quot;assembly.json&quot;)
+    return {
+        &quot;assembly_time&quot;: conversation.asked_at,
+        &quot;scope&quot;: {&quot;session&quot;: conversation.session},
+        &quot;budget&quot;: settings[&quot;budget&quot;],
+        &quot;profile&quot;: _policy(&quot;profile.json&quot;),
+        &quot;route_policy&quot;: _policy(&quot;route-policy.json&quot;),
+        &quot;tokenizer&quot;: settings[&quot;tokenizer&quot;],
+        &quot;renderer&quot;: settings[&quot;renderer&quot;],
+        &quot;batches&quot;: [
+            producers.app_policy(),
+            producers.help_center_search(conversation.question, settings[&quot;retrieval&quot;][&quot;top_k&quot;]),
+            producers.chat_session(conversation),
+        ],
+        &quot;conflicts&quot;: [],
+    }
+
+def assemble(document: dict[str, Any]) -&gt; AssemblyResult:
+    &quot;&quot;&quot;Admission, fitting and rendering: the payload to send, or none, and the trace that says why.&quot;&quot;&quot;
+    return cwa_assemble(Snapshot.from_json(document))</pre></div><!-- EXAMPLE_AFTER_END -->
+          <p style="margin: 12px 0 0; font-size: 14.5px; line-height: 1.55; color: var(--muted);">Each source proposes items. The assembler decides what is sent.</p>
         </div>
       </div>
-    </div>
+      <p style="margin: 20px 0 0;"><!-- EXAMPLE_COMMIT_START --><a href="https://github.com/contextwindowarchitecture/examples/tree/119b5ccd5fc32e798be0376a34d11e366cbe9e54/01-docs-qa" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at 119b5cc →</a><!-- EXAMPLE_COMMIT_END --></p>
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
       <span>02 / 03</span>
       <a href="#assembly" style="color: var(--accent);">Next · What CWA does ↓</a>
