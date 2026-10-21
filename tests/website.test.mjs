@@ -446,6 +446,14 @@ test('the Assembler simulator shows three systems, says its sizes are typical, a
   const lede = demo.match(/<h2[^>]*>Three requests, assembled\.<\/h2>\s*<p[^>]*>([^<]+)<\/p>/)[1];
   assert.ok(lede.split(/\s+/).length <= 30, lede);
   assert.ok(!html.includes('fmOpen') && !html.includes('openFailure'), 'the failure-card handlers left with the old home page');
+  // A note that counts the slots it fills says what the request shows.
+  const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven'];
+  const ucs = vm.runInNewContext(html.match(/const UCS = (\[[\s\S]*?\n\]);/)[1]);
+  for (const uc of ucs) {
+    const said = uc.note.match(/\b(\w+) slots filled/);
+    if (said) assert.equal(words.indexOf(said[1]), uc.picks.length, `${uc.label}: "${said[0]}"`);
+  }
+  assert.ok(ucs.some(uc => /six slots filled/.test(uc.note)), 'the weekly brief counts its six');
 });
 
 // A reader asked how slots reach the model: brackets? training? (FEEDBACK.md, Spec). Placement shows the answer for
@@ -466,4 +474,20 @@ test('Placement shows the request its profile renders, from the specification\'s
   assert.ok(html.includes('The model receives ordinary messages with tagged text, so no training is needed.'));
   assert.ok(html.includes('<a href="./index.html#sent">The same step in a running app, on the home page →</a>'));
   assert.throws(() => blocks.profileRequestBlock({ profile: { ...profile, version: 99 }, snapshot, payload }), /not the profile Placement shows/);
+});
+
+// Below 720px the implementations table drops its repository and cases-at columns. The header and every row must drop
+// the same ones, and the hiding rule must beat a cell's own inline display.
+test('the Assembler table drops the same columns from its header and its rows on a phone, and names never start a line empty', async () => {
+  const html = await fs.readFile(new URL('../assembler.html', import.meta.url), 'utf8');
+  assert.ok(html.includes('.im-hide-sm { display: none !important; }'));
+  const hidden = role => [...html.matchAll(new RegExp(`<span role="${role}"( class="im-hide-sm")?`, 'g'))].map(m => !!m[1]);
+  assert.equal(hidden('columnheader').length, 5);
+  assert.deepEqual(hidden('cell'), hidden('columnheader'), 'a row hides the columns its header hides');
+  const view = await component('assembler.html');
+  const list = Object.values(view.renderVals()).find(v => Array.isArray(v) && v[0] && 'pkg' in v[0]);
+  for (const row of list) {
+    assert.equal(row.scope + row.pkg, row.name);
+    if (!row.name.includes('/')) assert.deepEqual([row.scope, row.pkg], [row.name, ''], `${row.name}: no break before the name`);
+  }
 });
