@@ -202,13 +202,13 @@ test('every page asks before Examples or Viability leaves CWA, with the same mod
   assert.equal(glue.size, 1, 'the notice logic is identical on every page');
 });
 
-test('the notice says what each site holds: Viability is data heavy and not needed, Examples is the showcase', async () => {
+test('the notice says what each site holds: Viability is data heavy and holds the runs this site cites, Examples is the showcase', async () => {
   const { view } = await component('index.html');
   const click = { button: 0, preventDefault() {} };
   view.renderVals().openViability(click);
   let vals = view.renderVals();
   assert.deepEqual([vals.leavingUrl, vals.leavingGoLabel, vals.leavingCountdown], [VIABILITY, 'Go to Viability now', 'Opening Viability in 20 seconds']);
-  assert.ok(/data heavy/.test(vals.leavingLead) && /You don't need any of it to use or understand CWA\./.test(vals.leavingNote), 'Viability: data heavy and not needed');
+  assert.ok(/data heavy/.test(vals.leavingLead) && vals.leavingNote === 'It holds the runs behind the numbers this site cites, with their intervals and how to replay them.', 'Viability: data heavy, and where the cited numbers come from');
   view.renderVals().leavingStay();
   view.renderVals().openExamples(click);
   vals = view.renderVals();
