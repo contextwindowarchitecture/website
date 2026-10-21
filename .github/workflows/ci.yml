@@ -1,5 +1,6 @@
-# Generated artifacts are current, and the contract and site tests pass, on each supported Node; and the vendored
-# specification is the specification repository's at the commit spec.lock.json names. A tag runs it through
+# Generated artifacts are current, and the contract and site tests pass, on each supported Node; the vendored
+# specification is the specification repository's at the commit spec.lock.json names; and the home page's vendored
+# example is the examples repository's at the commit examples.lock.json names. A tag runs it through
 # release.yml, on the tagged commit, against the specification repository at the same tag.
 name: ci
 
@@ -59,3 +60,23 @@ jobs:
         with:
           node-version: "24"
       - run: node scripts/vendor-spec.mjs spec --check
+
+  examples:
+    name: vendored example matches its repository
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ inputs.ref }}
+      - id: lock
+        run: echo "commit=$(node -p "require('./examples.lock.json').commit")" >> "$GITHUB_OUTPUT"
+      # Not at ./examples, which holds the specification's examples.
+      - uses: actions/checkout@v5
+        with:
+          repository: contextwindowarchitecture/examples
+          ref: ${{ steps.lock.outputs.commit }}
+          path: examples-repo
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - run: node scripts/vendor-examples.mjs examples-repo --check

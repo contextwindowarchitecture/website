@@ -12,7 +12,7 @@ npm run build:contract
 npm test
 ```
 
-`npm test` fails if a vendored specification file differs from `spec.lock.json` or a generated artifact is stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Each tag gets a GitHub release once CI passes on the tagged commit (`.github/workflows/release.yml`), with the tag's own commits as notes, written by git-cliff; a tag that is not `vX.Y.Z` is a prerelease, and a tag pushed before the workflow existed is released with `gh workflow run release.yml -f tag=<tag>`. `CHANGELOG.md` is generated from the commit history with git-cliff (`cliff.toml`): regenerate it at a release with `uvx git-cliff --tag vX.Y.Z -o CHANGELOG.md` and never edit it by hand. The spec's own revision history is `CHANGES.md`, which the build writes into the Spec page's draft date; the page carries no changelog. Commit generated files with their sources so static hosting serves the tested validators.
+`npm test` fails if a vendored specification file differs from `spec.lock.json`, a vendored example file differs from `examples.lock.json`, or a generated artifact is stale, then runs the contract fixtures and embedded website-component checks. CI (`.github/workflows/ci.yml`) runs `npm ci` and `npm test` on Node 22 and 24. Each tag gets a GitHub release once CI passes on the tagged commit (`.github/workflows/release.yml`), with the tag's own commits as notes, written by git-cliff; a tag that is not `vX.Y.Z` is a prerelease, and a tag pushed before the workflow existed is released with `gh workflow run release.yml -f tag=<tag>`. `CHANGELOG.md` is generated from the commit history with git-cliff (`cliff.toml`): regenerate it at a release with `uvx git-cliff --tag vX.Y.Z -o CHANGELOG.md` and never edit it by hand. The spec's own revision history is `CHANGES.md`, which the build writes into the Spec page's draft date; the page carries no changelog. Commit generated files with their sources so static hosting serves the tested validators.
 
 ## Sources of truth
 
@@ -35,6 +35,10 @@ The specification is not written here. `SPEC.md`, `CHANGES.md`, `schema/`, `cont
 | `contract/model.json` | The planes, slots, item fields, authority values, conflict rules, pipeline stages and tests the Spec page lists, in its order; generates those lists on the Spec page, and fills the slot and authority tables in the llms guides |
 | `examples/` | Concrete item, producer batch, profiles and the route policies they name, payload and matching trace, and the sample message request with its snapshot |
 | `guides/producers.md`, `guides/assemblers.md` | The producer and assembler guides, written by hand around the blocks between their `generated` markers, which `python3 conformance/check.py --write` writes from the contract files and `implementations/`. Links to the specification's files are relative, links to site pages absolute |
+
+### Vendored from the examples repository
+
+`vendor/examples/` holds the files the home page shows from [contextwindowarchitecture/examples](https://github.com/contextwindowarchitecture/examples), at the paths they have there and the commit `examples.lock.json` names: the 01-docs-qa help-center bot's `before.py`, `after.py` and `context.py`, and two of its committed scenarios, `01-answer` (snapshot, trace and payload) and `03-off-topic` (refused, so a snapshot and a trace). Never edit them: change them there, then run `node scripts/vendor-examples.mjs ../examples` (`--check` compares with a checkout, `--verify` with the lock). The examples' CI regenerates their scenarios on every push, so a vendor can change what the page shows; its diff is the review. CI checks the vendored files against the examples repository at the locked commit.
 
 ### Written here
 

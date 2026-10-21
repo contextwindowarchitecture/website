@@ -8,3 +8,7 @@ conformance/** linguist-generated
 examples/** linguist-generated
 guides/** linguist-generated
 implementations/** linguist-generated
+
+# Copied from github.com/contextwindowarchitecture/examples by scripts/vendor-examples.mjs, at the commit
+# examples.lock.json names. Never edit them here: npm test fails when one differs from the lock.
+vendor/examples/** linguist-generated

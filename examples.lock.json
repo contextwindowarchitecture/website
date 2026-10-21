@@ -1,0 +1,15 @@
+{
+  "repository": "contextwindowarchitecture/examples",
+  "commit": "119b5ccd5fc32e798be0376a34d11e366cbe9e54",
+  "tags": [],
+  "files": {
+    "01-docs-qa/after.py": "e54e16e555ce3b1c34b906666e0ce84dc1177281c9f1036852b7d481e5f382bd",
+    "01-docs-qa/before.py": "5c7e57186d93e4ab0df1e87c985f31391569476a9fa19d222df5d41ff0c8fea7",
+    "01-docs-qa/context.py": "f3762672f8f1dfc8a1ddc95d3d2cf8c92f9093f2def668b6aa7dc3d225a48805",
+    "01-docs-qa/scenarios/01-answer/payload.json": "534bee41a56617f19b3801aa12511cfd57d8d733781e3c3b1264aa3b225782ab",
+    "01-docs-qa/scenarios/01-answer/snapshot.json": "8c81d7a9b1dfcefc3022fa2c3e415a0037a6d4a1ef2e93ef07a36c0b4a2d7add",
+    "01-docs-qa/scenarios/01-answer/trace.json": "498daf180916380a4915d247e3c4bcfa9959fca4f03e8a6a91313d05c7911e88",
+    "01-docs-qa/scenarios/03-off-topic/snapshot.json": "ff5fdca210c1e5c3cd05fe7932219c8108fc221cbec1cc17df032c22bbd04096",
+    "01-docs-qa/scenarios/03-off-topic/trace.json": "ef62055bd2879feb19df09add3832ad68e3d04162bf4e28653bf6056ba513b37"
+  }
+}
