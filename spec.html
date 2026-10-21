@@ -190,7 +190,7 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesModel }}" as="r" hint-placeholder-count="4">
-            <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
+            <div id="{{ r.id }}" class="rm" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
               <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
@@ -241,7 +241,7 @@
         <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--muted);"><strong>Factual conflicts:</strong> route policy for the group's fact key lists the eligible producers, by authenticated identity, in precedence order, and the scope keys a claim must carry. It may prefer a verified current observation over a stale document by listing that producer first, but no data role automatically wins, and an item's trust, its injection marker and the route's verified flag are never read (R-11). Freshness breaks a tie only between leaders from the top-ranked producer, and only when the route permits it, so it never lets an ineligible claim win; otherwise the route surfaces the conflict, requests more context or refuses. No conflict excludes a protected item. The application supplies typed conflict groups; the assembler does not discover contradictions by interpreting prose.</p>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesGov }}" as="r" hint-placeholder-count="7">
-            <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
+            <div id="{{ r.id }}" class="rm" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
               <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
@@ -266,7 +266,7 @@
         <p style="margin: 0 0 24px; font-size: 15px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;">Every slot sits in one of three tiers. <span style="color: var(--fg);">Protected</span> items are rendered whole or the assembly is refused. <span style="color: var(--fg);">Droppable</span> items may be omitted. <span style="color: var(--fg);">Compressible</span> items may be replaced by a precomputed shorter variant or omitted. Under budget pressure that happens only once droppable items are gone; the route's versioned fitting policy orders that step, and without one, variants come before omission. The one exception is a slot the route holds at a min_tokens floor: it can keep its droppable items while other slots compress. An item over its own token_budget, or in a slot over the route's max_tokens, is reduced first, whether or not the payload fits. Every omission is traced as over_budget. The assembler never touches protected items. Only the route's versioned policy can raise a slot's tier; an item that claims a higher tier than its slot allows is excluded with tier_upgrade_not_allowed, so a producer cannot protect its own items.</p>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesFit }}" as="r" hint-placeholder-count="7">
-            <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
+            <div id="{{ r.id }}" class="rm" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
               <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
@@ -281,7 +281,7 @@
         <div style="border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.75; margin-bottom: 24px;">
           <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>an unevaluated draft · JSON syntax is valid YAML</span></div>
           <!-- CONTRACT_PROFILE_START -->
-          <pre style="padding: 18px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;">{
+          <pre style="padding: 18px; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">{
   "spec": "cwa/draft",
   "id": "policy-first-chat",
   "version": 1,
@@ -346,7 +346,7 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesProf }}" as="r" hint-placeholder-count="2">
-            <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
+            <div id="{{ r.id }}" class="rm" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
               <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>
@@ -377,7 +377,7 @@
         </div>
         <div style="display: flex; flex-direction: column; gap: 14px;">
           <sc-for list="{{ rulesTrace }}" as="r" hint-placeholder-count="3">
-            <div id="{{ r.id }}" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
+            <div id="{{ r.id }}" class="rm" style="display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; padding: 16px 18px; border: 1px solid var(--line); background: var(--surface); align-items: start;">
               <a href="{{ r.href }}" style="font-family: var(--mono); font-size: 12.5px; color: var(--accent); font-weight: 600;">{{ r.id }}</a>
               <div style="min-width: 0;"><div style="font-size: 15px; font-weight: 600; line-height: 1.4; letter-spacing: -0.01em; color: var(--fg); margin-bottom: 6px; text-wrap: pretty;">{{ r.summary }}</div><div style="font-family: var(--mono); font-size: 13px; line-height: 1.7; color: var(--fg); overflow-wrap: anywhere;"><sc-for list="{{ r.segs }}" as="s" hint-placeholder-count="3"><span style="{{ s.style }}">{{ s.text }}</span></sc-for></div></div>
             </div>

@@ -148,7 +148,7 @@ for (const page of ['spec.html']) {
     const profile = JSON.stringify(data.PROFILES[0], null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
     updated = updated.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
       // The read-back holds this <pre> to plain text, so it wraps without a hanging indent rather than scrolling sideways.
-      `<!-- CONTRACT_PROFILE_START -->\n          <pre style="padding: 18px; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere;">${profile}</pre>\n          <!-- CONTRACT_PROFILE_END -->`);
+      `<!-- CONTRACT_PROFILE_START -->\n          <pre style="padding: 18px; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${profile}</pre>\n          <!-- CONTRACT_PROFILE_END -->`);
   }
   outputs.set(page, updated);
 }
