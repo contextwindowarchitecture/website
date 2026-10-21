@@ -158,7 +158,7 @@ test('the panel opens from the nav or a pill, searches, follows #glossary/<term>
 test('the home page is layer 1: a plain hero with no preview widget, and none of the material the deeper pages carry', async () => {
   const html = await read('index.html');
   assert.ok(!html.includes('{{ heroBlocks }}') && !html.includes('toggleHero') && !html.includes('startHeroClock'), 'no hero preview widget');
-  const lede = html.match(/<h1[^>]*>Context isn't a prompt[^<]*<\/h1>\s*<p[^>]*>([^<]+)<\/p>/)[1];
+  const lede = html.match(/<h1[^>]*>Decide what your model sees[^<]*<\/h1>\s*<p[^>]*>([\s\S]*?)<\/p>/)[1].replace(/<[^>]+>/g, '');
   assert.ok(lede.split(' ').length <= 50, `the hero lede stays short: ${lede.split(' ').length} words`);
   for (const word of ['authority', 'lifecycle', 'deterministic', 'payload', 'slot']) assert.ok(!lede.toLowerCase().includes(word), `the hero lede avoids ${word}`);
   for (const gone of ['{{ itemFields }}', 'const ITEM_FIELDS', 'const EVIDENCE_STAGES', '<section id="evidence"', '<section id="payload"', 'CONTRACT_PAYLOAD_START', 'const HERO_BUDGET', 'CONTRACT_MATURITY_START', 'CONTRACT_ITEM_START']) assert.ok(!html.includes(gone), `${gone} has left the home page`);

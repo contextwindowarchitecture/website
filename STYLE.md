@@ -167,7 +167,7 @@ Rules that fall out of the table:
 ### Casing and punctuation
 
 - **Kickers and labels are uppercase mono with middle dots.** "Context assembler spec · draft", "Assembling · profile · policy-first-chat/v1", "Specification · draft · 2026-09-27". Separate facets with ` · ` (space, U+00B7, space); dates are ISO.
-- **Headings are sentence case.** Landing-page headings are full sentences with a period, often two: "Context isn't a prompt. It's an assembled request." Docs-page headings are noun phrases without a period: "Placement profiles", "Admission failures".
+- **Headings are sentence case.** Landing-page headings are full sentences with a period, often two: "Decide what your model sees. Keep a record of why." Docs-page headings are noun phrases without a period: "Placement profiles", "Admission failures".
 - **RFC 2119 keywords** (MUST, MUST NOT, SHOULD, SHOULD NOT, MAY) are set in `color: var(--accent); font-weight: 600` in running text.
 - **Requirements are cited as R-n** and link to `#R-n` on the spec page.
 - **Browser titles** follow "Page name — Context Window Architecture", with a spaced em dash. The landing page reverses it: "Context Window Architecture — a context assembler spec (draft)".

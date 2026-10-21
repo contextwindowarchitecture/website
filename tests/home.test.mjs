@@ -58,6 +58,21 @@ test('the code slide shows build_request() from before.py and its CWA counterpar
   assert.equal([...code.matchAll(/<pre tabindex="0" aria-label="[^"]+"/g)].length, 2, 'both panels scroll from the keyboard and are named');
 });
 
+test('the first slide says what CWA is in plain words, brings in the assembler, and shows the real Python call', async () => {
+  const html = await read('index.html');
+  const top = html.slice(html.indexOf('<section id="top"'), html.indexOf('<section id="code"'));
+  assert.ok(top.includes('>Decide what your model sees. Keep a record of why.</h1>'));
+  assert.ok(top.includes('You call one right before your model call.') && top.includes('It never calls the model.'), 'what it is, and that it is no proxy');
+  assert.deepEqual([...top.matchAll(/<a class="term" href="#glossary\/([a-z-]+)"/g)].map(m => m[1]), ['assembler']);
+  const figure = top.match(/<pre tabindex="0" aria-label="[^"]+"[^>]*>([\s\S]*?)<\/pre>/)[1];
+  const source = (await vendored('01-docs-qa/context.py')) + (await vendored('01-docs-qa/after.py'));
+  for (const name of ['from cwa import', 'Snapshot', 'assemble', 'from_json', 'result.payload', 'result.trace']) {
+    assert.ok(figure.includes(name) && source.includes(name), `${name} is in the figure and in the example's own code`);
+  }
+  assert.ok(!top.includes('aria-hidden="true"'), 'the figure is real code, not a picture');
+  assert.match(html, /<title>Context Window Architecture: decide what your model sees<\/title>/);
+});
+
 test('a term link opens the glossary scrolled to its entry, on every page, and leaves the page where it was', async () => {
   const vm = await import('node:vm');
   for (const page of ['index.html', 'spec.html', 'evidence.html', 'assembler.html']) {

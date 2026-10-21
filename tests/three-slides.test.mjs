@@ -34,7 +34,7 @@ test('the home page is three slides, each a full-height section with one heading
   assert.deepEqual(slides.map(m => [m[1], m[2]]), [['top', '1'], ['code', '2'], ['assembly', '3']]);
   for (const m of slides) assert.ok(m[3].includes('min-height: calc(100vh - 68px)') && m[3].includes('scroll-snap-align: start'), `${m[1]} fills the viewport and snaps`);
   assert.ok(html.includes('scroll-snap-type: y proximity'), 'the page snaps between slides');
-  assert.match(html, /<h1[^>]*>Context isn't a prompt\. It's an assembled request\.<\/h1>/);
+  assert.match(html, /<h1[^>]*>Decide what your model sees\. Keep a record of why\.<\/h1>/);
   assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>Name the parts. Fit them to a budget. Write down why.</h2>'));
   for (const gone of ['<section id="shapes"', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
     assert.ok(!html.includes(gone), `${gone} has left the home page`);
@@ -66,11 +66,11 @@ test('harness engineering sits on the Assembler page below the simulator, with i
   assert.equal(view.renderVals().fwName, 'the Claude Agent SDK');
 });
 
-test('the first slide offers the simulator and the spec, the second shows the example\'s code, and the third opens three doors', async () => {
+test('the first slide offers the example and the spec, the second shows the example\'s code, and the third opens three doors', async () => {
   const html = await read('index.html');
   const first = html.slice(html.indexOf('<section id="top"'), html.indexOf('<section id="code"'));
-  assert.deepEqual([...first.matchAll(/<a href="([^"]+)" style="font-size: 16px;[^>]*>(Watch it assemble|Read the spec)<\/a>/g)].map(m => [m[2], m[1]]),
-    [['Watch it assemble', './assembler.html#assemble'], ['Read the spec', './spec.html']]);
+  assert.deepEqual([...first.matchAll(/<a href="([^"]+)" style="font-size: 16px;[^>]*>(See it on a real app ↓|Read the spec)<\/a>/g)].map(m => [m[2], m[1]]),
+    [['See it on a real app ↓', '#code'], ['Read the spec', './spec.html']]);
   const second = html.slice(html.indexOf('<section id="code"'), html.indexOf('<section id="assembly"'));
   assert.ok(['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_COMMIT'].every(b => second.includes(`<!-- ${b}_START -->`)), 'the before and after code, and the commit it is from');
   assert.ok(!html.includes('#assemble/clinical-triage/blob'), 'the failure shapes have left the home page');
