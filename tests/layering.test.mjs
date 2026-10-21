@@ -100,12 +100,17 @@ test('every page opens the same glossary panel from its nav, and shows a prerequ
     const code = html.match(/\/\/ GLOSSARY_GLUE_START[\s\S]*?\/\/ GLOSSARY_GLUE_END/);
     assert.ok(code, `${page} has the glossary glue`);
     glue.add(code[0]);
-    assert.ok(html.includes('<sc-for list="{{ prereq }}" as="p"'), `${page} has the prerequisite strip`);
     const { view } = await component(page);
     const ids = view.constructor.name && vm.runInNewContext('PREREQUISITES', { PREREQUISITES: undefined }) === undefined ? null : null; // placeholder to keep vm imported
     const prereq = html.match(/const PREREQUISITES = (\[[^\]]*\]);/);
     assert.ok(prereq, `${page} names its prerequisites`);
     const list = JSON.parse(prereq[1]);
+    // The home page links each slide's new term where it first appears instead (tests/home.test.mjs).
+    if (page === 'index.html') {
+      assert.ok(!html.includes('{{ prereq }}') && list.length === 0 && html.includes('<a class="term" href="#glossary/'), 'the home page has term links, not a strip');
+      continue;
+    }
+    assert.ok(html.includes('<sc-for list="{{ prereq }}" as="p"'), `${page} has the prerequisite strip`);
     assert.ok(list.length >= 3 && list.length <= 6, `${page}: ${list.length} prerequisites`);
     for (const id of list) assert.ok(GLOSSARY.some(e => e.id === id), `${page} assumes ${id}, which the glossary defines`);
     assert.deepEqual([...view.renderVals().prereq].map(p => p.term), list.map(id => id.replace(/-/g, ' ')), `${page}: before the glossary loads the strip shows the ids as words`);

@@ -1,6 +1,7 @@
 // The home page's example blocks, written by npm run build:contract from the files scripts/vendor-examples.mjs vendors:
 // the 01-docs-qa bot's request code before and after CWA, as excerpts of its own source, and what `uv run after.py`
-// prints for two committed scenarios: the trace table, the request as sent, and the refusal. Each block sits between
+// prints for two committed scenarios: the trace table, the request as sent, and the refusal. The measured slide's
+// numbers come from site/measured.json, which names the benchmark run they were read from. Each block sits between
 // <!-- NAME_START --> and <!-- NAME_END --> in index.html and is never edited by hand.
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -95,7 +96,35 @@ export function exampleBlocks({ lock, before, context, answered, refused }) {
     EXAMPLE_PAYLOAD: panel({ label: 'request · cwa-messages/v1', meta: answered.payload.tools.length ? `${answered.payload.tools.length} tools` : 'no tools on this route', aria: 'The request the model receives',
       text: request(answered.payload), wrap: true }),
     EXAMPLE_TRACE: panel({ label: 'trace', meta: 'as after.py prints it', aria: 'The trace: what was sent and what was left out', text: report(answered.snapshot, answered.trace) }),
+    EXAMPLE_RUN: door(`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, 'Running it', 'Run it yourself →',
+      'Clone the examples, then in 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key is needed to see what would be sent.'),
     EXAMPLE_REFUSAL: `<pre tabindex="0" aria-label="The refusal" style="padding: 14px 18px; overflow: auto; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${escapeHtml(report(refused.snapshot, refused.trace).split('\n')[0])}</pre>`,
+  };
+}
+
+// The door to running the example, at the locked commit; a hairline-grid cell like the spec's door beside it.
+const door = (href, label, title, copy) => `<a href="${href}" target="_blank" rel="noopener" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">` +
+  `<span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">${label}</span>` +
+  `<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">${title}</span>` +
+  `<span style="font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">${copy}</span></a>`;
+
+/** An arm's share, to two places; a row with several arms shows their range. */
+export function share(arms) {
+  const values = arms.map(a => a.numerator / a.denominator).sort((a, b) => a - b).map(v => v.toFixed(2));
+  return values[0] === values[values.length - 1] ? values[0] : `${values[0]}–${values[values.length - 1]}`;
+}
+
+/** The measured slide's rows and source links, from site/measured.json. */
+export function measuredBlocks({ source, rows }) {
+  const writeUp = `https://github.com/${source.repository}/blob/${source.commit}/${source.path}`;
+  return {
+    MEASURED: '<div style="border-bottom: 1px solid var(--line);">' + rows.map((row, i) =>
+      // The number column is sized in the numbers' own em, so the widest, a range, stays on one line.
+      '<div class="rm" style="display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 4px 0.5em; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); font-size: clamp(28px, 3.4vw, 42px);">' +
+      `<span style="font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; color: ${i === 0 ? 'var(--accent)' : 'var(--fg)'};">${share(row.arms)}</span>` +
+      `<span style="font-size: 16px; line-height: 1.45; color: var(--fg);">${escapeHtml(row.label)}</span></div>`).join('') + '</div>',
+    MEASURED_SOURCE: `<a href="${writeUp}#${source.anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The write-up, with intervals →</a>` +
+      `<a href="${writeUp}#${source.replay_anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Every number replays from the committed model cache, without a GPU →</a>`,
   };
 }
 

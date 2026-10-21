@@ -54,7 +54,7 @@ test('where the header hides the nav row, every page offers a menu button that o
   }
 });
 
-for (const [page, least] of [['index.html', 4], ['assembler.html', 5], ['evidence.html', 2], ['spec.html', 8]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
+for (const [page, least] of [['index.html', 3], ['assembler.html', 5], ['evidence.html', 2], ['spec.html', 8]]) test(`${page} stacks its fixed multi-column grids on narrow viewports`, async () => {
   const html = await fs.readFile(new URL('../' + page, import.meta.url), 'utf8');
   const style = html.match(/<style>[\s\S]*?<\/style>/)[0];
   if (page === 'evidence.html') {

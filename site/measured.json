@@ -1,0 +1,41 @@
+{
+  "source": {
+    "repository": "contextwindowarchitecture/benchmark",
+    "commit": "346cf40b40597bc45e7ebd45b9ff1439a9e414d7",
+    "path": "docs/domain2.md",
+    "section": "Scripted conversations (S2)",
+    "anchor": "scripted-conversations-s2",
+    "replay_anchor": "reproducing-it",
+    "run_id": "20261012T052348Z-4a0ea5d",
+    "summary": "domain2/results/d2/20261012T052348Z-4a0ea5d/summary.json",
+    "model": "Qwen/Qwen3.6-35B-A3B-FP8",
+    "budget": 8192,
+    "turns": 100
+  },
+  "rows": [
+    {
+      "label": "CWA, with state the app writes from what the user said",
+      "arms": [
+        { "arm": "cwa-state", "metric": "s2.aptitude", "numerator": 3770, "denominator": 3888 },
+        { "arm": "cwa-memory", "metric": "s2.aptitude", "numerator": 3845, "denominator": 3888 }
+      ]
+    },
+    {
+      "label": "A rolling summary of the conversation",
+      "arms": [
+        { "arm": "summary", "metric": "s2.aptitude", "numerator": 3350, "denominator": 3888 }
+      ]
+    },
+    {
+      "label": "Truncation: keep the system prompt, drop the oldest turns",
+      "arms": [
+        { "arm": "truncate-pinned", "metric": "s2.aptitude", "numerator": 3198, "denominator": 3888 }
+      ]
+    }
+  ],
+  "fact_in_payload": {
+    "from": "The write-up's S2 table, column \"Fact in payload at 8,192\"; summary.json does not hold it.",
+    "truncate-pinned": 0.9,
+    "cwa-state": 1
+  }
+}

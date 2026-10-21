@@ -155,7 +155,7 @@ result.trace    # what was left out, and why</pre>
       </div>
     </div>
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-      <span>01 / 03</span>
+      <span>01 / 04</span>
       <a href="#code" style="color: var(--accent);">Next · Before and after ↓</a>
     </div>
     </div>
@@ -212,7 +212,7 @@ def assemble(document: dict[str, Any]) -&gt; AssemblyResult:
       </div>
       <p style="margin: 20px 0 0;"><!-- EXAMPLE_COMMIT_START --><a href="https://github.com/contextwindowarchitecture/examples/tree/119b5ccd5fc32e798be0376a34d11e366cbe9e54/01-docs-qa" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at 119b5cc →</a><!-- EXAMPLE_COMMIT_END --></p>
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-      <span>02 / 03</span>
+      <span>02 / 04</span>
       <a href="#sent" style="color: var(--accent);">Next · What it sent ↓</a>
     </div>
     </div>
@@ -262,81 +262,35 @@ Why didn't I get my password reset email?
       <p style="margin: 32px 0 12px; font-size: 16px; line-height: 1.55; color: var(--fg);">Ask it for a banana-bread recipe and nothing reaches the model:</p>
       <!-- EXAMPLE_REFUSAL_START --><pre tabindex="0" aria-label="The refusal" style="padding: 14px 18px; overflow: auto; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">refused: evidence_required, recovery request_context. No request is sent.</pre><!-- EXAMPLE_REFUSAL_END -->
     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-      <span>03 / 03</span>
-      <a href="#planes" style="color: var(--accent);">Next · The schema ↓</a>
+      <span>03 / 04</span>
+      <a href="#measured" style="color: var(--accent);">Next · Measured ↓</a>
     </div>
     </div>
   </section>
 
-  <section id="planes" style="border-top: 1px solid var(--line); background: var(--surface);">
-    <div style="max-width: 1180px; margin: 0 auto; padding: 88px 32px 96px;">
-      <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; justify-content: space-between; margin-bottom: 20px;">
-        <div>
-          <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">The schema</div>
-          <h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 20ch;">Four planes. Eleven slots. Any number of items.</h2>
-        </div>
-        <div style="display: flex; gap: 6px; padding: 5px; border: 1px solid var(--line); border-radius: var(--pill); background: var(--surface);">
-          <button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}" style="{{ tabPlanes }}">Planes</button>
-          <button onClick="{{ setSlotsMode }}" aria-pressed="{{ slotsPressed }}" style="{{ tabSlots }}">Slots</button>
-        </div>
+  <section id="measured" data-slide="4" style="min-height: calc(100vh - 68px); scroll-snap-align: start; scroll-margin-top: 68px; display: flex; flex-direction: column; justify-content: center; border-top: 1px solid var(--line); background: var(--surface);">
+    <div style="max-width: 1180px; width: 100%; margin: 0 auto; padding: 64px 32px 40px;">
+      <div style="font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px;">Measured</div>
+      <h2 style="margin: 0 0 20px; font-size: clamp(34px, 4.6vw, 60px); line-height: 1; letter-spacing: -0.035em; font-weight: 700; max-width: 22ch; text-wrap: balance;">Long conversations push facts out of the window. Protected state keeps them.</h2>
+      <p style="margin: 0 0 32px; font-size: 19px; line-height: 1.55; color: var(--muted); max-width: 60ch; text-wrap: pretty;">The viability benchmark gave one model conversations of up to 100 turns on an 8,192-token budget. Everything was held equal except how each request was built.</p>
+      <div style="max-width: 820px;">
+        <!-- MEASURED_START --><div style="border-bottom: 1px solid var(--line);"><div class="rm" style="display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 4px 0.5em; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); font-size: clamp(28px, 3.4vw, 42px);"><span style="font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; color: var(--accent);">0.97–0.99</span><span style="font-size: 16px; line-height: 1.45; color: var(--fg);">CWA, with state the app writes from what the user said</span></div><div class="rm" style="display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 4px 0.5em; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); font-size: clamp(28px, 3.4vw, 42px);"><span style="font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; color: var(--fg);">0.86</span><span style="font-size: 16px; line-height: 1.45; color: var(--fg);">A rolling summary of the conversation</span></div><div class="rm" style="display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 4px 0.5em; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); font-size: clamp(28px, 3.4vw, 42px);"><span style="font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; color: var(--fg);">0.82</span><span style="font-size: 16px; line-height: 1.45; color: var(--fg);">Truncation: keep the system prompt, drop the oldest turns</span></div></div><!-- MEASURED_END -->
+        <p style="margin: 20px 0 0; font-size: 16px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">Truncation sent the fact the answer needed for 90% of questions. CWA's protected state sent it every time.</p>
+        <p style="margin: 12px 0 0; font-size: 13.5px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">One model (Qwen3.6-35B-A3B), one budget. The gain comes from the state your app keeps, which CWA protects from being cut, not from reordering history. When the model writes that state itself, CWA is level with truncation.</p>
+        <p style="margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 8px 24px;"><!-- MEASURED_SOURCE_START --><a href="https://github.com/contextwindowarchitecture/benchmark/blob/346cf40b40597bc45e7ebd45b9ff1439a9e414d7/docs/domain2.md#scripted-conversations-s2" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The write-up, with intervals →</a><a href="https://github.com/contextwindowarchitecture/benchmark/blob/346cf40b40597bc45e7ebd45b9ff1439a9e414d7/docs/domain2.md#reproducing-it" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Every number replays from the committed model cache, without a GPU →</a><!-- MEASURED_SOURCE_END --></p>
       </div>
-      <p style="margin: 0 0 20px; font-size: 18px; line-height: 1.6; color: var(--muted); max-width: 64ch; text-wrap: pretty;">A plane says <em>why</em> a piece of context exists. A slot is a typed collection inside a plane, with its own admission rules. An item is one governed object in a slot — a policy, a retrieved chunk, a tool observation. Newcomers learn the planes; implementers use the slots; the assembler moves the items.</p>
-      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 44px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
-        <span>The words this site uses:</span>
-        <sc-for list="{{ prereq }}" as="p" hint-placeholder-count="5">
-          <button onClick="{{ p.open }}" style="font-family: var(--mono); font-size: 12px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: var(--pill); padding: 5px 12px; cursor: pointer;" style-hover="border-color: var(--fg);">{{ p.term }}</button>
-        </sc-for>
+      <div class="g2c" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 40px;">
+        <!-- EXAMPLE_RUN_START --><a href="https://github.com/contextwindowarchitecture/examples/tree/119b5ccd5fc32e798be0376a34d11e366cbe9e54/01-docs-qa#readme" target="_blank" rel="noopener" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);"><span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Running it</span><span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">Run it yourself →</span><span style="font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">Clone the examples, then in 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key is needed to see what would be sent.</span></a><!-- EXAMPLE_RUN_END -->
+        <a href="./spec.html" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">
+          <span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">Reading</span>
+          <span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">Read the spec →</span>
+          <span style="font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">The rules an assembler, its producers and your application follow.</span>
+        </a>
       </div>
-
-      <sc-if value="{{ isPlanesMode }}" hint-placeholder-val="{{ true }}">
-        <div class="g4" style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line);">
-          <sc-for list="{{ planes }}" as="pl" hint-placeholder-count="4">
-            <div style="background: var(--bg); padding: 26px 24px 28px; display: flex; flex-direction: column; gap: 18px;">
-              <div style="{{ pl.barStyle }}"></div>
-              <div>
-                <div style="font-size: 26px; font-weight: 600; letter-spacing: -0.025em; line-height: 1.05; margin-bottom: 8px;">{{ pl.name }}</div>
-                <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);">{{ pl.answers }}</div>
-              </div>
-              <p style="margin: 0; font-size: 15px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ pl.blurb }}</p>
-              <div style="display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); padding-top: 16px;">
-                <sc-for list="{{ pl.slots }}" as="s" hint-placeholder-count="4">
-                  <div style="display: grid; grid-template-columns: minmax(0, 1fr); gap: 2px; padding: 8px 10px; background: var(--surface);">
-                    <span style="font-size: 15px; font-weight: 500;">{{ s.name }}</span>
-                    <span style="font-family: var(--mono); font-size: 11px; color: var(--muted);">{{ s.id }}</span>
-                  </div>
-                </sc-for>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
-
-      <sc-if value="{{ isSlotsMode }}" hint-placeholder-val="{{ false }}">
-        <div style="border-top: 1px solid var(--line);">
-          <sc-for list="{{ layers }}" as="layer" hint-placeholder-count="11">
-            <div style="border-bottom: 1px solid var(--line);">
-              <button class="lyr" onClick="{{ layer.toggle }}" style="width: 100%; display: grid; grid-template-columns: 250px minmax(0, 1fr) 40px; align-items: center; gap: 16px; padding: 20px 8px; background: transparent; border: 0; cursor: pointer; text-align: left; color: var(--fg); font-family: inherit;" style-hover="background: var(--surface);">
-                <span style="display: flex; align-items: center; gap: 10px; font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 0;"><span style="{{ layer.dotStyle }}"></span><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ layer.id }}</span></span>
-                <span style="font-size: clamp(20px, 2.4vw, 30px); font-weight: 600; letter-spacing: -0.025em;">{{ layer.name }}</span>
-                <span style="justify-self: end; font-family: var(--mono); font-size: 20px; color: var(--muted);">{{ layer.sign }}</span>
-              </button>
-              <div style="{{ layer.detailStyle }}">
-                <div class="lyrd" style="display: grid; grid-template-columns: 250px minmax(0, 1fr) minmax(0, 1fr); gap: 16px; padding: 0 8px 26px;">
-                  <div style="font-family: var(--mono); font-size: 11.5px; line-height: 1.6; color: var(--muted);">{{ layer.meta }}</div>
-                  <div>
-                    <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Holds</div>
-                    <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--fg); text-wrap: pretty;">{{ layer.purpose }}</p>
-                  </div>
-                  <div>
-                    <div style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;">Admission rule</div>
-                    <p style="margin: 0; font-size: 16px; line-height: 1.55; color: var(--muted); text-wrap: pretty;">{{ layer.value }}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </sc-for>
-        </div>
-      </sc-if>
+    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; border-top: 1px solid var(--line); margin-top: 48px; padding-top: 14px; font-family: var(--mono); font-size: 12px; color: var(--muted);">
+      <span>04 / 04</span>
+      <a href="#top" style="color: var(--accent);">Back to the top ↑</a>
+    </div>
     </div>
   </section>
 
@@ -416,34 +370,12 @@ Why didn't I get my password reset email?
 /* The Claude Design "accent" prop's default. It must match the data-props default above and the :root --accent token, so the standalone runtime, which passes the default when nothing was overridden, can be told apart from a real override. */
 const ACCENT_DEFAULT = "oklch(0.55 0.20 38)";
 
-const PLANES = [
-  { id: "governance", name: "Governance", color: "var(--p-gov)", answers: "Who may direct the model", blurb: "Governance holds authority, policy, permissions, steering examples, and the output contract. It is stable across a route, versioned like code, and never overridden by anything below it." },
-  { id: "state", name: "State", color: "var(--p-state)", answers: "What is true right now", blurb: "State holds canonical facts about the user, session, and task. It is structured, typed, and owned by the application. The model reads state but never becomes the source of truth for it." },
-  { id: "evidence", name: "Evidence", color: "var(--p-evid)", answers: "What the model may ground on", blurb: "Evidence holds retrieved chunks, tool observations, artifacts, and citations. Each arrives as its own evidence item with provenance, freshness, and trust, and is treated as reference material, not instruction." },
-  { id: "interaction", name: "Interaction", color: "var(--p-inter)", answers: "What has happened, and what is asked", blurb: "Interaction holds compressed memory, recent verbatim turns, and the live query that triggers generation." }
-];
-
-/* SLOTS repeats the slots of contract/model.json, which the Spec page shows; a wording change to one belongs in both. */
-/* [name, id, plane, holds, admission rule, meta] — index order is preserved from v1 so usage data stays valid */
-const SLOTS = [
-  ["Instructions", "governance.instructions", 0, "Identity, goals, refusals, and safety boundaries: the system's constitution.", "This slot is never omitted and admits only governing-authority items. Items that aren't verified, or that carry the injection marker, are excluded here.", "authority governing\ntier protected\nlineage verbatim"],
-  ["User facts", "state.user", 1, "Durable profile, entitlements, locale, permissions, session preferences, each a separate item with its own freshness.", "Items are scoped to the current tenant and user. Unverified user claims remain source-linked memory; only application-confirmed facts enter state.", "authority state\ntier droppable\nscope tenant · user"],
-  ["Knowledge", "evidence.knowledge", 2, "Retrieved chunks, each sent as its own evidence item with source, version, relevance and trust.", "Each one has to clear admission: a relevance score at or above the route's min_relevance, and inside its freshness limits. Where the route asks for it, exact duplicates go after conflicts are resolved (R-24). An empty result is recorded as an outcome, not treated as an error.", "authority reference_only\ntier compressible\nrisk untrusted_content"],
-  ["Task state", "state.task", 1, "Workflow stage, approval status, selected entity IDs, pending action, retry count.", "Task state is written by the application's state machine and never inferred from conversation. When it disagrees with other evidence, the route's fact policy decides; a route that treats state as canonical lists the state producer first (R-11).", "authority state\ntier protected\nowner application"],
-  ["Memory", "interaction.memory", 3, "Condensed summaries of older turns and inferred long-term facts, each linked to the turn it came from.", "Every entry carries an expires deadline and a source naming the turn it came from. Entries whose expires is at or before assembly_time, or that carry revoked_by, are excluded and show up in the trace (R-9). The assembler doesn't decide what's been contradicted; the application revokes it.", "authority generated\ntier compressible\nlifecycle expires · revocable"],
-  ["Recent history", "interaction.history", 3, "A verbatim transcript of the most recent turns.", "Summarising older turns into memory is the application's job, done before assembly (R-12). Under budget pressure, when the route declares no fitting order, turns with a shorter variant switch to it first; after that, whole turns are dropped, oldest first unless the turns carry relevance scores or the route ranks the slot differently. Prior model turns carry lineage: generated and untrusted authority, and every prior turn renders inside the history transcript, never as a platform message.", "authority user\ntier compressible\nrisk untrusted_content"],
-  ["Capabilities", "governance.capabilities", 0, "The tools, functions and resources the model is permitted to invoke, with their contracts.", "Only tools the route's capability policy allows for this user are admitted, against a versioned allow-list. Adapters propose tools, the policy admits them and assigns authority (R-15), and permission is decided outside the model.", "authority governing\ntier protected\nallow-list versioned"],
-  ["Tool results", "evidence.tool_results", 2, "Observations returned by tools already called, possibly several per loop, and any retrieved chunks a route sends here.", "When the route sets supersede: source, the newest observation from each producer and source stays and the older ones go (R-25). That's keyed on source, not on the tool call. An observation is evidence, not permission to act.", "authority observation\ntier compressible\nfreshness age in seconds"],
-  ["Examples", "governance.examples", 0, "Developer-owned input/output pairs that steer reasoning, tone or format.", "A route that wants them places the slot and lists a producer for it; admission applies the same four slot rules as anywhere else (R-3). They defer to instructions and the output contract. They're droppable, so under budget pressure they go before anything compressible.", "authority governing\ntier droppable\nconflict defers"],
-  ["Output contract", "governance.output_contract", 0, "Structure, style, length and schema of the response about to be generated.", "The contract is never omitted when a downstream parser exists. If a safety disclosure has to appear, make room for it in the contract itself. Conflict resolution can't drop a protected item, so a clash between the two escalates.", "authority governing\ntier protected\nrequired when parser: true"],
-  ["Query", "interaction.query", 3, "The most recent, unprocessed input the model must respond to.", "The query is never omitted and always carries user authority. It is the trigger for generation, placed wherever the route's profile puts it.", "authority user\ntier protected\nrole trigger"]
-];
-
-// The terms this page assumes, as glossary ids; the strip on the last slide shows them and the glossary defines them.
-const PREREQUISITES = ["plane","slot","item","assembler","trace"];
+// The home page has no prerequisite strip: each slide links its one new term where it first appears (STYLE.md, Term
+// links). The glossary glue, the same on every page, still reads this list.
+const PREREQUISITES = [];
 
 class Component extends DCLogic {
-  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, mode: "planes", open: { 0: true }, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
+  state = { glossary: null, glossaryOpen: false, glossaryQuery: "", glossaryTerm: null, theme: "light", menu: false, leaving: null, leavingLeft: 0 };
 
   componentWillUnmount() {
     this.menuUnmount();
@@ -463,8 +395,8 @@ class Component extends DCLogic {
     this.applyHash();
   }
 
-  // The simulator and harness engineering live on the Assembler page and the spec's old anchors went to Spec:
-  // a link that still names them here opens the page that holds them.
+  // The simulator and harness engineering live on the Assembler page, and the spec's old anchors and the schema
+  // section went to Spec: a link that still names them here opens the page that holds them.
   applyHash() {
     const hash = location.hash || "";
     const parts = hash.replace(/^#/, "").split("/");
@@ -473,6 +405,11 @@ class Component extends DCLogic {
     if (parts[0] === "assemble") { location.replace("./assembler.html" + hash); return; }
     if (parts[0] === "problem") { location.replace("./assembler.html#assemble"); return; }
     if (parts[0] === "harness") { location.replace("./assembler.html#harness"); return; }
+    if (parts[0] === "planes") { location.replace("./spec.html#s2"); return; }
+    if (parts[0] === "shapes") { location.replace("./assembler.html#assemble"); return; }
+    // The slides that were #assembly and #planes are #sent and #measured; an old link lands on the nearest one.
+    const renamed = { assembly: "sent" }[parts[0]];
+    if (renamed) parts[0] = renamed;
     // The page renders after it loads, so a plain anchor such as #planes, which the glossary links, is scrolled to here, once it exists.
     if (parts.length === 1 && parts[0] && parts[0] !== "glossary") for (const wait of [0, 600]) setTimeout(() => {
       const el = document.getElementById(parts[0]);
@@ -486,21 +423,6 @@ class Component extends DCLogic {
     document.documentElement.setAttribute("data-theme", t);
     try { localStorage.setItem("cwa-theme", t); } catch (e) {}
     this.setState({ theme: t });
-  }
-
-  tab(active) {
-    return "font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; border: 0; border-radius: 999px; padding: 9px 18px; cursor: pointer; background: " +
-      (active ? "var(--fg)" : "transparent") + "; color: " + (active ? "var(--bg)" : "var(--muted)") + ";";
-  }
-
-  color(i) { return PLANES[SLOTS[i][2]].color; }
-  dot(i, extra) { return "display: block; width: 10px; height: 10px; flex: none; background: " + this.color(i) + ";" + (extra || ""); }
-  schemaVals(out) {
-    out.planes = PLANES.map((pl, k) => ({
-      name: pl.name, answers: pl.answers, blurb: pl.blurb,
-      barStyle: "height: 6px; width: 48px; background: " + pl.color + ";",
-      slots: SLOTS.filter(s => s[2] === k).map(s => ({ name: s[0], id: s[1] }))
-    }));
   }
 
   // GLOSSARY_GLUE_START
@@ -683,28 +605,10 @@ class Component extends DCLogic {
     const rootStyle = document.documentElement.style;
     if (accent && accent !== ACCENT_DEFAULT) rootStyle.setProperty("--accent", accent);
     else rootStyle.removeProperty("--accent");
-    const mode = this.state.mode;
-    const layers = SLOTS.map((l, i) => {
-      const open = !!this.state.open[i];
-      return {
-        id: l[1], name: l[0], purpose: l[3], value: l[4], meta: l[5],
-        dotStyle: this.dot(i),
-        sign: open ? "−" : "+",
-        detailStyle: "display: " + (open ? "block" : "none") + "; animation: cwaRise 260ms ease both; white-space: pre-line;",
-        toggle: () => this.setState(s => ({ open: Object.assign({}, s.open, { [i]: !s.open[i] }) }))
-      };
-    });
     const out = {
-      layers,
-      isPlanesMode: mode === "planes", isSlotsMode: mode === "slots",
-      planesPressed: mode === "planes" ? "true" : "false", slotsPressed: mode === "slots" ? "true" : "false",
-      tabPlanes: this.tab(mode === "planes"), tabSlots: this.tab(mode === "slots"),
-      setPlanesMode: () => this.setState({ mode: "planes" }),
-      setSlotsMode: () => this.setState({ mode: "slots" }),
       themeLabel: this.state.theme === "dark" ? "Light" : "Dark",
       toggleTheme: () => this.applyTheme(this.state.theme === "dark" ? "light" : "dark"),
     };
-    this.schemaVals(out);
     return Object.assign(out, this.menuVals(), this.glossaryVals(), this.leavingVals());
   }
 }

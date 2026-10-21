@@ -123,3 +123,40 @@ test('the request and the refusal wrap their prose; the code and trace panels ke
   for (const name of ['EXAMPLE_PAYLOAD', 'EXAMPLE_REFUSAL']) assert.ok(pre(name).includes('white-space: pre-wrap; overflow-wrap: anywhere;'), `${name} wraps`);
   for (const name of ['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_TRACE']) assert.ok(!pre(name).includes('pre-wrap'), `${name} keeps its columns`);
 });
+
+test('a measured share is its fraction to two places, and a row of several arms shows their range', () => {
+  assert.equal(blocks.share([{ numerator: 3198, denominator: 3888 }]), '0.82');
+  assert.equal(blocks.share([{ numerator: 3845, denominator: 3888 }, { numerator: 3770, denominator: 3888 }]), '0.97–0.99');
+  assert.equal(blocks.share([{ numerator: 1, denominator: 3 }, { numerator: 1, denominator: 3 }]), '0.33');
+});
+
+test('the measured slide shows the benchmark\'s numbers with their caveat on the same slide, and names the run they came from', async () => {
+  const html = await read('index.html');
+  const measured = JSON.parse(await read('site/measured.json'));
+  const slide = html.slice(html.indexOf('<section id="measured"'), html.indexOf('</section>', html.indexOf('<section id="measured"')));
+  const rows = [...slide.matchAll(/<div class="rm"[^>]*><span[^>]*>([^<]+)<\/span><span[^>]*>([^<]+)<\/span><\/div>/g)].map(m => [m[1], m[2]]);
+  assert.deepEqual(rows, [['0.97–0.99', 'CWA, with state the app writes from what the user said'], ['0.86', 'A rolling summary of the conversation'], ['0.82', 'Truncation: keep the system prompt, drop the oldest turns']]);
+  assert.deepEqual(rows, measured.rows.map(row => [blocks.share(row.arms), row.label]));
+  assert.ok(measured.rows.every(row => row.arms.every(a => a.metric === 's2.aptitude' && a.denominator === 3888)), 'every share is the same probes\' aptitude');
+  const { source, fact_in_payload: fact } = measured;
+  assert.deepEqual([source.budget, source.turns, fact['truncate-pinned'], fact['cwa-state']], [8192, 100, 0.9, 1]);
+  assert.ok(slide.includes('conversations of up to 100 turns on an 8,192-token budget'));
+  assert.ok(slide.includes('Truncation sent the fact the answer needed for 90% of questions. CWA\'s protected state sent it every time.'));
+  // The caveat: one model, named; what the gain comes from; and the case where it vanishes.
+  assert.ok(slide.includes(`One model (${source.model.replace(/^.*\//, '').replace(/-FP8$/, '')}), one budget.`));
+  assert.ok(slide.includes('The gain comes from the state your app keeps') && slide.includes('When the model writes that state itself, CWA is level with truncation.'));
+  const writeUp = `https://github.com/${source.repository}/blob/${source.commit}/${source.path}`;
+  assert.ok(slide.includes(`href="${writeUp}#scripted-conversations-s2"`) && slide.includes(`href="${writeUp}#reproducing-it"`), 'the write-up and how to replay it, at the pinned commit');
+  assert.match(source.commit, /^[0-9a-f]{40}$/);
+  assert.equal([...slide.matchAll(/class="term"/g)].length, 0, 'no new term on the last slide');
+});
+
+test('the last slide opens two doors: running the example at its locked commit, and the spec', async () => {
+  const html = await read('index.html');
+  const lock = JSON.parse(await read(LOCK));
+  const slide = html.slice(html.indexOf('<section id="measured"'), html.indexOf('</section>', html.indexOf('<section id="measured"')));
+  const doors = slide.slice(slide.indexOf('<div class="g2c"'), slide.indexOf('<span>04 / 04</span>'));
+  assert.deepEqual([...doors.matchAll(/<a href="([^"]+)"/g)].map(m => m[1]), [`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, './spec.html']);
+  assert.ok(doors.includes('uv run after.py &quot;How do I export all my projects?&quot;') || doors.includes('uv run after.py "How do I export all my projects?"'));
+  assert.ok(doors.includes('No API key is needed to see what would be sent.'));
+});

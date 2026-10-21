@@ -28,22 +28,19 @@ async function component(page, { hash = '' } = {}) {
   return { view, document, byId, location, timers, window };
 }
 
-test('the home page is three slides, each a full-height section with one heading, then the schema section, and nothing else of the old page', async () => {
+test('the home page is four slides, each a full-height section with one heading, and nothing else of the old page', async () => {
   const html = await read('index.html');
   const slides = [...html.matchAll(/<section id="([a-z]+)" data-slide="(\d)" style="([^"]*)"/g)];
-  assert.deepEqual(slides.map(m => [m[1], m[2]]), [['top', '1'], ['code', '2'], ['sent', '3']]);
+  assert.deepEqual(slides.map(m => [m[1], m[2]]), [['top', '1'], ['code', '2'], ['sent', '3'], ['measured', '4']]);
   for (const m of slides) assert.ok(m[3].includes('min-height: calc(100vh - 68px)') && m[3].includes('scroll-snap-align: start'), `${m[1]} fills the viewport and snaps`);
   assert.ok(html.includes('scroll-snap-type: y proximity'), 'the page snaps between slides');
   assert.match(html, /<h1[^>]*>Decide what your model sees\. Keep a record of why\.<\/h1>/);
-  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>'));
-  for (const gone of ['<section id="shapes"', '<section id="assembly"', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
+  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>') && html.includes('>Long conversations push facts out of the window. Protected state keeps them.</h2>'));
+  for (const gone of ['<section id="shapes"', '<section id="assembly"', '<section id="planes"', 'const SLOTS', 'const PLANES', 'The words this site uses:', '{{ layers }}', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
     assert.ok(!html.includes(gone), `${gone} has left the home page`);
   }
-  assert.deepEqual([...html.matchAll(/>0(\d) \/ 03</g)].map(m => m[1]), ['1', '2', '3'], 'each slide counts itself');
-  const schema = html.slice(html.indexOf('<section id="planes"'));
-  assert.ok(html.indexOf('<section id="planes"') > html.indexOf('<section id="sent"'), 'the schema section follows the third slide');
-  assert.ok(schema.includes('<sc-for list="{{ prereq }}" as="p"') && schema.includes('The words this site uses:') && html.split('The words this site uses:').length === 2, 'the prerequisite strip sits at the top of the schema section');
-  assert.ok(schema.includes('<button onClick="{{ setPlanesMode }}" aria-pressed="{{ planesPressed }}"') && schema.includes('<sc-for list="{{ layers }}" as="layer"'), 'the planes and slots explorer');
+  assert.deepEqual([...html.matchAll(/>0(\d) \/ 04</g)].map(m => m[1]), ['1', '2', '3', '4'], 'each slide counts itself');
+  assert.equal(html.indexOf('<section', html.indexOf('<section id="measured"') + 1), -1, 'the measured slide is the last section');
   assert.ok(!html.includes('<section id="harness"') && !html.includes('frameworks()') && !html.includes('.g6'), 'harness engineering has moved to the Assembler page');
   const { view, location } = await component('index.html', { hash: '#harness' });
   view.applyHash();
@@ -74,8 +71,8 @@ test('the first slide offers the example and the spec, the second shows the exam
   const second = html.slice(html.indexOf('<section id="code"'), html.indexOf('<section id="sent"'));
   assert.ok(['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_COMMIT'].every(b => second.includes(`<!-- ${b}_START -->`)), 'the before and after code, and the commit it is from');
   assert.ok(!html.includes('#assemble/clinical-triage/blob'), 'the failure shapes have left the home page');
-  const third = html.slice(html.indexOf('<section id="sent"'), html.indexOf('<section id="planes"'));
-  assert.ok(['EXAMPLE_PAYLOAD', 'EXAMPLE_TRACE', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#planes"'), 'the request, the trace and the refusal, then the schema section');
+  const third = html.slice(html.indexOf('<section id="sent"'), html.indexOf('<section id="measured"'));
+  assert.ok(['EXAMPLE_PAYLOAD', 'EXAMPLE_TRACE', 'EXAMPLE_REFUSAL'].every(b => third.includes(`<!-- ${b}_START -->`)) && third.includes('href="#measured"'), 'the request, the trace and the refusal, then the measured slide');
 });
 
 test('there is no tour and no Demo page; old demo anchors on the home page open the page that holds them, and a section anchor scrolls once rendered', async () => {
@@ -86,16 +83,18 @@ test('there is no tour and no Demo page; old demo anchors on the home page open 
     for (const off of ['start.html', 'producers.html', 'about.html']) assert.ok(!html.includes(off), `${page} links only pages the nav lists, not ${off}`);
   }
   for (const off of ['demo.html', 'start.html', 'producers.html', 'about.html']) assert.equal(await fs.stat(new URL('../' + off, import.meta.url)).catch(() => null), null, `${off} is not published`);
-  for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5']]) {
+  for (const [hash, target] of [['#assemble', './assembler.html#assemble'], ['#assemble/clinical-triage/blob', './assembler.html#assemble/clinical-triage/blob'], ['#problem', './assembler.html#assemble'], ['#spec/profiles', './spec.html#s5'], ['#planes', './spec.html#s2'], ['#shapes', './assembler.html#assemble']]) {
     const { view, location } = await component('index.html', { hash });
     view.applyHash();
     assert.deepEqual(location.replaced, [target], hash);
   }
-  const { view, location, byId, timers, window } = await component('index.html', { hash: '#planes' });
-  byId.planes = { getBoundingClientRect: () => ({ top: 3000 }) };
-  view.applyHash();
-  for (const fn of timers.splice(0)) fn();
-  assert.deepEqual([location.replaced, window.scrolls], [[], [3000 - 68, 3000 - 68]], 'a section anchor stays on the page and is scrolled to once it has rendered');
+  for (const hash of ['#sent', '#assembly']) {
+    const { view, location, byId, timers, window } = await component('index.html', { hash });
+    byId.sent = { getBoundingClientRect: () => ({ top: 3000 }) };
+    view.applyHash();
+    for (const fn of timers.splice(0)) fn();
+    assert.deepEqual([location.replaced, window.scrolls], [[], [3000 - 68, 3000 - 68]], `${hash}: a section anchor stays on the page and is scrolled to once it has rendered`);
+  }
 });
 
 test('the Assembler page opens a system from a failure link and scrolls to it, and the nav, glossary and llms.txt follow the moves', async () => {
