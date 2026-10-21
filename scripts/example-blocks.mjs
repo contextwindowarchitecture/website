@@ -58,6 +58,8 @@ export function panel({ label, meta, text, prose = false }) {
 // snapshot; the slide links it.
 export const BEFORE = { file: '01-docs-qa/before.py', prefixes: ['def build_request('] };
 export const AFTER = { file: '01-docs-qa/after.py', prefixes: ['def build_request('] };
+// The Assembler page's harness section shows the handoff: assemble, stop on a refusal, pass the payload to the SDK.
+export const HANDOFF = { file: '01-docs-qa/after.py', prefixes: ['def answer('] };
 
 // Python's "{:g}": six significant digits, no trailing zeros.
 const g = n => String(Number(n.toPrecision(6)));
@@ -183,6 +185,14 @@ export function measuredBlocks({ source, rows }) {
     }).join('') + '</div>',
     MEASURED_SOURCE: `<a href="${writeUp}#${source.anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The write-up, with intervals →</a>` +
       `<a href="${writeUp}#${source.replay_anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Every number replays from the committed model cache, without a GPU →</a>`,
+  };
+}
+
+/** The Assembler page's blocks: after.py's answer(), and a link to providers.py, which makes the SDK call. */
+export function handoffBlocks({ lock, after }) {
+  return {
+    EXAMPLE_HANDOFF: panel({ label: 'after.py', meta: 'answer()', text: excerpt(after, HANDOFF.prefixes) }),
+    EXAMPLE_PROVIDERS: `<a href="https://github.com/${lock.repository}/blob/${lock.commit}/01-docs-qa/providers.py" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The SDK call, with the official Anthropic and OpenAI SDKs: providers.py →</a>`,
   };
 }
 

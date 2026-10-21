@@ -75,7 +75,7 @@ for (const [page, least] of [['index.html', 3], ['assembler.html', 5], ['evidenc
     assert.ok(style.includes('#unitrow > div { position: static !important; }'), 'stacked columns stop sticking');
   }
   const markup = html.slice(html.indexOf('</style>'), html.indexOf('<script type="text/x-dc"'));
-  const hooks = ['id="hero"', 'id="layout"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="g6"', 'class="g6p"', 'class="lyr"', 'class="lyrd"', 'class="pln"', 'class="rm"'];
+  const hooks = ['id="hero"', 'id="layout"', 'class="im"', 'class="g2"', 'class="g2c"', 'class="g3"', 'class="g4"', 'class="lyr"', 'class="lyrd"', 'class="pln"', 'class="rm"'];
   for (const hook of hooks) {
     const selector = hook.replace(/^id="/, '#').replace(/^class="/, '.').replace(/"$/, '');
     if (markup.includes(hook)) assert.ok(style.includes(selector + ' ') || style.includes(selector + ','), `${hook} has a responsive rule`);

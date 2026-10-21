@@ -29,19 +29,25 @@ async function component(page, { hash = '' } = {}) {
   return { view, document, byId, location, timers, window };
 }
 
-test('harness engineering sits on the Assembler page below the simulator, with its framework picker', async () => {
+test('harness engineering sits on the Assembler page below the simulator, as the example app\'s handoff to the SDK', async () => {
   const html = await read('assembler.html');
   const at = id => html.indexOf(`<section id="${id}"`);
   assert.ok(at('assemble') > 0 && at('harness') > at('assemble') && html.lastIndexOf('</section>', at('harness')) > at('assemble'), 'harness engineering follows the simulator');
   assert.ok(at('harness') < html.indexOf('>Tell us what it must do.</h2>'), 'and comes before the closing band');
   const harness = html.slice(at('harness'), html.indexOf('</section>', at('harness')));
-  assert.ok(harness.includes('>Already using a framework? The assembler goes inside it.</h2>') && harness.includes('<button onClick="{{ t.on }}" aria-pressed="{{ t.pressed }}"') && harness.includes('{{ fwVerdict }}'), 'the framework picker');
-  assert.ok(html.includes('.g6, .g6p { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }') && html.includes('.g6p { display: none !important; }'), 'the runtime loop folds on narrow screens');
-  const { view } = await component('assembler.html');
-  assert.deepEqual([...view.renderVals().fwTabs].map(t => t.pressed), ['true', 'false', 'false', 'false', 'false']);
-  assert.equal(view.renderVals().slotChips.length, 11);
-  view.renderVals().fwTabs[2].on();
-  assert.equal(view.renderVals().fwName, 'the Claude Agent SDK');
+  assert.ok(harness.includes('>The assembler sits just before your model call.</h2>') && harness.includes('<!-- EXAMPLE_HANDOFF_START -->') && harness.includes('<!-- EXAMPLE_PROVIDERS_START -->'), 'the handoff, from the example');
+  assert.equal((harness.match(/>Skip it if</g) || []).length, 3, 'and when not to bother');
+  // The framework picker showed one untested seam per framework; it returns only as tested integrations land.
+  assert.ok(!html.includes('fwTabs') && !html.includes('frameworks()') && !html.includes('.g6') && !html.includes('Should you use CWA with'), 'no framework picker');
+  const { DIR } = await import('../scripts/vendor-examples.mjs');
+  const blocks = await import('../scripts/example-blocks.mjs');
+  const after = await fs.readFile(new URL(`../${DIR}/${blocks.HANDOFF.file}`, import.meta.url), 'utf8');
+  const shown = harness.match(/<!-- EXAMPLE_HANDOFF_START -->[\s\S]*?<pre[^>]*>([\s\S]*?)<\/pre>/)[1];
+  const lines = [...shown.matchAll(/<span style="display: block;[^"]*">([\s\S]*?)<\/span>/g)].map(m => m[1].replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&'));
+  assert.equal(lines.join('\n'), blocks.excerpt(after, blocks.HANDOFF.prefixes));
+  assert.ok(lines.some(l => l.includes('if result.payload is None:')) && lines.some(l => l.includes('payload = json.loads(result.payload)')) && lines.some(l => l.includes('providers.ask(')), 'assemble, stop on a refusal, hand over');
+  const lock = JSON.parse(await read('examples.lock.json'));
+  assert.ok(harness.includes(`href="https://github.com/${lock.repository}/blob/${lock.commit}/01-docs-qa/providers.py"`), 'providers.py at the locked commit');
 });
 
 test('there is no tour and no Demo page; old demo anchors on the home page open the page that holds them, and a section anchor scrolls once rendered', async () => {
@@ -99,6 +105,6 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
   assert.match(llms, /^- \[Agent frameworks\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html#harness\)/m);
   assert.ok(!llms.includes('demo.html'), 'llms.txt no longer lists the Demo page');
   assert.match(llms, /^- \[Landing page\]\(https:\/\/contextwindowarchitecture\.io\/index\.html\): four slides/m);
-  assert.match(llms, /^- \[Assembler page\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html\): .*live assembly simulator.*agent framework/m);
+  assert.match(llms, /^- \[Assembler page\]\(https:\/\/contextwindowarchitecture\.io\/assembler\.html\): .*live assembly simulator.*model-calling loop/m);
   assert.doesNotMatch(llms.match(/^- \[Landing page\].*$/m)[0], /framework/, 'the landing page entry no longer promises the frameworks section');
 });

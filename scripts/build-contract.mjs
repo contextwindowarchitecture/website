@@ -6,7 +6,7 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { caseDigestsNow, implementations, maturitySentence, ranAt, tally } from './conformance-reports.mjs';
-import { exampleBlocks, exampleFiles, measuredBlocks, writeBlocks } from './example-blocks.mjs';
+import { exampleBlocks, exampleFiles, handoffBlocks, measuredBlocks, writeBlocks } from './example-blocks.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -128,7 +128,9 @@ const conformance = runs.map(({ label, source, report, outcomes }) => ({
   passed: [...outcomes.values()].filter(o => o === 'passed').length, stale: [...outcomes.values()].filter(o => o === 'stale').length,
 }));
 // The Assembler page's implementations table; its requirement rows went with the matrix.
-outputs.set('assembler.html', (await fs.readFile('assembler.html', 'utf8')).replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, () => `const CONFORMANCE = ${JSON.stringify(conformance)};`));
+// It also shows the example's handoff to the SDK, from the vendored after.py.
+outputs.set('assembler.html', writeBlocks((await fs.readFile('assembler.html', 'utf8')).replace(/const CONFORMANCE = [\[{][\s\S]*?[\]}];/, () => `const CONFORMANCE = ${JSON.stringify(conformance)};`),
+  handoffBlocks(await exampleFiles()), 'assembler.html'));
 for (const page of ['spec.html']) {
   const html = await fs.readFile(page, 'utf8');
   let updated = html.replace(/const RULES = \[[\s\S]*?\n\];/, `const RULES = ${JSON.stringify(rules, null, 2)};`);
