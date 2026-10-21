@@ -93,6 +93,7 @@ test('the Assembler page opens a system from a failure link and scrolls to it, a
     assert.ok(nav.includes('<a href="https://examples.contextwindowarchitecture.io"'), `${page}: Examples opens the examples site`);
     assert.ok(nav.includes('<a href="https://benchmark.contextwindowarchitecture.io"'), `${page}: Viability opens the benchmark site`);
     assert.ok((await read(page)).match(/<footer[\s\S]*?<\/footer>/)?.[0].includes('<a href="./llms.txt">llms.txt</a>'), `${page} has the footer`);
+    assert.ok((await read(page)).match(/<footer[\s\S]*?<\/footer>/)[0].includes('<span>Context Window Architecture is a specification. Four assemblers implement it.</span>'), `${page}: the footer names the spec and the assemblers that implement it`);
     const head = header(await read(page));
     assert.ok(head.includes('<img id="logo-light" src="./site/logo-light.png" alt="Context Window Architecture" width="108" height="40"') && head.includes('<img id="logo-dark" src="./site/logo-dark.png" alt="Context Window Architecture" width="108" height="40"'), `${page}: the header shows the organisation's logo, one file per theme`);
     assert.ok(!head.includes('var(--p-gov)') && !head.includes('>CWA</span>'), `${page}: the plane-grid mark and wordmark are gone from the header`);

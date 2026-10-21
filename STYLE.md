@@ -339,7 +339,7 @@ A row of text links. The active tab is `color: var(--fg); white-space: nowrap; b
 
 ### Footer
 
-`border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a context assembler specification, not a library." Right: Spec, GitHub, llms.txt, Apache-2.0 with `gap: 20px`. Every page carries it.
+`border-top: 1px solid var(--line)`, then a container with `padding: 40px 32px; display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; font-family: var(--mono); font-size: 12px; color: var(--muted);`. Left: the one-line tagline "Context Window Architecture is a specification. Four assemblers implement it." Right: Spec, GitHub, llms.txt, Apache-2.0 with `gap: 20px`. Every page carries it.
 
 ### Glossary panel
 
