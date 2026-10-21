@@ -33,16 +33,24 @@ export function excerpt(source, prefixes) {
     : text + (block.length === 1 && blocks[i - 1].length === 1 ? '\n' : '\n\n') + block.join('\n'), '');
 }
 
+// Code wraps instead of scrolling sideways: each line is a block of its own, and a long one hangs its continuation
+// four columns in from where its code starts. A blank line keeps its height.
+const codeLines = text => text.split('\n').map(line => {
+  if (line.trim() === '') return '<span style="display: block; height: 1.6em;"></span>';
+  const hang = line.match(/^ */)[0].length + 4;
+  return `<span style="display: block; padding-left: ${hang}ch; text-indent: -${hang}ch;">${escapeHtml(line)}</span>`;
+}).join('');
+
 /**
- * A bordered panel with a header row and a keyboard-scrollable <pre> (STYLE.md, Panels and Code). Code and the trace
- * keep their columns and scroll sideways; wrap is for prose, such as the request's message text.
+ * A bordered panel with a header row and a <pre> that never scrolls sideways (STYLE.md, Panels and Code). Code wraps
+ * under a hanging indent; prose, such as the request's message text, wraps as text does.
  */
-export function panel({ label, meta, aria, text, wrap = false }) {
+export function panel({ label, meta, text, prose = false }) {
   if (text.includes('{{')) throw new Error(`${label}: "{{" would read as a template binding.`);
   return '<div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;">' +
     '<div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;">' +
     `<span>${escapeHtml(label)}</span><span>${escapeHtml(meta)}</span></div>` +
-    `<pre tabindex="0" aria-label="${escapeHtml(aria)}" style="padding: 18px; overflow: auto; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6;${wrap ? ' white-space: pre-wrap; overflow-wrap: anywhere;' : ''}">${escapeHtml(text.trimEnd())}</pre></div>`;
+    `<pre style="padding: 18px; margin: 0; font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${prose ? escapeHtml(text.trimEnd()) : codeLines(text.trimEnd())}</pre></div>`;
 }
 
 // What each code panel shows: the statements build_request() and its CWA counterpart are made of.
@@ -90,15 +98,15 @@ export async function exampleFiles(root = '.') {
 export function exampleBlocks({ lock, before, context, answered, refused }) {
   const tree = `https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa`;
   return {
-    EXAMPLE_BEFORE: panel({ label: 'before.py', meta: 'build_request()', aria: 'before.py: how the bot builds a request without CWA', text: excerpt(before, BEFORE.prefixes) }),
-    EXAMPLE_AFTER: panel({ label: 'context.py', meta: 'snapshot() · assemble()', aria: 'context.py: how the same bot builds a request with CWA', text: excerpt(context, AFTER.prefixes) }),
+    EXAMPLE_BEFORE: panel({ label: 'before.py', meta: 'build_request()', text: excerpt(before, BEFORE.prefixes) }),
+    EXAMPLE_AFTER: panel({ label: 'context.py', meta: 'snapshot() · assemble()', text: excerpt(context, AFTER.prefixes) }),
     EXAMPLE_COMMIT: `<a href="${tree}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The whole app, at ${lock.commit.slice(0, 7)} →</a>`,
-    EXAMPLE_PAYLOAD: panel({ label: 'request · cwa-messages/v1', meta: answered.payload.tools.length ? `${answered.payload.tools.length} tools` : 'no tools on this route', aria: 'The request the model receives',
-      text: request(answered.payload), wrap: true }),
-    EXAMPLE_TRACE: panel({ label: 'trace', meta: 'as after.py prints it', aria: 'The trace: what was sent and what was left out', text: report(answered.snapshot, answered.trace) }),
+    EXAMPLE_PAYLOAD: panel({ label: 'request · cwa-messages/v1', meta: answered.payload.tools.length ? `${answered.payload.tools.length} tools` : 'no tools on this route',
+      text: request(answered.payload), prose: true }),
+    EXAMPLE_TRACE: panel({ label: 'trace', meta: 'as after.py prints it', text: report(answered.snapshot, answered.trace) }),
     EXAMPLE_RUN: door(`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, 'Running it', 'Run it yourself →',
       'Clone the examples, then in 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key is needed to see what would be sent.'),
-    EXAMPLE_REFUSAL: `<pre tabindex="0" aria-label="The refusal" style="padding: 14px 18px; overflow: auto; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${escapeHtml(report(refused.snapshot, refused.trace).split('\n')[0])}</pre>`,
+    EXAMPLE_REFUSAL: `<pre style="padding: 14px 18px; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${escapeHtml(report(refused.snapshot, refused.trace).split('\n')[0])}</pre>`,
   };
 }
 

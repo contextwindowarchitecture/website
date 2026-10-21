@@ -27,12 +27,16 @@ test('a term\'s first use is a term link that opens the glossary at it, once per
 const blocks = await import('../scripts/example-blocks.mjs');
 const { DIR, LOCK } = await import('../scripts/vendor-examples.mjs');
 const vendored = name => read(`${DIR}/${name}`);
-/** A generated block's text as a reader sees it: its <pre> with the markup stripped and the entities decoded. */
+const decode = text => text.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+/** A <pre>'s text as a reader sees it: code is one block per line, prose is plain text. */
+const preText = pre => /^<span style="display: block;/.test(pre)
+  ? [...pre.matchAll(/<span style="display: block;[^"]*">([\s\S]*?)<\/span>/g)].map(m => decode(m[1])).join('\n') : decode(pre);
+/** A generated block's text as a reader sees it. */
 const shown = (html, name) => {
   const block = html.match(new RegExp(`<!-- ${name}_START -->([\\s\\S]*?)<!-- ${name}_END -->`))?.[1];
   assert.ok(block, `index.html has the ${name} block`);
-  const pre = block.match(/<pre[^>]*>([\s\S]*?)<\/pre>/)?.[1] ?? block;
-  return pre.replace(/<[^>]+>/g, '').replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+  const pre = block.match(/<pre[^>]*>([\s\S]*?)<\/pre>/)?.[1];
+  return pre === undefined ? decode(block) : preText(pre);
 };
 
 test('an excerpt is the named top-level statements in source order, each whole, and a missing one is an error', () => {
@@ -41,7 +45,7 @@ test('an excerpt is the named top-level statements in source order, each whole, 
   assert.equal(blocks.excerpt(source, ['B =', 'import']), 'import x\n\nB = (\n    2,\n)', 'a closing bracket at the margin belongs to its statement');
   assert.equal(blocks.excerpt(source, ['import', 'A =']), 'import x\nA = 1', 'single lines stay together');
   assert.throws(() => blocks.excerpt(source, ['def h(']), /No top-level statement starts with "def h\("/);
-  assert.throws(() => blocks.panel({ label: 'x', meta: '', aria: 'x', text: 'a {{ b }}' }), /template binding/);
+  assert.throws(() => blocks.panel({ label: 'x', meta: '', text: 'a {{ b }}' }), /template binding/);
 });
 
 test('the code slide shows build_request() from before.py and its CWA counterpart from context.py, as vendored', async () => {
@@ -55,7 +59,7 @@ test('the code slide shows build_request() from before.py and its CWA counterpar
   const code = html.slice(html.indexOf('<section id="code"'), html.indexOf('</section>', html.indexOf('<section id="code"')));
   assert.ok(code.includes(`<a href="https://github.com/contextwindowarchitecture/examples/tree/${lock.commit}/01-docs-qa" target="_blank" rel="noopener"`) && code.includes(`at ${lock.commit.slice(0, 7)} →</a>`), 'the whole app, at the locked commit');
   assert.ok(code.includes('>Paste the top five articles into the system prompt, keep the last six messages, send.</p>'));
-  assert.equal([...code.matchAll(/<pre tabindex="0" aria-label="[^"]+"/g)].length, 2, 'both panels scroll from the keyboard and are named');
+  assert.equal([...code.matchAll(/<pre /g)].length, 2, 'two panels');
 });
 
 test('the first slide says what CWA is in plain words, brings in the assembler, and shows the real Python call', async () => {
@@ -64,7 +68,7 @@ test('the first slide says what CWA is in plain words, brings in the assembler, 
   assert.ok(top.includes('>Decide what your model sees. Keep a record of why.</h1>'));
   assert.ok(top.includes('You call one right before your model call.') && top.includes('It never calls the model.'), 'what it is, and that it is no proxy');
   assert.deepEqual([...top.matchAll(/<a class="term" href="#glossary\/([a-z-]+)"/g)].map(m => m[1]), ['assembler']);
-  const figure = top.match(/<pre tabindex="0" aria-label="[^"]+"[^>]*>([\s\S]*?)<\/pre>/)[1];
+  const figure = preText(top.match(/<pre[^>]*>([\s\S]*?)<\/pre>/)[1]);
   const source = (await vendored('01-docs-qa/context.py')) + (await vendored('01-docs-qa/after.py'));
   for (const name of ['from cwa import', 'Snapshot', 'assemble', 'from_json', 'result.payload', 'result.trace']) {
     assert.ok(figure.includes(name) && source.includes(name), `${name} is in the figure and in the example's own code`);
@@ -122,11 +126,19 @@ test('the third slide\'s captions agree with the scenario, and the refusal is th
   assert.equal(shown(html, 'EXAMPLE_REFUSAL'), 'refused: evidence_required, recovery request_context. No request is sent.');
 });
 
-test('the request and the refusal wrap their prose; the code and trace panels keep their columns', async () => {
+test('nothing on the home page scrolls sideways: code wraps under a hanging indent, prose wraps as text does', async () => {
   const html = await read('index.html');
-  const pre = name => html.match(new RegExp(`<!-- ${name}_START -->[\\s\\S]*?<pre [^>]*style="([^"]*)"`))[1];
-  for (const name of ['EXAMPLE_PAYLOAD', 'EXAMPLE_REFUSAL']) assert.ok(pre(name).includes('white-space: pre-wrap; overflow-wrap: anywhere;'), `${name} wraps`);
-  for (const name of ['EXAMPLE_BEFORE', 'EXAMPLE_AFTER', 'EXAMPLE_TRACE']) assert.ok(!pre(name).includes('pre-wrap'), `${name} keeps its columns`);
+  const pres = [...html.matchAll(/<pre style="([^"]*)">([\s\S]*?)<\/pre>/g)];
+  assert.equal(pres.length, (html.match(/<pre[ >]/g) || []).length, 'every <pre> is one of these');
+  for (const [, style, body] of pres) {
+    assert.ok(style.includes('white-space: pre-wrap; overflow-wrap: anywhere;') && !style.includes('overflow: auto'), `wraps: ${body.slice(0, 60)}`);
+    for (const [, line, hang, indent, text] of body.matchAll(/(<span style="display: block; padding-left: (\d+)ch; text-indent: -(\d+)ch;">([^<]*)<\/span>)/g)) {
+      assert.equal(hang, indent);
+      assert.equal(Number(hang), decode(text).match(/^ */)[0].length + 4, `the continuation hangs four columns in: ${line.slice(0, 80)}`);
+    }
+  }
+  assert.ok(!html.includes('tabindex="0"'), 'no panel needs a keyboard to scroll it');
+  assert.ok(blocks.panel({ label: 'x', meta: '', text: '  a\n\nb' }).includes('<span style="display: block; padding-left: 6ch; text-indent: -6ch;">  a</span><span style="display: block; height: 1.6em;"></span><span style="display: block; padding-left: 4ch; text-indent: -4ch;">b</span>'));
 });
 
 test('a measured share is its fraction to two places, and a row of several arms shows their range', () => {
