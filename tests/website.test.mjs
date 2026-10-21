@@ -445,3 +445,23 @@ test('the Assembler simulator shows three systems, says its sizes are typical, a
   assert.ok(lede.split(/\s+/).length <= 30, lede);
   assert.ok(!html.includes('fmOpen') && !html.includes('openFailure'), 'the failure-card handlers left with the old home page');
 });
+
+// A reader asked how slots reach the model: brackets? training? (FEEDBACK.md, Spec). Placement shows the answer for
+// the profile it prints, from the specification's own example request.
+test('Placement shows the request its profile renders, from the specification\'s example', async () => {
+  const html = await fs.readFile(new URL('../evidence.html', import.meta.url), 'utf8');
+  const read = async name => JSON.parse(await fs.readFile(new URL('../' + name, import.meta.url), 'utf8'));
+  const blocks = await import('../scripts/example-blocks.mjs');
+  const [profile] = await read('examples/profiles.json');
+  const snapshot = await read('examples/messages-snapshot.json'), payload = await read('examples/messages-payload.json');
+  const block = html.match(/<!-- PROFILE_REQUEST_START -->([\s\S]*?)<!-- PROFILE_REQUEST_END -->/)[1];
+  assert.equal(block, blocks.profileRequestBlock({ profile, snapshot, payload }).PROFILE_REQUEST);
+  const text = block.match(/<pre[^>]*>([\s\S]*?)<\/pre>/)[1].replaceAll('&lt;', '<').replaceAll('&gt;', '>').replaceAll('&quot;', '"').replaceAll('&amp;', '&');
+  assert.ok(text.startsWith('── system ──\nYou are Ada') && text.includes('\n── tool ──\n') && /\n── user ──\n<user_profile id="user:profile">\n/.test(text) && text.endsWith('</query>'));
+  for (const { wrap } of profile.placement.filter(p => p.wrap.startsWith('xml:') && snapshot.batches.some(b => b.items.some(i => i.slot === p.slot)))) {
+    assert.ok(text.includes(`<${wrap.slice(4)} id="`), `${wrap} becomes a tag the model reads`);
+  }
+  assert.ok(html.includes('The model receives ordinary messages with tagged text, so no training is needed.'));
+  assert.ok(html.includes('<a href="./index.html#sent">The same step in a running app, on the home page →</a>'));
+  assert.throws(() => blocks.profileRequestBlock({ profile: { ...profile, version: 99 }, snapshot, payload }), /not the profile Placement shows/);
+});

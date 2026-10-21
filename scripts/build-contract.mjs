@@ -6,7 +6,7 @@ import addFormats from 'ajv-formats';
 import standalone from 'ajv/dist/standalone/index.js';
 import { build } from 'esbuild';
 import { caseDigestsNow, implementations, maturitySentence, ranAt, tally } from './conformance-reports.mjs';
-import { exampleBlocks, exampleFiles, handoffBlocks, measuredBlocks, writeBlocks } from './example-blocks.mjs';
+import { exampleBlocks, exampleFiles, handoffBlocks, measuredBlocks, profileRequestBlock, writeBlocks } from './example-blocks.mjs';
 
 const check = process.argv.includes('--check');
 const read = async path => JSON.parse(await fs.readFile(path, 'utf8'));
@@ -86,11 +86,13 @@ const evidence = await fs.readFile('evidence.html', 'utf8');
 const firstProfile = data.PROFILES[0];
 const profileJson = JSON.stringify(firstProfile, null, 2).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 if (!/<!-- CONTRACT_PROFILE_START -->/.test(evidence)) throw new Error('evidence.html has no profile block to write.');
-outputs.set('evidence.html', evidence.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
+outputs.set('evidence.html', writeBlocks(evidence.replace(/<!-- CONTRACT_PROFILE_START -->[\s\S]*?<!-- CONTRACT_PROFILE_END -->/,
   () => '<!-- CONTRACT_PROFILE_START -->\n' +
     `          <div style="display: flex; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>profile.yaml</span><span>${firstProfile.id}/v${firstProfile.version}</span></div>\n` +
     `          <div style="padding: 18px; white-space: pre; overflow: auto;">${profileJson}</div>\n` +
-    '          <!-- CONTRACT_PROFILE_END -->'));
+    '          <!-- CONTRACT_PROFILE_END -->'),
+  // And the request that profile renders: the specification's example, examples/messages-payload.json.
+  profileRequestBlock({ profile: firstProfile, snapshot: await read('examples/messages-snapshot.json'), payload: await read('examples/messages-payload.json') }), 'evidence.html'));
 
 // The requirement text is authored once and embedded for static hosting.
 const requirements = (await read('contract/requirements.json')).sort((a, b) => Number(a.id.slice(2)) - Number(b.id.slice(2)));

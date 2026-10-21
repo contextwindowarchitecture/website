@@ -82,9 +82,21 @@ export function report(snapshot, trace) {
   return lines.join('\n');
 }
 
-/** A cwa-messages/v1 payload as after.py hands it to the SDK, printed the way cli.show_request() prints a dry run. */
+/**
+ * A cwa-messages/v1 payload as after.py hands it to the SDK, printed the way cli.show_request() prints a dry run: the
+ * system entries, the tools if there are any, then the messages.
+ */
 export function request(payload) {
-  return [...payload.system.map(entry => `── system ──\n${entry.text}`), ...payload.messages.map(m => `── ${m.role} ──\n${m.content}`)].join('\n\n');
+  return [...payload.system.map(entry => `── system ──\n${entry.text}`), ...(payload.tools ?? []).map(tool => `── tool ──\n${tool.text}`),
+    ...payload.messages.map(m => `── ${m.role} ──\n${m.content}`)].join('\n\n');
+}
+
+/** Placement's request panel: the specification's example request, which the profile the page shows rendered. */
+export function profileRequestBlock({ profile, snapshot, payload }) {
+  if (snapshot.profile.id !== profile.id || snapshot.profile.version !== profile.version) {
+    throw new Error(`examples/messages-snapshot.json uses ${snapshot.profile.id}/v${snapshot.profile.version}, not the profile Placement shows (${profile.id}/v${profile.version}).`);
+  }
+  return { PROFILE_REQUEST: panel({ label: `request · ${snapshot.renderer}`, meta: `${profile.id}/v${profile.version}`, text: request(payload), prose: true }) };
 }
 
 const PLANE_COLOUR = { governance: 'var(--p-gov)', state: 'var(--p-state)', evidence: 'var(--p-evid)', interaction: 'var(--p-inter)' };

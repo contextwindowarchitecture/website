@@ -240,6 +240,49 @@
           <!-- CONTRACT_PROFILE_END -->
         </div>
         <p style="margin: 20px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--muted); max-width: 70ch; text-wrap: pretty;"><span style="color: var(--fg); font-weight: 600;">Version note.</span> These profiles are drafts for the revised contract. All are explicitly unevaluated; promotion requires a model version, suite, date, results, and reproducible artifact. Earlier evaluation summaries are withdrawn because supporting runs are unavailable.</p>
+        <p style="margin: 32px 0 18px; font-size: 16px; line-height: 1.6; max-width: 70ch; text-wrap: pretty;">Each placement row says where a slot's items go. <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">system</span> makes a system message, <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">tools</span> fills the request's tool list, and each <span style="font-family: var(--mono); font-size: 13px; color: var(--fg);">xml:</span> wrapper becomes a tag around the item inside one user message, in the profile's order. The model receives ordinary messages with tagged text, so no training is needed. This is the specification's example request, rendered with the profile above:</p>
+        <!-- PROFILE_REQUEST_START --><div style="border: 1px solid var(--line); background: var(--bg); min-width: 0;"><div style="display: flex; justify-content: space-between; gap: 12px; padding: 12px 18px; border-bottom: 1px solid var(--line); font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;"><span>request · cwa-messages/v1</span><span>policy-first-chat/v1</span></div><pre style="padding: 14px 16px; margin: 0; font-family: var(--mono); font-size: 12px; line-height: 1.55; white-space: pre-wrap; overflow-wrap: anywhere;">── system ──
+You are Ada, a support agent for Northwind.
+Never quote prices you cannot verify with a tool.
+
+── tool ──
+{&quot;name&quot;: &quot;issue_refund&quot;, &quot;parameters&quot;: {&quot;order_id&quot;: &quot;string&quot;, &quot;amount&quot;: &quot;number&quot;}}
+
+── tool ──
+{&quot;name&quot;: &quot;lookup_order&quot;, &quot;parameters&quot;: {&quot;order_id&quot;: &quot;string&quot;}}
+
+── user ──
+&lt;user_profile id=&quot;user:profile&quot;&gt;
+plan=pro; region=EU; tone=concise
+&lt;/user_profile&gt;
+&lt;evidence id=&quot;billing-faq:v3#p1&quot;&gt;
+Refunds return to the original payment method.
+&lt;/evidence&gt;
+&lt;evidence id=&quot;refunds-eu:v17#p4&quot;&gt;
+Pro plans refund in full within 30 days of purchase.
+&lt;/evidence&gt;
+&lt;task id=&quot;task:refund_request&quot;&gt;
+refund_request: verify_eligibility=done, issue=pending
+&lt;/task&gt;
+&lt;memory id=&quot;mem:plan-purchase&quot;&gt;
+User bought Pro in March, EU billing.
+&lt;/memory&gt;
+&lt;history id=&quot;turn:16&quot; speaker=&quot;user&quot;&gt;
+Is my order refundable?
+&lt;/history&gt;
+&lt;history id=&quot;turn:17&quot; speaker=&quot;assistant&quot;&gt;
+Let me check order 8821.
+&lt;/history&gt;
+&lt;observation id=&quot;obs:order-8821&quot;&gt;
+{&quot;order_id&quot;: &quot;8821&quot;, &quot;total&quot;: 240, &quot;days_since_purchase&quot;: 12}
+&lt;/observation&gt;
+&lt;format id=&quot;format:chat&quot;&gt;
+Max 3 sentences. No bullet lists.
+&lt;/format&gt;
+&lt;query id=&quot;turn:18&quot;&gt;
+Can you just process it now?
+&lt;/query&gt;</pre></div><!-- PROFILE_REQUEST_END -->
+        <p style="margin: 14px 0 0; font-size: 14.5px; line-height: 1.6;"><a href="./index.html#sent">The same step in a running app, on the home page →</a></p>
       </section>
 
       <section id="evaluate">
