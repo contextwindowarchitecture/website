@@ -181,16 +181,19 @@ test('the measured slide shows the benchmark\'s numbers with their caveat on the
   const html = await read('index.html');
   const measured = JSON.parse(await read('site/measured.json'));
   const slide = html.slice(html.indexOf('<section id="measured"'), html.indexOf('</section>', html.indexOf('<section id="measured"')));
-  const rows = [...slide.matchAll(/<div class="rm"[^>]*><span[^>]*>([^<]+)<\/span><span[^>]*>([^<]+)<\/span><\/div>/g)].map(m => [m[1], m[2]]);
+  const rows = [...slide.matchAll(/<div style="padding: 14px 0; border-top: 1px solid var\(--line\);"><div[^>]*>([^<]+)<\/div><div[^>]*>([^<]+)<\/div>/g)].map(m => [m[1], m[2]]);
   assert.deepEqual(rows, [['0.97–0.99', 'CWA, with state the app writes from what the user said'], ['0.86', 'A rolling summary of the conversation'], ['0.82', 'Truncation: keep the system prompt, drop the oldest turns']]);
   assert.deepEqual(rows, measured.rows.map(row => [blocks.share(row.arms), row.label]));
   assert.ok(measured.rows.every(row => row.arms.every(a => a.metric === 's2.aptitude' && a.denominator === 3888)), 'every share is the same probes\' aptitude');
   const { source, fact_in_payload: fact } = measured;
   assert.deepEqual([source.budget, source.turns, fact['truncate-pinned'], fact['cwa-state']], [8192, 100, 0.9, 1]);
   assert.ok(slide.includes('conversations of up to 100 turns on an 8,192-token budget'));
+  // Each share's bar is drawn on a 0-to-1 scale: the lowest arm solid, a range's upper part lighter.
+  const bars = [...slide.matchAll(/<div aria-hidden="true" style="display: flex; height: 6px;[^"]*"><div style="width: ([\d.]+)%;[^"]*"><\/div>(?:<div style="width: ([\d.]+)%;[^"]*opacity: 0.4;"><\/div>)?<\/div>/g)].map(m => [m[1], m[2] ?? null]);
+  assert.deepEqual(bars, [['97.0', '1.9'], ['86.2', null], ['82.3', null]]);
   assert.ok(slide.includes('Truncation sent the fact the answer needed for 90% of questions. CWA\'s protected state sent it every time.'));
   // The caveat: one model, named; what the gain comes from; and the case where it vanishes.
-  assert.ok(slide.includes(`One model (${source.model.replace(/^.*\//, '').replace(/-FP8$/, '')}), one budget.`));
+  assert.ok(slide.includes(`gave one model, ${source.model.replace(/^.*\//, '').replace(/-FP8$/, '')}, conversations`) && slide.includes('One model, one budget.'));
   assert.ok(slide.includes('The gain comes from the state your app keeps') && slide.includes('When the model writes that state itself, CWA is level with truncation.'));
   const writeUp = `https://github.com/${source.repository}/blob/${source.commit}/${source.path}`;
   assert.ok(slide.includes(`href="${writeUp}#scripted-conversations-s2"`) && slide.includes(`href="${writeUp}#reproducing-it"`), 'the write-up and how to replay it, at the pinned commit');
@@ -205,7 +208,7 @@ test('the last slide opens two doors: running the example at its locked commit, 
   const doors = slide.slice(slide.indexOf('<div class="g2c"'), slide.indexOf('<span>04 / 04</span>'));
   assert.deepEqual([...doors.matchAll(/<a href="([^"]+)"/g)].map(m => m[1]), [`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, './spec.html']);
   assert.ok(doors.includes('uv run after.py &quot;How do I export all my projects?&quot;') || doors.includes('uv run after.py "How do I export all my projects?"'));
-  assert.ok(doors.includes('No API key is needed to see what would be sent.'));
+  assert.ok(doors.includes('No API key needed.'));
 });
 
 test('the home page is four slides, each a full-height section with one heading, and nothing else of the old page', async () => {
@@ -215,7 +218,7 @@ test('the home page is four slides, each a full-height section with one heading,
   for (const m of slides) assert.ok(m[3].includes('min-height: calc(100vh - 68px)') && m[3].includes('scroll-snap-align: start'), `${m[1]} fills the viewport and snaps`);
   assert.ok(html.includes('scroll-snap-type: y proximity'), 'the page snaps between slides');
   assert.match(html, /<h1[^>]*>Decide what your model sees\. Keep a record of why\.<\/h1>/);
-  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>') && html.includes('>Long conversations push facts out of the window. Protected state keeps them.</h2>'));
+  assert.ok(html.includes('>The same help-center bot, before and after.</h2>') && html.includes('>What the model receives, and what was left out.</h2>') && html.includes('>Long chats lose facts. Protected state keeps them.</h2>'));
   for (const gone of ['<section id="shapes"', '<section id="assembly"', '<section id="planes"', 'const SLOTS', 'const PLANES', 'The words this site uses:', '{{ layers }}', '<section id="problem"', '<section id="why"', '<section id="assemble"', '<section id="deeper"', '<section id="scaffold"', 'const UCS', '>What it is</div>', ">Who it's for</div>"]) {
     assert.ok(!html.includes(gone), `${gone} has left the home page`);
   }

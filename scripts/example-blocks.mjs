@@ -149,13 +149,13 @@ export function exampleBlocks({ lock, before, after, answered, refused }) {
       text: request(answered.payload), prose: true }),
     EXAMPLE_WINDOW: requestWindow(answered),
     EXAMPLE_RUN: door(`https://github.com/${lock.repository}/tree/${lock.commit}/01-docs-qa#readme`, 'Running it', 'Run it yourself →',
-      'Clone the examples, then in 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key is needed to see what would be sent.'),
+      'In 01-docs-qa: <span style="font-family: var(--mono); font-size: 12.5px; color: var(--fg);">uv run after.py "How do I export all my projects?"</span>. No API key needed.'),
     EXAMPLE_REFUSAL: `<pre style="padding: 14px 18px; margin: 0; border: 1px solid var(--line); background: var(--bg); font-family: var(--mono); font-size: 12.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere;">${escapeHtml(report(refused.snapshot, refused.trace).split('\n')[0])}</pre>`,
   };
 }
 
 // The door to running the example, at the locked commit; a hairline-grid cell like the spec's door beside it.
-const door = (href, label, title, copy) => `<a href="${href}" target="_blank" rel="noopener" style="background: var(--bg); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">` +
+const door = (href, label, title, copy) => `<a href="${href}" target="_blank" rel="noopener" style="background: var(--bg); padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; color: var(--fg);" style-hover="background: var(--accent-soft);">` +
   `<span style="font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">${label}</span>` +
   `<span style="font-size: 17px; font-weight: 600; letter-spacing: -0.015em;">${title}</span>` +
   `<span style="font-size: 13.5px; line-height: 1.5; color: var(--muted); text-wrap: pretty;">${copy}</span></a>`;
@@ -170,11 +170,17 @@ export function share(arms) {
 export function measuredBlocks({ source, rows }) {
   const writeUp = `https://github.com/${source.repository}/blob/${source.commit}/${source.path}`;
   return {
-    MEASURED: '<div style="border-bottom: 1px solid var(--line);">' + rows.map((row, i) =>
-      // The number column is sized in the numbers' own em, so the widest, a range, stays on one line.
-      '<div class="rm" style="display: grid; grid-template-columns: 5.6em minmax(0, 1fr); gap: 4px 0.5em; align-items: baseline; padding: 16px 0; border-top: 1px solid var(--line); font-size: clamp(28px, 3.4vw, 42px);">' +
-      `<span style="font-family: var(--mono); font-weight: 600; letter-spacing: -0.02em; white-space: nowrap; color: ${i === 0 ? 'var(--accent)' : 'var(--fg)'};">${share(row.arms)}</span>` +
-      `<span style="font-size: 16px; line-height: 1.45; color: var(--fg);">${escapeHtml(row.label)}</span></div>`).join('') + '</div>',
+    // Each row: the share, what produced it, and a bar on a 0-to-1 scale (a range shows its upper part lighter).
+    MEASURED: '<div style="border-bottom: 1px solid var(--line);">' + rows.map((row, i) => {
+      const values = row.arms.map(a => a.numerator / a.denominator).sort((a, b) => a - b);
+      const low = (100 * values[0]).toFixed(1), high = (100 * (values[values.length - 1] - values[0])).toFixed(1);
+      const colour = i === 0 ? 'var(--accent)' : 'var(--muted)';
+      return '<div style="padding: 14px 0; border-top: 1px solid var(--line);">' +
+        `<div style="font-family: var(--mono); font-size: clamp(26px, 3vw, 36px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; color: ${i === 0 ? 'var(--accent)' : 'var(--fg)'};">${share(row.arms)}</div>` +
+        `<div style="margin-top: 4px; font-size: 15px; line-height: 1.4; color: var(--fg);">${escapeHtml(row.label)}</div>` +
+        `<div aria-hidden="true" style="display: flex; height: 6px; margin-top: 10px; background: var(--line);"><div style="width: ${low}%; background: ${colour};"></div>` +
+        (Number(high) > 0 ? `<div style="width: ${high}%; background: ${colour}; opacity: 0.4;"></div>` : '') + '</div></div>';
+    }).join('') + '</div>',
     MEASURED_SOURCE: `<a href="${writeUp}#${source.anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">The write-up, with intervals →</a>` +
       `<a href="${writeUp}#${source.replay_anchor}" target="_blank" rel="noopener" style="font-family: var(--mono); font-size: 13px; color: var(--accent);">Every number replays from the committed model cache, without a GPU →</a>`,
   };
