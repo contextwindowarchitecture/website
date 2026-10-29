@@ -1,0 +1,154 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 880" width="880" height="880" role="img" aria-labelledby="title desc">
+  <title id="title">How the CWA website's pieces connect</title>
+  <desc id="desc">Two upstream repositories are vendored into this repository with pinned locks. The vendored files and the files written here feed npm run build:contract, which writes the generated files. npm test checks the whole tree; a push runs CI, a tag makes a release, and GitHub Pages serves main as committed.</desc>
+  <!-- Colours are the site's STYLE.md tokens (sRGB hex), light then dark. -->
+  <style>
+    .bg { fill: #fbfaf7; }
+    .up { fill: #f1f0ec; stroke: #dad9d5; }
+    .vend { fill: #f1f0ec; stroke: #6c6863; stroke-dasharray: 5 4; }
+    .own { fill: #fbfaf7; stroke: #181611; }
+    .gen { fill: #ffe5d8; stroke: #cb3000; }
+    .gate { fill: #fbfaf7; stroke: #dad9d5; }
+    .pill { fill: #fbfaf7; stroke: #cb3000; }
+    .wire { fill: none; stroke: #6c6863; stroke-width: 1.25; }
+    .head { fill: #6c6863; }
+    text { font-family: 'Space Grotesk', Helvetica, Arial, sans-serif; fill: #181611; }
+    .k { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; letter-spacing: 1.2px; fill: #cb3000; }
+    .t { font-size: 15px; font-weight: 600; }
+    .m { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; }
+    .s { font-size: 13px; fill: #6c6863; }
+    .sf { font-size: 13px; }
+    .tag { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 10.5px; letter-spacing: 0.8px; fill: #6c6863; }
+    .pt { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 12px; fill: #cb3000; }
+    .lbl { font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: 11px; fill: #6c6863; }
+    @media (prefers-color-scheme: dark) {
+      .bg, .own, .gate, .pill { fill: #12100d; }
+      .up, .vend { fill: #1b1915; }
+      .up, .gate { stroke: #312f2b; }
+      .vend { stroke: #9b9891; }
+      .own { stroke: #f1f0ed; }
+      .gen { fill: #41261a; stroke: #ff8244; }
+      .pill { stroke: #ff8244; }
+      .wire { stroke: #9b9891; }
+      .head { fill: #9b9891; }
+      text { fill: #f1f0ed; }
+      .k, .pt { fill: #ff8244; }
+      .s, .tag, .lbl { fill: #9b9891; }
+    }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path class="head" d="M0,0 L10,5 L0,10 z"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" width="880" height="880"/>
+
+  <!-- Legend: border style says whether a file may be edited here -->
+  <text class="k" x="24" y="34">HOW THE PIECES CONNECT</text>
+  <rect class="vend" x="452" y="24" width="22" height="13"/>
+  <text class="s" x="482" y="35">vendored</text>
+  <rect class="own" x="562" y="24" width="22" height="13"/>
+  <text class="s" x="592" y="35">written here</text>
+  <rect class="gen" x="702" y="24" width="22" height="13"/>
+  <text class="s" x="732" y="35">generated</text>
+
+  <!-- Row 1: upstream repositories -->
+  <text class="tag" x="24" y="70">UPSTREAM REPOSITORIES</text>
+  <rect class="up" x="24" y="80" width="404" height="100"/>
+  <text class="t" x="42" y="106">Specification repository</text>
+  <text class="m" x="42" y="128">contextwindowarchitecture/</text>
+  <text class="m" x="42" y="146">contextwindowarchitecture</text>
+  <text class="s" x="42" y="167">Where SPEC.md, the schemas and the cases are written</text>
+
+  <rect class="up" x="452" y="80" width="404" height="100"/>
+  <text class="t" x="470" y="106">Examples repository</text>
+  <text class="m" x="470" y="128">contextwindowarchitecture/examples</text>
+  <text class="s" x="470" y="167">Home of the 01-docs-qa help-center bot</text>
+
+  <!-- Vendoring: copy at a commit, pin it in a lock -->
+  <path class="wire" d="M226,180 V248" marker-end="url(#arrow)"/>
+  <rect class="pill" x="108" y="201" width="236" height="28" rx="14"/>
+  <text class="pt" x="226" y="219" text-anchor="middle">node scripts/vendor-spec.mjs</text>
+  <path class="wire" d="M654,180 V248" marker-end="url(#arrow)"/>
+  <rect class="pill" x="522" y="201" width="264" height="28" rx="14"/>
+  <text class="pt" x="654" y="219" text-anchor="middle">node scripts/vendor-examples.mjs</text>
+
+  <!-- Row 2: vendored copies -->
+  <text class="tag" x="24" y="244">THIS REPOSITORY</text>
+  <rect class="vend" x="24" y="250" width="404" height="110"/>
+  <text class="t" x="42" y="276">Vendored specification</text>
+  <text class="m" x="42" y="298">SPEC.md · CHANGES.md · schema/ · contract/</text>
+  <text class="m" x="42" y="316">conformance/ · examples/ · guides/</text>
+  <text class="m" x="42" y="334">implementations/</text>
+  <text class="s" x="42" y="352">Pinned by spec.lock.json</text>
+
+  <rect class="vend" x="452" y="250" width="404" height="110"/>
+  <text class="t" x="470" y="276">Vendored example</text>
+  <text class="m" x="470" y="298">vendor/examples/01-docs-qa/</text>
+  <text class="s" x="470" y="320">before.py, after.py, context.py, two scenarios</text>
+  <text class="s" x="470" y="352">Pinned by examples.lock.json</text>
+
+  <!-- A spec vendor also syncs the Spec page to the new SPEC.md -->
+  <path class="wire" d="M120,360 V428" marker-end="url(#arrow)"/>
+  <text class="lbl" x="130" y="392">spec-page.mjs --sync</text>
+  <text class="lbl" x="130" y="407">updates spec.html</text>
+
+  <!-- The build reads both vendored copies and the hand-written pages -->
+  <path class="wire" d="M330,360 V386 H560" marker-end="url(#arrow)"/>
+  <path class="wire" d="M380,430 V386"/>
+  <path class="wire" d="M654,360 V372"/>
+  <path class="wire" d="M654,400 V428" marker-end="url(#arrow)"/>
+  <rect class="pill" x="562" y="372" width="184" height="28" rx="14"/>
+  <text class="pt" x="654" y="390" text-anchor="middle">npm run build:contract</text>
+
+  <!-- Row 3: edited here, and written by the build -->
+  <rect class="own" x="24" y="430" width="404" height="120"/>
+  <text class="t" x="42" y="456">Written here</text>
+  <text class="m" x="42" y="478">index.html · spec.html</text>
+  <text class="m" x="42" y="496">evidence.html · assembler.html</text>
+  <text class="m" x="42" y="514">contract.js · site/ · llms.txt</text>
+  <text class="m" x="42" y="532">scripts/ · tests/ · STYLE.md</text>
+
+  <rect class="gen" x="452" y="430" width="404" height="140"/>
+  <text class="t" x="470" y="456">Generated</text>
+  <text class="m" x="470" y="478">generated/contract-data.js</text>
+  <text class="m" x="470" y="496">generated/schema-validators.js</text>
+  <text class="m" x="470" y="514">llms-producers.txt · llms-assemblers.txt</text>
+  <text class="m" x="470" y="532">llms-full.txt</text>
+  <text class="sf" x="470" y="556">and the marked blocks inside the four pages</text>
+
+  <!-- Row 4: the gate, then what a push and a tag start -->
+  <text class="tag" x="24" y="616">CHECKED, RELEASED, SERVED</text>
+  <rect class="gate" x="24" y="626" width="253" height="120"/>
+  <text class="t" x="42" y="652">npm test</text>
+  <text class="m" x="42" y="674">verify:spec · verify:examples</text>
+  <text class="m" x="42" y="692">check:generated</text>
+  <text class="m" x="42" y="710">node --test tests/</text>
+  <text class="s" x="42" y="734">Run before every commit</text>
+
+  <path class="wire" d="M277,686 H311" marker-end="url(#arrow)"/>
+  <text class="lbl" x="294" y="678" text-anchor="middle">push</text>
+
+  <rect class="gate" x="313" y="626" width="253" height="120"/>
+  <text class="t" x="331" y="652">CI · ci.yml</text>
+  <text class="s" x="331" y="674">npm test on Node 22 and 24</text>
+  <text class="s" x="331" y="694">Vendored files match their</text>
+  <text class="s" x="331" y="712">repositories at the locks</text>
+
+  <path class="wire" d="M566,686 H600" marker-end="url(#arrow)"/>
+  <text class="lbl" x="583" y="678" text-anchor="middle">tag</text>
+
+  <rect class="gate" x="602" y="626" width="254" height="120"/>
+  <text class="t" x="620" y="652">Release · release.yml</text>
+  <text class="s" x="620" y="674">Runs once CI passes on the tag</text>
+  <text class="s" x="620" y="694">Notes written by git-cliff</text>
+  <text class="s" x="620" y="714">draft-release is a prerelease</text>
+
+  <!-- Pages publishes main on push, independent of CI -->
+  <path class="wire" d="M150,746 V790" marker-end="url(#arrow)"/>
+  <text class="lbl" x="160" y="772">push to main</text>
+  <rect class="gate" x="24" y="792" width="832" height="64"/>
+  <text class="t" x="42" y="818">GitHub Pages · contextwindowarchitecture.io</text>
+  <text class="s" x="42" y="840">Serves the repository root of main as committed. Publishing does not wait for CI.</text>
+</svg>
